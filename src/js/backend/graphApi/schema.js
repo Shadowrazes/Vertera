@@ -1,9 +1,21 @@
 import { buildSchema } from 'graphql';
 
+
+//usersExt(page: Int!, pageSize: Int, sortBy: String): [User]
 const typeDefs = `
     type Query {
         user(id: Int!): User
         users: [User]
+        client(id: Int!): Client
+        clients: [Client]
+        helper(id: Int!): Helper
+        helpers: [Helper]
+        ticket(id: Int!): Ticket
+        tickets: [Ticket]
+        message(id: Int!): Message
+        messages: [Message]
+        attachment(id: Int!): Attachment
+        attachments: [Attachment]
     }
 
     type Mutation {

@@ -1,15 +1,25 @@
 import MySQL  from 'mysql2';
 
-const Connection = MySQL.createConnection({
-    host: '',
-    user: '',
-    password: '',
-    database: ''
-});
-  
-Connection.connect(err => {
-    if (err) throw error;
-    console.log("DB Connected");
+const Pool = MySQL.createPool({
+    connectionLimit: 5,
+    host: 'localhost',
+    user: 'root',
+    password: 'cdbyjhsk',
+    database: 'vertera'
 });
 
-export default DB;
+//const a = Pool.getConnection();
+
+// Pool.connect(err => {
+//     if (err){
+//         console.log('DB connection error')
+//     }
+//     console.log("DB Connected");
+// });
+
+// Pool.query('SELECT * FROM users', function(err, rows, fields) {
+//     if (err) throw err;
+//     console.log(fields);
+// });
+
+export default Pool;

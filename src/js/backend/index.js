@@ -7,8 +7,13 @@ import { body } from 'express-validator';
 import { schema } from './GraphApi/schema.js';
 import { resolvers } from './GraphApi/resolvers.js';
 
+import Pool from './DB/Connect.js';
+import UserEntity from './Entities/User.js';
+
 const app = Express();
 const port = '4444'
+
+UserEntity.pool = Pool;
 
 app.use(Express.json());
 
@@ -19,7 +24,7 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.get('/', (request, response) => {
-    response.send('Hello');
+    UserEntity.Get(1, response);
 });
 
 app.listen(port, (err) => {
@@ -29,3 +34,6 @@ app.listen(port, (err) => {
 
     console.log('Server started');
 });
+
+// const a = UserEntity.Get(1);
+// console.log(7);
