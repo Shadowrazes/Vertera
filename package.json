@@ -17,6 +17,7 @@
     "graphql": "^15.8.0",
     "graphql-import": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.6.2",
     "nodemon": "^3.0.1"
   }
 }
