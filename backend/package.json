@@ -17,7 +17,6 @@
     "express-validator": "^7.0.1",
     "graphql": "^15.8.0",
     "graphql-import": "^1.0.2",
-    "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.2",
     "nodemon": "^3.0.1"
