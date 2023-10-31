@@ -4,27 +4,24 @@ import JWT from 'jsonwebtoken';
 import { graphqlHTTP }  from 'express-graphql';
 import { body } from 'express-validator';
 
-import { schema } from './GraphApi/schema.js';
+import { typeDefs } from './GraphApi/schema.js';
 import { resolvers } from './GraphApi/resolvers.js';
-
-import Pool from './DB/Connect.js';
-import UserEntity from './Entities/User.js';
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
 const app = Express();
 const port = '4444'
 
-UserEntity.pool = Pool;
-
 app.use(Express.json());
 
+const schema = makeExecutableSchema({ typeDefs, resolvers })
 app.use('/graphql', graphqlHTTP({
     schema: schema,
-    rootValue: resolvers,
+    //rootValue: resolvers,
     graphiql: true 
 }));
 
 app.get('/', (request, response) => {
-    UserEntity.Get(1, response);
+
 });
 
 app.listen(port, (err) => {
@@ -34,6 +31,3 @@ app.listen(port, (err) => {
 
     console.log('Server started');
 });
-
-// const a = UserEntity.Get(1);
-// console.log(7);

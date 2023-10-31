@@ -1,8 +1,5 @@
-import { buildSchema } from 'graphql';
-
-
 //usersExt(page: Int!, pageSize: Int, sortBy: String): [User]
-const typeDefs = `
+export const typeDefs = `
     type Query {
         user(id: Int!): User
         users: [User]
@@ -40,7 +37,7 @@ const typeDefs = `
         id: Int!
         login: String!
         password: String!
-        user: User!
+        user: User
     }
 
     type Ticket {
@@ -71,5 +68,3 @@ const typeDefs = `
         name: String!
     }
 `;
-
-export const schema = buildSchema(typeDefs);
