@@ -16,7 +16,6 @@ app.use(Express.json());
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 app.use('/graphql', graphqlHTTP({
     schema: schema,
-    //rootValue: resolvers,
     graphiql: true 
 }));
 

@@ -1,13 +1,7 @@
-import Entity from "./Entity.js";
+class Entity{
+    static Pool;
 
-class UserEntity extends Entity{
-    static TableName = 'users';
-
-    static async Get(id) {
-        return await super.Get(id, this.TableName);
-    }
-
-    static async GetAll() {
+    static async Get(id, table) {
         try {
             const connection = await new Promise((resolve, reject) => {
                 this.Pool.getConnection((err, connection) => {
@@ -16,24 +10,25 @@ class UserEntity extends Entity{
             });
 
             const rows = await new Promise((resolve, reject) => {
-                connection.query(`SELECT * from ${this.TableName}`, (err, rows) => {
+                connection.query(`SELECT * from ${table} WHERE id = ?`, [id], (err, rows) => {
                     connection.release();
                     err ? reject(err) : resolve(rows);
                 });
             });
 
-            return rows;
+            return rows[0];
         } catch (err) {
             console.error(err);
             return { error: 'DB access error' };
         }
     }
 
+    static async GetAll() {
+        
+    }
+
     static async Insert(id, name, role, county) {
-        Pool.query(
-            'INSERT INTO posts SET ?',
-            { id, name, role, county }
-        );
+        
     }
 
     static async Update(id) {
@@ -43,9 +38,6 @@ class UserEntity extends Entity{
     static async Delete(id) {
 
     }
-
-    //  clear table
-    // Insert or Update
 }
 
-export default UserEntity;
+export default Entity;

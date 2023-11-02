@@ -21,3 +21,14 @@ CREATE TABLE IF NOT EXISTS helpers(
 )  ENGINE=INNODB;
 
 INSERT INTO users (id, name, role, country) VALUES (NULL, 'sanya', 'client', 'russia');
+
+CREATE TABLE IF NOT EXISTS tickets(
+    id INT AUTO_INCREMENT,
+    clientId INT NOT NULL,
+    helperId INT NOT NULL,
+    date VARCHAR(255) NOT NULL,
+    section VARCHAR(255) NOT NULL,
+    theme VARCHAR(255),
+    score INT,
+    PRIMARY KEY (id)
+)  ENGINE=INNODB;

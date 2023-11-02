@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class MessageEntity{
+class TranslationEntity{
     static async Get(id) {
         
     }
@@ -25,4 +25,4 @@ class MessageEntity{
     // Insert or Update
 }
 
-export default MessageEntity;
+export default TranslationEntity;

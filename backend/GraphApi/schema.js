@@ -1,18 +1,25 @@
-//usersExt(page: Int!, pageSize: Int, sortBy: String): [User]
+// tickets(unit: String, theme: String, subTheme: String, helperId: Int,
+//     helperCountries: [String], clientCountries: [String], date: String,
+//     reaction: String, words: [String], status: String, after: [String],
+//     userId: [String], limit: Int, offset: Int, orderBy: String, orderDir: String
+// ): [Ticket]
+
 export const typeDefs = `
+    scalar DateTime
+
     type Query {
         user(id: Int!): User
-        users: [User]
+        userList: [User]
         client(id: Int!): Client
-        clients: [Client]
+        clientList: [Client]
         helper(id: Int!): Helper
-        helpers: [Helper]
+        helperList: [Helper]
         ticket(id: Int!): Ticket
-        tickets: [Ticket]
+        ticketList(filters: TicketFilter!): [Ticket]
         message(id: Int!): Message
-        messages: [Message]
+        messageList: [Message]
         attachment(id: Int!): Attachment
-        attachments: [Attachment]
+        attachmentList: [Attachment]
     }
 
     type Mutation {
@@ -44,10 +51,28 @@ export const typeDefs = `
         id: Int!
         client: Client!
         helper: Helper!
-        date: String!
-        section: String!
-        theme: String
-        score: String
+        status: String!
+        date: DateTime!
+        unit: String!
+        theme: String!
+        subTheme: String
+        reaction: String
+    }
+
+    input TicketFilter{
+        unit: [String]
+        theme: [String]
+        subTheme: [String]
+        helperId: [String]
+        helperCountries: [String]
+        clientCountries: [String]
+        date: String
+        reaction: String
+        status: String
+        orderBy: String!
+        orderDir: String!
+        limit: Int!
+        offset: Int!
     }
 
     type Message {
@@ -59,7 +84,7 @@ export const typeDefs = `
         type: String!
         read: Boolean!
         text: String!
-        date: String!
+        date: DateTime!
     }
 
     type Attachment {
