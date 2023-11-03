@@ -3,9 +3,12 @@ import UserEntity from "./User.js";
 
 class HelperEntity extends Entity{
     static TableName = 'helpers';
+    static PrimaryField = 'id';
+    static LoginField = 'login';
+    static PasswordField = 'password';
 
     static async Get(id) {
-        const sql = `SELECT * from ${table} WHERE id = ?`;
+        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
         return result[0];
     }

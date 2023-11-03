@@ -3,6 +3,9 @@ import UserEntity from "./User.js";
 
 class ClientEntity extends Entity{
     static TableName = 'clients';
+    static PrimaryField = 'id';
+    static PhoneField = 'phone';
+    static EmailField = 'email';
 
     static async Get(id) {
         

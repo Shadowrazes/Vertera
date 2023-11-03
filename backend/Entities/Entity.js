@@ -25,18 +25,6 @@ class Entity{
         }
     }
 
-    static async Max(table, columnName) {
-        
-    }
-
-    static async Min(table, columnName) {
-        
-    }
-
-    static async Count(table, columnName, value) {
-        
-    }
-
     static async Insert(id, name, role, county) {
         
     }

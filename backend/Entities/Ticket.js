@@ -1,20 +1,41 @@
 import Entity from "./Entity.js";
+import MessageEntity from "./Message.js";
 
 class TicketEntity extends Entity{
     static TableName = 'tickets';
+    static PrimaryField = 'id';
+    static ClientIdField = 'clientId';
+    static HelperIdField = 'helpreId';
+    static StatusField = 'status';
+    static DateField = 'date';
+    static UnitField = 'unit';
+    static ThemeField = 'theme';
+    static SubThemeField = 'subTheme';
+    static ReactionField = 'reaction';
 
     static async Get(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE id = ?`;
+        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
     static async GetLastMsg(ticketId) {
-
+        const sql = `
+        SELECT * FROM ${MessageEntity.TableName} 
+        WHERE ${MessageEntity.TicketIdField} = ? 
+        ORDER BY ${MessageEntity.DateField} DESC LIMIT 1
+        `;
+        const result = await super.Request(sql, [ticketId]);   
+        return result[0];
     }
 
     static async GetMsgStats(ticketId) {
-
+        const sql = `
+        SELECT COUNT(*) AS total, COUNT(*) - SUM(CAST(${MessageEntity.ReadField} AS INT)) AS unread
+        FROM ${MessageEntity.TableName}  WHERE ${MessageEntity.TicketIdField} = ?;
+        `;
+        const result = await super.Request(sql, [ticketId]);   
+        return result[0];
     }
 
     static async GetList(filter) {
@@ -22,20 +43,20 @@ class TicketEntity extends Entity{
 
         if (filter.unit && filter.unit.length > 0) {
             const units = filter.unit.map(unit => `'${unit}'`).join(',');
-            sql += ` AND unit IN (${units})`;
-            sql += ` AND unit = '${filter.unit}'`;
+            sql += ` AND ${this.UnitField} IN (${units})`;
+            sql += ` AND ${this.UnitField} = '${filter.unit}'`;
         }
         if (filter.theme && filter.theme.length > 0) {
             const themes = filter.theme.map(theme => `'${theme}'`).join(',');
-            sql += ` AND theme IN (${themes})`;
+            sql += ` AND ${this.ThemeField} IN (${themes})`;
         }
         if (filter.subTheme && filter.subTheme.length > 0) {
             const subThemes = filter.subTheme.map(subTheme => `'${subTheme}'`).join(',');
-            sql += ` AND subTheme IN (${subThemes})`;
+            sql += ` AND ${this.SubThemeField} IN (${subThemes})`;
         }
         if (filter.helperName && filter.helperName.length > 0) {
             const helperNames = filter.helperName.map(helperName => `'${helperName}'`).join(',');
-            sql += ` AND helperName IN (${helperNames})`;
+            sql += ` AND ${this.HelperIdField} IN (${helperNames})`;
         }
         if (filter.helperCountries && filter.helperCountries.length > 0) {
             const helperCountries = filter.helperCountries.map(country => `'${country}'`).join(',');
@@ -46,13 +67,13 @@ class TicketEntity extends Entity{
             sql += ` AND clientCountries IN (${clientCountries})`;
         }
         if (filter.date) {
-            sql += ` AND date = '${filter.date}'`;
+            sql += ` AND ${this.DateField} = '${filter.date}'`;
         }
         if (filter.reaction) {
-            sql += ` AND reaction = '${filter.reaction}'`;
+            sql += ` AND ${this.ReactionField} = '${filter.reaction}'`;
         }
         if (filter.status) {
-            sql += ` AND status = '${filter.status}'`;
+            sql += ` AND ${this.StatusField} = '${filter.status}'`;
         }
   
         sql += ` ORDER BY ${filter.orderBy} ${filter.orderDir}`;

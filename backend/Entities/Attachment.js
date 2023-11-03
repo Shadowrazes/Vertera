@@ -1,6 +1,11 @@
 import Entity from "./Entity.js";
 
 class AttachmentEntity{
+    static TableName = 'attachments';
+    static PrimaryField = 'id';
+    static PathField = 'path';
+    static NameField = 'name';
+
     static async Get(id) {
         
     }
