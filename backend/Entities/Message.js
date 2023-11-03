@@ -1,6 +1,8 @@
 import Entity from "./Entity.js";
 
 class MessageEntity extends Entity{
+    static TableName = 'messages';
+
     static async Get(id) {
         
     }

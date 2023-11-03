@@ -5,7 +5,14 @@ query	{
     theme
     subTheme
     date
+    lastMessage{
+      id
+    }
   }
+}
+
+mutation{
+  addHelperUser(fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf")
 }
 
 CREATE TABLE IF NOT EXISTS users (

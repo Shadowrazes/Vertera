@@ -47,7 +47,12 @@ export const resolvers = {
         },
     },
     Ticket: {
-        
+        lastMessage: async (parent, args) => {
+            return await TicketEntity.GetLastMsg(parent.id);
+        },
+        msgStats: async (parent, args) => {
+            return await TicketEntity.GetMsgStats(parent.id);
+        },
     },
     Attachment: {
         

@@ -5,7 +5,9 @@ class HelperEntity extends Entity{
     static TableName = 'helpers';
 
     static async Get(id) {
-        return await super.Get(id, this.TableName);
+        const sql = `SELECT * from ${table} WHERE id = ?`;
+        const result = await super.Request(sql, [id]);
+        return result[0];
     }
 
     static async GetAll() {
@@ -14,26 +16,10 @@ class HelperEntity extends Entity{
 
     static async Insert(fullName, country, login, password) {
         const id = await UserEntity.Insert(fullName, 'helper', country);
-
-        try {
-            const connection = await new Promise((resolve, reject) => {
-                this.Pool.getConnection((err, connection) => {
-                    err ? reject(err) : resolve(connection);
-                });
-            });
-
-            const result = await new Promise((resolve, reject) => {
-                connection.query(`INSERT INTO ${this.TableName} SET ?`, {id, login, password}, (err, result) => {
-                    connection.release();
-                    err ? reject(err) : resolve(result);
-                });
-            });
-
-            return id;
-        } catch (err) {
-            console.error(err);
-            return { error: 'DB access error' };
-        }
+        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const fields = {id, login, password};
+        const result = await super.Request(sql, fields);
+        return id;
     }
 
     static async Update(id) {

@@ -1,7 +1,7 @@
 class Entity{
     static Pool;
 
-    static async Get(id, table) {
+    static async Request(sql, fields) {
         try {
             const connection = await new Promise((resolve, reject) => {
                 this.Pool.getConnection((err, connection) => {
@@ -9,34 +9,36 @@ class Entity{
                 });
             });
 
-            const rows = await new Promise((resolve, reject) => {
-                connection.query(`SELECT * from ${table} WHERE id = ?`, [id], (err, rows) => {
+            const result = await new Promise((resolve, reject) => {
+                connection.query(sql, fields, (err, result) => {
                     connection.release();
-                    err ? reject(err) : resolve(rows);
+                    err ? reject(err) : resolve(result);
                 });
             });
 
-            return rows[0];
+            return result;
         } catch (err) {
-            console.error(err);
+            console.log(err);
+            const e = new Error(`Error code ${err.code}`);
+            throw e;
             return { error: 'DB access error' };
         }
     }
 
-    static async GetAll() {
+    static async Max(table, columnName) {
+        
+    }
+
+    static async Min(table, columnName) {
+        
+    }
+
+    static async Count(table, columnName, value) {
         
     }
 
     static async Insert(id, name, role, county) {
         
-    }
-
-    static async Update(id) {
-
-    }
-
-    static async Delete(id) {
-
     }
 }
 

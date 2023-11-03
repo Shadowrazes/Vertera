@@ -58,9 +58,16 @@ export const typeDefs = `
         theme: String!
         subTheme: String
         reaction: String
+        lastMessage: Message!
+        msgStats: TicketMsgStats!
     }
 
-    input TicketFilter{
+    type TicketMsgStats {
+        total: Int!
+        unread: Int!
+    }
+
+    input TicketFilter {
         unit: [String]
         theme: [String]
         subTheme: [String]

@@ -4,24 +4,20 @@ class TicketEntity extends Entity{
     static TableName = 'tickets';
 
     static async Get(id) {
-        return await super.Get(id, this.TableName);
+        const sql = `SELECT * from ${this.TableName} WHERE id = ?`;
+        const result = await super.Request(sql, [id]);
+        return result[0];
+    }
+
+    static async GetLastMsg(ticketId) {
+
+    }
+
+    static async GetMsgStats(ticketId) {
+
     }
 
     static async GetList(filter) {
-        // unit: String
-        // theme: String
-        // subTheme: String
-        // helperName: String
-        // helperCountries: [String]
-        // clientCountries: [String]
-        // date: String
-        // reaction: String
-        // status: String
-        // orderBy: String!
-        // orderDir: String!
-        // limit: Int!
-        // offset: Int!
-
         let sql = 'SELECT * FROM tickets WHERE 1=1';
 
         if (filter.unit && filter.unit.length > 0) {
@@ -62,26 +58,7 @@ class TicketEntity extends Entity{
         sql += ` ORDER BY ${filter.orderBy} ${filter.orderDir}`;
         sql += ` LIMIT ${filter.limit} OFFSET ${filter.offset}`;
 
-        try {
-            const connection = await new Promise((resolve, reject) => {
-                this.Pool.getConnection((err, connection) => {
-                    err ? reject(err) : resolve(connection);
-                });
-            });
-
-            const rows = await new Promise((resolve, reject) => {
-                connection.query(sql, (err, rows) => {
-                    connection.release();
-                    err ? reject(err) : resolve(rows);
-                });
-            });
-
-            console.log(rows);
-            return rows;
-        } catch (err) {
-            console.error(err);
-            return { error: 'DB access error' };
-        }
+        return await super.Request(sql);
     }
 
     static async Insert(id, name, role, county) {
