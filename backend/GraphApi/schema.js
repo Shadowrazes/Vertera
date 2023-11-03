@@ -23,12 +23,13 @@ export const typeDefs = `
     }
 
     type Mutation {
-        addUser(id: String!, name: String!, role: String, country: String): Int!
+        addClientUser(fullName: String!, country: String, phone: String!, email: String): Int!
+        addHelperUser(fullName: String!, country: String, login: String!, password: String): Int!
     }
 
     type User {
         id: Int!
-        name: String!
+        fullName: String!
         role: String!
         country: String!
     }

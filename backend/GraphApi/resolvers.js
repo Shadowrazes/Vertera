@@ -28,7 +28,12 @@ export const resolvers = {
         },
     },
     Mutation: {
-        
+        addClientUser: async (_, { fullName, country, phone, email }) => {
+            return await ClientEntity.Insert(fullName, country, phone, email);
+        },
+        addHelperUser: async (_, { fullName, country, login, password }) => {
+            return await HelperEntity.Insert(fullName, country, login, password);
+        },
     },
     User: {
         

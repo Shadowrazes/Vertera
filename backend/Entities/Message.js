@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class MessageEntity{
+class MessageEntity extends Entity{
     static async Get(id) {
         
     }

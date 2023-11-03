@@ -1,10 +1,25 @@
+query	{
+  ticketList(filters: {limit: 9999, offset: 0, orderBy: "date", orderDir: "ASC"}){
+    id
+    unit
+    theme
+    subTheme
+    date
+  }
+}
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
+    fullName VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
+
+INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'sanya', 'client', 'russia');
+INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'misha', 'helper', 'africa');
+INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'lesha', 'helper', 'poland');
+INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'kostya', 'client', 'china');
 
 CREATE TABLE IF NOT EXISTS clients(
     id INT NOT NULL,
@@ -12,6 +27,9 @@ CREATE TABLE IF NOT EXISTS clients(
     email VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
+
+INSERT INTO clients (id, phone, email) VALUES (1, '79999999999', 'test@test.ru');
+INSERT INTO clients (id, phone, email) VALUES (4, '71111111111', 'vertera@vertera.ru');
 
 CREATE TABLE IF NOT EXISTS helpers(
     id INT NOT NULL,
@@ -26,9 +44,31 @@ CREATE TABLE IF NOT EXISTS tickets(
     id INT AUTO_INCREMENT,
     clientId INT NOT NULL,
     helperId INT NOT NULL,
-    date VARCHAR(255) NOT NULL,
-    section VARCHAR(255) NOT NULL,
-    theme VARCHAR(255),
-    score INT,
+    status VARCHAR(255) NOT NULL,
+    date DATETIME NOT NULL,
+    unit VARCHAR(255) NOT NULL,
+    theme VARCHAR(255) NOT NULL,
+    subTheme VARCHAR(255),
+    reaction VARCHAR(255),
+    PRIMARY KEY (id)
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS messages(
+    id INT AUTO_INCREMENT,
+    senderId INT NOT NULL,
+    recieverId INT NOT NULL,
+    attachmentId INT,
+    ticketId INT NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    read BOOL NOT NULL,
+    text VARCHAR(255),
+    date DATETIME NOT NULL,
+    PRIMARY KEY (id)
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS attachments(
+    id INT AUTO_INCREMENT,
+    path VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
