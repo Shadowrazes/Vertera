@@ -1,9 +1,3 @@
-// tickets(unit: String, theme: String, subTheme: String, helperId: Int,
-//     helperCountries: [String], clientCountries: [String], date: String,
-//     reaction: String, words: [String], status: String, after: [String],
-//     userId: [String], limit: Int, offset: Int, orderBy: String, orderDir: String
-// ): [Ticket]
-
 export const typeDefs = `
     scalar DateTime
 
@@ -25,6 +19,8 @@ export const typeDefs = `
     type Mutation {
         addClientUser(fields: ClientInsert!): Int!
         addHelperUser(fields: HelperInsert!): Int!
+        addTicket(fields: TicketInsert!): Int!
+        addMessage(fields: MessageInsert!): Int!
     }
 
     type User {
@@ -115,5 +111,21 @@ export const typeDefs = `
         country: String
         login: String!
         password: String
+    }
+
+    input TicketInsert {
+        clientId: Int!
+        unit: String!
+        theme: String!
+        subTheme: String
+    }
+
+    input MessageInsert {
+        senderId: Int!
+        recieverId: Int!
+        ticketId: Int!
+        text: String!
+        attachPath: String
+        attachName: String
     }
 `;

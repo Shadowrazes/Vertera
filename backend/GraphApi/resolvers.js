@@ -40,6 +40,12 @@ export const resolvers = {
         addHelperUser: async (_, { fullName, country, login, password }) => {
             return await HelperEntity.Insert(fullName, country, login, password);
         },
+        addTicket: async (_, fields) => {
+            return await TicketEntity.Insert(fields);
+        },
+        addMessage: async (_, fields) => {
+            return await MessageEntity.Insert(fields);
+        },
     },
     User: {
         
