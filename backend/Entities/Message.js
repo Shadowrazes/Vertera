@@ -8,7 +8,7 @@ class MessageEntity extends Entity{
     static AttachmentIdField = 'attachmentId';
     static TicketIdField = 'ticketId';
     static TypeField = 'type';
-    static ReadField = 'read';
+    static ReadField = 'readed';
     static TextField = 'text';
     static DateField = 'date';
 

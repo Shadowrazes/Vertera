@@ -78,7 +78,8 @@ export const typeDefs = `
         clientCountries: [String]
         date: String
         reaction: String
-        status: String
+        status: [String]
+        replyed: Boolean
         orderBy: String!
         orderDir: String!
         limit: Int!
@@ -92,7 +93,7 @@ export const typeDefs = `
         attachment: Attachment
         ticket: Ticket!
         type: String!
-        read: Boolean!
+        readed: Boolean!
         text: String!
         date: DateTime!
     }

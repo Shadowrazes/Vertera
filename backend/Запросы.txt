@@ -1,12 +1,24 @@
 query	{
-  ticketList(filters: {limit: 9999, offset: 0, orderBy: "date", orderDir: "ASC"}){
+  ticketList(filters: {limit: 9999, offset: 0, orderBy: "lastMsgDate", orderDir: "ASC", clientCountries: ["russia", "china"]}){
     id
     unit
     theme
     subTheme
     date
     lastMessage{
+      date
+    }
+    helper{
       id
+      user{
+        country
+      }
+    }
+    client{
+      id
+      user{
+        country
+      }
     }
   }
 }
@@ -76,7 +88,7 @@ CREATE TABLE IF NOT EXISTS messages(
     attachmentId INT,
     ticketId INT NOT NULL,
     type VARCHAR(255) NOT NULL,
-    read BOOL NOT NULL,
+    readed BOOL NOT NULL,
     text VARCHAR(255),
     date DATETIME NOT NULL,
     PRIMARY KEY (id)
