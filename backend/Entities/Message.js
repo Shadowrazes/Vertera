@@ -20,7 +20,7 @@ class MessageEntity extends Entity{
         
     }
 
-    static async Insert(id, name, role, county) {
+    static async Insert(args) {
         
     }
 

@@ -19,10 +19,10 @@ class ClientEntity extends Entity{
         return result;
     }
 
-    static async Insert(fullName, country, phone, email) {
-        const id = await UserEntity.Insert(fullName, 'client', country);
+    static async Insert(args) {
+        const id = await UserEntity.Insert(args, 'client');
         const sql = `INSERT INTO ${this.TableName} SET ?`;
-        const fields = {id, phone, email};
+        const fields = {id, phone: args.phone, email: args.email};
         const result = await super.Request(sql, fields);
         return id;
     }

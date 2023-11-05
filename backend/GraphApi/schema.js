@@ -101,16 +101,16 @@ export const typeDefs = `
 
     input ClientInsert {
         fullName: String!
-        country: String
+        country: String!
         phone: String!
-        email: String
+        email: String!
     }
 
     input HelperInsert {
         fullName: String!
-        country: String
+        country: String!
         login: String!
-        password: String
+        password: String!
     }
 
     input TicketInsert {

@@ -19,10 +19,10 @@ class HelperEntity extends Entity{
         return result;
     }
 
-    static async Insert(fullName, country, login, password) {
-        const id = await UserEntity.Insert(fullName, 'helper', country);
+    static async Insert(args) {
+        const id = await UserEntity.Insert(args, 'helper');
         const sql = `INSERT INTO ${this.TableName} SET ?`;
-        const fields = {id, login, password};
+        const fields = {id, login: args.login, password: args.password};
         const result = await super.Request(sql, fields);
         return id;
     }

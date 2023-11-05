@@ -134,7 +134,7 @@ class TicketEntity extends Entity{
         return await super.Request(sql);
     }
 
-    static async Insert(id, name, role, county) {
+    static async Insert(args) {
         
     }
 

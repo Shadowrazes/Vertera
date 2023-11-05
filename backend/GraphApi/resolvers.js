@@ -34,17 +34,17 @@ export const resolvers = {
         },
     },
     Mutation: {
-        addClientUser: async (_, { fullName, country, phone, email }) => {
-            return await ClientEntity.Insert(fullName, country, phone, email);
+        addClientUser: async (_, args) => {
+            return await ClientEntity.Insert(args.fields);
         },
-        addHelperUser: async (_, { fullName, country, login, password }) => {
-            return await HelperEntity.Insert(fullName, country, login, password);
+        addHelperUser: async (_, args) => {
+            return await HelperEntity.Insert(args.fields);
         },
-        addTicket: async (_, fields) => {
-            return await TicketEntity.Insert(fields);
+        addTicket: async (_, args) => {
+            return await TicketEntity.Insert(args.fields);
         },
-        addMessage: async (_, fields) => {
-            return await MessageEntity.Insert(fields);
+        addMessage: async (_, args) => {
+            return await MessageEntity.Insert(args.fields);
         },
     },
     User: {
