@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
 
 class TranslationEntity extends Entity{
-    static async Get(id) {
+    static async GetById(id) {
         
     }
 

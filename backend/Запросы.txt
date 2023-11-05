@@ -15,6 +15,15 @@ mutation{
   addHelperUser(fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf")
 }
 
+SELECT tickets.id, tickets.clientId, tickets.helperId, users.country
+FROM tickets
+JOIN users ON tickets.clientId = users.id OR tickets.helperId = users.id
+
+SELECT tickets.id, tickets.clientId, tickets.helperId, users.country AS client_id, helps.country AS helper_id
+FROM tickets
+JOIN users ON tickets.clientId = users.id
+JOIN users AS helps ON tickets.helperId = helps.id
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT,
     fullName VARCHAR(255) NOT NULL,

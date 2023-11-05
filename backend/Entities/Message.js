@@ -12,7 +12,7 @@ class MessageEntity extends Entity{
     static TextField = 'text';
     static DateField = 'date';
 
-    static async Get(id) {
+    static async GetById(id) {
         
     }
 

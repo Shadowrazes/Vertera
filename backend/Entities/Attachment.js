@@ -6,7 +6,7 @@ class AttachmentEntity{
     static PathField = 'path';
     static NameField = 'name';
 
-    static async Get(id) {
+    static async GetById(id) {
         
     }
 

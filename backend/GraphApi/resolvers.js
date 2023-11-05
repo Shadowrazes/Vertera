@@ -15,13 +15,13 @@ Entity.Pool = Pool;
 export const resolvers = {
     Query:{
         user: async (_, { id }) => {
-            return await UserEntity.Get(id);
+            return await UserEntity.GetById(id);
         },
         userList: async (_, { id }) => {
             return await UserEntity.GetAll();
         },
         helper: async (_, { id }) => {
-            return await HelperEntity.Get(id);
+            return await HelperEntity.GetById(id);
         },
         ticketList: async (_, args) => {
             return await TicketEntity.GetList(args.filters);
@@ -39,14 +39,22 @@ export const resolvers = {
         
     },
     Client: {
-
+        user: async (parent, args) => {
+            return await UserEntity.GetById(parent.id);
+        },
     },
     Helper: {
         user: async (parent, args) => {
-            return await UserEntity.Get(parent.id);
+            return await UserEntity.GetById(parent.id);
         },
     },
     Ticket: {
+        client: async (parent, args) => {
+            return await ClientEntity.GetById(parent.clientId);
+        },
+        helper: async (parent, args) => {
+            return await HelperEntity.GetById(parent.helperId);
+        },
         lastMessage: async (parent, args) => {
             return await TicketEntity.GetLastMsg(parent.id);
         },

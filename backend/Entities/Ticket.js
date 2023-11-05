@@ -1,11 +1,12 @@
 import Entity from "./Entity.js";
 import MessageEntity from "./Message.js";
+import UserEntity from "./User.js";
 
 class TicketEntity extends Entity{
     static TableName = 'tickets';
     static PrimaryField = 'id';
     static ClientIdField = 'clientId';
-    static HelperIdField = 'helpreId';
+    static HelperIdField = 'helperId';
     static StatusField = 'status';
     static DateField = 'date';
     static UnitField = 'unit';
@@ -13,7 +14,7 @@ class TicketEntity extends Entity{
     static SubThemeField = 'subTheme';
     static ReactionField = 'reaction';
 
-    static async Get(id) {
+    static async GetById(id) {
         const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
         return result[0];
@@ -39,12 +40,34 @@ class TicketEntity extends Entity{
     }
 
     static async GetList(filter) {
-        let sql = 'SELECT * FROM tickets WHERE 1=1';
+        const usersClientAlias = 'clies';
+        const usersHelperAlias = 'helps';
+        const clientCountryAlias = 'clientCountry';
+        const helperCountryAlias = 'helperCountry';
+
+        let sql = `
+        SELECT  ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.ClientIdField}, 
+                ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusField}, 
+                ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
+                ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
+                ${this.TableName}.${this.ReactionField}, 
+                ${usersClientAlias}.${UserEntity.CountryField} AS ${clientCountryAlias},
+                ${usersHelperAlias}.${UserEntity.CountryField} AS ${helperCountryAlias} 
+
+        FROM    ${this.TableName} 
+
+        JOIN    ${UserEntity.TableName} AS ${usersClientAlias} 
+                ON ${this.TableName}.${this.ClientIdField} = ${usersClientAlias}.id
+
+        JOIN    ${UserEntity.TableName} AS ${usersHelperAlias} 
+                ON ${this.TableName}.${this.HelperIdField} = ${usersHelperAlias}.id
+
+        WHERE   1=1
+        `;
 
         if (filter.unit && filter.unit.length > 0) {
             const units = filter.unit.map(unit => `'${unit}'`).join(',');
             sql += ` AND ${this.UnitField} IN (${units})`;
-            sql += ` AND ${this.UnitField} = '${filter.unit}'`;
         }
         if (filter.theme && filter.theme.length > 0) {
             const themes = filter.theme.map(theme => `'${theme}'`).join(',');
@@ -60,11 +83,11 @@ class TicketEntity extends Entity{
         }
         if (filter.helperCountries && filter.helperCountries.length > 0) {
             const helperCountries = filter.helperCountries.map(country => `'${country}'`).join(',');
-            sql += ` AND helperCountries IN (${helperCountries})`;
+            sql += ` AND ${usersHelperAlias}.${UserEntity.CountryField} IN (${helperCountries})`;
         }
         if (filter.clientCountries && filter.clientCountries.length > 0) {
             const clientCountries = filter.clientCountries.map(country => `'${country}'`).join(',');
-            sql += ` AND clientCountries IN (${clientCountries})`;
+            sql += ` AND ${usersClientAlias}.${UserEntity.CountryField} IN (${clientCountries})`;
         }
         if (filter.date) {
             sql += ` AND ${this.DateField} = '${filter.date}'`;
@@ -99,19 +122,3 @@ class TicketEntity extends Entity{
 }
 
 export default TicketEntity;
-
-// let sql = `
-//             SELECT * FROM ${this.TableName} WHERE 1=1
-//             ${filter.date ? ` AND date = '${filter.date}'` : ``}
-//             ${filter.unit ? ` AND unit = '${filter.unit}'` : ``}
-//             ${filter.theme ? ` AND theme = '${filter.theme}'` : ``}
-//             ${filter.status ? ` AND status = '${filter.status}'` : ``}
-//             ${filter.subTheme ? ` AND subTheme = '${filter.subTheme}'` : ``}
-//             ${filter.reaction ? ` AND reaction = '${filter.reaction}'` : ``}
-//             ${filter.helperName ? ` 
-//                 AND reaction = '${filter.helperName}'
-//                 ` : ``
-//             }
-//             ` + ` ORDER BY ${filter.orderBy} ${filter.orderDir}
-//             ` + ` LIMIT ${filter.limit} OFFSET ${filter.offset}
-//         `;

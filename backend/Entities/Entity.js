@@ -24,10 +24,6 @@ class Entity{
             return { error: 'DB access error' };
         }
     }
-
-    static async Insert(id, name, role, county) {
-        
-    }
 }
 
 export default Entity;
