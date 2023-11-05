@@ -23,8 +23,8 @@ export const typeDefs = `
     }
 
     type Mutation {
-        addClientUser(fullName: String!, country: String, phone: String!, email: String): Int!
-        addHelperUser(fullName: String!, country: String, login: String!, password: String): Int!
+        addClientUser(fields: ClientInsert!): Int!
+        addHelperUser(fields: HelperInsert!): Int!
     }
 
     type User {
@@ -68,6 +68,24 @@ export const typeDefs = `
         unread: Int!
     }
 
+    type Message {
+        id: Int!
+        sender: User!
+        reciever: User!
+        attachment: Attachment
+        ticket: Ticket!
+        type: String!
+        readed: Boolean!
+        text: String!
+        date: DateTime!
+    }
+
+    type Attachment {
+        id: Int!
+        path: String!
+        name: String!
+    }
+
     input TicketFilter {
         unit: [String]
         theme: [String]
@@ -85,21 +103,17 @@ export const typeDefs = `
         offset: Int!
     }
 
-    type Message {
-        id: Int!
-        sender: User!
-        reciever: User!
-        attachment: Attachment
-        ticket: Ticket!
-        type: String!
-        readed: Boolean!
-        text: String!
-        date: DateTime!
+    input ClientInsert {
+        fullName: String!
+        country: String
+        phone: String!
+        email: String
     }
 
-    type Attachment {
-        id: Int!
-        path: String!
-        name: String!
+    input HelperInsert {
+        fullName: String!
+        country: String
+        login: String!
+        password: String
     }
 `;

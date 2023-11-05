@@ -17,11 +17,14 @@ export const resolvers = {
         user: async (_, { id }) => {
             return await UserEntity.GetById(id);
         },
-        userList: async (_, { id }) => {
-            return await UserEntity.GetAll();
+        userList: async (_, args) => {
+            return await UserEntity.GetList();
         },
         helper: async (_, { id }) => {
             return await HelperEntity.GetById(id);
+        },
+        helperList: async (_, args) => {
+            return await UserEntity.GetList();
         },
         ticket: async (_, { id }) => {
             return await TicketEntity.GetById(id);

@@ -13,8 +13,10 @@ class ClientEntity extends Entity{
         return result[0];
     }
 
-    static async GetAll() {
-        
+    static async GetList() {
+        const sql = `SELECT * from ${this.TableName}`;
+        const result = await super.Request(sql);
+        return result;
     }
 
     static async Insert(fullName, country, phone, email) {
