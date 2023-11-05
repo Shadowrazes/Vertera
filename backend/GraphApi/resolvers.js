@@ -23,6 +23,9 @@ export const resolvers = {
         helper: async (_, { id }) => {
             return await HelperEntity.GetById(id);
         },
+        ticket: async (_, { id }) => {
+            return await TicketEntity.GetById(id);
+        },
         ticketList: async (_, args) => {
             return await TicketEntity.GetList(args.filters);
         },
@@ -55,11 +58,22 @@ export const resolvers = {
         helper: async (parent, args) => {
             return await HelperEntity.GetById(parent.helperId);
         },
+        messages: async (parent, args) => {
+            return await TicketEntity.GetMessages(parent.id);
+        },
         lastMessage: async (parent, args) => {
             return await TicketEntity.GetLastMsg(parent.id);
         },
         msgStats: async (parent, args) => {
             return await TicketEntity.GetMsgStats(parent.id);
+        },
+    },
+    Message: {
+        sender: async (parent, args) => {
+            return await UserEntity.GetById(parent.senderId);
+        },
+        reciever: async (parent, args) => {
+            return await UserEntity.GetById(parent.recieverId);
         },
     },
     Attachment: {

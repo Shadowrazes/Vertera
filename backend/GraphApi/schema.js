@@ -50,16 +50,15 @@ export const typeDefs = `
 
     type Ticket {
         id: Int!
-        clientId: Int!
-        helperId: Int!
+        client: Client!
+        helper: Helper!
         status: String!
         date: DateTime!
         unit: String!
         theme: String!
         subTheme: String
         reaction: String
-        client: Client!
-        helper: Helper!
+        messages: [Message]
         lastMessage: Message!
         msgStats: TicketMsgStats!
     }
