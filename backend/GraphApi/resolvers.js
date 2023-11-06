@@ -41,7 +41,7 @@ export const resolvers = {
             return await HelperEntity.Insert(args.fields);
         },
         addTicket: async (_, args) => {
-            return await TicketEntity.Insert(args.fields);
+            return await TicketEntity.Insert(args);
         },
         addMessage: async (_, args) => {
             return await MessageEntity.Insert(args.fields);

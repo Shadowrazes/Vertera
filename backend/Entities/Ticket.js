@@ -1,4 +1,5 @@
 import Entity from "./Entity.js";
+import HelperEntity from "./Helper.js";
 import MessageEntity from "./Message.js";
 import UserEntity from "./User.js";
 
@@ -135,7 +136,20 @@ class TicketEntity extends Entity{
     }
 
     static async Insert(args) {
+        const ticketFields = args.ticketFields;
+        const messageFields = args.messageFields;
+
+        const helperId = await HelperEntity.GetMostFreeHelper(ticketFields)
+        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unit: ticketFields.unit, 
+                        theme: ticketFields.theme, subTheme: ticketFields.subTheme, status: 'Новый'};
+        const result = await super.Request(sql, fields);
         
+        messageFields.recieverId = helperId;
+        messageFields.ticketId = result.insertId;
+        const messageResult = await MessageEntity.Insert(messageFields);
+
+        return result.insertId;
     }
 
     static async Update(id) {

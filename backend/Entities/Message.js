@@ -21,7 +21,12 @@ class MessageEntity extends Entity{
     }
 
     static async Insert(args) {
-        
+        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
+                        ticketId: args.ticketId, text: args.text, date: new Date(), };
+        const result = await super.Request(sql, fields);
+        // attach insert
+        return result.insertId;
     }
 
     static async Update(id) {

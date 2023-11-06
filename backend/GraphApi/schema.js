@@ -19,7 +19,7 @@ export const typeDefs = `
     type Mutation {
         addClientUser(fields: ClientInsert!): Int!
         addHelperUser(fields: HelperInsert!): Int!
-        addTicket(fields: TicketInsert!): Int!
+        addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
     }
 
@@ -124,6 +124,7 @@ export const typeDefs = `
         senderId: Int!
         recieverId: Int!
         ticketId: Int!
+        type: String!
         text: String!
         attachPath: String
         attachName: String

@@ -6,6 +6,10 @@ class HelperEntity extends Entity{
     static PrimaryField = 'id';
     static LoginField = 'login';
     static PasswordField = 'password';
+    static DepartmentField = 'department';
+    static JobTitleField = 'jobTitle';
+    static BirthdayField = 'birthday';
+    static StartWorkDateField = 'startWorkDate';
 
     static async GetById(id) {
         const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -17,6 +21,11 @@ class HelperEntity extends Entity{
         const sql = `SELECT * from ${this.TableName}`;
         const result = await super.Request(sql);
         return result;
+    }
+
+    static async GetMostFreeHelper(ticketArgs) {
+        // temp
+        return 2;
     }
 
     static async Insert(args) {
