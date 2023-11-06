@@ -27,46 +27,31 @@ mutation{
   addHelperUser(fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf")
 }
 
-SELECT tickets.id, tickets.clientId, tickets.helperId, users.country
-FROM tickets
-JOIN users ON tickets.clientId = users.id OR tickets.helperId = users.id
-
-SELECT tickets.id, tickets.clientId, tickets.helperId, users.country AS client_id, helps.country AS helper_id
-FROM tickets
-JOIN users ON tickets.clientId = users.id
-JOIN users AS helps ON tickets.helperId = helps.id
-
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT,
     fullName VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
+    phone VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
-
-INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'sanya', 'client', 'russia');
-INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'misha', 'helper', 'africa');
-INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'lesha', 'helper', 'poland');
-INSERT INTO users (id, fullName, role, country) VALUES (NULL, 'kostya', 'client', 'china');
 
 CREATE TABLE IF NOT EXISTS clients(
     id INT NOT NULL,
-    phone VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
-
-INSERT INTO clients (id, phone, email) VALUES (1, '79999999999', 'test@test.ru');
-INSERT INTO clients (id, phone, email) VALUES (4, '71111111111', 'vertera@vertera.ru');
 
 CREATE TABLE IF NOT EXISTS helpers(
     id INT NOT NULL,
     login VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    department VARCHAR(255) NOT NULL,
+    jobTitle VARCHAR(255) NOT NULL,
+    birthday VARCHAR(255) NOT NULL,
+    startWorkDate VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 )  ENGINE=INNODB;
-
-INSERT INTO users (id, name, role, country) VALUES (NULL, 'sanya', 'client', 'russia');
 
 CREATE TABLE IF NOT EXISTS tickets(
     id INT AUTO_INCREMENT,
