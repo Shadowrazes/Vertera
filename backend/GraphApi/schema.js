@@ -28,11 +28,11 @@ export const typeDefs = `
         fullName: String!
         role: String!
         country: String!
+        phone: String!
     }
 
     type Client {
         id: Int!
-        phone: String!
         email: String!
         user: User!
     }
@@ -41,7 +41,11 @@ export const typeDefs = `
         id: Int!
         login: String!
         password: String!
-        user: User
+        department: String!
+        jobTitle: String!
+        birthday: DateTime!
+        startWorkDate: DateTime!
+        user: User!
     }
 
     type Ticket {
@@ -108,9 +112,13 @@ export const typeDefs = `
 
     input HelperInsert {
         fullName: String!
+        phone: String!
         country: String!
         login: String!
         password: String!
+        department: String!
+        jobTitle: String!
+        birthday: DateTime!
     }
 
     input TicketInsert {

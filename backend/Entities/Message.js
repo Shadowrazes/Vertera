@@ -16,7 +16,7 @@ class MessageEntity extends Entity{
         
     }
 
-    static async GetList() {
+    static async GetListByTicket(ticketId) {
         
     }
 
