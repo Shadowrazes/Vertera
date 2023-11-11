@@ -24,13 +24,25 @@ export const resolvers = {
             return await HelperEntity.GetById(id);
         },
         helperList: async (_, args) => {
-            return await UserEntity.GetList();
+            return await HelperEntity.GetList();
+        },
+        client: async (_, { id }) => {
+            return await ClientEntity.GetById(id);
+        },
+        clientList: async (_, args) => {
+            return await ClientEntity.GetList();
         },
         ticket: async (_, { id }) => {
             return await TicketEntity.GetById(id);
         },
         ticketList: async (_, args) => {
             return await TicketEntity.GetList(args.filters);
+        },
+        message: async (_, { id }) => {
+            return await MessageEntity.GetById(id);
+        },
+        messageList: async (_, { ticketId }) => {
+            return await MessageEntity.GetListByTicket(ticketId);
         },
     },
     Mutation: {
@@ -68,7 +80,7 @@ export const resolvers = {
             return await HelperEntity.GetById(parent.helperId);
         },
         messages: async (parent, args) => {
-            return await TicketEntity.GetMessages(parent.id);
+            return await MessageEntity.GetListByTicket(parent.id);
         },
         lastMessage: async (parent, args) => {
             return await TicketEntity.GetLastMsg(parent.id);
@@ -83,6 +95,12 @@ export const resolvers = {
         },
         reciever: async (parent, args) => {
             return await UserEntity.GetById(parent.recieverId);
+        },
+        attachs: async (parent, args) => {
+            return await AttachmentEntity.GetListByMsg(parent.id);
+        },
+        ticket: async (parent, args) => {
+            return await TicketEntity.GetById(parent.ticketId);
         },
     },
     Attachment: {

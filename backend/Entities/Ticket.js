@@ -40,15 +40,6 @@ class TicketEntity extends Entity{
         return result[0];
     }
 
-    static async GetMessages(ticketId) {
-        const sql = `
-        SELECT * FROM ${MessageEntity.TableName} 
-        WHERE ${MessageEntity.TicketIdField} = ?;
-        `;
-        const result = await super.Request(sql, [ticketId]);   
-        return result;
-    }
-
     static async GetList(filter) {
         const usersClientAS = 'clies';
         const usersHelperAS = 'helps';

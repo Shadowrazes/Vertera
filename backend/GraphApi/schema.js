@@ -11,9 +11,9 @@ export const typeDefs = `
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): [Ticket]
         message(id: Int!): Message
-        messageList: [Message]
+        messageList(ticketId: Int!): [Message]
         attachment(id: Int!): Attachment
-        attachmentList: [Attachment]
+        attachmentList(messageId: Int!): [Attachment]
     }
 
     type Mutation {
@@ -72,12 +72,13 @@ export const typeDefs = `
         id: Int!
         sender: User!
         reciever: User!
-        attachment: Attachment
+        attachs: [Attachment]
         ticket: Ticket!
+        ticketId: Int!
         type: String!
-        readed: Boolean!
         text: String!
         date: DateTime!
+        readed: Boolean!
     }
 
     type Attachment {

@@ -23,6 +23,24 @@ query	{
   }
 }
 
+query {
+  message(id: 1){
+    id
+    text
+    type
+    sender{
+      fullName
+    }
+    reciever{
+      fullName
+    }
+    attachs{
+      name
+      path
+    }
+  }
+}
+
 mutation{
   addHelperUser(fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf")
 }

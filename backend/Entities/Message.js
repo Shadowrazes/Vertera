@@ -13,11 +13,15 @@ class MessageEntity extends Entity{
     static DateField = 'date';
 
     static async GetById(id) {
-        
+        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [id]);
+        return result[0];
     }
 
     static async GetListByTicket(ticketId) {
-        
+        const sql = `SELECT * from ${this.TableName} WHERE ${this.TicketIdField} = ?`;
+        const result = await super.Request(sql, [ticketId]);
+        return result;
     }
 
     static async Insert(args) {
