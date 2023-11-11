@@ -21,6 +21,10 @@ export const typeDefs = `
         addHelperUser(fields: HelperInsert!): Int!
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
+
+        updateTicket(id: Int!, fields: TicketUpdate!): UpdateInfo!
+
+        deleteTicket(id: Int): Int!
     }
 
     type User {
@@ -87,6 +91,12 @@ export const typeDefs = `
         name: String!
     }
 
+    type UpdateInfo {
+        affected: Int!
+        changed: Int!
+        warning: Int!
+    }
+
     input TicketFilter {
         unit: [String]
         theme: [String]
@@ -137,5 +147,14 @@ export const typeDefs = `
         text: String!
         attachPath: String
         attachName: String
+    }
+
+    input TicketUpdate {
+        helperId: Int
+        status: String
+        unit: String
+        theme: String
+        subTheme: String
+        reaction: String
     }
 `;

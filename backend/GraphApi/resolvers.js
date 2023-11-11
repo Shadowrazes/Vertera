@@ -58,6 +58,12 @@ export const resolvers = {
         addMessage: async (_, args) => {
             return await MessageEntity.Insert(args.fields);
         },
+        updateTicket: async (_, args) => {
+            return await TicketEntity.Update(args.id, args.fields);
+        },
+        deleteTicket: async (_, { id }) => {
+            return await TicketEntity.Delete(id);
+        },
     },
     User: {
         
