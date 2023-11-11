@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `attachments`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `attachments` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `messageId` int NOT NULL,
   `path` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
@@ -36,7 +37,7 @@ CREATE TABLE `attachments` (
 
 LOCK TABLES `attachments` WRITE;
 /*!40000 ALTER TABLE `attachments` DISABLE KEYS */;
-INSERT INTO `attachments` VALUES (1,'attachs/1/','ogreMage.jpg'),(2,'attachs/3/','pudge.png');
+INSERT INTO `attachments` VALUES (1,1,'attachs/1/','ogreMage.jpg'),(2,6,'attachs/3/','pudge.png');
 /*!40000 ALTER TABLE `attachments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,11 +105,10 @@ CREATE TABLE `messages` (
   `id` int NOT NULL AUTO_INCREMENT,
   `senderId` int NOT NULL,
   `recieverId` int NOT NULL,
-  `attachmentId` int DEFAULT NULL,
   `ticketId` int NOT NULL,
   `type` varchar(255) NOT NULL,
   `readed` tinyint(1) NOT NULL,
-  `text` varchar(255) DEFAULT NULL,
+  `text` varchar(255) NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -120,7 +120,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES (1,1,2,1,1,'common',1,'lorem','2021-10-20 23:00:00'),(2,2,1,NULL,1,'common',1,'ipsum','2021-10-20 23:05:00'),(3,4,3,NULL,2,'common',1,'ogre','2023-11-20 23:02:00'),(4,3,4,NULL,2,'common',1,'mage','2023-11-20 23:06:00'),(5,4,3,NULL,2,'common',0,'best','2023-11-20 23:09:00'),(6,1,3,2,3,'common',0,'best','2023-11-20 23:19:00'),(7,0,1,NULL,1,'reacton',1,'Оцените ответ','2021-10-20 23:07:00'),(8,0,4,NULL,2,'notification',1,'Вашим вопросом занимается Алексей','2023-11-20 23:19:00');
+INSERT INTO `messages` VALUES (1,1,2,1,'common',1,'lorem','2021-10-20 23:00:00'),(2,2,1,1,'common',1,'ipsum','2021-10-20 23:05:00'),(3,4,3,2,'common',1,'ogre','2023-11-20 23:02:00'),(4,3,4,2,'common',1,'mage','2023-11-20 23:06:00'),(5,4,3,2,'common',0,'best','2023-11-20 23:09:00'),(6,1,3,3,'common',0,'best','2023-11-20 23:19:00'),(7,0,1,1,'reacton',1,'Оцените ответ','2021-10-20 23:07:00'),(8,0,4,2,'notification',1,'Вашим вопросом занимается Алексей','2023-11-20 23:19:00');
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,7 +151,7 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 23:00:00','Партнерам/клиентам','Водоросли','Морской огурец','like',''),(2,4,3,'2023-11-20 23:05:00','Держателям офиса','Колёса',NULL,'dislike',''),(3,1,3,'2023-11-20 23:15:00','Держателям офиса','Камни',NULL,NULL,'Новый');
+INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 23:00:00','Партнерам/клиентам','Водоросли','Морской огурец','like','Закрыт'),(2,4,3,'2023-11-20 23:05:00','Держателям офиса','Колёса',NULL,'dislike','Закрыт'),(3,1,3,'2023-11-20 23:15:00','Держателям офиса','Камни',NULL,NULL,'Новый');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -167,9 +167,9 @@ CREATE TABLE `users` (
   `fullName` varchar(255) NOT NULL,
   `role` varchar(255) NOT NULL,
   `country` varchar(255) NOT NULL,
-  `phone` varchar(45) NOT NULL,
+  `phone` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -178,7 +178,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'sanya','client','russia','797866786'),(2,'misha','helper','africa','387654678645'),(3,'lesha','helper','poland','543345672132'),(4,'kostya','client','china','456575675');
+INSERT INTO `users` VALUES (0,'system','system','none',''),(1,'sanya','client','russia','797866786'),(2,'misha','helper','africa','387654678645'),(3,'lesha','helper','poland','543345672132'),(4,'kostya','client','china','456575675');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -191,4 +191,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-06 18:55:41
+-- Dump completed on 2023-11-11 20:13:38
