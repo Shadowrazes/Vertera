@@ -33,7 +33,7 @@ class HelperEntity extends Entity{
         const sql = `INSERT INTO ${this.TableName} SET ?`;
         const fields = {id, login: args.login, password: args.password, department: args.department,
                         jobTitle: args.jobTitle, birthday: args.birthday, startWorkDate: new Date()};
-        const result = await super.Request(sql, fields);
+        const result = await super.Request(sql, [fields]);
         return id;
     }
 

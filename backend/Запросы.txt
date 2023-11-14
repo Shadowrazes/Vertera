@@ -6,6 +6,10 @@ mutation{
   addTicket( ticketFields: {clientId: 1, unit: "test", theme: "tst"}, messageFields: {senderId: 1, recieverId: 2, ticketId: 1, type: "common", text: "test", attachPaths: ["test/a", "test/321"]})
 }
 
+mutation{
+  addHelperUser(fields: {fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf", phone: "79999999", department: "test", jobTitle: "водонос", birthday: "2000-11-05"})
+}
+
 query	{
   ticketList(filters: {limit: 9999, offset: 0, orderBy: "lastMsgDate", orderDir: "ASC", clientCountries: ["russia", "china"]}){
     id
@@ -47,8 +51,4 @@ query {
       path
     }
   }
-}
-
-mutation{
-  addHelperUser(fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf")
 }

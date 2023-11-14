@@ -23,7 +23,7 @@ class ClientEntity extends Entity{
         const id = await UserEntity.Insert(args, 'client');
         const sql = `INSERT INTO ${this.TableName} SET ?`;
         const fields = {id, email: args.email};
-        const result = await super.Request(sql, fields);
+        const result = await super.Request(sql, [fields]);
         return id;
     }
 
