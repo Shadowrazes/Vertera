@@ -116,16 +116,16 @@ export const resolvers = {
         name: 'DateTime',
         description: 'Дата и время в формате ISO 8601',
         serialize(value) {
-          return value.toISOString(); // преобразуем дату в строку в формате ISO 8601
+            return value.toISOString().split('.')[0]; // преобразуем дату в строку в формате ISO 8601
         },
         parseValue(value) {
-          return new Date(value); // преобразуем строку в формате ISO 8601 в объект Date
+            return new Date(value); // преобразуем строку в формате ISO 8601 в объект Date
         },
         parseLiteral(ast) {
-          if (ast.kind === Kind.STRING) {
-            return new Date(ast.value); // преобразуем строковое значение в формате ISO 8601 в объект Date
-          }
-          return null;
+            if (ast.kind === Kind.STRING) {
+                return new Date(ast.value); // преобразуем строковое значение в формате ISO 8601 в объект Date
+            }
+            return null;
         },
     }),
 }

@@ -19,8 +19,15 @@ class AttachmentEntity extends Entity {
         return result;
     }
 
-    static async Insert(id, name, role, county) {
-        
+    static async Insert(messageId, attachs) {
+        let insertIds = [];
+        for(const path of attachs){
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const fields = {messageId, path};
+            const result = await super.Request(sql, fields);
+            insertIds.push(result.insertId);
+        }
+        console.log(insertIds);
     }
 
     static async Update(id) {

@@ -103,7 +103,7 @@ export const typeDefs = `
         helperId: [String]
         helperCountries: [String]
         clientCountries: [String]
-        date: String
+        date: DateTime
         reaction: String
         status: [String]
         replyed: Boolean
@@ -144,8 +144,7 @@ export const typeDefs = `
         ticketId: Int!
         type: String!
         text: String!
-        attachPath: String
-        attachName: String
+        attachPaths: [String]
     }
 
     input TicketUpdate {

@@ -9,7 +9,7 @@ class UserEntity extends Entity{
 
     static async GetById(id) {
         const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]);   
+        const result = await super.Request(sql, [id]); 
         return result[0];
     }
 

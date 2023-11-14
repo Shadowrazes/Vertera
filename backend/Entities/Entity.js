@@ -1,27 +1,65 @@
 class Entity{
     static Pool;
 
-    static async Request(sql, fields) {
-        try {
-            const connection = await new Promise((resolve, reject) => {
-                this.Pool.getConnection((err, connection) => {
-                    err ? reject(err) : resolve(connection);
-                });
-            });
-
-            const result = await new Promise((resolve, reject) => {
-                connection.query(sql, fields, (err, result) => {
-                    connection.release();
-                    err ? reject(err) : resolve(result);
-                });
-            });
-
-            return result;
-        } catch (err) {
+    static async GetConn() {
+        return await this.Pool.getConnection().catch(err => {
             console.log(err);
-            const e = new Error(`Error code ${err.code}`);
-            throw e;
-            return { error: 'DB access error' };
+            throw err;
+        });
+    }
+
+    static async Request(sql, fields) {
+        const conn = await this.Pool.getConnection().catch(err => {
+            console.log(err);
+            throw err;
+        });
+
+        return conn.query(sql, fields).then(res => {
+            console.log('fetched');
+            return res[0];
+        })
+        .catch(err =>{
+            console.log(err);
+            throw err;
+        })
+        .finally(() => {
+            conn.release();
+            console.log('released');
+        });
+    }
+
+    static async TransRequest(conn, sql, fields) {
+        return conn.query(sql, fields).then(res => {
+            console.log('fetched');
+            return res[0];
+        })
+        .catch(err =>{
+            console.log(err);
+            throw err;
+        });
+    }
+
+    static async Transaction(reqQueue) {
+        const conn = await this.Pool.getConnection().catch(err => {
+            console.log(err);
+            throw err;
+        });
+
+        try{
+            await conn.beginTransaction();
+            const result = await reqQueue(conn);
+            await conn.commit();
+            return result;
+        }
+        catch(err){
+            await conn.rollback();
+            console.log(err);
+            console.log('rollback');
+            throw err;
+        }
+        finally {
+            conn.release();
+            console.log('released');
         }
     }
 }

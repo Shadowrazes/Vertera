@@ -72,29 +72,30 @@ class TicketEntity extends Entity{
         WHERE   1=1
         `;
 
+        let fields = [];
         if (filter.unit && filter.unit.length > 0) {
-            const units = filter.unit.map(unit => `'${unit}'`).join(',');
-            sql += ` AND ${this.UnitField} IN (${units})`;
+            sql += ` AND ${this.UnitField} IN (?)`;
+            fields.push(filter.unit);
         }
         if (filter.theme && filter.theme.length > 0) {
-            const themes = filter.theme.map(theme => `'${theme}'`).join(',');
-            sql += ` AND ${this.ThemeField} IN (${themes})`;
+            sql += ` AND ${this.ThemeField} IN (?)`;
+            fields.push(filter.theme);
         }
         if (filter.subTheme && filter.subTheme.length > 0) {
-            const subThemes = filter.subTheme.map(subTheme => `'${subTheme}'`).join(',');
-            sql += ` AND ${this.SubThemeField} IN (${subThemes})`;
+            sql += ` AND ${this.SubThemeField} IN (?)`;
+            fields.push(filter.subTheme);
         }
         if (filter.helperName && filter.helperName.length > 0) {
-            const helperNames = filter.helperName.map(helperName => `'${helperName}'`).join(',');
-            sql += ` AND ${this.HelperIdField} IN (${helperNames})`;
+            sql += ` AND ${this.HelperIdField} IN (?)`;
+            fields.push(filter.helperName);
         }
         if (filter.helperCountries && filter.helperCountries.length > 0) {
-            const helperCountries = filter.helperCountries.map(country => `'${country}'`).join(',');
-            sql += ` AND ${usersHelperAS}.${UserEntity.CountryField} IN (${helperCountries})`;
+            sql += ` AND ${usersHelperAS}.${UserEntity.CountryField} IN (?)`;
+            fields.push(filter.helperCountries);
         }
         if (filter.clientCountries && filter.clientCountries.length > 0) {
-            const clientCountries = filter.clientCountries.map(country => `'${country}'`).join(',');
-            sql += ` AND ${usersClientAS}.${UserEntity.CountryField} IN (${clientCountries})`;
+            sql += ` AND ${usersClientAS}.${UserEntity.CountryField} IN (?)`;
+            fields.push(filter.clientCountries);
         }
         if (filter.replyed != undefined) {
             sql += ` 
@@ -109,21 +110,24 @@ class TicketEntity extends Entity{
             `;
         }
         if (filter.status && filter.status.length > 0) {
-            const statuses = filter.status.map(status => `'${status}'`).join(',');
-            sql += ` AND ${this.StatusField} IN (${statuses})`;
+            sql += ` AND ${this.StatusField} IN (?)`;
+            fields.push(filter.status);
         }
         if (filter.date) {
-            sql += ` AND ${this.DateField} = '${filter.date}'`;
+            sql += ` AND ${this.TableName}.${this.DateField} = ?`;
+            fields.push(filter.date);
         }
         if (filter.reaction) {
-            sql += ` AND ${this.ReactionField} = '${filter.reaction}'`;
+            sql += ` AND ${this.ReactionField} = ?`;
+            fields.push(filter.reaction);
         }
   
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
-        sql += ` ORDER BY ${filter.orderBy} ${filter.orderDir}`;
-        sql += ` LIMIT ${filter.limit} OFFSET ${filter.offset}`;
+        sql += ` ORDER BY ? ?`;
+        sql += ` LIMIT ? OFFSET ?`;
 
-        return await super.Request(sql);
+        fields.push(filter.orderBy, filter.orderDir, filter.limit, filter.offset);
+        return await super.Request(sql, fields);
     }
 
     static async Insert(args) {

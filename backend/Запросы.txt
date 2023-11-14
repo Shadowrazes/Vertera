@@ -1,3 +1,7 @@
+mutation{
+  addMessage(fields: {senderId: 1, recieverId: 2, ticketId: 1, type: "common", text: "test", attachPaths: ["test/a", "test/321"]})
+}
+
 query	{
   ticketList(filters: {limit: 9999, offset: 0, orderBy: "lastMsgDate", orderDir: "ASC", clientCountries: ["russia", "china"]}){
     id

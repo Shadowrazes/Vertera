@@ -5,7 +5,8 @@ const Pool = MySQL.createPool({
     host: 'localhost',
     user: 'root',
     password: 'cdbyjhsk',
-    database: 'vertera'
-});
+    database: 'vertera',
+    namedPlaceholders: true
+}).promise();
 
 export default Pool;
