@@ -9,10 +9,7 @@ class Entity{
     }
 
     static async Request(sql, fields) {
-        const conn = await this.Pool.getConnection().catch(err => {
-            console.log(err);
-            throw err;
-        });
+        const conn = await this.GetConn();
 
         return conn.query(sql, fields).then(res => {
             console.log('fetched');
@@ -32,10 +29,6 @@ class Entity{
         return conn.query(sql, fields).then(res => {
             console.log('fetched');
             return res[0];
-        })
-        .catch(err =>{
-            console.log(err);
-            throw err;
         });
     }
 

@@ -25,36 +25,38 @@ class MessageEntity extends Entity{
         return result;
     }
 
-    static async Insert(args) {
-        const res = await super.Transaction(async (conn) => {
+    static async Insert(args, conn) {
+        const transFunc = async (conn, args) => {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
-                            ticketId: args.ticketId, text: args.text, date: new Date() };
+                            ticketId: args.ticketId, text: args.text, date: new Date(), };
 
-            console.log(fields);
-            const result = await conn.execute(sql, fields).then(res => {
-                console.log('fetched');
-                return res[0];
-            });
-            console.log('1');
+            const result = await super.TransRequest(conn, sql, [fields]);
             if(args.attachPaths){
-                const messageId = result.insertId;
-                const attachs = args.attachPaths;
-                let insertIds = [];
-                for(const path of attachs){
-                    const sql = `INSERT INTO ${AttachmentEntity.TableName} SET ?`;
-                    const fields = {messageId, path};
-                    const attachResult = await conn.execute(sql, fields).then(res => {
-                        console.log('fetched');
-                        return res[0];
-                    });
-                    insertIds.push(attachResult.insertId);
-                }
-                console.log(insertIds);
+                const attachResult = await AttachmentEntity.TransInsert(conn, result.insertId, args.attachPaths);
             }
             return result.insertId;
-        });
-        return res;
+        };
+        if(!conn){
+            return await super.Transaction(async (conn) => {
+                return await transFunc(conn, args);
+            });
+        }
+        else{
+            return await transFunc(conn, args);
+        }
+    }
+
+    static async TransInsert(conn, args) {
+        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
+                        ticketId: args.ticketId, text: args.text, date: new Date(), };
+
+        const result = await super.TransRequest(conn, sql, [fields]);
+        if(args.attachPaths){
+            const attachResult = await AttachmentEntity.TransInsert(conn, result.insertId, args.attachPaths);
+        }
+        return result.insertId;
     }
 
     static async Update(id) {
