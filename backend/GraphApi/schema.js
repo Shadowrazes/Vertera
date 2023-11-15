@@ -23,8 +23,11 @@ export const typeDefs = `
         addMessage(fields: MessageInsert!): Int!
 
         updateTicket(id: Int!, fields: TicketUpdate!): UpdateInfo!
+        updateClientUser(id: Int!, fields: ClientUpdate!): UpdateInfo!
+        updateHelperUser(id: Int!, fields: HelperUpdate!): UpdateInfo!
 
         deleteTicket(id: Int): Int!
+        deleteUser(id: Int) : Int!
     }
 
     type User {
@@ -154,5 +157,22 @@ export const typeDefs = `
         theme: String
         subTheme: String
         reaction: String
+    }
+
+    input ClientUpdate {
+        fullName: String!
+        country: String!
+        phone: String!
+        email: String!
+    }
+
+    input HelperUpdate {
+        fullName: String!
+        country: String!
+        phone: String!
+        password: String!
+        department: String!
+        jobTitle: String!
+        birthday: DateTime!
     }
 `;

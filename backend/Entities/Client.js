@@ -29,16 +29,19 @@ class ClientEntity extends Entity{
         });
     }
 
-    static async Update(id) {
+    static async TransUpdate(id, fields) {
+        return await super.Transaction(async (conn) => {
+            const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
+            const clientFields = { email: fields.email };
+            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+            
+            const clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
+            const userResult = await UserEntity.TransUpdate(conn, id, userFields);
 
+            return {affected: clientResult.affectedRows, changed: clientResult.changedRows, 
+                    warning: clientResult.warningStatus};
+        });
     }
-
-    static async Delete(id) {
-
-    }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default ClientEntity;

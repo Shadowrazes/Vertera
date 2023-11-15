@@ -26,16 +26,18 @@ class UserEntity extends Entity{
         return result.insertId;
     }
 
-    static async Update(id) {
-
+    static async TransUpdate(conn, id, fields) {
+        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+        const result = await super.TransRequest(conn, sql, [fields, id]);
+        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
     }
 
-    static async Delete(id) {
-
+    // Cascade deleting User & (Client || Helper) 
+    static async DeleteCascade(id) {
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [id]);
+        return result.affectedRows;
     }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default UserEntity;

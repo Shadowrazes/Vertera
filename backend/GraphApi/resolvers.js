@@ -61,8 +61,17 @@ export const resolvers = {
         updateTicket: async (_, args) => {
             return await TicketEntity.Update(args.id, args.fields);
         },
+        updateClientUser: async (_, args) => {
+            return await ClientEntity.TransUpdate(args.id, args.fields);
+        },
+        updateHelperUser: async (_, args) => {
+            return await HelperEntity.TransUpdate(args.id, args.fields);
+        },
         deleteTicket: async (_, { id }) => {
-            return await TicketEntity.Delete(id);
+            return await TicketEntity.DeleteCascade(id);
+        },
+        deleteUser: async (_, { id }) => {
+            return await UserEntity.DeleteCascade(id);
         },
     },
     User: {

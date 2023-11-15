@@ -39,16 +39,20 @@ class HelperEntity extends Entity{
         });
     }
 
-    static async Update(id) {
+    static async TransUpdate(id, fields) {
+        return await super.Transaction(async (conn) => {
+            const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
+            const helperFields = {  password: fields.password, department: fields.department,
+                                    jobTitle: fields.jobTitle, birthday: fields.birthday };
+            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+            
+            const helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
+            const userResult = await UserEntity.TransUpdate(conn, id, userFields);
 
+            return {affected: helperResult.affectedRows, changed: helperResult.changedRows, 
+                    warning: helperResult.warningStatus};
+        });
     }
-
-    static async Delete(id) {
-
-    }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default HelperEntity;

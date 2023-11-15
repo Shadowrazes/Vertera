@@ -155,10 +155,10 @@ class TicketEntity extends Entity{
         return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
     }
 
-    static async Delete(id) {
+    // Cascade deleting Ticket & Ticket Messages & Messages attachs
+    static async DeleteCascade(id) {
         const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
-        console.log(result);
         return result.affectedRows;
     }
 }

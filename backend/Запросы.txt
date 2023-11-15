@@ -7,7 +7,23 @@ mutation{
 }
 
 mutation{
-  addHelperUser(fields: {fullName: "hyt", country: "dfgdf", login: "sdfsdf", password: "sdfgdf", phone: "79999999", department: "test", jobTitle: "водонос", birthday: "2000-11-05"})
+  addHelperUser(fields: {fullName: "test testich", country: "russia", login: "abchihba", password: "svinota", phone: "79999999", department: "test", jobTitle: "водонос", birthday: "2000-11-05"})
+}
+
+mutation{
+  addClientUser(fields: {fullName: "test testich", country: "russia", phone: "79999999", email: "test@mail.ru"})
+}
+
+mutation{
+  updateHelperUser(id: 35,  fields: {fullName: "tested", country: "africa", password: "sasd", phone: "78888", department: "aga", jobTitle: "кабанчик", birthday: "2022-11-05"}){
+    affected
+  }
+}
+
+mutation{
+  updateClientUser(id: 36,  fields: {fullName: "tested", country: "africa", phone: "78888", email: "asda@test.ru"}){
+    affected
+  }
 }
 
 query	{
