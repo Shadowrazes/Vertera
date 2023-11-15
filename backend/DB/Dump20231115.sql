@@ -26,9 +26,10 @@ CREATE TABLE `attachments` (
   `id` int NOT NULL AUTO_INCREMENT,
   `messageId` int NOT NULL,
   `path` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`),
+  KEY `AttachToMsgFK_idx` (`messageId`),
+  CONSTRAINT `AttachToMsgFK` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +38,7 @@ CREATE TABLE `attachments` (
 
 LOCK TABLES `attachments` WRITE;
 /*!40000 ALTER TABLE `attachments` DISABLE KEYS */;
-INSERT INTO `attachments` VALUES (1,1,'attachs/1/','ogreMage.jpg'),(2,6,'attachs/3/','pudge.png');
+INSERT INTO `attachments` VALUES (1,1,'/files/1/a9348906971dfbcf2835f44359476277.png'),(2,6,'/files/3/67acaccb9df2de102d68196b4a0eef9c.jpg');
 /*!40000 ALTER TABLE `attachments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -51,7 +52,8 @@ DROP TABLE IF EXISTS `clients`;
 CREATE TABLE `clients` (
   `id` int NOT NULL,
   `email` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT `ClientToUserFK` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -80,7 +82,9 @@ CREATE TABLE `helpers` (
   `jobTitle` varchar(255) NOT NULL,
   `startWorkDate` date DEFAULT NULL,
   `birthday` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `login_UNIQUE` (`login`),
+  CONSTRAINT `HelperToUserFK` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -110,8 +114,10 @@ CREATE TABLE `messages` (
   `readed` tinyint(1) NOT NULL,
   `text` varchar(255) NOT NULL,
   `date` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`),
+  KEY `MsgToTicketFK_idx` (`ticketId`),
+  CONSTRAINT `MsgToTicketFK` FOREIGN KEY (`ticketId`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -142,7 +148,7 @@ CREATE TABLE `tickets` (
   `reaction` varchar(255) DEFAULT NULL,
   `status` varchar(225) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,8 +157,32 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 23:00:00','Партнерам/клиентам','Водоросли','Морской огурец','like','Закрыт'),(2,4,3,'2023-11-20 23:05:00','Держателям офиса','Колёса',NULL,'dislike','Закрыт'),(3,1,3,'2023-11-20 23:15:00','Держателям офиса','Камни',NULL,NULL,'Новый');
+INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 00:00:00','Партнерам/клиентам','Водоросли','Морской огурец','like','Закрыт'),(2,4,3,'2023-11-20 00:00:00','Держателям офиса','Колёса',NULL,'dislike','Закрыт'),(3,1,3,'2023-11-20 00:00:00','Держателям офиса','Камни',NULL,NULL,'Новый');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `translations`
+--
+
+DROP TABLE IF EXISTS `translations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `translations` (
+  `id` int NOT NULL,
+  `word` varchar(45) DEFAULT NULL,
+  `russian` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `translations`
+--
+
+LOCK TABLES `translations` WRITE;
+/*!40000 ALTER TABLE `translations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `translations` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -169,7 +199,7 @@ CREATE TABLE `users` (
   `country` varchar(255) NOT NULL,
   `phone` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -191,4 +221,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-11 20:13:38
+-- Dump completed on 2023-11-15 10:26:26

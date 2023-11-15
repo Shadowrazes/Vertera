@@ -4,7 +4,7 @@ class Entity{
     static async GetConn() {
         return await this.Pool.getConnection().catch(err => {
             console.log(err);
-            throw err;
+            throw err.code ? new Error(err.code) : 'DB Access error';
         });
     }
 
@@ -12,22 +12,22 @@ class Entity{
         const conn = await this.GetConn();
 
         return conn.query(sql, fields).then(res => {
-            console.log('fetched');
+            console.log('Request Completed');
             return res[0];
         })
         .catch(err =>{
             console.log(err);
-            throw err;
+            throw err.code ? new Error(err.code) : 'DB Access error';
         })
         .finally(() => {
             conn.release();
-            console.log('released');
+            console.log('Conn Released');
         });
     }
 
     static async TransRequest(conn, sql, fields) {
         return conn.query(sql, fields).then(res => {
-            console.log('fetched');
+            console.log('Trans Request Completed');
             return res[0];
         });
     }
@@ -35,24 +35,25 @@ class Entity{
     static async Transaction(reqQueue) {
         const conn = await this.Pool.getConnection().catch(err => {
             console.log(err);
-            throw err;
+            throw err.code ? new Error(err.code) : 'DB Access error';
         });
 
         try{
             await conn.beginTransaction();
             const result = await reqQueue(conn);
             await conn.commit();
+            console.log('Conn Commit');
             return result;
         }
         catch(err){
             await conn.rollback();
             console.log(err);
-            console.log('rollback');
-            throw err;
+            console.log('Conn Rollback');
+            throw err.code ? new Error(err.code) : 'DB Access error';
         }
         finally {
             conn.release();
-            console.log('released');
+            console.log('Conn Released');
         }
     }
 }

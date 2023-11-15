@@ -19,10 +19,10 @@ class UserEntity extends Entity{
         return result;
     }
 
-    static async Insert(args, role) {
+    static async TransInsert(conn, args, role) {
         const sql = `INSERT INTO ${this.TableName} SET ?`;
         const fields = {fullName: args.fullName, role, country: args.country, phone: args.phone};
-        const result = await super.Request(sql, [fields]);
+        const result = await super.TransRequest(conn, sql, [fields]);
         return result.insertId;
     }
 

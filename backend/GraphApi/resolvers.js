@@ -47,16 +47,16 @@ export const resolvers = {
     },
     Mutation: {
         addClientUser: async (_, args) => {
-            return await ClientEntity.Insert(args.fields);
+            return await ClientEntity.TransInsert(args.fields);
         },
         addHelperUser: async (_, args) => {
-            return await HelperEntity.Insert(args.fields);
+            return await HelperEntity.TransInsert(args.fields);
         },
         addTicket: async (_, args) => {
-            return await TicketEntity.Insert(args);
+            return await TicketEntity.TransInsert(args);
         },
         addMessage: async (_, args) => {
-            return await MessageEntity.Insert(args.fields);
+            return await MessageEntity.TransInsert(args.fields);
         },
         updateTicket: async (_, args) => {
             return await TicketEntity.Update(args.id, args.fields);

@@ -25,7 +25,7 @@ class MessageEntity extends Entity{
         return result;
     }
 
-    static async Insert(args, conn) {
+    static async TransInsert(args, conn) {
         const transFunc = async (conn, args) => {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
@@ -45,18 +45,6 @@ class MessageEntity extends Entity{
         else{
             return await transFunc(conn, args);
         }
-    }
-
-    static async TransInsert(conn, args) {
-        const sql = `INSERT INTO ${this.TableName} SET ?`;
-        const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
-                        ticketId: args.ticketId, text: args.text, date: new Date(), };
-
-        const result = await super.TransRequest(conn, sql, [fields]);
-        if(args.attachPaths){
-            const attachResult = await AttachmentEntity.TransInsert(conn, result.insertId, args.attachPaths);
-        }
-        return result.insertId;
     }
 
     static async Update(id) {

@@ -5,7 +5,6 @@ class AttachmentEntity extends Entity {
     static PrimaryField = 'id';
     static MessageIdField = 'messageId'
     static PathField = 'path';
-    static NameField = 'name';
 
     static async GetById(id) {
         const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -31,16 +30,13 @@ class AttachmentEntity extends Entity {
         return insertIds;
     }
 
-    static async Update(id) {
+    static async Update(id, fields) {
 
     }
 
     static async Delete(id) {
 
     }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default AttachmentEntity;

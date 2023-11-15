@@ -130,7 +130,7 @@ class TicketEntity extends Entity{
         return await super.Request(sql, fields);
     }
 
-    static async Insert(args) {
+    static async TransInsert(args) {
         return await super.Transaction(async (conn) => {
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
@@ -143,7 +143,7 @@ class TicketEntity extends Entity{
             
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
-            const messageResult = await MessageEntity.Insert(messageFields, conn);
+            const messageResult = await MessageEntity.TransInsert(messageFields, conn);
             console.log(messageResult);
             return result.insertId;
         });
