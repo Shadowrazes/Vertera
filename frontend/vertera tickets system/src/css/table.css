@@ -1,0 +1,45 @@
+.table__sorts {
+    display: flex;
+    gap: 20px;
+}
+
+.table__sorts-label {
+    font-size: 17px;
+    color: #787878;
+}
+
+.table__sort {
+    font-size: 17px;
+    color: black;
+    cursor: pointer;
+}
+
+.table__sort-active {
+    color: #00AB97;
+}
+
+.table__table {
+    border: 1px solid #DEE2E6;
+}
+
+.table__table th {
+    text-align: center;
+    padding: 45px 25px 15px 25px !important;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.table__table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 5px 25px 5px 25px !important;
+    font-size: 17px;
+}
+
+.table__status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    padding: 10px; 
+}
