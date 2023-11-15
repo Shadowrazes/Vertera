@@ -12,7 +12,7 @@ import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import _ from 'lodash'
-import { FilelUpload } from './RouteFuncs/FileUpload.js';
+import { FilelUpload } from './Utils/FileUpload.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
