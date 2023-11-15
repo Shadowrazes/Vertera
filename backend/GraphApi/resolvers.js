@@ -44,6 +44,12 @@ export const resolvers = {
         messageList: async (_, { ticketId }) => {
             return await MessageEntity.GetListByTicket(ticketId);
         },
+        attachment: async (_, { id }) => {
+            return await AttachmentEntity.GetById(id);
+        },
+        attachmentList: async (_, { messageId }) => {
+            return await AttachmentEntity.GetListByMsg(messageId);
+        },
     },
     Mutation: {
         addClientUser: async (_, args) => {
@@ -73,9 +79,6 @@ export const resolvers = {
         deleteUser: async (_, { id }) => {
             return await UserEntity.DeleteCascade(id);
         },
-    },
-    User: {
-        
     },
     Client: {
         user: async (parent, args) => {
@@ -117,9 +120,6 @@ export const resolvers = {
         ticket: async (parent, args) => {
             return await TicketEntity.GetById(parent.ticketId);
         },
-    },
-    Attachment: {
-        
     },
     DateTime: new GraphQLScalarType({
         name: 'DateTime',

@@ -29,14 +29,6 @@ class AttachmentEntity extends Entity {
         console.log(insertIds);
         return insertIds;
     }
-
-    static async Update(id, fields) {
-
-    }
-
-    static async Delete(id) {
-
-    }
 }
 
 export default AttachmentEntity;
