@@ -1,8 +1,6 @@
 import Express from 'express';
-import JWT from 'jsonwebtoken';
 
 import { graphqlHTTP }  from 'express-graphql';
-import { body } from 'express-validator';
 
 import { typeDefs } from './GraphApi/schema.js';
 import { resolvers } from './GraphApi/resolvers.js';
