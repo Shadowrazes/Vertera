@@ -6,7 +6,6 @@ class HelperEntity extends Entity{
     static PrimaryField = 'id';
     static LoginField = 'login';
     static PasswordField = 'password';
-    static DepartmentField = 'department';
     static JobTitleField = 'jobTitle';
     static BirthdayField = 'birthday';
     static StartWorkDateField = 'startWorkDate';
@@ -32,8 +31,8 @@ class HelperEntity extends Entity{
         return await super.Transaction(async (conn) => {
             const id = await UserEntity.TransInsert(conn, args, 'helper');
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, login: args.login, password: args.password, department: args.department,
-                            jobTitle: args.jobTitle, birthday: args.birthday, startWorkDate: new Date()};
+            const fields = {id, login: args.login, password: args.password, jobTitle: args.jobTitle,
+                            birthday: args.birthday, startWorkDate: new Date()};
             const result = await super.TransRequest(conn, sql, [fields]);
             return id;
         });
@@ -42,8 +41,7 @@ class HelperEntity extends Entity{
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
             const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
-            const helperFields = {  password: fields.password, department: fields.department,
-                                    jobTitle: fields.jobTitle, birthday: fields.birthday };
+            const helperFields = {  password: fields.password, jobTitle: fields.jobTitle, birthday: fields.birthday };
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             
             const helperResult = await super.TransRequest(conn, sql, [helperFields, id]);

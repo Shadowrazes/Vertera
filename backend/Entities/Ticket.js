@@ -73,17 +73,17 @@ class TicketEntity extends Entity{
         `;
 
         let fields = [];
-        if (filter.unit && filter.unit.length > 0) {
+        if (filter.unitId && filter.unitId.length > 0) {
             sql += ` AND ${this.UnitField} IN (?)`;
-            fields.push(filter.unit);
+            fields.push(filter.unitId);
         }
-        if (filter.theme && filter.theme.length > 0) {
+        if (filter.themeId && filter.themeId.length > 0) {
             sql += ` AND ${this.ThemeField} IN (?)`;
-            fields.push(filter.theme);
+            fields.push(filter.themeId);
         }
-        if (filter.subTheme && filter.subTheme.length > 0) {
+        if (filter.subThemeId && filter.subThemeId.length > 0) {
             sql += ` AND ${this.SubThemeField} IN (?)`;
-            fields.push(filter.subTheme);
+            fields.push(filter.subThemeId);
         }
         if (filter.helperName && filter.helperName.length > 0) {
             sql += ` AND ${this.HelperIdField} IN (?)`;

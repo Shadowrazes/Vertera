@@ -48,9 +48,9 @@ export const typeDefs = `
         id: Int!
         login: String!
         password: String!
-        department: String!
         jobTitle: String!
         birthday: DateTime!
+        departments: [Department]!
         startWorkDate: DateTime!
         user: User!
     }
@@ -61,13 +61,35 @@ export const typeDefs = `
         helper: Helper!
         status: String!
         date: DateTime!
-        unit: String!
-        theme: String!
-        subTheme: String
+        subTheme: SubTheme!
         reaction: String
         messages: [Message]
         lastMessage: Message!
         msgStats: TicketMsgStats!
+    }
+
+    type Unit {
+        id: Int!
+        name: String!
+    }
+
+    type Theme {
+        id: Int!
+        name: String!
+        unit: Unit!
+    }
+
+    type SubTheme {
+        id: Int!
+        name: String!
+        theme: Theme!
+        departments: [Department]!
+    }
+
+    type Department {
+        id: Int!
+        name: String!
+        individual: Boolean!
     }
 
     type TicketMsgStats {
@@ -100,9 +122,9 @@ export const typeDefs = `
     }
 
     input TicketFilter {
-        unit: [String]
-        theme: [String]
-        subTheme: [String]
+        unitId: [Int]
+        themeId: [Int]
+        subThemeId: [Int]
         helperId: [String]
         helperCountries: [String]
         clientCountries: [String]
@@ -129,7 +151,6 @@ export const typeDefs = `
         country: String!
         login: String!
         password: String!
-        department: String!
         jobTitle: String!
         birthday: DateTime!
     }

@@ -8,6 +8,12 @@ import ClientEntity from "../Entities/Client.js";
 import TicketEntity from "../Entities/Ticket.js";
 import MessageEntity from "../Entities/Message.js";
 import AttachmentEntity from "../Entities/Attachment.js";
+import ThemeEntity from "../Entities/Theme.js";
+import SubThemeEntity from "../Entities/SubTheme.js";
+import UnitEntity from "../Entities/Unit.js"; 
+import DepartmentEntity from "../Entities/Department.js"; 
+import ThemeDepartmentEntity from "../Entities/ThemeDepartment.js";
+import HelperDepartmentEntity from "../Entities/HelperDepartment.js"; 
 import TranslationEntity from "../Entities/Translation.js";
 
 Entity.Pool = Pool;
@@ -27,21 +33,25 @@ export const resolvers = {
             return await HelperEntity.GetList();
         },
         client: async (_, { id }) => {
+            // user
             return await ClientEntity.GetById(id);
         },
         clientList: async (_, args) => {
             return await ClientEntity.GetList();
         },
         ticket: async (_, { id }) => {
+            // user
             return await TicketEntity.GetById(id);
         },
         ticketList: async (_, args) => {
+            // user
             return await TicketEntity.GetList(args.filters);
         },
         message: async (_, { id }) => {
             return await MessageEntity.GetById(id);
         },
         messageList: async (_, { ticketId }) => {
+            // user
             return await MessageEntity.GetListByTicket(ticketId);
         },
         attachment: async (_, { id }) => {
@@ -53,21 +63,27 @@ export const resolvers = {
     },
     Mutation: {
         addClientUser: async (_, args) => {
+            // user
             return await ClientEntity.TransInsert(args.fields);
         },
         addHelperUser: async (_, args) => {
+            // superAdmin
             return await HelperEntity.TransInsert(args.fields);
         },
         addTicket: async (_, args) => {
+            // user
             return await TicketEntity.TransInsert(args);
         },
         addMessage: async (_, args) => {
+            // user
             return await MessageEntity.TransInsert(args.fields);
         },
         updateTicket: async (_, args) => {
+            // user
             return await TicketEntity.Update(args.id, args.fields);
         },
         updateClientUser: async (_, args) => {
+            // user
             return await ClientEntity.TransUpdate(args.id, args.fields);
         },
         updateHelperUser: async (_, args) => {
@@ -89,6 +105,9 @@ export const resolvers = {
         user: async (parent, args) => {
             return await UserEntity.GetById(parent.id);
         },
+        departments: async (parent, args) => {
+            return await HelperDepartmentEntity.GetListByHelperId(parent.id);
+        },
     },
     Ticket: {
         client: async (parent, args) => {
@@ -106,6 +125,9 @@ export const resolvers = {
         msgStats: async (parent, args) => {
             return await TicketEntity.GetMsgStats(parent.id);
         },
+        subTheme: async (parent, args) => {
+            return await SubThemeEntity.GetById(parent.subThemeId);
+        },
     },
     Message: {
         sender: async (parent, args) => {
@@ -119,6 +141,19 @@ export const resolvers = {
         },
         ticket: async (parent, args) => {
             return await TicketEntity.GetById(parent.ticketId);
+        },
+    },
+    SubTheme: {
+        theme: async (parent, args) => {
+            return await ThemeEntity.GetById(parent.themeId);
+        },
+        departments: async (parent, args) => {
+            return await ThemeDepartmentEntity.GetListBySubThemeId(parent.id);
+        },
+    },
+    Theme: {
+        unit: async (parent, args) => {
+            return await UnitEntity.GetById(parent.unitId);
         },
     },
     DateTime: new GraphQLScalarType({
