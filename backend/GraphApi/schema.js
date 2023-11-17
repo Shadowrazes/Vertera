@@ -183,9 +183,9 @@ export const typeDefs = `
     input TicketUpdate {
         helperId: Int
         status: String
-        unit: String
-        theme: String
-        subTheme: String
+        unit: Int
+        theme: Int
+        subTheme: Int
         reaction: String
     }
 
@@ -201,7 +201,6 @@ export const typeDefs = `
         country: String!
         phone: String!
         password: String!
-        department: String!
         jobTitle: String!
         birthday: DateTime!
     }
