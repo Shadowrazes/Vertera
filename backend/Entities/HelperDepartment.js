@@ -24,6 +24,23 @@ class HelperDepartmentEntity extends Entity{
         const result = await super.Request(sql, [helperId]);
         return result;
     }
+
+    static async TransInsert(conn, helperId, departmentIds) {
+        let insertedIds = [];
+        for(const departmentId of departmentIds){
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const fields = {helperId, departmentId};
+            const result = await super.TransRequest(conn, sql, [fields]);
+            insertedIds.push(result.insertId);
+        }
+        return insertedIds;
+    }
+
+    static async TransDeleteByHelper(conn, id) {
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.HelperIdField} = ?`;
+        const result = await super.TransRequest(conn, sql, [id]);
+        return result.affectedRows;
+    }
 }
 
 export default HelperDepartmentEntity;

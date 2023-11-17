@@ -162,6 +162,7 @@ export const typeDefs = `
         password: String!
         jobTitle: String!
         birthday: DateTime!
+        departmentIds: [Int]!
     }
 
     input TicketInsert {
@@ -190,18 +191,19 @@ export const typeDefs = `
     }
 
     input ClientUpdate {
-        fullName: String!
-        country: String!
-        phone: String!
-        email: String!
+        fullName: String
+        country: String
+        phone: String
+        email: String
     }
 
     input HelperUpdate {
-        fullName: String!
-        country: String!
-        phone: String!
-        password: String!
-        jobTitle: String!
-        birthday: DateTime!
+        fullName: String
+        country: String
+        phone: String
+        password: String
+        jobTitle: String
+        birthday: DateTime
+        departmentIds: [Int]
     }
 `;
