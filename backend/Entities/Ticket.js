@@ -10,9 +10,9 @@ class TicketEntity extends Entity{
     static HelperIdField = 'helperId';
     static StatusField = 'status';
     static DateField = 'date';
-    static UnitField = 'unit';
-    static ThemeField = 'theme';
-    static SubThemeField = 'subTheme';
+    static UnitField = 'unitId';
+    static ThemeField = 'themeId';
+    static SubThemeField = 'subThemeId';
     static ReactionField = 'reaction';
 
     static async GetById(id) {

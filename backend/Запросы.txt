@@ -29,9 +29,15 @@ mutation{
 query	{
   ticketList(filters: {limit: 9999, offset: 0, orderBy: "lastMsgDate", orderDir: "ASC", clientCountries: ["russia", "china"]}){
     id
-    unit
-    theme
-    subTheme
+    subTheme{
+      name
+      theme{
+        name
+        unit{
+          name
+        }
+      }
+    }
     date
     lastMessage{
       date

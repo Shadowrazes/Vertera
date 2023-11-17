@@ -166,9 +166,9 @@ export const typeDefs = `
 
     input TicketInsert {
         clientId: Int!
-        unit: String!
-        theme: String!
-        subTheme: String
+        unitId: Int!
+        themeId: Int!
+        subThemeId: Int
     }
 
     input MessageInsert {
