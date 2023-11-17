@@ -1,0 +1,22 @@
+#dropdown-custom-1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    color: black;
+    font-size: 20px;
+    max-width: 566px;
+    width: 100%;
+    border-radius: 7px;
+    border: 1px solid #8C8C8C;
+}
+
+.dropdown-menu {
+    max-width: 566px;
+    width: 100%;
+}
+
+.dropdown-item {
+    width: inherit !important;
+    font-size: 18px !important;
+}

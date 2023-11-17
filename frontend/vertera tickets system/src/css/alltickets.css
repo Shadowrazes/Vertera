@@ -1,0 +1,27 @@
+.alltickets__container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 100px;
+    margin-bottom: 50px;
+}
+
+.alltickets__column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.alltickets__button-row {
+    flex-wrap: nowrap !important;
+    gap: 25px;
+    margin-top: 40px !important;
+    margin-bottom: 50px;
+    padding-left: 12px;
+}
+
+.alltickets__button-two {
+    width: 250px;
+    background: #FFF !important;
+    border: 1px solid #00AB97 !important;
+    color: #00AB97 !important;
+}

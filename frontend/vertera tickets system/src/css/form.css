@@ -1,0 +1,22 @@
+.form__column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+#TextareaForm {
+    width: 672px;
+    padding: 20px 13px;
+    resize: none;
+}
+
+#FileInputForm {
+    width: 672px;
+}
+
+#ButtonForm {
+    width: 672px;
+    background: #00AB97 !important;
+    border-radius: 5px;
+    border: none;
+}

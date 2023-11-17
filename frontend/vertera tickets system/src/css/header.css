@@ -1,0 +1,18 @@
+.header {
+    margin-top: 50px;
+}
+.header__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.header__btn-group {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+.header__exit {
+    font-size: 24px;
+    color: black;
+    text-decoration: none;
+}
