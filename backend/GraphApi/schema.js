@@ -4,16 +4,25 @@ export const typeDefs = `
     type Query {
         user(id: Int!): User
         userList: [User]
+
         client(id: Int!): Client
         clientList: [Client]
+
         helper(id: Int!): Helper
         helperList: [Helper]
+
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): [Ticket]
+
         message(id: Int!): Message
         messageList(ticketId: Int!): [Message]
+
         attachment(id: Int!): Attachment
         attachmentList(messageId: Int!): [Attachment]
+
+        subThemeList: [SubTheme]
+
+        departmentList: [Department]
     }
 
     type Mutation {

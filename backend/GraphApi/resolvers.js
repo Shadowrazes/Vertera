@@ -60,6 +60,12 @@ export const resolvers = {
         attachmentList: async (_, { messageId }) => {
             return await AttachmentEntity.GetListByMsg(messageId);
         },
+        subThemeList: async (_, args) => {
+            return await SubThemeEntity.GetList();
+        },
+        departmentList: async (_, args) => {
+            return await DepartmentEntity.GetList();
+        },
     },
     Mutation: {
         addClientUser: async (_, args) => {
