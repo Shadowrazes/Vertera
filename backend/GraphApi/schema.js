@@ -31,7 +31,7 @@ export const typeDefs = `
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
 
-        updateTicket(id: Int!, fields: TicketUpdate!): UpdateInfo!
+        updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, fields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, fields: HelperUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
@@ -194,9 +194,9 @@ export const typeDefs = `
     input TicketUpdate {
         helperId: Int
         status: String
-        unit: Int
-        theme: Int
-        subTheme: Int
+        unitId: Int
+        themeId: Int
+        subThemeId: Int
         reaction: String
     }
 

@@ -135,7 +135,7 @@ class TicketEntity extends Entity{
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
-            const helperId = await HelperEntity.GetMostFreeHelper(ticketFields.subThemeId)
+            const helperId = await HelperEntity.GetMostFreeHelper(ticketFields.subThemeId);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
                             themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, status: 'Новый'};
@@ -149,7 +149,11 @@ class TicketEntity extends Entity{
         });
     }
 
-    static async Update(id, fields) {
+    static async Update(id, fields, departmentId) {
+        if(!fields.helperId && departmentId) {
+            fields.helperId = await HelperEntity.GetMostFreeHelper(fields.subThemeId, departmentId);
+        }
+
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [fields, id]);
         return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};

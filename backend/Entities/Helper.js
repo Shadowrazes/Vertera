@@ -43,9 +43,21 @@ class HelperEntity extends Entity{
     // ) 
     // ORDER BY ticketCount
 
-    static async GetMostFreeHelper(subThemeId) {
+    static async GetMostFreeHelper(subThemeId, departmentId) {
+        const findingDepartmentIdSql = `
+            SELECT ${ThemeDepartmentEntity.DepartmentIdField} 
+            FROM ${ThemeDepartmentEntity.TableName} 
+            WHERE ${ThemeDepartmentEntity.SubThemeIdField} = ?
+        `;
+
         const ticketCountAS = 'ticketCount';
         const statusFilter = ['Закрыт'];
+        let fields = [statusFilter];
+
+        if(!departmentId){
+            fields.push(subThemeId)
+        }
+
         const sql = `
             SELECT 
                 ${this.TableName}.${this.PrimaryField}, 
@@ -62,22 +74,15 @@ class HelperEntity extends Entity{
                 FROM ${HelperDepartmentEntity.TableName} 
                 WHERE ${HelperDepartmentEntity.DepartmentIdField} 
                 IN (
-                    SELECT ${ThemeDepartmentEntity.DepartmentIdField} 
-                    FROM ${ThemeDepartmentEntity.TableName} 
-                    WHERE ${ThemeDepartmentEntity.SubThemeIdField} = ?
+                    ${departmentId ? departmentId : findingDepartmentIdSql}
                 ) 
                 GROUP BY ${HelperDepartmentEntity.HelperIdField}
             ) 
             ORDER BY ${ticketCountAS}
             LIMIT 1
         `;
-        const result = await super.Request(sql, [statusFilter, subThemeId]);
-        console.log(result)
+        const result = await super.Request(sql, fields);
         return result[0].id;
-        return 2;
-        // const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        // const result = await super.Request(sql, [id]);
-        // return result[0];
     }
 
     static async TransInsert(args) {

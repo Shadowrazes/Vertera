@@ -61,10 +61,7 @@ export const resolvers = {
             return await AttachmentEntity.GetListByMsg(messageId);
         },
         subThemeList: async (_, args) => {
-            console.log('hui')
-            const a = await SubThemeEntity.GetList();
-            console.log('hui2');
-            return a;
+            return await SubThemeEntity.GetList();
         },
         departmentList: async (_, args) => {
             return await DepartmentEntity.GetList();
@@ -89,7 +86,7 @@ export const resolvers = {
         },
         updateTicket: async (_, args) => {
             // user
-            return await TicketEntity.Update(args.id, args.fields);
+            return await TicketEntity.Update(args.id, args.fields, args.departmentId);
         },
         updateClientUser: async (_, args) => {
             // user
