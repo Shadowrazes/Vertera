@@ -135,10 +135,10 @@ class TicketEntity extends Entity{
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
-            const helperId = await HelperEntity.GetMostFreeHelper(ticketFields)
+            const helperId = await HelperEntity.GetMostFreeHelper(ticketFields.subThemeId)
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unit: ticketFields.unitId, 
-                            theme: ticketFields.themeId, subTheme: ticketFields.subThemeId, status: 'Новый'};
+            const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
+                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, status: 'Новый'};
             const result = await super.TransRequest(conn, sql, [fields]);
             
             messageFields.recieverId = helperId;

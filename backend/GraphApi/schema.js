@@ -179,7 +179,7 @@ export const typeDefs = `
         clientId: Int!
         unitId: Int!
         themeId: Int!
-        subThemeId: Int
+        subThemeId: Int!
     }
 
     input MessageInsert {

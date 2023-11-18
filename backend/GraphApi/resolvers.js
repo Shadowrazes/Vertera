@@ -61,7 +61,10 @@ export const resolvers = {
             return await AttachmentEntity.GetListByMsg(messageId);
         },
         subThemeList: async (_, args) => {
-            return await SubThemeEntity.GetList();
+            console.log('hui')
+            const a = await SubThemeEntity.GetList();
+            console.log('hui2');
+            return a;
         },
         departmentList: async (_, args) => {
             return await DepartmentEntity.GetList();
