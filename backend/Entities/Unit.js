@@ -16,6 +16,19 @@ class UnitEntity extends Entity{
         const result = await super.Request(sql);
         return result;
     }
+
+    static async Update(id, fields) {
+        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [fields, id]);
+        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+    }
+
+    // Cascade deleting Unit & Themes & SubThemes & SubTheme to department link
+    static async DeleteCascade(id) {
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [id]);
+        return result.affectedRows;
+    }
 }
 
 export default UnitEntity;

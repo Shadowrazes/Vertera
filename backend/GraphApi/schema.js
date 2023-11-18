@@ -34,9 +34,19 @@ export const typeDefs = `
         updateTicket(id: Int!, fields: TicketUpdate!): UpdateInfo!
         updateClientUser(id: Int!, fields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, fields: HelperUpdate!): UpdateInfo!
+        updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
+        updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
+        updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
+        updateThemeDepartment(id: Int!, fields: ThemeDepartmentsUpdate!): UpdateInfo!
+        updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
 
         deleteTicket(id: Int): Int!
         deleteUser(id: Int) : Int!
+        deleteUnit(id: Int) : Int!
+        deleteTheme(id: Int) : Int!
+        deleteSubTheme(id: Int) : Int!
+        deleteThemeDepartment(id: Int) : Int!
+        deleteDepartment(id: Int) : Int!
     }
 
     type User {
@@ -205,5 +215,34 @@ export const typeDefs = `
         jobTitle: String
         birthday: DateTime
         departmentIds: [Int]
+    }
+
+    input SubThemeUpdate {
+        themeId: Int
+        name: String
+    }
+
+    input SubThemeUpdate {
+        themeId: Int
+        name: String
+    }
+
+    input ThemeUpdate {
+        unitId: Int
+        name: String
+    }
+
+    input UnitUpdate {
+        name: String!
+    }
+
+    input ThemeDepartmentsUpdate {
+        subThemeId: Int!
+        departmentId: Int!
+    }
+
+    input DepartmentUpdate {
+        name: String!
+        individual: Boolean!
     }
 `;

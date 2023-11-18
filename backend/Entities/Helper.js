@@ -46,7 +46,7 @@ class HelperEntity extends Entity{
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
             const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
-            const helperFields = {  password: fields.password, jobTitle: fields.jobTitle, birthday: fields.birthday };
+            const helperFields = { password: fields.password, jobTitle: fields.jobTitle, birthday: fields.birthday };
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             
             const helperResult = await super.TransRequest(conn, sql, [helperFields, id]);

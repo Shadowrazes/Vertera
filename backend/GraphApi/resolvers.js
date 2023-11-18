@@ -95,11 +95,41 @@ export const resolvers = {
         updateHelperUser: async (_, args) => {
             return await HelperEntity.TransUpdate(args.id, args.fields);
         },
+        updateSubTheme: async (_, args) => {
+            return await SubThemeEntity.Update(args.id, args.fields);
+        },
+        updateTheme: async (_, args) => {
+            return await ThemeEntity.Update(args.id, args.fields);
+        },
+        updateUnit: async (_, args) => {
+            return await UnitEntity.Update(args.id, args.fields);
+        },
+        updateThemeDepartment: async (_, args) => {
+            return await ThemeDepartmentEntity.Update(args.id, args.fields);
+        },
+        updateDepartment: async (_, args) => {
+            return await DepartmentEntity.Update(args.id, args.fields);
+        },
         deleteTicket: async (_, { id }) => {
             return await TicketEntity.DeleteCascade(id);
         },
         deleteUser: async (_, { id }) => {
             return await UserEntity.DeleteCascade(id);
+        },
+        deleteUnit: async (_, { id }) => {
+            return await UnitEntity.DeleteCascade(id);
+        },
+        deleteTheme: async (_, { id }) => {
+            return await ThemeEntity.DeleteCascade(id);
+        },
+        deleteSubTheme: async (_, { id }) => {
+            return await SubThemeEntity.DeleteCascade(id);
+        },
+        deleteThemeDepartment: async (_, { id }) => {
+            return await ThemeDepartmentEntity.DeleteCascade(id);
+        },
+        deleteDepartment: async (_, { id }) => {
+            return await DepartmentEntity.DeleteCascade(id);
         },
     },
     Client: {
