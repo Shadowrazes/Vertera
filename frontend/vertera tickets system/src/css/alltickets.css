@@ -1,27 +1,111 @@
 .alltickets__container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 100px;
-    margin-bottom: 50px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 100px;
+  margin-bottom: 50px;
+}
+
+.alltickets__filters-container {
+}
+
+.alltickets__date-range-picker {
+  background: white;
+  max-width: 566px !important;
+  width: 100%;
+  border-radius: 7px;
+  border: 1px solid #8c8c8c;
+}
+
+.rs-picker-toggle {
+  border: none !important;
+}
+
+.alltickets__date-range-picker:hover {
+  border-color: #8c8c8c !important;
+}
+
+.rs-picker-toggle:hover {
+  border-color: #8c8c8c !important;
+}
+
+.rs-picker-toggle:focus {
+  border-color: #8c8c8c !important;
+}
+
+.rs-btn:focus-visible {
+  outline: none !important;
+}
+
+.alltickets__date-range-picker input {
+  color: black;
+  font-size: 20px;
+}
+
+.alltickets__date-range-picker span {
+  color: black !important;
+  font-size: 20px;
 }
 
 .alltickets__column {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
 .alltickets__button-row {
-    flex-wrap: nowrap !important;
-    gap: 25px;
-    margin-top: 40px !important;
-    margin-bottom: 50px;
-    padding-left: 12px;
+  flex-wrap: nowrap !important;
+  gap: 25px;
+  margin-top: 40px !important;
+  margin-bottom: 50px;
+  padding-left: 12px;
 }
 
 .alltickets__button-two {
-    width: 250px;
-    background: #FFF !important;
-    border: 1px solid #00AB97 !important;
-    color: #00AB97 !important;
+  width: 250px;
+  background: #fff !important;
+  border: 1px solid #00ab97 !important;
+  color: #00ab97 !important;
+}
+
+.alltickets__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  list-style: none;
+  margin-top: 50px;
+}
+
+.alltickets__page-item {
+}
+
+.alltickets__page-link {
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  padding: 8px 12px;
+  font-size: 16px;
+  text-decoration: none;
+  color: black;
+}
+
+.alltickets__page-link.active-link {
+  border: 1px solid #00ab97;
+  background: rgba(0, 171, 151, 0.11);
+}
+
+.alltickets__page-btn {
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  width: 138px;
+  padding: 8px;
+  background: white;
+}
+
+.alltickets__page-btn-disabled {
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  width: 138px;
+  padding: 8px;
+  background: white;
+  color: #8c8c8c;
 }

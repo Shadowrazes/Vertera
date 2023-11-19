@@ -91,6 +91,10 @@ function TableTickets() {
     navigate("/all-tickets");
   };
 
+  const maxRows = 8;
+
+  const limitedData = data.slice(0, maxRows);
+
   return (
     <>
       <TitleH2 title="Мои обращения" className="title__heading" />
@@ -126,7 +130,7 @@ function TableTickets() {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {limitedData.map((item) => (
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.section}</td>

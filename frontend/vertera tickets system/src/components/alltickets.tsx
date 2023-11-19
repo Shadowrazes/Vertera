@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
+import { DateRangePicker } from "rsuite";
 import TitleH2 from "./title";
 import DropdownBT from "./dropdown";
 import ButtonCustom from "./button";
 import "../css/alltickets.css";
+import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
   type TableRow = {
@@ -77,19 +79,53 @@ function allTickets() {
         return "white";
     }
   }
-
-  const [selectedFilter, setSelectedFilter] = useState(-1);
+  //filters visibillity
+  const [selectedSort, setSelectedSort] = useState(-1);
   const [isVisible, setIsVisible] = useState(false);
 
   const handleHideComponent = () => {
     setIsVisible((prevVisibility) => !prevVisibility);
   };
 
-  const handleFilters = (index: number) => {
-    setSelectedFilter(index);
+  const handleSorts = (index: number) => {
+    setSelectedSort(index);
   };
 
   let items = ["1", "2", "3"];
+  //paginaton
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(data.length / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(data.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  // dropdown reset
+  const initialSelectedFilterState = [-1, -1, -1, -1, -1, -1];
+  const [selectedFilter, setSelectedFilter] = useState(
+    initialSelectedFilterState
+  );
+
+  const handleResetFilters = () => {
+    const resetState = initialSelectedFilterState.map(() => -1);
+    setSelectedFilter(resetState);
+  };
 
   return (
     <>
@@ -108,7 +144,10 @@ function allTickets() {
                 <DropdownBT items={items} label="Подтема" />
               </Col>
               <Col className="alltickets__column">
-                <DropdownBT items={items} label="Задать период" />
+                <DateRangePicker
+                  className="alltickets__date-range-picker"
+                  placeholder="Задать период"
+                />
                 <DropdownBT items={items} label="Мои реакции" />
                 <DropdownBT items={items} label="Есть слова" />
               </Col>
@@ -118,6 +157,7 @@ function allTickets() {
               <ButtonCustom
                 title="Сбросить"
                 className="alltickets__button-two"
+                onClick={handleResetFilters}
               />
             </Row>
           </Form>
@@ -130,10 +170,10 @@ function allTickets() {
           <span
             key={column}
             onClick={() => {
-              handleFilters(index);
+              handleSorts(index);
             }}
             className={
-              selectedFilter === index
+              selectedSort === index
                 ? "table__sort table__sort-active"
                 : "table__sort"
             }
@@ -156,7 +196,7 @@ function allTickets() {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {currentItems.map((item) => (
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.section}</td>
@@ -176,6 +216,46 @@ function allTickets() {
           ))}
         </tbody>
       </Table>
+
+      <ul className="alltickets__pagination">
+        <button
+          onClick={handlePrevPage}
+          className={
+            currentPage === 1
+              ? "alltickets__page-btn-disabled"
+              : "alltickets__page-btn"
+          }
+          disabled={currentPage === 1}
+        >
+          Предыдущая
+        </button>
+        {pageNumbers.map((number) => (
+          <li key={number} className="alltickets__page-item">
+            <a
+              onClick={() => setCurrentPage(number)}
+              href="#"
+              className={
+                number === currentPage
+                  ? "alltickets__page-link active-link"
+                  : "alltickets__page-link"
+              }
+            >
+              {number}
+            </a>
+          </li>
+        ))}
+        <button
+          onClick={handleNextPage}
+          className={
+            currentPage === Math.ceil(data.length / itemsPerPage)
+              ? "alltickets__page-btn-disabled"
+              : "alltickets__page-btn"
+          }
+          disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
+        >
+          Следующая
+        </button>
+      </ul>
     </>
   );
 }
