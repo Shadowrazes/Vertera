@@ -86,7 +86,7 @@ export const resolvers = {
         },
         updateTicket: async (_, args) => {
             // user
-            return await TicketEntity.Update(args.id, args.fields, args.departmentId);
+            return await TicketEntity.TransUpdate(args.id, args.fields, args.departmentId);
         },
         updateClientUser: async (_, args) => {
             // user
