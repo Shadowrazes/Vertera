@@ -131,7 +131,10 @@ function allTickets() {
     <>
       <div className="alltickets__container">
         <TitleH2 title="Все обращения" className="title__heading-nomargin" />
-        <ButtonCustom title="Показать фильтр" onClick={handleHideComponent} />
+        <ButtonCustom
+          title={isVisible == false ? "Показать фильтр" : "Скрыть фильтр"}
+          onClick={handleHideComponent}
+        />
       </div>
 
       {isVisible && (
