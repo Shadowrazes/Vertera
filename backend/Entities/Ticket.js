@@ -144,19 +144,42 @@ class TicketEntity extends Entity{
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
             const messageResult = await MessageEntity.TransInsert(messageFields, conn);
-            console.log(messageResult);
+
+            const helperResult = await UserEntity.GetById(helperId);
+            const helperFullNameSplit = helperResult.fullName.trim().split(' ');
+            const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
+
+            const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
+                                   ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
+            const msgSysResult = await MessageEntity.TransInsert(msgSysFields, conn);
+
             return result.insertId;
         });
     }
 
-    static async Update(id, fields, departmentId) {
-        if(!fields.helperId && departmentId) {
-            fields.helperId = await HelperEntity.GetMostFreeHelper(fields.subThemeId, departmentId);
-        }
+    static async TransUpdate(id, fields, departmentId) {
+        return await super.Transaction(async (conn) => {
+            if(!fields.helperId && departmentId) {
+                fields.helperId = await HelperEntity.GetMostFreeHelper(fields.subThemeId, departmentId);
+            }
+    
+            if(fields.helperId) {
+                const clientResult = await this.GetById(id);
+                const clientId = clientResult.clientId;
 
-        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [fields, id]);
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+                const helperResult = await UserEntity.GetById(fields.helperId);
+                const helperFullNameSplit = helperResult.fullName.trim().split(' ');
+                const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
+    
+                const msgFields = { senderId: 0, recieverId: clientId, type: 'system', readed: 0,
+                                    ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
+                const msgResult = await MessageEntity.TransInsert(msgFields, conn);
+            }
+    
+            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [fields, id]);
+            return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        });
     }
 
     // Cascade deleting Ticket & Ticket Messages & Messages attachs

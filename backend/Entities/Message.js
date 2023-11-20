@@ -54,9 +54,6 @@ class MessageEntity extends Entity{
     static async Delete(id) {
 
     }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default MessageEntity;
