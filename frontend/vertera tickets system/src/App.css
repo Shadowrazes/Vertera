@@ -5,6 +5,10 @@ body {
     color: black;
 }
 
+a {
+    font-family: 'TT Norms Pro', sans-serif;
+}
+
 .container {
     padding: 0 20px;
     margin: 0 auto;
