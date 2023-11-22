@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
-import TitleH2 from "./title";
-import DropdownBT from "./dropdown";
-import ButtonCustom from "./button";
-import "../css/alltickets.css";
+import TitleH2 from "../components/title";
+import DropdownBT from "../components/dropdown";
+import ButtonCustom from "../components/button";
+import "../css/all_tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
@@ -65,7 +65,7 @@ function allTickets() {
     },
   ];
 
-  function getStatusColor(status: string): string {
+  function getStatusBGColor(status: string): string {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -150,6 +150,19 @@ function allTickets() {
                 <DateRangePicker
                   className="alltickets__date-range-picker"
                   placeholder="Задать период"
+                  locale={{
+                    sunday: "Вс",
+                    monday: "Пн",
+                    tuesday: "Вт",
+                    wednesday: "Ср",
+                    thursday: "Чт",
+                    friday: "Пт",
+                    saturday: "Сб",
+                    ok: "ОК",
+                    today: "Сегодня",
+                    yesterday: "Вчера",
+                    last7Days: "Последние 7 дней",
+                  }}
                 />
                 <DropdownBT items={items} label="Мои реакции" />
                 <DropdownBT items={items} label="Есть слова" />
@@ -210,7 +223,7 @@ function allTickets() {
               <td>
                 <span
                   className="table__status"
-                  style={{ background: getStatusColor(item.status) }}
+                  style={{ background: getStatusBGColor(item.status) }}
                 >
                   {item.status}
                 </span>
@@ -234,9 +247,8 @@ function allTickets() {
         </button>
         {pageNumbers.map((number) => (
           <li key={number} className="alltickets__page-item">
-            <a
+            <button
               onClick={() => setCurrentPage(number)}
-              href="#"
               className={
                 number === currentPage
                   ? "alltickets__page-link active-link"
@@ -244,7 +256,7 @@ function allTickets() {
               }
             >
               {number}
-            </a>
+            </button>
           </li>
         ))}
         <button
