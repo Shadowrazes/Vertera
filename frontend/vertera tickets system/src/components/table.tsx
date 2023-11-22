@@ -28,27 +28,27 @@ function TableTickets() {
   const data: TableRow[] = [
     {
       id: 1,
-      section: "Темы",
+      section: "А",
       date: new Date("2023-10-17"),
-      theme: "Название темы",
+      theme: "Название темы2",
       last_message: "02.10.23| Имя Фамилия",
       message_count: "3/1",
       status: "Новый",
     },
     {
       id: 2,
-      section: "Темы",
+      section: "Г",
       date: new Date("2023-10-17"),
-      theme: "Название темы",
+      theme: "Название темы1",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "В процессе",
     },
     {
       id: 3,
-      section: "Темы",
+      section: "П",
       date: new Date("2023-10-17"),
-      theme: "Название темы",
+      theme: "Название темы3",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "В ожидании",
@@ -57,7 +57,7 @@ function TableTickets() {
       id: 4,
       section: "Темы",
       date: new Date("2023-10-17"),
-      theme: "Название темы",
+      theme: "Название темы4",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "Закрыт",
@@ -79,12 +79,6 @@ function TableTickets() {
     }
   }
 
-  const [selectedFilter, setSelectedFilter] = useState(-1);
-
-  const handleFilters = (index: number) => {
-    setSelectedFilter(index);
-  };
-
   const navigate = useNavigate();
 
   const goToAllTickets = () => {
@@ -95,6 +89,14 @@ function TableTickets() {
 
   const limitedData = data.slice(0, maxRows);
 
+  /////////////////////////////////////////////////////////
+  const [selectedSort, setSelectedSort] = useState(-1);
+
+  const handleSorts = (index: number) => {
+    setSelectedSort(index);
+  };
+  //////////////////////////////////////////
+
   return (
     <>
       <TitleH2 title="Мои обращения" className="title__heading" />
@@ -104,10 +106,10 @@ function TableTickets() {
           <span
             key={column}
             onClick={() => {
-              handleFilters(index);
+              handleSorts(index);
             }}
             className={
-              selectedFilter === index
+              selectedSort === index
                 ? "table__sort table__sort-active"
                 : "table__sort"
             }

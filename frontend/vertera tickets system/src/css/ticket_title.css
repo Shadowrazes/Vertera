@@ -1,0 +1,9 @@
+.ticket-title__container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.ticket-title__state {
+    font-size: 24px;
+}
