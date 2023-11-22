@@ -70,11 +70,11 @@ export const resolvers = {
     Mutation: {
         addClientUser: async (_, args) => {
             // user
-            return await ClientEntity.TransInsert(args.fields);
+            return await ClientEntity.TransInsert(args.userFields, args.clientFields);
         },
         addHelperUser: async (_, args) => {
             // superAdmin
-            return await HelperEntity.TransInsert(args.fields);
+            return await HelperEntity.TransInsert(args.userFields, args.helperFields);
         },
         addTicket: async (_, args) => {
             // user
@@ -90,10 +90,10 @@ export const resolvers = {
         },
         updateClientUser: async (_, args) => {
             // user
-            return await ClientEntity.TransUpdate(args.id, args.fields);
+            return await ClientEntity.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateHelperUser: async (_, args) => {
-            return await HelperEntity.TransUpdate(args.id, args.fields);
+            return await HelperEntity.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         updateSubTheme: async (_, args) => {
             return await SubThemeEntity.Update(args.id, args.fields);

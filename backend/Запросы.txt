@@ -7,11 +7,11 @@ mutation{
 }
 
 mutation{
-  addHelperUser(fields: {fullName: "test testich", country: "russia", login: "abchihba", password: "svinota", phone: "79999999", department: "test", jobTitle: "водонос", birthday: "2000-11-05"})
+  addHelperUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitle: "Куратор", birthday: "2000-11-05", departmentIds: [1, 2]})
 }
 
 mutation{
-  addClientUser(fields: {fullName: "test testich", country: "russia", phone: "79999999", email: "test@mail.ru"})
+  addClientUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test", password: "testtik"}, clientFields: {email: "test@mail.ru"})
 }
 
 mutation{
@@ -21,7 +21,7 @@ mutation{
 }
 
 mutation{
-  updateClientUser(id: 36,  fields: {fullName: "tested", country: "africa", phone: "78888", email: "asda@test.ru"}){
+  updateClientUser(id: 40, userFields: {fullName: "test", country: "russia", password: "dfsgsdfsdgdfg", }, clientFields: {email:"dfsgdfg"}){
     affected
   }
 }

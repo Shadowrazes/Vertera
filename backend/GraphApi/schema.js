@@ -26,14 +26,14 @@ export const typeDefs = `
     }
 
     type Mutation {
-        addClientUser(fields: ClientInsert!): Int!
-        addHelperUser(fields: HelperInsert!): Int!
+        addClientUser(userFields: UserInsert!, clientFields: ClientInsert!): Int!
+        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
 
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
-        updateClientUser(id: Int!, fields: ClientUpdate!): UpdateInfo!
-        updateHelperUser(id: Int!, fields: HelperUpdate!): UpdateInfo!
+        updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
+        updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
         updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
@@ -54,7 +54,7 @@ export const typeDefs = `
         fullName: String!
         role: String!
         country: String!
-        phone: String!
+        phone: String
     }
 
     type Client {
@@ -65,8 +65,6 @@ export const typeDefs = `
 
     type Helper {
         id: Int!
-        login: String!
-        password: String!
         jobTitle: String!
         birthday: DateTime!
         departments: [Department]!
@@ -157,19 +155,19 @@ export const typeDefs = `
         offset: Int!
     }
 
-    input ClientInsert {
+    input UserInsert {
         fullName: String!
         country: String!
-        phone: String!
+        login: String
+        password: String
+        phone: String
+    }
+
+    input ClientInsert {
         email: String!
     }
 
     input HelperInsert {
-        fullName: String!
-        phone: String!
-        country: String!
-        login: String!
-        password: String!
         jobTitle: String!
         birthday: DateTime!
         departmentIds: [Int]!
@@ -200,18 +198,18 @@ export const typeDefs = `
         reaction: String
     }
 
-    input ClientUpdate {
+    input UserUpdate {
         fullName: String
         country: String
+        password: String
         phone: String
+    }
+
+    input ClientUpdate {
         email: String
     }
 
     input HelperUpdate {
-        fullName: String
-        country: String
-        phone: String
-        password: String
         jobTitle: String
         birthday: DateTime
         departmentIds: [Int]

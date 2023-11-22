@@ -85,31 +85,30 @@ class HelperEntity extends Entity{
         return result[0].id;
     }
 
-    static async TransInsert(args) {
+    static async TransInsert(userFields, helperFields) {
         return await super.Transaction(async (conn) => {
-            const id = await UserEntity.TransInsert(conn, args, 'helper');
-
+            userFields.role = 'helper';
+            const id = await UserEntity.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, login: args.login, password: args.password, jobTitle: args.jobTitle,
-                            birthday: args.birthday, startWorkDate: new Date()};
+            const fields = {id, jobTitle: helperFields.jobTitle, birthday: helperFields.birthday, 
+                            startWorkDate: new Date()};
             const result = await super.TransRequest(conn, sql, [fields]);
 
-            const helperDepartmentResult = await HelperDepartmentEntity.TransInsert(conn, id, args.departmentIds);
+            const helperDepartmentResult = await HelperDepartmentEntity.TransInsert(conn, id, helperFields.departmentIds);
 
             return id;
         });
     }
 
-    static async TransUpdate(id, fields) {
+    static async TransUpdate(id, userFields, helperArgs) {
         return await super.Transaction(async (conn) => {
-            const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
-            const helperFields = { password: fields.password, jobTitle: fields.jobTitle, birthday: fields.birthday };
+            const helperFields = { jobTitle: helperArgs.jobTitle, birthday: helperArgs.birthday };
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             
             const helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
             const userResult = await UserEntity.TransUpdate(conn, id, userFields);
             const helperDepartmentDelResult = await HelperDepartmentEntity.TransDeleteByHelper(conn, id);
-            const helperDepartmentInsertResult = await HelperDepartmentEntity.TransInsert(conn, id, args.departmentIds);
+            const helperDepartmentInsertResult = await HelperDepartmentEntity.TransInsert(conn, id, helperArgs.departmentIds);
 
             return {affected: helperResult.affectedRows, changed: helperResult.changedRows, 
                     warning: helperResult.warningStatus};

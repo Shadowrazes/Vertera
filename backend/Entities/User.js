@@ -1,4 +1,5 @@
 import Entity from "./Entity.js";
+import Account from "../Utils/Account.js"
 
 class UserEntity extends Entity{
     static TableName = 'users';
@@ -19,14 +20,33 @@ class UserEntity extends Entity{
         return result;
     }
 
-    static async TransInsert(conn, args, role) {
+    static async TransInsert(conn, fields) {
         const sql = `INSERT INTO ${this.TableName} SET ?`;
-        const fields = {fullName: args.fullName, role, country: args.country, phone: args.phone};
+
+        if(fields.password && !fields.login || !fields.password && fields.login){
+            throw new Error('No password or login');
+        }
+
+        if(fields.password){
+            if(fields.password.length < 6){
+                throw new Error('Bad password');
+            }
+
+            fields.password = await Account.GenerateHash(fields.password);
+        }
         const result = await super.TransRequest(conn, sql, [fields]);
         return result.insertId;
     }
 
     static async TransUpdate(conn, id, fields) {
+        if(fields.password){
+            if(fields.password.length < 6){
+                throw new Error('Bad password');
+            }
+
+            fields.password = await Account.GenerateHash(fields.password);
+        }
+
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.TransRequest(conn, sql, [fields, id]);
         return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};

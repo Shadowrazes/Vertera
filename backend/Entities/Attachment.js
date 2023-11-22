@@ -26,7 +26,6 @@ class AttachmentEntity extends Entity {
             const result = await super.TransRequest(conn, sql, [fields]);
             insertIds.push(result.insertId);
         }
-        console.log(insertIds);
         return insertIds;
     }
 }

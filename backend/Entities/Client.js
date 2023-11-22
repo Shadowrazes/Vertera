@@ -19,20 +19,19 @@ class ClientEntity extends Entity{
         return result;
     }
 
-    static async TransInsert(args) {
+    static async TransInsert(userFields, clientFields) {
         return await super.Transaction(async (conn) => {
-            const id = await UserEntity.TransInsert(conn, args, 'client');
+            userFields.role = 'client';
+            const id = await UserEntity.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, email: args.email};
+            const fields = {id, email: clientFields.email};
             const result = await super.TransRequest(conn, sql, [fields]);
             return id;
         });
     }
-
-    static async TransUpdate(id, fields) {
+    
+    static async TransUpdate(id, userFields, clientFields) {
         return await super.Transaction(async (conn) => {
-            const userFields = { fullName: fields.fullName, country: fields.country, phone: fields.phone };
-            const clientFields = { email: fields.email };
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             
             const clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
