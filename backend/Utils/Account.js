@@ -19,6 +19,7 @@ class Account {
             return isValidPassword;
         }
         catch (err) {
+            console.log(err);
             throw new Error('Auth error');
         }
     }

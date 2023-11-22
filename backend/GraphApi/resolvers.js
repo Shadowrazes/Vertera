@@ -20,6 +20,9 @@ Entity.Pool = Pool;
 
 export const resolvers = {
     Query:{
+        login: async (_, { login, password }) => {
+            return await UserEntity.Login(login, password);
+        },
         user: async (_, { id }) => {
             return await UserEntity.GetById(id);
         },

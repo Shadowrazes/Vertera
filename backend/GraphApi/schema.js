@@ -2,6 +2,8 @@ export const typeDefs = `
     scalar DateTime
 
     type Query {
+        login(login: String!, password: String!): String!
+
         user(id: Int!): User
         userList: [User]
 

@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import Account from "../Utils/Account.js"
+import Token from "../Utils/Token.js"
 
 class UserEntity extends Entity{
     static TableName = 'users';
@@ -7,15 +8,40 @@ class UserEntity extends Entity{
     static FullNameField = 'fullName';
     static RoleField = 'role';
     static CountryField = 'country';
+    static LoginField = 'login';
+    static PasswordField = 'password';
+    static TokenField = 'token';
+
+    static async UpdateToken(id, token) {
+        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [token, id]);
+        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+    }
+
+    static async Login(login, password) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
+        const userResult = await super.Request(sql, [login]);
+
+        if(userResult.length == 0) throw new Error('Auth error');
+
+        const passwordHash = userResult[0].password;
+        const userId = userResult[0].id;
+        const isPassValid = await Account.CheckPassword(password, passwordHash);
+
+        const token = await Token.Generate({ userId });
+        const tokenUpdateResult = await this.UpdateToken(userId, { token });
+
+        return token;
+    }
 
     static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]); 
         return result[0];
     }
 
     static async GetList() {
-        const sql = `SELECT * from ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName}`;
         const result = await super.Request(sql);
         return result;
     }

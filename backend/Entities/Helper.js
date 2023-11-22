@@ -7,8 +7,6 @@ import ThemeDepartmentEntity from "./ThemeDepartment.js";
 class HelperEntity extends Entity{
     static TableName = 'helpers';
     static PrimaryField = 'id';
-    static LoginField = 'login';
-    static PasswordField = 'password';
     static JobTitleField = 'jobTitle';
     static BirthdayField = 'birthday';
     static StartWorkDateField = 'startWorkDate';
