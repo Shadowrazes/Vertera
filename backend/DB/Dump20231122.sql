@@ -29,7 +29,7 @@ CREATE TABLE `attachments` (
   PRIMARY KEY (`id`),
   KEY `AttachToMsgFK_idx` (`messageId`),
   CONSTRAINT `AttachToMsgFK` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +38,7 @@ CREATE TABLE `attachments` (
 
 LOCK TABLES `attachments` WRITE;
 /*!40000 ALTER TABLE `attachments` DISABLE KEYS */;
-INSERT INTO `attachments` VALUES (1,1,'/files/1/a9348906971dfbcf2835f44359476277.png'),(2,6,'/files/3/67acaccb9df2de102d68196b4a0eef9c.jpg');
+INSERT INTO `attachments` VALUES (1,1,'/files/1/a9348906971dfbcf2835f44359476277.png'),(2,6,'/files/3/67acaccb9df2de102d68196b4a0eef9c.jpg'),(71,63,'test/a'),(72,63,'test/321');
 /*!40000 ALTER TABLE `attachments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -63,7 +63,7 @@ CREATE TABLE `clients` (
 
 LOCK TABLES `clients` WRITE;
 /*!40000 ALTER TABLE `clients` DISABLE KEYS */;
-INSERT INTO `clients` VALUES (1,'sanya@beats.ru'),(4,'kostya@beats.ru');
+INSERT INTO `clients` VALUES (1,'sanya@beats.ru'),(4,'kostya@beats.ru'),(46,'test@mail.ru');
 /*!40000 ALTER TABLE `clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,7 +109,7 @@ CREATE TABLE `helper_departments` (
   KEY `HelperToDepartmentFK_idx` (`departmentId`),
   CONSTRAINT `DepartmentToHelperFK` FOREIGN KEY (`helperId`) REFERENCES `helpers` (`id`) ON DELETE CASCADE,
   CONSTRAINT `HelperToDepartmentFK` FOREIGN KEY (`departmentId`) REFERENCES `departments` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,13 +131,10 @@ DROP TABLE IF EXISTS `helpers`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `helpers` (
   `id` int NOT NULL,
-  `login` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
   `jobTitle` varchar(255) NOT NULL,
   `startWorkDate` date DEFAULT NULL,
   `birthday` date DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `login_UNIQUE` (`login`),
   CONSTRAINT `HelperToUserFK` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -148,7 +145,7 @@ CREATE TABLE `helpers` (
 
 LOCK TABLES `helpers` WRITE;
 /*!40000 ALTER TABLE `helpers` DISABLE KEYS */;
-INSERT INTO `helpers` VALUES (2,'misha','beats','Куратор','2023-11-06','2001-12-23'),(3,'lesha','beats','Руководитель','2023-10-01','2003-09-01'),(5,'nikita','crown','Куратор','2023-09-17','2023-01-23');
+INSERT INTO `helpers` VALUES (0,'admin','2023-09-17','2023-09-17'),(2,'Куратор','2023-11-06','2001-12-23'),(3,'Руководитель','2023-10-01','2003-09-01'),(5,'Куратор','2023-09-17','2023-01-23');
 /*!40000 ALTER TABLE `helpers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -171,7 +168,7 @@ CREATE TABLE `messages` (
   PRIMARY KEY (`id`),
   KEY `MsgToTicketFK_idx` (`ticketId`),
   CONSTRAINT `MsgToTicketFK` FOREIGN KEY (`ticketId`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +177,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES (1,1,2,1,'common',1,'lorem','2021-10-20 23:00:00'),(2,2,1,1,'common',1,'ipsum','2021-10-20 23:05:00'),(3,4,3,2,'common',1,'ogre','2023-11-20 23:02:00'),(4,3,4,2,'common',1,'mage','2023-11-20 23:06:00'),(5,4,3,2,'common',0,'best','2023-11-20 23:09:00'),(6,1,3,3,'common',0,'best','2023-11-20 23:19:00'),(7,0,1,1,'reacton',1,'Оцените ответ','2021-10-20 23:07:00'),(8,0,4,2,'notification',1,'Вашим вопросом занимается Алексей','2023-11-20 23:19:00');
+INSERT INTO `messages` VALUES (1,1,2,1,'common',1,'lorem','2021-10-20 23:00:00'),(2,2,1,1,'common',1,'ipsum','2021-10-20 23:05:00'),(3,4,3,2,'common',1,'ogre','2023-11-20 23:02:00'),(4,3,4,2,'common',1,'mage','2023-11-20 23:06:00'),(5,4,3,2,'common',0,'best','2023-11-20 23:09:00'),(6,1,3,3,'common',0,'best','2023-11-20 23:19:00'),(7,0,1,1,'reacton',1,'Оцените ответ','2021-10-20 23:07:00'),(8,0,4,2,'system',1,'Вашим вопросом занимается Алексей','2023-11-20 23:19:00'),(60,0,1,14,'system',0,'Вашим вопросом занимается nikita','2023-11-20 20:08:26'),(61,0,1,14,'system',0,'Вашим вопросом занимается misha','2023-11-20 20:14:19'),(62,0,1,14,'system',0,'Вашим вопросом занимается misha','2023-11-20 20:27:08'),(63,1,3,15,'common',0,'test','2023-11-20 20:30:56'),(64,0,1,15,'system',0,'Вашим вопросом занимается lesha','2023-11-20 20:30:56');
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -285,7 +282,7 @@ CREATE TABLE `tickets` (
   `reaction` varchar(255) DEFAULT NULL,
   `status` varchar(225) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -294,7 +291,7 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 00:00:00',1,1,2,'like','Закрыт'),(2,4,3,'2023-11-20 00:00:00',1,14,73,'dislike','Закрыт'),(3,1,3,'2023-11-20 00:00:00',2,20,92,NULL,'Новый');
+INSERT INTO `tickets` VALUES (1,1,2,'2021-10-20 00:00:00',1,1,2,'like','Закрыт'),(2,4,3,'2023-11-20 00:00:00',1,14,73,'dislike','Закрыт'),(3,1,3,'2023-11-20 00:00:00',2,20,92,NULL,'Новый'),(11,1,2,'2023-11-19 01:17:49',1,6,31,NULL,'Новый'),(12,1,3,'2023-11-19 01:18:19',1,6,31,NULL,'Новый'),(13,1,2,'2023-11-19 01:18:25',1,6,31,NULL,'Новый'),(14,1,2,'2023-11-19 02:19:35',1,6,31,NULL,'Новый'),(15,1,3,'2023-11-20 20:30:56',1,6,31,NULL,'Новый');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -359,8 +356,12 @@ CREATE TABLE `users` (
   `role` varchar(255) NOT NULL,
   `country` varchar(255) NOT NULL,
   `phone` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `login` varchar(255) DEFAULT NULL,
+  `password` varchar(512) DEFAULT NULL,
+  `token` varchar(512) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `login_UNIQUE` (`login`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -369,7 +370,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (0,'system','system','none',''),(1,'sanya','client','russia','797866786'),(2,'misha','helper','africa','387654678645'),(3,'lesha','helper','poland','543345672132'),(4,'kostya','client','china','456575675'),(5,'nikita','helper','japan','98728749384');
+INSERT INTO `users` VALUES (0,'system','system','none','','admin','complexPass',NULL),(1,'sanya','client','russia','797866786',NULL,NULL,NULL),(2,'misha','helper','africa','387654678645','misha','beats',NULL),(3,'lesha','helper','poland','543345672132','lesha','beats',NULL),(4,'kostya','client','china','456575675',NULL,NULL,NULL),(5,'nikita','helper','japan','98728749384','nikita','crown',NULL),(46,'test testich','client','russia','79999999','test','$2b$10$GgnULXdvdLkH1c3qFTIGCePrwBbovZ2fCNR1/74yzDfwRzHpsV0sG','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDYsImlhdCI6MTcwMDY0Njk4MywiZXhwIjoxNzAwNjc1NzgzfQ.hxURuBI5xPUhL1zjJgaPihIVVsgQ4PscPvBa6q-bKDE');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -382,4 +383,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-17 15:15:55
+-- Dump completed on 2023-11-22 18:28:33
