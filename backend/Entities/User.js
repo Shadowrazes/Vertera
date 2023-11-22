@@ -12,12 +12,6 @@ class UserEntity extends Entity{
     static PasswordField = 'password';
     static TokenField = 'token';
 
-    static async UpdateToken(id, token) {
-        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [token, id]);
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
-    }
-
     static async Login(login, password) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
@@ -32,6 +26,14 @@ class UserEntity extends Entity{
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
 
         return token;
+    }
+
+    static async GetRoleByToken(token) {
+        const userId = await Token.Validation(token);
+        const result = await this.GetById(userId);
+        if(result.length == 0) throw new Error('Invalid token');
+        console.log(result.role);
+        return result.role;
     }
 
     static async GetById(id) {
@@ -75,6 +77,12 @@ class UserEntity extends Entity{
 
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.TransRequest(conn, sql, [fields, id]);
+        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+    }
+
+    static async UpdateToken(id, token) {
+        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [token, id]);
         return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
     }
 
