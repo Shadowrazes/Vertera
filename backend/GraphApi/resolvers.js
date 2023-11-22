@@ -27,6 +27,7 @@ export const resolvers = {
             return await UserEntity.GetById(id);
         },
         userList: async (_, args) => {
+            if(!(await UserEntity.AccessAllow('helper', args.token))) throw new Error('Forbidden');
             return await UserEntity.GetList();
         },
         helper: async (_, { id }) => {

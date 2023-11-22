@@ -12,6 +12,10 @@ class UserEntity extends Entity{
     static PasswordField = 'password';
     static TokenField = 'token';
 
+    static userAccess = ['system', 'helper', 'client'];
+    static helperAccess = ['system', 'helper'];
+    static adminAccess = ['system'];
+
     static async Login(login, password) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
@@ -28,11 +32,18 @@ class UserEntity extends Entity{
         return token;
     }
 
+    static async AccessAllow(level, token) {
+        const userRole = await this.GetRoleByToken(token);
+
+        if(level == 'user') return this.userAccess.includes(userRole);
+        if(level == 'helper') return this.helperAccess.includes(userRole);
+        if(level == 'admin') return this.adminAccess.includes(userRole);
+    }
+
     static async GetRoleByToken(token) {
         const userId = await Token.Validation(token);
         const result = await this.GetById(userId);
         if(result.length == 0) throw new Error('Invalid token');
-        console.log(result.role);
         return result.role;
     }
 

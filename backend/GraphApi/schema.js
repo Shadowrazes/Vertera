@@ -5,7 +5,7 @@ export const typeDefs = `
         login(login: String!, password: String!): String!
 
         user(id: Int!): User
-        userList: [User]
+        userList(token: String!): [User]
 
         client(id: Int!): Client
         clientList: [Client]
