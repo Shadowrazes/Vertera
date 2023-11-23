@@ -1,0 +1,42 @@
+.chat-message-recipient__container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.chat-message-recipient__box {
+    width: 1075px;
+    border: 1px solid #DEE2E6;
+    border-radius: 15px;
+    background: white;
+    padding: 50px 150px 50px 50px;
+}
+
+.chat-message-recipient__text {
+    max-width: 1075px;
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 20px;
+    word-wrap: break-word;
+}
+
+.chat-message-recepient__separator {
+    border-bottom: 1px solid black;
+    width: 110%;
+    margin-bottom: 50px;
+}
+
+.chat-message-recepient__rate-container {
+    display: flex;
+    justify-content: center;
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 36px;
+}
+
+.chat-message-recipient__time {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 15px;
+    color: #5C5C5C;
+}

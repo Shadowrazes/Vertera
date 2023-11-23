@@ -1,32 +1,66 @@
 import { useState } from "react";
-import ChatMessage from "./chat_message";
+import ChatMessageSender from "./chat_message_sender";
+import ChatMessageRecepient from "./chat_message_recipient";
 import ChatInput from "./chat_input";
 
 interface Message {
-  sender: string;
   message: string;
+  time: string;
 }
 
-function Chat(): JSX.Element {
+const timeFormatter = () => {
+  const currentDate = new Date();
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  } as Intl.DateTimeFormatOptions;
+
+  const formatter = new Intl.DateTimeFormat("ru-RU", options);
+  let formattedDate = formatter.format(currentDate);
+
+  formattedDate = formattedDate.slice(0, -3);
+
+  const timeOptions = {
+    hour: "numeric",
+    minute: "numeric",
+  } as Intl.DateTimeFormatOptions;
+
+  const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
+  const formattedTime = timeFormatter.format(currentDate);
+
+  return `${formattedDate}, ${formattedTime}`;
+};
+
+function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
 
   function sendMessage(message: string): void {
     const newMessage: Message = {
-      sender: "User",
       message: message,
+      time: timeFormatter(),
     };
     setMessages([...messages, newMessage]);
   }
 
   return (
-    <div>
+    <>
       <div>
         {messages.map((msg, index) => (
-          <ChatMessage key={index} sender={msg.sender} message={msg.message} />
+          // <ChatMessageSender
+          //   key={index}
+          //   message={msg.message}
+          //   time={msg.time}
+          // />
+          <ChatMessageRecepient
+            key={index}
+            message={msg.message}
+            time={msg.time}
+          />
         ))}
       </div>
       <ChatInput onSendMessage={sendMessage} />
-    </div>
+    </>
   );
 }
 

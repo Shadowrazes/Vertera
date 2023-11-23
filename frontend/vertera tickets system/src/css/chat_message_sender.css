@@ -1,0 +1,28 @@
+.chat-message-sender__container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.chat-message-sender__box {
+    width: 1075px;
+    border-radius: 15px;
+    background: rgba(134, 211, 255, 0.09);
+    padding: 50px 150px 50px 50px;
+}
+
+.chat-message-sender__text {
+    max-width: 1075px;
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 20px;
+    word-wrap: break-word;
+}
+
+.chat-message-sender__time {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 15px;
+    color: #5C5C5C;
+}

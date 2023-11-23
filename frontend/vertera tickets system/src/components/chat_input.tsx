@@ -4,7 +4,7 @@ interface ChatInputProps {
   onSendMessage: (message: string) => void;
 }
 
-function ChatInput({ onSendMessage }: ChatInputProps): JSX.Element {
+function ChatInput({ onSendMessage }: ChatInputProps) {
   const [message, setMessage] = useState("");
 
   function handleChange(e: ChangeEvent<HTMLInputElement>): void {
