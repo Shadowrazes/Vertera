@@ -1,0 +1,37 @@
+.chat-input__container {
+    display: flex;
+    justify-content: center;
+}
+
+.chat-input__form {
+    display: flex;
+    justify-content: center;
+    width: 670px;
+}
+
+.chat-input__row {
+    gap: 25px;
+}
+
+.chat-input__textarea {
+    resize: none;
+}
+
+.chat-input__button-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-input__button-send {
+    min-width: 400px !important;
+    padding: 15px;
+    font-family: 'TT Norms Pro', sans-serif;
+}
+
+.chat-input__button-row .chat-input__button-close {
+    padding: 15px;
+    background: #fff !important;
+    border: 1px solid #00ab97 !important;
+    font-family: 'TT Norms Pro', sans-serif;
+    color: #00ab97 !important;
+}

@@ -5,6 +5,7 @@ interface ButtonProps {
   title: string;
   className?: string;
   onClick?: () => void;
+  type?: string;
 }
 
 function ButtonCustom({ title, className, onClick }: ButtonProps) {

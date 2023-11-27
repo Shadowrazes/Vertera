@@ -30,9 +30,42 @@
 
 .chat-message-recepient__rate-container {
     display: flex;
+    flex-direction: column;
+    gap: 25px;
     justify-content: center;
+    align-items: center;
     font-family: 'TT Norms Pro', sans-serif;
     font-size: 36px;
+}
+
+.chat-message-recepient__rate-title {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 36px;
+}
+
+.chat-message-recepient__rate-like {
+    display: flex;
+    gap: 40px;
+}
+
+.chat-message-recepient__rate-icon-dislike {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 4.649px;
+    background: #F6E3E3;
+}
+
+.chat-message-recepient__rate-icon-like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 4.649px;
+    background: rgba(0, 171, 151, 0.11);;
 }
 
 .chat-message-recipient__time {
