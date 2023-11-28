@@ -1,7 +1,7 @@
 import { useState } from "react";
-import ChatMessageSender from "./chat_message_sender";
-import ChatMessageRecepient from "./chat_message_recipient";
-import ChatInput from "./chat_input";
+import ChatMessageSender from "./chat-message-sender";
+import ChatMessageRecepient from "./chat-message-recipient";
+import ChatInput from "./chat-input";
 
 interface Message {
   message: string;

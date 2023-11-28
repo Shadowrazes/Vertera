@@ -57,7 +57,7 @@ function ChatMessage({ message, time }: ChatMessageProps) {
                   </svg>
                 </span>
               </a>
-              <a href="">
+              <a href="#">
                 <span className="chat-message-recepient__rate-icon-like">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
