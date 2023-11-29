@@ -1,0 +1,25 @@
+.spinner__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.spinner__style {
+    width: 115px !important;
+    height: 115px !important;
+    color: #00AB97;
+}
+
+.progress__container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .progress__text {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 26px;
+    font-weight: 300; 
+  }

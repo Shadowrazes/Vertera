@@ -1,4 +1,4 @@
-import "../css/ticket_title.css";
+import "../css/ticket-title.css";
 
 function getStatusColor(status: string): string {
   switch (status) {

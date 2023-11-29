@@ -1,0 +1,96 @@
+.chat-input__container {
+    display: flex;
+    justify-content: center;
+}
+
+.chat-input__form {
+    display: flex;
+    justify-content: center;
+    width: 670px;
+}
+
+.chat-input__row {
+    gap: 25px;
+}
+
+.chat-input__textarea {
+    resize: none;
+}
+
+.chat-input__button-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-input__button-send {
+    min-width: 400px !important;
+    padding: 15px;
+    font-family: 'TT Norms Pro', sans-serif;
+}
+
+.chat-input__button-row .chat-input__button-close {
+    padding: 15px;
+    background: #fff !important;
+    border: 1px solid #00ab97 !important;
+    font-family: 'TT Norms Pro', sans-serif;
+    color: #00ab97 !important;
+}
+
+.chat-input__close-container .chat-input__button-close {
+    padding: 15px;
+    background: #fff !important;
+    border: 1px solid #00ab97 !important;
+    font-family: 'TT Norms Pro', sans-serif;
+    color: #00ab97 !important;
+}
+
+.chat-input__more {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.chat-input__more:before, .chat-input__more:after {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    box-sizing: border-box;
+    width: 41%;
+    height: 3px;
+    background: #DEE2E6;
+    border: solid #FFF;
+    border-width: 0 70px;
+}
+
+.chat-input__more:before {
+    margin-left: -100%;
+}
+
+.chat-input__more:after {
+    margin-right: -100%;
+}
+
+.chat-input__more-text {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 24px;
+}
+
+.chat-input__more-link {
+    text-decoration: none;
+    color: #979797;
+}
+
+.chat-input__close-box {
+    display: flex;
+    align-items: center;
+    padding-left: 50px;
+    margin-bottom: 50px;
+    width: 1074px;
+    height: 124px;
+    border-radius: 15px;
+    border: 1px solid #DEE2E6;
+}
+
+.chat-input__close-text {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 20px;
+}

@@ -46,6 +46,11 @@
   font-size: 20px;
 }
 
+.alltickets__link {
+  color: black;
+  text-decoration: none;
+}
+
 .alltickets__column {
   display: flex;
   flex-direction: column;
@@ -63,7 +68,6 @@
 .alltickets__button-two {
   width: 250px;
   background: #fff !important;
-  border: 1px solid #00ab97 !important;
   color: #00ab97 !important;
 }
 

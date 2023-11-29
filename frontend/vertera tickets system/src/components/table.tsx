@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Table, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
 import "../css/table.css";
-
-import { useNavigate } from "react-router-dom";
 
 function TableTickets() {
   type TableRow = {

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
+import { Link } from "react-router-dom";
 import TitleH2 from "../components/title";
 import DropdownBT from "../components/dropdown";
 import ButtonCustom from "../components/button";
-import "../css/all_tickets.css";
+import "../css/all-tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
@@ -94,7 +95,7 @@ function allTickets() {
   let items = ["1", "2", "3"];
   //paginaton
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 4;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -214,19 +215,73 @@ function allTickets() {
         <tbody>
           {currentItems.map((item) => (
             <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.section}</td>
-              <td>{item.date.toLocaleDateString()}</td>
-              <td>{item.theme}</td>
-              <td>{item.last_message}</td>
-              <td>{item.message_count}</td>
               <td>
-                <span
-                  className="table__status"
-                  style={{ background: getStatusBGColor(item.status) }}
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
                 >
-                  {item.status}
-                </span>
+                  {item.id}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  {item.section}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  {item.date.toLocaleDateString()}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  {item.theme}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  {item.last_message}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  {item.message_count}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${item.id}`}
+                  state={{ status: item.status }}
+                  className="alltickets__link"
+                >
+                  <span
+                    className="table__status"
+                    style={{ background: getStatusBGColor(item.status) }}
+                  >
+                    {item.status}
+                  </span>
+                </Link>
               </td>
             </tr>
           ))}
