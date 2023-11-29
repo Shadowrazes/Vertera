@@ -1,4 +1,4 @@
-import "../css/chat_message_recipient.css";
+import "../css/chat-message-recipient.css";
 
 interface ChatMessageProps {
   message: string;

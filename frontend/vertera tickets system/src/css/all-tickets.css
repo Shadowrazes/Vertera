@@ -46,6 +46,11 @@
   font-size: 20px;
 }
 
+.alltickets__link {
+  color: black;
+  text-decoration: none;
+}
+
 .alltickets__column {
   display: flex;
   flex-direction: column;

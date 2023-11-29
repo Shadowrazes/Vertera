@@ -7,7 +7,7 @@ import Table from "./components/table";
 import AllTickets from "./pages/all-tickets";
 import ButtonOne from "./components/button";
 import TicketTitle from "./components/ticket-title";
-import Chat from "./components/chat";
+import Chat from "./pages/chat";
 import "./App.css";
 
 import CreateTicket from "./pages/create-ticket";
@@ -17,20 +17,15 @@ import Loader from "./pages/loading";
 function App() {
   return (
     <div className="container">
-      {/* <Header /> */}
-      {/* <Router>
+      <Header />
+      <Router>
         <Routes>
           <Route path="/" element={<CreateTicket />} />
           <Route path="/all-tickets" element={<AllTickets />} />
-          <Route
-            path="/dialog"
-            element={<TicketTitle title="Обращение #123" state="Открыта" />}
-          />
+          <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
         </Routes>
-      </Router> */}
-      {/* <TicketTitle title="Обращение #123" state="Открыта" />
-      <Chat /> */}
-      <Loader />
+      </Router>
+      {/* <Loader /> */}
     </div>
   );
 }

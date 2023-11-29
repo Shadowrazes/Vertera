@@ -18,7 +18,6 @@
     max-width: 1075px;
     font-family: 'TT Norms Pro', sans-serif;
     font-size: 20px;
-    word-wrap: break-word;
 }
 
 .chat-message-sender__time {

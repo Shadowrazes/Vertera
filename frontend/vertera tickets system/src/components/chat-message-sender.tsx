@@ -1,4 +1,4 @@
-import "../css/chat_message_sender.css";
+import "../css/chat-message-sender.css";
 
 interface ChatMessageProps {
   message: string;
@@ -10,7 +10,7 @@ function ChatMessage({ message, time }: ChatMessageProps) {
     <>
       <div className="chat-message-sender__container">
         <div className="chat-message-sender__box">
-          <p className="chat-message-sender__text">{message}</p>
+          <div className="chat-message-sender__text">{message}</div>
         </div>
         <span className="chat-message-sender__time">{time}</span>
       </div>
