@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class AttachmentEntity extends Entity {
+class Attachment extends Entity {
     static TableName = 'attachments';
     static PrimaryField = 'id';
     static MessageIdField = 'messageId'
@@ -30,4 +30,4 @@ class AttachmentEntity extends Entity {
     }
 }
 
-export default AttachmentEntity;
+export default Attachment;

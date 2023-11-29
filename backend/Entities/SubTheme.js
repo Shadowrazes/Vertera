@@ -1,8 +1,6 @@
 import Entity from "./Entity.js";
-import ThemeEntity from "./Theme.js";
-import UnitEntity from "./Unit.js";
 
-class SubThemeEntity extends Entity{
+class SubTheme extends Entity{
     static TableName = 'subthemes';
     static PrimaryField = 'id';
     static NameField = 'name';
@@ -13,20 +11,6 @@ class SubThemeEntity extends Entity{
         const result = await super.Request(sql, [id]); 
         return result[0];
     }
-
-    // const themeNameAS = 'theme';
-    //     const unitNameAS = 'unit';
-    //     const sql = `
-    //         SELECT 
-    //             ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.NameField}, 
-    //             ${ThemeEntity.TableName}.${ThemeEntity.NameField} AS ${themeNameAS},
-    //             ${UnitEntity.TableName}.${UnitEntity.NameField} AS ${unitNameAS} 
-    //         FROM ${this.TableName}
-    //         JOIN ${ThemeEntity.TableName} 
-    //             ON ${this.TableName}.${this.ThemeIdField} = ${ThemeEntity.TableName}.${ThemeEntity.PrimaryField}
-    //         JOIN ${UnitEntity.TableName} 
-    //             ON ${ThemeEntity.TableName}.${ThemeEntity.UnitIdField} = ${UnitEntity.TableName} .${UnitEntity.PrimaryField};
-    //     `;
 
     static async GetList() {
         const sql = `SELECT * from ${this.TableName}`;
@@ -48,4 +32,4 @@ class SubThemeEntity extends Entity{
     }
 }
 
-export default SubThemeEntity;
+export default SubTheme;

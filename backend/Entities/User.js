@@ -2,7 +2,7 @@ import Entity from "./Entity.js";
 import Account from "../Utils/Account.js"
 import Token from "../Utils/Token.js"
 
-class UserEntity extends Entity{
+class User extends Entity{
     static TableName = 'users';
     static PrimaryField = 'id';
     static FullNameField = 'fullName';
@@ -105,4 +105,4 @@ class UserEntity extends Entity{
     }
 }
 
-export default UserEntity;
+export default User;

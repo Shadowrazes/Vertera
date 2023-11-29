@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class DepartmentEntity extends Entity{
+class Department extends Entity{
     static TableName = 'departments';
     static PrimaryField = 'id';
     static NameField = 'name';
@@ -31,4 +31,4 @@ class DepartmentEntity extends Entity{
     }
 }
 
-export default DepartmentEntity;
+export default Department;

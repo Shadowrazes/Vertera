@@ -2,198 +2,198 @@ import Pool from '../DB/Connect.js';
 import { GraphQLScalarType, Kind }  from 'graphql';
 
 import Entity from "../Entities/Entity.js";
-import UserEntity from "../Entities/User.js";
-import HelperEntity from "../Entities/Helper.js";
-import ClientEntity from "../Entities/Client.js";
-import TicketEntity from "../Entities/Ticket.js";
-import MessageEntity from "../Entities/Message.js";
-import AttachmentEntity from "../Entities/Attachment.js";
-import ThemeEntity from "../Entities/Theme.js";
-import SubThemeEntity from "../Entities/SubTheme.js";
-import UnitEntity from "../Entities/Unit.js"; 
-import DepartmentEntity from "../Entities/Department.js"; 
-import ThemeDepartmentEntity from "../Entities/ThemeDepartment.js";
-import HelperDepartmentEntity from "../Entities/HelperDepartment.js"; 
-import TranslationEntity from "../Entities/Translation.js";
+import User from "../Entities/User.js";
+import Helper from "../Entities/Helper.js";
+import Client from "../Entities/Client.js";
+import Ticket from "../Entities/Ticket.js";
+import Message from "../Entities/Message.js";
+import Attachment from "../Entities/Attachment.js";
+import Theme from "../Entities/Theme.js";
+import SubTheme from "../Entities/SubTheme.js";
+import Unit from "../Entities/Unit.js"; 
+import Department from "../Entities/Department.js"; 
+import ThemeDepartment from "../Entities/ThemeDepartment.js";
+import HelperDepartment from "../Entities/HelperDepartment.js"; 
+import Translations from "../Entities/Translations.js";
 
 Entity.Pool = Pool;
 
 export const resolvers = {
     Query:{
         login: async (_, { login, password }) => {
-            return await UserEntity.Login(login, password);
+            return await User.Login(login, password);
         },
         user: async (_, { id }) => {
-            return await UserEntity.GetById(id);
+            return await User.GetById(id);
         },
         userList: async (_, args) => {
-            if(!(await UserEntity.AccessAllow('helper', args.token))) throw new Error('Forbidden');
-            return await UserEntity.GetList();
+            if(!(await User.AccessAllow('helper', args.token))) throw new Error('Forbidden');
+            return await User.GetList();
         },
         helper: async (_, { id }) => {
-            return await HelperEntity.GetById(id);
+            return await Helper.GetById(id);
         },
         helperList: async (_, args) => {
-            return await HelperEntity.GetList();
+            return await Helper.GetList();
         },
         client: async (_, { id }) => {
             // user
-            return await ClientEntity.GetById(id);
+            return await Client.GetById(id);
         },
         clientList: async (_, args) => {
-            return await ClientEntity.GetList();
+            return await Client.GetList();
         },
         ticket: async (_, { id }) => {
             // user
-            return await TicketEntity.GetById(id);
+            return await Ticket.GetById(id);
         },
         ticketList: async (_, args) => {
             // user
-            return await TicketEntity.GetList(args.filters);
+            return await Ticket.GetList(args.filters);
         },
         message: async (_, { id }) => {
-            return await MessageEntity.GetById(id);
+            return await Message.GetById(id);
         },
         messageList: async (_, { ticketId }) => {
             // user
-            return await MessageEntity.GetListByTicket(ticketId);
+            return await Message.GetListByTicket(ticketId);
         },
         attachment: async (_, { id }) => {
-            return await AttachmentEntity.GetById(id);
+            return await Attachment.GetById(id);
         },
         attachmentList: async (_, { messageId }) => {
-            return await AttachmentEntity.GetListByMsg(messageId);
+            return await Attachment.GetListByMsg(messageId);
         },
         subThemeList: async (_, args) => {
-            return await SubThemeEntity.GetList();
+            return await SubTheme.GetList();
         },
         departmentList: async (_, args) => {
-            return await DepartmentEntity.GetList();
+            return await Department.GetList();
         },
     },
     Mutation: {
         addClientUser: async (_, args) => {
             // user
-            return await ClientEntity.TransInsert(args.userFields, args.clientFields);
+            return await Client.TransInsert(args.userFields, args.clientFields);
         },
         addHelperUser: async (_, args) => {
             // superAdmin
-            return await HelperEntity.TransInsert(args.userFields, args.helperFields);
+            return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         addTicket: async (_, args) => {
             // user
-            return await TicketEntity.TransInsert(args);
+            return await Ticket.TransInsert(args);
         },
         addMessage: async (_, args) => {
             // user
-            return await MessageEntity.TransInsert(args.fields);
+            return await Message.TransInsert(args.fields);
         },
         updateTicket: async (_, args) => {
             // user
-            return await TicketEntity.TransUpdate(args.id, args.fields, args.departmentId);
+            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
         },
         updateClientUser: async (_, args) => {
             // user
-            return await ClientEntity.TransUpdate(args.id, args.userFields, args.clientFields);
+            return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateHelperUser: async (_, args) => {
-            return await HelperEntity.TransUpdate(args.id, args.userFields, args.helperFields);
+            return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         updateSubTheme: async (_, args) => {
-            return await SubThemeEntity.Update(args.id, args.fields);
+            return await SubTheme.Update(args.id, args.fields);
         },
         updateTheme: async (_, args) => {
-            return await ThemeEntity.Update(args.id, args.fields);
+            return await Theme.Update(args.id, args.fields);
         },
         updateUnit: async (_, args) => {
-            return await UnitEntity.Update(args.id, args.fields);
+            return await Unit.Update(args.id, args.fields);
         },
         updateThemeDepartment: async (_, args) => {
-            return await ThemeDepartmentEntity.Update(args.id, args.fields);
+            return await ThemeDepartment.Update(args.id, args.fields);
         },
         updateDepartment: async (_, args) => {
-            return await DepartmentEntity.Update(args.id, args.fields);
+            return await Department.Update(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
-            return await TicketEntity.DeleteCascade(id);
+            return await Ticket.DeleteCascade(id);
         },
         deleteUser: async (_, { id }) => {
-            return await UserEntity.DeleteCascade(id);
+            return await User.DeleteCascade(id);
         },
         deleteUnit: async (_, { id }) => {
-            return await UnitEntity.DeleteCascade(id);
+            return await Unit.DeleteCascade(id);
         },
         deleteTheme: async (_, { id }) => {
-            return await ThemeEntity.DeleteCascade(id);
+            return await Theme.DeleteCascade(id);
         },
         deleteSubTheme: async (_, { id }) => {
-            return await SubThemeEntity.DeleteCascade(id);
+            return await SubTheme.DeleteCascade(id);
         },
         deleteThemeDepartment: async (_, { id }) => {
-            return await ThemeDepartmentEntity.DeleteCascade(id);
+            return await ThemeDepartment.DeleteCascade(id);
         },
         deleteDepartment: async (_, { id }) => {
-            return await DepartmentEntity.DeleteCascade(id);
+            return await Department.DeleteCascade(id);
         },
     },
     Client: {
         user: async (parent, args) => {
-            return await UserEntity.GetById(parent.id);
+            return await User.GetById(parent.id);
         },
     },
     Helper: {
         user: async (parent, args) => {
-            return await UserEntity.GetById(parent.id);
+            return await User.GetById(parent.id);
         },
         departments: async (parent, args) => {
-            return await HelperDepartmentEntity.GetListByHelperId(parent.id);
+            return await HelperDepartment.GetListByHelperId(parent.id);
         },
     },
     Ticket: {
         client: async (parent, args) => {
-            return await ClientEntity.GetById(parent.clientId);
+            return await Client.GetById(parent.clientId);
         },
         helper: async (parent, args) => {
-            return await HelperEntity.GetById(parent.helperId);
+            return await Helper.GetById(parent.helperId);
         },
         messages: async (parent, args) => {
-            return await MessageEntity.GetListByTicket(parent.id);
+            return await Message.GetListByTicket(parent.id);
         },
         lastMessage: async (parent, args) => {
-            return await TicketEntity.GetLastMsg(parent.id);
+            return await Ticket.GetLastMsg(parent.id);
         },
         msgStats: async (parent, args) => {
-            return await TicketEntity.GetMsgStats(parent.id);
+            return await Ticket.GetMsgStats(parent.id);
         },
         subTheme: async (parent, args) => {
-            return await SubThemeEntity.GetById(parent.subThemeId);
+            return await SubTheme.GetById(parent.subThemeId);
         },
     },
     Message: {
         sender: async (parent, args) => {
-            return await UserEntity.GetById(parent.senderId);
+            return await User.GetById(parent.senderId);
         },
         reciever: async (parent, args) => {
-            return await UserEntity.GetById(parent.recieverId);
+            return await User.GetById(parent.recieverId);
         },
         attachs: async (parent, args) => {
-            return await AttachmentEntity.GetListByMsg(parent.id);
+            return await Attachment.GetListByMsg(parent.id);
         },
         ticket: async (parent, args) => {
-            return await TicketEntity.GetById(parent.ticketId);
+            return await Ticket.GetById(parent.ticketId);
         },
     },
     SubTheme: {
         theme: async (parent, args) => {
-            return await ThemeEntity.GetById(parent.themeId);
+            return await Theme.GetById(parent.themeId);
         },
         departments: async (parent, args) => {
-            return await ThemeDepartmentEntity.GetListBySubThemeId(parent.id);
+            return await ThemeDepartment.GetListBySubThemeId(parent.id);
         },
     },
     Theme: {
         unit: async (parent, args) => {
-            return await UnitEntity.GetById(parent.unitId);
+            return await Unit.GetById(parent.unitId);
         },
     },
     DateTime: new GraphQLScalarType({

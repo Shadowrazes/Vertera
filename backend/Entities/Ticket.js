@@ -1,9 +1,9 @@
 import Entity from "./Entity.js";
-import HelperEntity from "./Helper.js";
-import MessageEntity from "./Message.js";
-import UserEntity from "./User.js";
+import Helper from "./Helper.js";
+import Message from "./Message.js";
+import User from "./User.js";
 
-class TicketEntity extends Entity{
+class Ticket extends Entity{
     static TableName = 'tickets';
     static PrimaryField = 'id';
     static ClientIdField = 'clientId';
@@ -23,9 +23,9 @@ class TicketEntity extends Entity{
 
     static async GetLastMsg(ticketId) {
         const sql = `
-        SELECT * FROM ${MessageEntity.TableName} 
-        WHERE ${MessageEntity.TicketIdField} = ? 
-        ORDER BY ${MessageEntity.DateField} DESC LIMIT 1
+        SELECT * FROM ${Message.TableName} 
+        WHERE ${Message.TicketIdField} = ? 
+        ORDER BY ${Message.DateField} DESC LIMIT 1
         `;
         const result = await super.Request(sql, [ticketId]);   
         return result[0];
@@ -33,8 +33,8 @@ class TicketEntity extends Entity{
 
     static async GetMsgStats(ticketId) {
         const sql = `
-        SELECT COUNT(*) AS total, SUM(IF(${MessageEntity.TableName}.${MessageEntity.ReadField} = 0, 1, 0)) AS unread
-        FROM ${MessageEntity.TableName} WHERE ${MessageEntity.TicketIdField} = ?;
+        SELECT COUNT(*) AS total, SUM(IF(${Message.TableName}.${Message.ReadField} = 0, 1, 0)) AS unread
+        FROM ${Message.TableName} WHERE ${Message.TicketIdField} = ?;
         `;
         const result = await super.Request(sql, [ticketId]);   
         return result[0];
@@ -53,21 +53,21 @@ class TicketEntity extends Entity{
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, 
-                ${usersClientAS}.${UserEntity.CountryField} AS ${clientCountryAS},
-                ${usersHelperAS}.${UserEntity.CountryField} AS ${helperCountryAS},
+                ${usersClientAS}.${User.CountryField} AS ${clientCountryAS},
+                ${usersHelperAS}.${User.CountryField} AS ${helperCountryAS},
                 MAX(messages.date) AS lastMsgDate, 
                 COUNT(messages.id) AS totalMsg
 
         FROM    ${this.TableName} 
 
-        JOIN    ${UserEntity.TableName} AS ${usersClientAS} 
+        JOIN    ${User.TableName} AS ${usersClientAS} 
                 ON ${this.TableName}.${this.ClientIdField} = ${usersClientAS}.id
 
-        JOIN    ${UserEntity.TableName} AS ${usersHelperAS} 
+        JOIN    ${User.TableName} AS ${usersHelperAS} 
                 ON ${this.TableName}.${this.HelperIdField} = ${usersHelperAS}.id
 
-        JOIN    ${MessageEntity.TableName} 
-                ON ${this.TableName}.${this.PrimaryField} = ${MessageEntity.TableName}.${MessageEntity.TicketIdField}
+        JOIN    ${Message.TableName} 
+                ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
 
         WHERE   1=1
         `;
@@ -90,22 +90,22 @@ class TicketEntity extends Entity{
             fields.push(filter.helperName);
         }
         if (filter.helperCountries && filter.helperCountries.length > 0) {
-            sql += ` AND ${usersHelperAS}.${UserEntity.CountryField} IN (?)`;
+            sql += ` AND ${usersHelperAS}.${User.CountryField} IN (?)`;
             fields.push(filter.helperCountries);
         }
         if (filter.clientCountries && filter.clientCountries.length > 0) {
-            sql += ` AND ${usersClientAS}.${UserEntity.CountryField} IN (?)`;
+            sql += ` AND ${usersClientAS}.${User.CountryField} IN (?)`;
             fields.push(filter.clientCountries);
         }
         if (filter.replyed != undefined) {
             sql += ` 
             AND ${this.ClientIdField} = (
-                SELECT ${MessageEntity.SenderIdField}
-                FROM ${MessageEntity.TableName}
-                WHERE ${MessageEntity.DateField} = (
-                    SELECT MAX(${MessageEntity.DateField}) 
-                    FROM ${MessageEntity.TableName} 
-                    WHERE ${MessageEntity.TicketIdField} ${!filter.replyed ? '=' : '<>'} ${this.TableName}.${this.PrimaryField})
+                SELECT ${Message.SenderIdField}
+                FROM ${Message.TableName}
+                WHERE ${Message.DateField} = (
+                    SELECT MAX(${Message.DateField}) 
+                    FROM ${Message.TableName} 
+                    WHERE ${Message.TicketIdField} ${!filter.replyed ? '=' : '<>'} ${this.TableName}.${this.PrimaryField})
                 )
             `;
         }
@@ -135,7 +135,7 @@ class TicketEntity extends Entity{
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
-            const helperId = await HelperEntity.GetMostFreeHelper(ticketFields.subThemeId);
+            const helperId = await Helper.GetMostFreeHelper(ticketFields.subThemeId);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
                             themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, status: 'Новый'};
@@ -143,15 +143,15 @@ class TicketEntity extends Entity{
             
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
-            const messageResult = await MessageEntity.TransInsert(messageFields, conn);
+            const messageResult = await Message.TransInsert(messageFields, conn);
 
-            const helperResult = await UserEntity.GetById(helperId);
+            const helperResult = await User.GetById(helperId);
             const helperFullNameSplit = helperResult.fullName.trim().split(' ');
             const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
 
             const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
                                    ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
-            const msgSysResult = await MessageEntity.TransInsert(msgSysFields, conn);
+            const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
             return result.insertId;
         });
@@ -160,20 +160,20 @@ class TicketEntity extends Entity{
     static async TransUpdate(id, fields, departmentId) {
         return await super.Transaction(async (conn) => {
             if(!fields.helperId && departmentId) {
-                fields.helperId = await HelperEntity.GetMostFreeHelper(fields.subThemeId, departmentId);
+                fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
             }
     
             if(fields.helperId) {
                 const clientResult = await this.GetById(id);
                 const clientId = clientResult.clientId;
 
-                const helperResult = await UserEntity.GetById(fields.helperId);
+                const helperResult = await User.GetById(fields.helperId);
                 const helperFullNameSplit = helperResult.fullName.trim().split(' ');
                 const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
     
                 const msgFields = { senderId: 0, recieverId: clientId, type: 'system', readed: 0,
                                     ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
-                const msgResult = await MessageEntity.TransInsert(msgFields, conn);
+                const msgResult = await Message.TransInsert(msgFields, conn);
             }
     
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
@@ -190,4 +190,4 @@ class TicketEntity extends Entity{
     }
 }
 
-export default TicketEntity;
+export default Ticket;

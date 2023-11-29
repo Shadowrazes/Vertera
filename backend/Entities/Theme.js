@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class ThemeEntity extends Entity{
+class Theme extends Entity{
     static TableName = 'themes';
     static PrimaryField = 'id';
     static NameField = 'name';
@@ -32,4 +32,4 @@ class ThemeEntity extends Entity{
     }
 }
 
-export default ThemeEntity;
+export default Theme;

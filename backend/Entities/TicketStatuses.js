@@ -1,7 +1,6 @@
 import Entity from "./Entity.js";
-import User from "./User.js";
 
-class Client extends Entity{
+class TicketStatuses extends Entity{
     static TableName = 'clients';
     static PrimaryField = 'id';
     static PhoneField = 'phone';
@@ -22,7 +21,7 @@ class Client extends Entity{
     static async TransInsert(userFields, clientFields) {
         return await super.Transaction(async (conn) => {
             userFields.role = 'client';
-            const id = await User.TransInsert(conn, userFields);
+            const id = await UserEntity.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {id, email: clientFields.email};
             const result = await super.TransRequest(conn, sql, [fields]);
@@ -35,7 +34,7 @@ class Client extends Entity{
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             
             const clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
-            const userResult = await User.TransUpdate(conn, id, userFields);
+            const userResult = await UserEntity.TransUpdate(conn, id, userFields);
 
             return {affected: clientResult.affectedRows, changed: clientResult.changedRows, 
                     warning: clientResult.warningStatus};
@@ -43,4 +42,4 @@ class Client extends Entity{
     }
 }
 
-export default Client;
+export default TicketStatuses;

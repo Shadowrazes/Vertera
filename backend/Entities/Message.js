@@ -1,7 +1,7 @@
-import AttachmentEntity from "./Attachment.js";
+import Attachment from "./Attachment.js";
 import Entity from "./Entity.js";
 
-class MessageEntity extends Entity{
+class Message extends Entity{
     static TableName = 'messages';
     static PrimaryField = 'id';
     static SenderIdField = 'senderId';
@@ -33,7 +33,7 @@ class MessageEntity extends Entity{
 
             const result = await super.TransRequest(conn, sql, [fields]);
             if(args.attachPaths){
-                const attachResult = await AttachmentEntity.TransInsert(conn, result.insertId, args.attachPaths);
+                const attachResult = await Attachment.TransInsert(conn, result.insertId, args.attachPaths);
             }
             return result.insertId;
         };
@@ -56,4 +56,4 @@ class MessageEntity extends Entity{
     }
 }
 
-export default MessageEntity;
+export default Message;

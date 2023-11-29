@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
-import DepartmentEntity from "./Department.js"; 
+import Department from "./Department.js"; 
 
-class HelperDepartmentEntity extends Entity{
+class HelperDepartment extends Entity{
     static TableName = 'helper_departments';
     static PrimaryField = 'id';
     static HelperIdField = 'helperId';
@@ -15,8 +15,8 @@ class HelperDepartmentEntity extends Entity{
 
     static async GetListByHelperId(helperId) {
         const sql = `
-        SELECT * from ${DepartmentEntity.TableName} 
-        WHERE ${DepartmentEntity.PrimaryField} IN (
+        SELECT * from ${Department.TableName} 
+        WHERE ${Department.PrimaryField} IN (
             SELECT ${this.DepartmentIdField} from ${this.TableName} 
             WHERE ${this.HelperIdField} = ?
         )`;
@@ -43,4 +43,4 @@ class HelperDepartmentEntity extends Entity{
     }
 }
 
-export default HelperDepartmentEntity;
+export default HelperDepartment;

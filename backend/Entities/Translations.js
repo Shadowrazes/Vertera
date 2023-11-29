@@ -1,6 +1,6 @@
 import Entity from "./Entity.js";
 
-class TranslationEntity extends Entity{
+class Translations extends Entity{
     static async GetById(id) {
         
     }
@@ -9,7 +9,7 @@ class TranslationEntity extends Entity{
         
     }
 
-    static async Insert(id, name, role, county) {
+    static async Insert() {
         
     }
 
@@ -25,4 +25,4 @@ class TranslationEntity extends Entity{
     // Insert or Update
 }
 
-export default TranslationEntity;
+export default Translations;
