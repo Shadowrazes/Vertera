@@ -31,7 +31,7 @@ class Helper extends Entity{
         `;
 
         const ticketCountAS = 'ticketCount';
-        const statusFilter = ['Закрыт'];
+        const statusFilter = [2];
         let fields = [statusFilter];
 
         if(!departmentId){
@@ -45,7 +45,7 @@ class Helper extends Entity{
             FROM ${this.TableName}
             LEFT JOIN (
                 SELECT ${Ticket.HelperIdField}, COUNT(*) AS ${ticketCountAS}
-                FROM ${Ticket.TableName} WHERE ${Ticket.StatusField} NOT IN (?)
+                FROM ${Ticket.TableName} WHERE ${Ticket.StatusIdField} NOT IN (?)
                 GROUP BY ${Ticket.HelperIdField}
             ) AS ${Ticket.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.HelperIdField} 

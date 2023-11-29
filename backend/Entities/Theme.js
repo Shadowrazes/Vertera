@@ -3,22 +3,23 @@ import Entity from "./Entity.js";
 class Theme extends Entity{
     static TableName = 'themes';
     static PrimaryField = 'id';
-    static NameField = 'name';
+    static NameCodeField = 'nameCode';
     static UnitIdField = 'unitId';
 
     static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]); 
         return result[0];
     }
 
     static async GetList() {
-        const sql = `SELECT * from ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName}`;
         const result = await super.Request(sql);
         return result;
     }
 
     static async Update(id, fields) {
+        return;
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [fields, id]);
         return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};

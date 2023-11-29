@@ -4,7 +4,7 @@ class Entity{
     static async GetConn() {
         return await this.Pool.getConnection().catch(err => {
             console.log(err);
-            throw err.code ? new Error(err.code) : 'DB Access error';
+            throw err.code ? new Error('Unsolvable') : err;
         });
     }
 
@@ -17,7 +17,7 @@ class Entity{
         })
         .catch(err =>{
             console.log(err);
-            throw err.code ? new Error(err.code) : 'DB Access error';
+            throw err.code ? new Error('Unsolvable') : err;
         })
         .finally(() => {
             conn.release();
@@ -26,7 +26,7 @@ class Entity{
     }
 
     static async TransRequest(conn, sql, fields) {
-        return conn.query(sql, fields).then(res => {
+        return await conn.query(sql, fields).then(res => {
             console.log('Trans Request Completed');
             return res[0];
         });
@@ -35,7 +35,7 @@ class Entity{
     static async Transaction(reqQueue) {
         const conn = await this.Pool.getConnection().catch(err => {
             console.log(err);
-            throw err.code ? new Error(err.code) : 'DB Access error';
+            throw err.code ? new Error('Unsolvable') : err;
         });
 
         try{
@@ -49,7 +49,7 @@ class Entity{
             await conn.rollback();
             console.log(err);
             console.log('Conn Rollback');
-            throw err.code ? new Error(err.code) : 'DB Access error';
+            throw err.code ? new Error('Unsolvable') : err;
         }
         finally {
             conn.release();

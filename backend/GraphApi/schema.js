@@ -55,8 +55,13 @@ export const typeDefs = `
         id: Int!
         fullName: String!
         role: String!
-        country: String!
+        country: Country!
         phone: String
+    }
+
+    type Country {
+        id: Int!
+        name(lang: String!): Translation!
     }
 
     type Client {
@@ -67,18 +72,23 @@ export const typeDefs = `
 
     type Helper {
         id: Int!
-        jobTitle: String!
+        jobTitle: HelperJobTitle!
         birthday: DateTime!
         departments: [Department]!
         startWorkDate: DateTime!
         user: User!
     }
 
+    type HelperJobTitle {
+        id: Int!
+        name(lang: String!): Translation!
+    }
+
     type Ticket {
         id: Int!
         client: Client!
         helper: Helper!
-        status: String!
+        status: TicketStatus!
         date: DateTime!
         subTheme: SubTheme!
         reaction: String
@@ -87,27 +97,38 @@ export const typeDefs = `
         msgStats: TicketMsgStats!
     }
 
+    type TicketStatus {
+        id: Int!
+        name(lang: String!): Translation!
+    }
+
+    type Translation {
+        type: String!
+        code: String!
+        stroke: String
+    }
+
     type Unit {
         id: Int!
-        name: String!
+        name(lang: String!): Translation!
     }
 
     type Theme {
         id: Int!
-        name: String!
+        name(lang: String!): Translation!
         unit: Unit!
     }
 
     type SubTheme {
         id: Int!
-        name: String!
+        name(lang: String!): Translation!
         theme: Theme!
         departments: [Department]!
     }
 
     type Department {
         id: Int!
-        name: String!
+        name(lang: String!): Translation!
         individual: Boolean!
     }
 
@@ -141,15 +162,15 @@ export const typeDefs = `
     }
 
     input TicketFilter {
-        unitId: [Int]
-        themeId: [Int]
-        subThemeId: [Int]
-        helperId: [String]
-        helperCountries: [String]
-        clientCountries: [String]
+        unitIds: [Int]
+        themeIds: [Int]
+        subThemeIds: [Int]
+        helperIds: [Int]
+        helperCountryIds: [Int]
+        clientCountryIds: [Int]
         date: DateTime
         reaction: String
-        status: [String]
+        statusIds: [Int]
         replyed: Boolean
         orderBy: String!
         orderDir: String!
@@ -159,7 +180,7 @@ export const typeDefs = `
 
     input UserInsert {
         fullName: String!
-        country: String!
+        countryId: Int!
         login: String
         password: String
         phone: String
@@ -170,7 +191,7 @@ export const typeDefs = `
     }
 
     input HelperInsert {
-        jobTitle: String!
+        jobTitleId: Int!
         birthday: DateTime!
         departmentIds: [Int]!
     }
@@ -193,7 +214,7 @@ export const typeDefs = `
 
     input TicketUpdate {
         helperId: Int
-        status: String
+        statusId: Int
         unitId: Int
         themeId: Int
         subThemeId: Int
@@ -202,7 +223,7 @@ export const typeDefs = `
 
     input UserUpdate {
         fullName: String
-        country: String
+        countryId: Int
         password: String
         phone: String
     }
@@ -212,28 +233,23 @@ export const typeDefs = `
     }
 
     input HelperUpdate {
-        jobTitle: String
+        jobTitleId: Int
         birthday: DateTime
         departmentIds: [Int]
     }
 
     input SubThemeUpdate {
         themeId: Int
-        name: String
-    }
-
-    input SubThemeUpdate {
-        themeId: Int
-        name: String
+        nameCode: String
     }
 
     input ThemeUpdate {
         unitId: Int
-        name: String
+        nameCode: String
     }
 
     input UnitUpdate {
-        name: String!
+        nameCode: String!
     }
 
     input ThemeDepartmentsUpdate {
@@ -242,7 +258,7 @@ export const typeDefs = `
     }
 
     input DepartmentUpdate {
-        name: String!
+        nameCode: String!
         individual: Boolean!
     }
 `;

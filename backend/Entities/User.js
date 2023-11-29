@@ -7,7 +7,7 @@ class User extends Entity{
     static PrimaryField = 'id';
     static FullNameField = 'fullName';
     static RoleField = 'role';
-    static CountryField = 'country';
+    static CountryIdField = 'countryId';
     static LoginField = 'login';
     static PasswordField = 'password';
     static TokenField = 'token';

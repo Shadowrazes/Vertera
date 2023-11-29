@@ -8,7 +8,7 @@ class Ticket extends Entity{
     static PrimaryField = 'id';
     static ClientIdField = 'clientId';
     static HelperIdField = 'helperId';
-    static StatusField = 'status';
+    static StatusIdField = 'statusId';
     static DateField = 'date';
     static UnitField = 'unitId';
     static ThemeField = 'themeId';
@@ -16,7 +16,7 @@ class Ticket extends Entity{
     static ReactionField = 'reaction';
 
     static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
@@ -49,12 +49,12 @@ class Ticket extends Entity{
         // SUM(IF(messages.readed = 0, 1, 0)) AS unreadMsg
         let sql = `
         SELECT  ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.ClientIdField}, 
-                ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusField}, 
+                ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusIdField}, 
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, 
-                ${usersClientAS}.${User.CountryField} AS ${clientCountryAS},
-                ${usersHelperAS}.${User.CountryField} AS ${helperCountryAS},
+                ${usersClientAS}.${User.CountryIdField} AS ${clientCountryAS},
+                ${usersHelperAS}.${User.CountryIdField} AS ${helperCountryAS},
                 MAX(messages.date) AS lastMsgDate, 
                 COUNT(messages.id) AS totalMsg
 
@@ -73,29 +73,29 @@ class Ticket extends Entity{
         `;
 
         let fields = [];
-        if (filter.unitId && filter.unitId.length > 0) {
+        if (filter.unitIds && filter.unitIds.length > 0) {
             sql += ` AND ${this.UnitField} IN (?)`;
-            fields.push(filter.unitId);
+            fields.push(filter.unitIds);
         }
-        if (filter.themeId && filter.themeId.length > 0) {
+        if (filter.themeIds && filter.themeIds.length > 0) {
             sql += ` AND ${this.ThemeField} IN (?)`;
-            fields.push(filter.themeId);
+            fields.push(filter.themeIds);
         }
-        if (filter.subThemeId && filter.subThemeId.length > 0) {
+        if (filter.subThemeIds && filter.subThemeIds.length > 0) {
             sql += ` AND ${this.SubThemeField} IN (?)`;
-            fields.push(filter.subThemeId);
+            fields.push(filter.subThemeIds);
         }
-        if (filter.helperName && filter.helperName.length > 0) {
+        if (filter.helperIds && filter.helperIds.length > 0) {
             sql += ` AND ${this.HelperIdField} IN (?)`;
-            fields.push(filter.helperName);
+            fields.push(filter.helperIds);
         }
-        if (filter.helperCountries && filter.helperCountries.length > 0) {
-            sql += ` AND ${usersHelperAS}.${User.CountryField} IN (?)`;
-            fields.push(filter.helperCountries);
+        if (filter.helperCountryIds && filter.helperCountryIds.length > 0) {
+            sql += ` AND ${usersHelperAS}.${User.CountryIdField} IN (?)`;
+            fields.push(filter.helperCountryIds);
         }
-        if (filter.clientCountries && filter.clientCountries.length > 0) {
-            sql += ` AND ${usersClientAS}.${User.CountryField} IN (?)`;
-            fields.push(filter.clientCountries);
+        if (filter.clientCountryIds && filter.clientCountryIds.length > 0) {
+            sql += ` AND ${usersClientAS}.${User.CountryIdField} IN (?)`;
+            fields.push(filter.clientCountryIds);
         }
         if (filter.replyed != undefined) {
             sql += ` 
@@ -109,9 +109,9 @@ class Ticket extends Entity{
                 )
             `;
         }
-        if (filter.status && filter.status.length > 0) {
-            sql += ` AND ${this.StatusField} IN (?)`;
-            fields.push(filter.status);
+        if (filter.statusIds && filter.statusIds.length > 0) {
+            sql += ` AND ${this.StatusIdField} IN (?)`;
+            fields.push(filter.statusIds);
         }
         if (filter.date) {
             sql += ` AND ${this.TableName}.${this.DateField} = ?`;
@@ -138,7 +138,7 @@ class Ticket extends Entity{
             const helperId = await Helper.GetMostFreeHelper(ticketFields.subThemeId);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
-                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, status: 'Новый'};
+                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: 1};
             const result = await super.TransRequest(conn, sql, [fields]);
             
             messageFields.recieverId = helperId;
@@ -171,7 +171,7 @@ class Ticket extends Entity{
                 const helperFullNameSplit = helperResult.fullName.trim().split(' ');
                 const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
     
-                const msgFields = { senderId: 0, recieverId: clientId, type: 'system', readed: 0,
+                const msgFields = { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
                                     ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
                 const msgResult = await Message.TransInsert(msgFields, conn);
             }

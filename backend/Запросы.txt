@@ -15,7 +15,7 @@ mutation{
 }
 
 mutation{
-  updateHelperUser(id: 35,  fields: {fullName: "tested", country: "africa", password: "sasd", phone: "78888", department: "aga", jobTitle: "кабанчик", birthday: "2022-11-05"}){
+  updateHelperUser(id: 35,  userFields: {fullName: "tested", country: "africa", password: "sasd", phone: "78888"}, helperFields: {departmentIds: [1, 2], jobTitle: "кабанчик", birthday: "2022-11-05"}){
     affected
   }
 }
@@ -30,11 +30,17 @@ query	{
   ticketList(filters: {limit: 9999, offset: 0, orderBy: "lastMsgDate", orderDir: "ASC", clientCountries: ["russia", "china"]}){
     id
     subTheme{
-      name
+      name(lang:"ru"){
+        stroke
+      }
       theme{
-        name
+        name(lang:"ru"){
+          stroke
+        }
         unit{
-          name
+          name(lang:"ru"){
+            stroke
+          }
         }
       }
     }
@@ -57,6 +63,19 @@ query	{
   }
 }
 
+query{
+  ticket(id: 2){
+    status{
+      id
+      name(lang: "ru"){
+        type
+        code
+        stroke
+      }
+    }
+  }
+}
+
 query {
   message(id: 1){
     id
@@ -72,5 +91,11 @@ query {
       name
       path
     }
+  }
+}
+
+query{
+  userList(token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDYsImlhdCI6MTcwMDY0Njk4MywiZXhwIjoxNzAwNjc1NzgzfQ.hxURuBI5xPUhL1zjJgaPihIVVsgQ4PscPvBa6q-bKDE"){
+    id
   }
 }

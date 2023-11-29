@@ -1,16 +1,37 @@
 import Entity from "./Entity.js";
 
 class Translations extends Entity{
-    static async GetById(id) {
-        
+    static TableName = 'translations';
+    static PrimaryField = 'id';
+    static TypeField = 'type';
+    static CodeField = 'code';
+    static LangAS = 'stroke';
+
+    static async GetByCode(code, lang) {
+        const sql = `
+            SELECT ${this.TypeField}, ${this.CodeField}, ${lang} AS ${this.LangAS} 
+            FROM ${this.TableName} WHERE ${this.CodeField} = ?
+        `;
+        const result = await super.Request(sql, [code]);
+        return result[0];
     }
 
-    static async GetAll() {
-        
+    static async GetList() {
+        const sql = `SELECT * FROM ${this.TableName}`;
+        const result = await super.Request(sql);
+        return result;
     }
 
-    static async Insert() {
-        
+    static async GetListByType(type) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.TypeField} = ?`;
+        const result = await super.Request(sql, [type]);
+        return result;
+    }
+
+    static async Insert(fields) {
+        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const result = await super.Request(sql, [fields]);
+        return result.insertId;
     }
 
     static async Update(id) {
@@ -20,9 +41,6 @@ class Translations extends Entity{
     static async Delete(id) {
 
     }
-
-    //  clear table
-    // Insert or Update
 }
 
 export default Translations;

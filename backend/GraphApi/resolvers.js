@@ -12,8 +12,11 @@ import Theme from "../Entities/Theme.js";
 import SubTheme from "../Entities/SubTheme.js";
 import Unit from "../Entities/Unit.js"; 
 import Department from "../Entities/Department.js"; 
+import Country from '../Entities/Country.js';
 import ThemeDepartment from "../Entities/ThemeDepartment.js";
-import HelperDepartment from "../Entities/HelperDepartment.js"; 
+import HelperDepartment from "../Entities/HelperDepartment.js";
+import TicketStatus from '../Entities/TicketStatus.js'; 
+import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translations from "../Entities/Translations.js";
 
 Entity.Pool = Pool;
@@ -136,6 +139,11 @@ export const resolvers = {
             return await Department.DeleteCascade(id);
         },
     },
+    User: {
+        country: async (parent, args) => {
+            return await Country.GetById(parent.countryId);
+        },
+    },
     Client: {
         user: async (parent, args) => {
             return await User.GetById(parent.id);
@@ -145,8 +153,16 @@ export const resolvers = {
         user: async (parent, args) => {
             return await User.GetById(parent.id);
         },
+        jobTitle: async (parent, args) => {
+            return await HelperJobTitle.GetById(parent.id);
+        },
         departments: async (parent, args) => {
             return await HelperDepartment.GetListByHelperId(parent.id);
+        },
+    },
+    HelperJobTitle: {
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
         },
     },
     Ticket: {
@@ -167,6 +183,9 @@ export const resolvers = {
         },
         subTheme: async (parent, args) => {
             return await SubTheme.GetById(parent.subThemeId);
+        },
+        status: async (parent, args) => {
+            return await TicketStatus.GetById(parent.statusId);
         },
     },
     Message: {
@@ -190,10 +209,36 @@ export const resolvers = {
         departments: async (parent, args) => {
             return await ThemeDepartment.GetListBySubThemeId(parent.id);
         },
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
+        },
     },
     Theme: {
         unit: async (parent, args) => {
             return await Unit.GetById(parent.unitId);
+        },
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
+        },
+    },
+    Unit: {
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
+        },
+    },
+    TicketStatus: {
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
+        },
+    },
+    Department: {
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
+        },
+    },
+    Country: {
+        name: async (parent, args) => {
+            return await Translations.GetByCode(parent.nameCode, args.lang);
         },
     },
     DateTime: new GraphQLScalarType({
