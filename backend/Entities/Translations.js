@@ -7,7 +7,7 @@ class Translations extends Entity{
     static CodeField = 'code';
     static LangAS = 'stroke';
 
-    static async GetByCode(code, lang) {
+    static async GetByCode(lang, code) {
         const sql = `
             SELECT ${this.TypeField}, ${this.CodeField}, ${lang} AS ${this.LangAS} 
             FROM ${this.TableName} WHERE ${this.CodeField} = ?
@@ -16,14 +16,20 @@ class Translations extends Entity{
         return result[0];
     }
 
-    static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+    static async GetList(lang) {
+        const sql = `
+            SELECT ${this.TypeField}, ${this.CodeField}, ${lang} AS ${this.LangAS} 
+            FROM ${this.TableName}
+        `;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetListByType(type) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.TypeField} = ?`;
+    static async GetListByType(lang, type) {
+        const sql = `
+            SELECT ${this.TypeField}, ${this.CodeField}, ${lang} AS ${this.LangAS} 
+            FROM ${this.TableName} WHERE ${this.TypeField} = ?
+        `;
         const result = await super.Request(sql, [type]);
         return result;
     }

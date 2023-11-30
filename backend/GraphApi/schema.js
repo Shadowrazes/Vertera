@@ -25,6 +25,15 @@ export const typeDefs = `
         subThemeList: [SubTheme]
 
         departmentList: [Department]
+
+        jobTitleList: [HelperJobTitle]
+
+        countryList: [Country]
+
+        ticketStatusList: [TicketStatus]
+
+        translationList(lang: String!): [Translation]
+        translationListByType(lang: String!, type: String!): [Translation]
     }
 
     type Mutation {

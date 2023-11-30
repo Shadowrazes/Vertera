@@ -94,6 +94,32 @@ query {
   }
 }
 
+query	{
+  helper(id: 2){
+    jobTitle{
+      id
+      name(lang:"ru"){
+        stroke
+        code
+      }
+    }
+    departments{
+      name(lang:"ru"){
+        stroke
+        code
+      }
+    }
+    user{
+      country{
+        name(lang:"ru"){
+          code
+          stroke
+        }
+      }
+    }
+  }
+}
+
 query{
   userList(token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDYsImlhdCI6MTcwMDY0Njk4MywiZXhwIjoxNzAwNjc1NzgzfQ.hxURuBI5xPUhL1zjJgaPihIVVsgQ4PscPvBa6q-bKDE"){
     id

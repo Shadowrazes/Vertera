@@ -73,6 +73,21 @@ export const resolvers = {
         departmentList: async (_, args) => {
             return await Department.GetList();
         },
+        jobTitleList: async (_, args) => {
+            return await HelperJobTitle.GetList();
+        },
+        countryList: async (_, args) => {
+            return await Country.GetList();
+        },
+        ticketStatusList: async (_, args) => {
+            return await TicketStatus.GetList();
+        },
+        translationList: async (_, args) => {
+            return await Translations.GetList(args.lang);
+        },
+        translationListByType: async (_, args) => {
+            return await Translations.GetListByType(args.lang, args.type);
+        },
     },
     Mutation: {
         addClientUser: async (_, args) => {
@@ -162,7 +177,7 @@ export const resolvers = {
     },
     HelperJobTitle: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     Ticket: {
@@ -210,7 +225,7 @@ export const resolvers = {
             return await ThemeDepartment.GetListBySubThemeId(parent.id);
         },
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     Theme: {
@@ -218,27 +233,27 @@ export const resolvers = {
             return await Unit.GetById(parent.unitId);
         },
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     Unit: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     TicketStatus: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     Department: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     Country: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(parent.nameCode, args.lang);
+            return await Translations.GetByCode(args.lang, parent.nameCode);
         },
     },
     DateTime: new GraphQLScalarType({
