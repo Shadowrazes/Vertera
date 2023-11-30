@@ -132,6 +132,9 @@ export const resolvers = {
         updateDepartment: async (_, args) => {
             return await Department.Update(args.id, args.fields);
         },
+        updateTranslation: async (_, args) => {
+            return await Translations.Update(args.fields);
+        },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
         },

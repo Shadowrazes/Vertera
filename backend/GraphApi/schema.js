@@ -50,6 +50,7 @@ export const typeDefs = `
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
         updateThemeDepartment(id: Int!, fields: ThemeDepartmentsUpdate!): UpdateInfo!
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
+        updateTranslation(fields: TranslationUpdate!): UpdateInfo!
 
         deleteTicket(id: Int): Int!
         deleteUser(id: Int) : Int!
@@ -245,6 +246,12 @@ export const typeDefs = `
         jobTitleId: Int
         birthday: DateTime
         departmentIds: [Int]
+    }
+
+    input TranslationUpdate {
+        code: String!
+        lang: String!
+        stroke: String!
     }
 
     input SubThemeUpdate {

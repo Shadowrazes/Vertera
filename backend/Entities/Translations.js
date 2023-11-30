@@ -1,4 +1,5 @@
 import Entity from "./Entity.js";
+import Translitter from "../Utils/Translitter.js";
 
 class Translations extends Entity{
     static TableName = 'translations';
@@ -35,16 +36,28 @@ class Translations extends Entity{
     }
 
     static async Insert(fields) {
+        return;
         const sql = `INSERT INTO ${this.TableName} SET ?`;
         const result = await super.Request(sql, [fields]);
         return result.insertId;
     }
 
-    static async Update(id) {
+    static async Update(fields) {
+        const newCode = Translitter.Transform(fields.stroke);
 
+        const sql = `
+            UPDATE ${this.TableName} 
+            SET ${fields.lang} = ?, ${this.CodeField} = '${newCode}'
+            WHERE ${this.CodeField} = ?
+        `;
+   
+        const result = await super.Request(sql, [fields.stroke, fields.code]);
+
+        return {affected: result.affectedRows, changed: result.changedRows, 
+                warning: result.warningStatus};
     }
 
-    static async Delete(id) {
+    static async Delete(code) {
 
     }
 }
