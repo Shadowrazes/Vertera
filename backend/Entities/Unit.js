@@ -1,9 +1,11 @@
 import Entity from "./Entity.js";
+import Translation from "./Translation.js";
 
 class Unit extends Entity{
     static TableName = 'units';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
+    static TranslationType = 'unit'
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -17,11 +19,13 @@ class Unit extends Entity{
         return result;
     }
 
-    static async Update(id, fields) {
-        return;
-        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [fields, id]);
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+    static async TransUpdate(id, fields) {
+        return await super.Transaction(async (conn) => {
+            const row = await this.GetById(id);
+            const codeType = this.TranslationType + ' ' + row.id;
+            const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode, codeType);
+            return translationResult;
+        });
     }
 
     // Cascade deleting Unit & Themes & SubThemes & SubTheme to department link

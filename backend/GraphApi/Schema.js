@@ -49,12 +49,16 @@ export const typeDefs = `
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
+        updateThemeDepartment(id: Int!, fields: ThemeDepartmentsUpdate!): UpdateInfo!
+
+        updateTranslation(fields: TranslationUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
         updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
-        updateThemeDepartment(id: Int!, fields: ThemeDepartmentsUpdate!): UpdateInfo!
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
-        updateTranslation(fields: TranslationUpdate!): UpdateInfo!
+        updateCountry(id: Int!, fields: CountryUpdate!): UpdateInfo!
+        updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
+        updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
 
         deleteTicket(id: Int!): Int!
         deleteUser(id: Int!) : Int!
@@ -279,27 +283,46 @@ export const typeDefs = `
         stroke: String!
     }
 
+    input CountryUpdate {
+        stroke: String
+        lang: String!
+    }
+
+    inpit TicketStatusUpdate {
+        stroke: String
+        lang: String!
+    }
+
+    input HelperJobTitleUpdate {
+        stroke: String
+        lang: String!
+    }
+
     input SubThemeUpdate {
         themeId: Int
-        nameCode: String
+        stroke: String
+        lang: String!
     }
 
     input ThemeUpdate {
         unitId: Int
-        nameCode: String
+        stroke: String
+        lang: String!
     }
 
     input UnitUpdate {
-        nameCode: String!
+        stroke: String!
+        lang: String!
+    }
+
+    input DepartmentUpdate {
+        stroke: String!
+        lang: String!
+        individual: Boolean!
     }
 
     input ThemeDepartmentsUpdate {
         subThemeId: Int!
         departmentId: Int!
-    }
-
-    input DepartmentUpdate {
-        nameCode: String!
-        individual: Boolean!
     }
 `;

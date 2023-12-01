@@ -130,22 +130,31 @@ export const resolvers = {
             return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         updateSubTheme: async (_, args) => {
-            return await SubTheme.Update(args.id, args.fields);
+            return await SubTheme.TransUpdate(args.id, args.fields);
         },
         updateTheme: async (_, args) => {
-            return await Theme.Update(args.id, args.fields);
+            return await Theme.TransUpdate(args.id, args.fields);
         },
         updateUnit: async (_, args) => {
-            return await Unit.Update(args.id, args.fields);
-        },
-        updateThemeDepartment: async (_, args) => {
-            return await ThemeDepartment.Update(args.id, args.fields);
+            return await Unit.TransUpdate(args.id, args.fields);
         },
         updateDepartment: async (_, args) => {
-            return await Department.Update(args.id, args.fields);
+            return await Department.TransUpdate(args.id, args.fields);
+        },
+        updateCountry: async (_, args) => {
+            return await Country.TransUpdate(args.id, args.fields);
+        },
+        updateTicketStatus: async (_, args) => {
+            return await TicketStatus.TransUpdate(args.id, args.fields);
+        },
+        updateHelperJobTitle: async (_, args) => {
+            return await HelperJobTitle.TransUpdate(args.id, args.fields);
         },
         updateTranslation: async (_, args) => {
             return await Translation.Update(args.fields);
+        },
+        updateThemeDepartment: async (_, args) => {
+            return await ThemeDepartment.Update(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);

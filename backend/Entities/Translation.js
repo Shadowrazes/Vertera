@@ -8,6 +8,11 @@ class Translation extends Entity{
     static TypeField = 'type';
     static CodeField = 'code';
     static LangAS = 'stroke';
+    static MainLang = 'ru';
+    static OuterTypes = ['interface'];
+    static InnerTypes = [
+        'ticketStatus', 'subTheme', 'theme', 'unit', 'department', 'jobTitle', 'country'
+    ];
 
     static async GetByCode(lang, code) {
         const sql = `
@@ -37,6 +42,11 @@ class Translation extends Entity{
     }
 
     static async Insert(fields) {
+        // одинаковые переводы?
+        if(!this.OuterTypes.includes(fields.type)){
+            throw new Error('This type for translation is forbidden');
+        }
+
         const code = Translitter.Transform(fields.type + ' ' + md5(fields.stroke));
         const sql = `
             INSERT INTO ${this.TableName} 
@@ -47,8 +57,9 @@ class Translation extends Entity{
         return code;
     }
 
-    static async TransInsert(conn, fields, type) {
-        const code = Translitter.Transform(type + ' ' + md5(fields.stroke));
+    // Types come from other entities, only internal
+    static async TransInsert(conn, fields, type, codeType) {
+        const code = Translitter.Transform(codeType + ' ' + md5(fields.stroke));
         const sql = `
             INSERT INTO ${this.TableName} 
             SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${type}'
@@ -60,10 +71,11 @@ class Translation extends Entity{
 
     // Cascade updating translation & dependent tables
     static async Update(fields) {
-        const codeType = fields.code.split('_')[0];
+        const codeSplit = fields.code.split('_');
+        const codeType = codeSplit[0];
 
-        if(fields.codeTypeId){
-            codeType += ' ' + fields.codeTypeId;
+        if(codeSplit.length > 2){
+            codeType += ' ' + codeSplit[1];
         }
 
         const newCode = Translitter.Transform(codeType + ' ' + md5(fields.stroke));
@@ -76,8 +88,25 @@ class Translation extends Entity{
    
         const result = await super.Request(sql, [fields.stroke, fields.code]);
 
-        return {affected: result.affectedRows, changed: result.changedRows, 
-                warning: result.warningStatus};
+        return {affected: result.affectedRows, changed: result.changedRows,
+                warning: result.warningStatus, newCode};
+    }
+
+    static async TransUpdate(conn, fields, code, codeType) {
+        if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
+
+        const newCode = Translitter.Transform(codeType + ' ' + md5(fields.stroke));
+
+        const sql = `
+            UPDATE ${this.TableName} 
+            SET ${fields.lang} = ?, ${this.CodeField} = '${newCode}'
+            WHERE ${this.CodeField} = ?
+        `;
+   
+        const result = await super.TransRequest(conn, sql, [fields.stroke, code]);
+
+        return {affected: result.affectedRows, changed: result.changedRows,
+                warning: result.warningStatus, newCode};
     }
 
     static async Delete(code) {
