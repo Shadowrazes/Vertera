@@ -47,3 +47,26 @@ app.listen(port, (err) => {
 
     console.log('Server started');
 });
+
+// import Translitter from './Utils/Translitter.js';
+// import Translation from './Entities/Translation.js';
+// import md5 from 'md5';
+
+// const translations = await Translation.GetList('ru');
+
+// for(const translation of translations){
+//     const codeSplit = translation.code.split('_');
+//     let code = codeSplit[0];
+
+//     if(translation.type == 'unit' || translation.type == 'theme' ||translation.type == 'subTheme'){
+//         code += ' ' + codeSplit[1];
+//     }
+
+//     code += ' ' + md5(translation.stroke);
+
+//     const newCode = Translitter.Transform(code);
+
+//     await Translation.Upd(newCode, translation.code);
+
+//     console.log(newCode);
+// }

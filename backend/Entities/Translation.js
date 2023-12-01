@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import Translitter from "../Utils/Translitter.js";
+import md5 from 'md5';
 
 class Translation extends Entity{
     static TableName = 'translations';
@@ -36,7 +37,7 @@ class Translation extends Entity{
     }
 
     static async Insert(fields) {
-        const code = Translitter.Transform(fields.type + ' ' + fields.stroke);
+        const code = Translitter.Transform(fields.type + ' ' + md5(fields.stroke));
         const sql = `
             INSERT INTO ${this.TableName} 
             SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${fields.type}'
@@ -47,7 +48,7 @@ class Translation extends Entity{
     }
 
     static async TransInsert(conn, fields, type) {
-        const code = Translitter.Transform(type + ' ' + fields.stroke);
+        const code = Translitter.Transform(type + ' ' + md5(fields.stroke));
         const sql = `
             INSERT INTO ${this.TableName} 
             SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${type}'
@@ -60,7 +61,12 @@ class Translation extends Entity{
     // Cascade updating translation & dependent tables
     static async Update(fields) {
         const codeType = fields.code.split('_')[0];
-        const newCode = Translitter.Transform(codeType + ' ' + fields.stroke);
+
+        if(fields.codeTypeId){
+            codeType += ' ' + fields.codeTypeId;
+        }
+
+        const newCode = Translitter.Transform(codeType + ' ' + md5(fields.stroke));
 
         const sql = `
             UPDATE ${this.TableName} 
