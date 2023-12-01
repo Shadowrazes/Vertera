@@ -19,6 +19,18 @@ mutation{
 }
 
 mutation{
+  addTheme(fields:{unitId:2, stroke:"тест", lang:"ru"})
+}
+
+mutation{
+  updateTheme(id:26, fields:{unitId:1, stroke:"тестик", lang:"ru"}){
+    affected
+    changed
+    warning
+  }
+}
+
+mutation{
   updateHelperUser(id: 35,  userFields: {fullName: "tested", country: "africa", password: "sasd", phone: "78888"}, helperFields: {departmentIds: [1, 2], jobTitle: "кабанчик", birthday: "2022-11-05"}){
     affected
   }

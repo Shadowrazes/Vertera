@@ -41,10 +41,15 @@ export const typeDefs = `
         addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
+
+        addTranslation(fields: TranslationInsert!): String!
         addTicketStatus(fields: TicketStatusInsert!): String!
         addCountry(fields: CountryInsert!): String!
         addJobTitle(fields: HelperJobTitleInsert!): String!
-        addTranslation(fields: TranslationInsert!): String!
+        addSubTheme(fields: SubThemeInsert!): String!
+        addTheme(fields: ThemeInsert!): String!
+        addUnit(fields: UnitInsert!): String!
+        addDepartment(fields: DepartmentInsert!): String!
 
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
@@ -230,6 +235,29 @@ export const typeDefs = `
         attachPaths: [String]
     }
 
+    input SubThemeInsert {
+        themeId: Int!
+        stroke: String!
+        lang: String!
+    }
+
+    input ThemeInsert {
+        unitId: Int!
+        stroke: String!
+        lang: String!
+    }
+
+    input UnitInsert {
+        stroke: String!
+        lang: String!
+    }
+
+    input DepartmentInsert {
+        stroke: String!
+        lang: String!
+        individual: Boolean!
+    }
+
     input TicketStatusInsert {
         lang: String!
         stroke: String!
@@ -288,7 +316,7 @@ export const typeDefs = `
         lang: String!
     }
 
-    inpit TicketStatusUpdate {
+    input TicketStatusUpdate {
         stroke: String
         lang: String!
     }

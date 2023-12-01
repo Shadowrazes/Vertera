@@ -115,6 +115,18 @@ export const resolvers = {
         addJobTitle: async (_, args) => {
             return await HelperJobTitle.TransInsert(args.fields);
         },
+        addSubTheme: async (_, args) => {
+            return await SubTheme.TransInsert(args.fields);
+        },
+        addTheme: async (_, args) => {
+            return await Theme.TransInsert(args.fields);
+        },
+        addUnit: async (_, args) => {
+            return await Unit.TransInsert(args.fields);
+        },
+        addDepartment: async (_, args) => {
+            return await Department.TransInsert(args.fields);
+        },
         addTranslation: async (_, args) => {
             return await Translation.Insert(args.fields);
         },

@@ -2,6 +2,14 @@ class Entity{
     static Pool;
     static EmptyUpdateInfo = { affected: 0, changed: 0, warning: 0 };
 
+    static async GetFutureIdAI(tableName) {
+        const tableInfo = await this.Request(`SHOW CREATE TABLE ${tableName}`);
+        const regexp = /AUTO_INCREMENT=(\d+)/;
+        const regexResult = tableInfo[0]['Create Table'].match(regexp);
+        const futureId = parseInt(regexResult[1]);
+        return futureId;
+    }
+
     static async GetConn() {
         return await this.Pool.getConnection().catch(err => {
             console.log(err);

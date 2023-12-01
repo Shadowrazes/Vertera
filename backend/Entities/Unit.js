@@ -19,6 +19,19 @@ class Unit extends Entity{
         return result;
     }
 
+    static async TransInsert(fields) {
+        return await super.Transaction(async (conn) => {
+            const id = await super.GetFutureIdAI(this.TableName);
+            const codeType = this.TranslationType + ' ' + id;
+            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType, codeType);
+
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const insertFields = {nameCode};
+            const result = await super.TransRequest(conn, sql, [insertFields]);
+            return nameCode;
+        });
+    }
+
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
             const row = await this.GetById(id);

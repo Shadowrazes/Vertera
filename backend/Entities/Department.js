@@ -19,6 +19,18 @@ class Department extends Entity{
         return result;
     }
 
+    static async TransInsert(fields) {
+        return await super.Transaction(async (conn) => {
+            const codeType = this.TranslationType;
+            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType, codeType);
+
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const insertFields = {individual: fields.individual, nameCode};
+            const result = await super.TransRequest(conn, sql, [insertFields]);
+            return nameCode;
+        });
+    }
+
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
             if(fields.stroke){

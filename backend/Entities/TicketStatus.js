@@ -21,10 +21,11 @@ class TicketStatus extends Entity{
 
     static async TransInsert(fields) {
         return await super.Transaction(async (conn) => {
-            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType, this.TranslationType);
+            const codeType = this.TranslationType;
+            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType, codeType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {nameCode: nameCode};
+            const insertFields = {nameCode};
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });

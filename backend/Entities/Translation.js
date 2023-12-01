@@ -42,7 +42,7 @@ class Translation extends Entity{
     }
 
     static async Insert(fields) {
-        // одинаковые переводы?
+        // одинаковые переводы элементов интерфейса в разных частях?
         if(!this.OuterTypes.includes(fields.type)){
             throw new Error('This type for translation is forbidden');
         }
@@ -59,6 +59,8 @@ class Translation extends Entity{
 
     // Types come from other entities, only internal
     static async TransInsert(conn, fields, type, codeType) {
+        if(fields.lang != this.MainLang) throw new Error('Insert is possible only by ru lang');
+
         const code = Translitter.Transform(codeType + ' ' + md5(fields.stroke));
         const sql = `
             INSERT INTO ${this.TableName} 
@@ -92,6 +94,7 @@ class Translation extends Entity{
                 warning: result.warningStatus, newCode};
     }
 
+    // CodeType come from other entities, only internal
     static async TransUpdate(conn, fields, code, codeType) {
         if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
 
