@@ -17,7 +17,7 @@ import ThemeDepartment from "../Entities/ThemeDepartment.js";
 import HelperDepartment from "../Entities/HelperDepartment.js";
 import TicketStatus from '../Entities/TicketStatus.js'; 
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
-import Translations from "../Entities/Translations.js";
+import Translation from "../Entities/Translation.js";
 
 Entity.Pool = Pool;
 
@@ -83,10 +83,10 @@ export const resolvers = {
             return await TicketStatus.GetList();
         },
         translationList: async (_, args) => {
-            return await Translations.GetList(args.lang);
+            return await Translation.GetList(args.lang);
         },
         translationListByType: async (_, args) => {
-            return await Translations.GetListByType(args.lang, args.type);
+            return await Translation.GetListByType(args.lang, args.type);
         },
     },
     Mutation: {
@@ -105,6 +105,18 @@ export const resolvers = {
         addMessage: async (_, args) => {
             // user
             return await Message.TransInsert(args.fields);
+        },
+        addTicketStatus: async (_, args) => {
+            return await TicketStatus.TransInsert(args.fields);
+        },
+        addCountry: async (_, args) => {
+            return await Country.TransInsert(args.fields);
+        },
+        addJobTitle: async (_, args) => {
+            return await HelperJobTitle.TransInsert(args.fields);
+        },
+        addTranslation: async (_, args) => {
+            return await Translation.Insert(args.fields);
         },
         updateTicket: async (_, args) => {
             // user
@@ -133,7 +145,7 @@ export const resolvers = {
             return await Department.Update(args.id, args.fields);
         },
         updateTranslation: async (_, args) => {
-            return await Translations.Update(args.fields);
+            return await Translation.Update(args.fields);
         },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
@@ -180,7 +192,7 @@ export const resolvers = {
     },
     HelperJobTitle: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     Ticket: {
@@ -228,7 +240,7 @@ export const resolvers = {
             return await ThemeDepartment.GetListBySubThemeId(parent.id);
         },
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     Theme: {
@@ -236,27 +248,27 @@ export const resolvers = {
             return await Unit.GetById(parent.unitId);
         },
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     Unit: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     TicketStatus: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     Department: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     Country: {
         name: async (parent, args) => {
-            return await Translations.GetByCode(args.lang, parent.nameCode);
+            return await Translation.GetByCode(args.lang, parent.nameCode);
         },
     },
     DateTime: new GraphQLScalarType({

@@ -1,9 +1,11 @@
 import Entity from "./Entity.js";
+import Translation from "./Translation.js";
 
 class HelperJobTitle extends Entity{
     static TableName = 'helper_job_titles';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
+    static TranslationType = 'jobTitle'
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -15,6 +17,17 @@ class HelperJobTitle extends Entity{
         const sql = `SELECT * FROM ${this.TableName}`;
         const result = await super.Request(sql);
         return result;
+    }
+
+    static async TransInsert(fields) {
+        return await super.Transaction(async (conn) => {
+            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
+
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const insertFields = {nameCode: nameCode};
+            const result = await super.TransRequest(conn, sql, [insertFields]);
+            return nameCode;
+        });
     }
 }
 

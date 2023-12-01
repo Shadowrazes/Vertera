@@ -41,6 +41,10 @@ export const typeDefs = `
         addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
         addMessage(fields: MessageInsert!): Int!
+        addTicketStatus(fields: TicketStatusInsert!): String!
+        addCountry(fields: CountryInsert!): String!
+        addJobTitle(fields: HelperJobTitleInsert!): String!
+        addTranslation(fields: TranslationInsert!): String!
 
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
@@ -52,13 +56,13 @@ export const typeDefs = `
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
         updateTranslation(fields: TranslationUpdate!): UpdateInfo!
 
-        deleteTicket(id: Int): Int!
-        deleteUser(id: Int) : Int!
-        deleteUnit(id: Int) : Int!
-        deleteTheme(id: Int) : Int!
-        deleteSubTheme(id: Int) : Int!
-        deleteThemeDepartment(id: Int) : Int!
-        deleteDepartment(id: Int) : Int!
+        deleteTicket(id: Int!): Int!
+        deleteUser(id: Int!) : Int!
+        deleteUnit(id: Int!) : Int!
+        deleteTheme(id: Int!) : Int!
+        deleteSubTheme(id: Int!) : Int!
+        deleteThemeDepartment(id: Int!) : Int!
+        deleteDepartment(id: Int!) : Int!
     }
 
     type User {
@@ -220,6 +224,27 @@ export const typeDefs = `
         type: String!
         text: String!
         attachPaths: [String]
+    }
+
+    input TicketStatusInsert {
+        lang: String!
+        stroke: String!
+    }
+
+    input HelperJobTitleInsert {
+        lang: String!
+        stroke: String!
+    }
+
+    input CountryInsert {
+        lang: String!
+        stroke: String!
+    }
+
+    input TranslationInsert {
+        type: String!
+        lang: String!
+        stroke: String!
     }
 
     input TicketUpdate {

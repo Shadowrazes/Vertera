@@ -2,8 +2,8 @@ import Express from 'express';
 
 import { graphqlHTTP }  from 'express-graphql';
 
-import { typeDefs } from './GraphApi/schema.js';
-import { resolvers } from './GraphApi/resolvers.js';
+import { typeDefs } from './GraphApi/Schema.js';
+import { resolvers } from './GraphApi/Resolvers.js';
 import { makeExecutableSchema } from '@graphql-tools/schema'
 
 import fileUpload from 'express-fileupload';
