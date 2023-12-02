@@ -2,6 +2,14 @@ class Entity{
     static Pool;
     static EmptyUpdateInfo = { affected: 0, changed: 0, warning: 0 };
 
+    static ArgsSize(obj) {
+        return Object.keys(obj).length;
+    }
+
+    static IsArgsEmpty(obj) {
+        return _.isEmpty(obj);
+    }
+
     static async GetFutureIdAI(tableName) {
         const tableInfo = await this.Request(`SHOW CREATE TABLE ${tableName}`);
         const regexp = /AUTO_INCREMENT=(\d+)/;

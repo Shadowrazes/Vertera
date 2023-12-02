@@ -22,9 +22,7 @@ class Theme extends Entity{
 
     static async TransInsert(fields) {
         return await super.Transaction(async (conn) => {
-            const id = await super.GetFutureIdAI(this.TableName);
-            const codeType = this.TranslationType + ' ' + id;
-            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType, codeType);
+            const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const insertFields = {unitId: fields.unitId, nameCode};
@@ -37,8 +35,7 @@ class Theme extends Entity{
         return await super.Transaction(async (conn) => {
             if(fields.stroke){
                 const row = await this.GetById(id);
-                const codeType = this.TranslationType + ' ' + row.id;
-                const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode, codeType);
+                const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
             }
 
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
