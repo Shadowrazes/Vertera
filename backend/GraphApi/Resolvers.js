@@ -165,9 +165,6 @@ export const resolvers = {
         updateTranslation: async (_, args) => {
             return await Translation.Update(args.fields);
         },
-        updateThemeDepartment: async (_, args) => {
-            return await ThemeDepartment.Update(args.id, args.fields);
-        },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
         },

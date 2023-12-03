@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
+import ThemeDepartment from "./ThemeDepartment.js";
 
 class SubTheme extends Entity{
     static TableName = 'subthemes';
@@ -27,6 +28,9 @@ class SubTheme extends Entity{
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const insertFields = {themeId: fields.themeId, nameCode};
             const result = await super.TransRequest(conn, sql, [insertFields]);
+
+            const themeDepartmentResult = await ThemeDepartment.TransInsert(conn, result.insertId, fields.departmentIds);
+
             return nameCode;
         });
     }
@@ -36,6 +40,11 @@ class SubTheme extends Entity{
             if(fields.stroke){
                 const row = await this.GetById(id);
                 const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
+            }
+
+            if(fields.departmentIds && fields.departmentIds.length > 0) {
+                const themeDepartmentDelResult = await ThemeDepartment.TransDeleteBySubTheme(conn, id);
+                const themeDepartmentInsertResult = await ThemeDepartment.TransInsert(conn, id, fields.departmentIds);
             }
 
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;

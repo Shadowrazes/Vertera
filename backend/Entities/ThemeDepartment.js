@@ -24,6 +24,23 @@ class ThemeDepartment extends Entity{
         const result = await super.Request(sql, [subThemeId]);
         return result;
     }
+
+    static async TransInsert(conn, subThemeId, departmentIds) {
+        let insertedIds = [];
+        for(const departmentId of departmentIds){
+            const sql = `INSERT INTO ${this.TableName} SET ?`;
+            const fields = {subThemeId, departmentId};
+            const result = await super.TransRequest(conn, sql, [fields]);
+            insertedIds.push(result.insertId);
+        }
+        return insertedIds;
+    }
+
+    static async TransDeleteBySubTheme(conn, id) {
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.SubThemeIdField} = ?`;
+        const result = await super.TransRequest(conn, sql, [id]);
+        return result.affectedRows;
+    }
 }
 
 export default ThemeDepartment;

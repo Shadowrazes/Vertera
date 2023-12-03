@@ -54,7 +54,6 @@ export const typeDefs = `
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
-        updateThemeDepartment(id: Int!, fields: ThemeDepartmentsUpdate!): UpdateInfo!
 
         updateTranslation(fields: TranslationUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
@@ -239,6 +238,7 @@ export const typeDefs = `
         themeId: Int!
         stroke: String!
         lang: String!
+        departmentIds: [Int]!
     }
 
     input ThemeInsert {
@@ -329,6 +329,7 @@ export const typeDefs = `
     input SubThemeUpdate {
         themeId: Int
         stroke: String
+        departmentIds: [Int]
         lang: String!
     }
 
@@ -347,10 +348,5 @@ export const typeDefs = `
         stroke: String!
         lang: String!
         individual: Boolean!
-    }
-
-    input ThemeDepartmentsUpdate {
-        subThemeId: Int!
-        departmentId: Int!
     }
 `;
