@@ -1,68 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import "../css/table.css";
 
-function testTable() {
+function TestTable() {
   type TableRow = {
     id: number;
-    section: string;
-    date: Date;
     theme: string;
-    last_message: string;
-    message_count: string;
-    status: string;
+    [key: string]: string | number;
   };
 
-  const columns = [
-    "Раздел",
-    "Дата",
-    "Тема",
-    "Последнее сообщение",
-    "Сообщений",
-  ];
+  const columns = ["ID тикет", "Тема"];
 
-  const data: TableRow[] = [
-    {
-      id: 1,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "02.10.23| Имя Фамилия",
-      message_count: "3/1",
-      status: "Новый",
-    },
-    {
-      id: 2,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В процессе",
-    },
+  const initialData: TableRow[] = [
     {
       id: 3,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В ожидании",
+      theme: "B",
     },
     {
       id: 4,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "Закрыт",
+      theme: "A",
+    },
+    {
+      id: 1,
+      theme: "D",
+    },
+    {
+      id: 2,
+      theme: "C",
     },
   ];
 
+  const [data, setData] = useState(initialData);
   const [selectedSort, setSelectedSort] = useState(-1);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const sortData = (field: string) => {
+    const copyData = [...data];
+
+    const sortedData = copyData.sort((a, b) => {
+      const aValue: string | number | Date = a[field];
+      const bValue: string | number | Date = b[field];
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortDirection === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      } else if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      } else {
+        return 0;
+      }
+    });
+
+    setData(sortedData);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  };
+
+  useEffect(() => {}, []);
+
   const handleSorts = (index: number) => {
     setSelectedSort(index);
+    sortData(columns[index]);
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,45 +74,49 @@ function testTable() {
     <>
       <div className="table__sorts">
         <span className="table__sorts-label">Сортировать по:</span>
-        {columns.map((column, index) => (
-          <span
-            key={column}
-            onClick={() => {
-              handleSorts(index);
-            }}
-            className={
-              selectedSort === index
-                ? "table__sort table__sort-active"
-                : "table__sort"
-            }
-          >
-            {column}
-          </span>
-        ))}
+
+        <span
+          onClick={() => {
+            sortData("id");
+          }}
+          className="table__sort"
+        >
+          ID
+        </span>
+        <span
+          onClick={() => {
+            sortData("theme");
+          }}
+          className="table__sort"
+        >
+          Тема
+        </span>
       </div>
 
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th>ID тикет</th>
-            <th>Раздел</th>
-            <th>Дата создания</th>
-            <th>Тема</th>
-            <th>Последнее сообщение</th>
-            <th>Сообщений</th>
-            <th>Статус</th>
+            <th
+              onClick={() => {
+                sortData("id");
+              }}
+            >
+              ID тикет
+            </th>
+            <th
+              onClick={() => {
+                sortData("theme");
+              }}
+            >
+              Тема
+            </th>
           </tr>
         </thead>
         <tbody>
           {currentItems.map((item) => (
             <tr key={item.id}>
               <td>{item.id}</td>
-              <td>{item.section}</td>
-              <td>{item.date.toLocaleDateString()}</td>
               <td>{item.theme}</td>
-              <td>{item.last_message}</td>
-              <td>{item.message_count}</td>
-              <td>{item.status}</td>
             </tr>
           ))}
         </tbody>
@@ -123,4 +125,4 @@ function testTable() {
   );
 }
 
-export default testTable;
+export default TestTable;
