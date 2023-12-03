@@ -32,10 +32,16 @@ class Client extends Entity{
     
     static async TransUpdate(id, userFields, clientFields) {
         return await super.Transaction(async (conn) => {
-            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-            
-            const clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
-            const userResult = await User.TransUpdate(conn, id, userFields);
+            let clientResult = super.EmptyUpdateInfo;
+
+            if(!super.IsArgsEmpty(clientFields)){
+                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+                clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
+            }
+
+            if(!super.IsArgsEmpty(userFields)){
+                const userResult = await User.TransUpdate(conn, id, userFields);
+            }
 
             return {affected: clientResult.affectedRows, changed: clientResult.changedRows, 
                     warning: clientResult.warningStatus};

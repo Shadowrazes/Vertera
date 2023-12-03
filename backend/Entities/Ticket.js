@@ -159,13 +159,17 @@ class Ticket extends Entity{
 
     static async TransUpdate(id, fields, departmentId) {
         return await super.Transaction(async (conn) => {
-            if(!fields.helperId && departmentId) {
-                fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
-            }
-    
-            if(fields.helperId) {
+            if(super.IsArgsEmpty(fields) && !departmentId) throw new Error('Empty fields');
+
+            // обновить хелпера при subTheme?
+
+            if(fields.helperId || departmentId) {
                 const clientResult = await this.GetById(id);
                 const clientId = clientResult.clientId;
+
+                if(departmentId) {
+                    fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
+                }
 
                 const helperResult = await User.GetById(fields.helperId);
                 const helperFullNameSplit = helperResult.fullName.trim().split(' ');
@@ -176,8 +180,13 @@ class Ticket extends Entity{
                 const msgResult = await Message.TransInsert(msgFields, conn);
             }
     
-            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-            const result = await super.TransRequest(conn, sql, [fields, id]);
+            let result = super.EmptyUpdateInfo;
+
+            if(!super.IsArgsEmpty(fields)){
+                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+                result = await super.TransRequest(conn, sql, [fields, id]);
+            }
+
             return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
         });
     }

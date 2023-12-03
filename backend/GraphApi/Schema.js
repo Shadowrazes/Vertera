@@ -312,17 +312,17 @@ export const typeDefs = `
     }
 
     input CountryUpdate {
-        stroke: String
+        stroke: String!
         lang: String!
     }
 
     input TicketStatusUpdate {
-        stroke: String
+        stroke: String!
         lang: String!
     }
 
     input HelperJobTitleUpdate {
-        stroke: String
+        stroke: String!
         lang: String!
     }
 

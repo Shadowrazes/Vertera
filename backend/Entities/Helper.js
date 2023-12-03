@@ -82,16 +82,25 @@ class Helper extends Entity{
 
     static async TransUpdate(id, userFields, helperArgs) {
         return await super.Transaction(async (conn) => {
-            const helperFields = { jobTitle: helperArgs.jobTitle, birthday: helperArgs.birthday };
-            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-            
-            const helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
-            const userResult = await User.TransUpdate(conn, id, userFields);
-            const helperDepartmentDelResult = await HelperDepartment.TransDeleteByHelper(conn, id);
-            const helperDepartmentInsertResult = await HelperDepartment.TransInsert(conn, id, helperArgs.departmentIds);
+            if(super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error('Empty fields');
 
-            return {affected: helperResult.affectedRows, changed: helperResult.changedRows, 
-                    warning: helperResult.warningStatus};
+            let helperResult = super.EmptyUpdateInfo;
+            if(super.ArgsSize(helperArgs) != 1 && helperArgs.departmentIds){
+                const helperFields = { jobTitle: helperArgs.jobTitle, birthday: helperArgs.birthday };
+                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+                helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
+            }
+
+            if(!super.IsArgsEmpty(userFields)){
+                const userResult = await User.TransUpdate(conn, id, userFields);
+            }
+
+            if(helperArgs.departmentIds && helperArgs.departmentIds.length > 0){
+                const helperDepartmentDelResult = await HelperDepartment.TransDeleteByHelper(conn, id);
+                const helperDepartmentInsertResult = await HelperDepartment.TransInsert(conn, id, helperArgs.departmentIds);
+            }
+
+            return {affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus};
         });
     }
 }
