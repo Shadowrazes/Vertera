@@ -42,10 +42,10 @@ class Translation extends Entity{
     }
 
     static async Insert(fields) {
-        // одинаковые переводы элементов интерфейса в разных частях?
-        if(!this.OuterTypes.includes(fields.type)) throw new Error('This type for translation is forbidden');
+        // одинаковые переводы элементов интерфейса в разных частях сайта?
+        if(!this.OuterTypes.includes(fields.type)) throw new Error('This type of translation is forbidden');
 
-        const code = Translitter.Transform(fields.type + ' ' + md5(new Date()));
+        const code = Translitter.Transform(fields.type + ' ' + md5(new Date().toISOString()));
         const sql = `
             INSERT INTO ${this.TableName} 
             SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${fields.type}'
@@ -59,7 +59,7 @@ class Translation extends Entity{
     static async TransInsert(conn, fields, type) {
         if(fields.lang != this.MainLang) throw new Error('Insert is possible only by ru lang');
 
-        const code = Translitter.Transform(type + ' ' + md5(new Date()));
+        const code = Translitter.Transform(type + ' ' + md5(new Date().toISOString()));
         const sql = `
             INSERT INTO ${this.TableName} 
             SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${type}'
@@ -83,6 +83,7 @@ class Translation extends Entity{
     }
 
     // Code come from other entities, only internal
+    // Cascade updating translation & dependent tables by other entities
     static async TransUpdate(conn, fields, code) {
         if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
 
