@@ -1,6 +1,7 @@
 .table__sorts {
     display: flex;
     gap: 20px;
+    margin-bottom: 5px;
 }
 
 .table__sorts-label {
@@ -16,6 +17,7 @@
 
 .table__sort-active {
     color: #00AB97;
+    border-bottom: 1px #00AB97 dashed;
 }
 
 .table__table {

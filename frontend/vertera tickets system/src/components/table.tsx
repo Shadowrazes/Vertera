@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
+
 import "../css/table.css";
 
 function TableTickets() {
@@ -27,27 +29,27 @@ function TableTickets() {
   const data: TableRow[] = [
     {
       id: 1,
-      section: "А",
+      section: "Темы",
       date: new Date("2023-10-17"),
-      theme: "Название темы2",
+      theme: "Название темы",
       last_message: "02.10.23| Имя Фамилия",
       message_count: "3/1",
       status: "Новый",
     },
     {
       id: 2,
-      section: "Г",
+      section: "Темы",
       date: new Date("2023-10-17"),
-      theme: "Название темы1",
+      theme: "Название темы",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "В процессе",
     },
     {
       id: 3,
-      section: "П",
+      section: "Темы",
       date: new Date("2023-10-17"),
-      theme: "Название темы3",
+      theme: "Название темы",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "В ожидании",
@@ -56,7 +58,7 @@ function TableTickets() {
       id: 4,
       section: "Темы",
       date: new Date("2023-10-17"),
-      theme: "Название темы4",
+      theme: "Название темы",
       last_message: "03.10.23| Имя Фамилия",
       message_count: "4/1",
       status: "Закрыт",

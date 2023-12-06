@@ -6,40 +6,50 @@ function TestTable() {
   type TableRow = {
     id: number;
     theme: string;
+    status: string;
     [key: string]: string | number;
   };
 
-  const columns = ["ID тикет", "Тема"];
+  const columns = ["theme", "status"];
+  const columnsName = ["Тема", "Статус"];
 
   const initialData: TableRow[] = [
     {
       id: 3,
       theme: "B",
+      status: "Новый",
     },
     {
       id: 4,
       theme: "A",
+      status: "В процессе",
     },
     {
       id: 1,
-      theme: "D",
+      theme: "C",
+      status: "В ожидании",
     },
     {
       id: 2,
-      theme: "C",
+      theme: "D",
+      status: "Закрыт",
     },
   ];
 
   const [data, setData] = useState(initialData);
   const [selectedSort, setSelectedSort] = useState(-1);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">(
+    "asc"
+  );
+  let counter = 0;
 
   const sortData = (field: string) => {
-    const copyData = [...data];
+    console.log(field);
+    // const copyData = [...data];
 
-    const sortedData = copyData.sort((a, b) => {
-      const aValue: string | number | Date = a[field];
-      const bValue: string | number | Date = b[field];
+    const sortedData = data.sort((a, b) => {
+      const aValue: string | number = a[field];
+      const bValue: string | number = b[field];
 
       if (typeof aValue === "string" && typeof bValue === "string") {
         return sortDirection === "asc"
@@ -51,16 +61,27 @@ function TestTable() {
         return 0;
       }
     });
-
-    setData(sortedData);
     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    setData(sortedData);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // sortData("id");
+    // setSortDirection("asc");
+  }, []);
 
   const handleSorts = (index: number) => {
-    setSelectedSort(index);
+    if (selectedSort == index) {
+      counter++;
+    } else {
+      counter = 0;
+    }
+    if (counter == 1) {
+      setSortDirection("asc");
+    }
+
     sortData(columns[index]);
+    setSelectedSort(index);
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,42 +95,29 @@ function TestTable() {
     <>
       <div className="table__sorts">
         <span className="table__sorts-label">Сортировать по:</span>
-
-        <span
-          onClick={() => {
-            sortData("id");
-          }}
-          className="table__sort"
-        >
-          ID
-        </span>
-        <span
-          onClick={() => {
-            sortData("theme");
-          }}
-          className="table__sort"
-        >
-          Тема
-        </span>
+        {columns.map((column, index) => (
+          <span
+            key={column}
+            onClick={() => {
+              handleSorts(index);
+            }}
+            className={
+              selectedSort === index
+                ? "table__sort table__sort-active"
+                : "table__sort"
+            }
+          >
+            {columnsName[index]}
+          </span>
+        ))}
       </div>
 
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th
-              onClick={() => {
-                sortData("id");
-              }}
-            >
-              ID тикет
-            </th>
-            <th
-              onClick={() => {
-                sortData("theme");
-              }}
-            >
-              Тема
-            </th>
+            <th>ID тикет</th>
+            <th>Тема</th>
+            <th>Статус</th>
           </tr>
         </thead>
         <tbody>
@@ -117,6 +125,7 @@ function TestTable() {
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.theme}</td>
+              <td>{item.status}</td>
             </tr>
           ))}
         </tbody>
