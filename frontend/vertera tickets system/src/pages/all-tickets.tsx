@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+
 import TitleH2 from "../components/title";
 import DropdownBT from "../components/dropdown";
 import ButtonCustom from "../components/button";
+
 import "../css/all-tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
