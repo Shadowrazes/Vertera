@@ -2,81 +2,82 @@ import { useState, useEffect } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import { useQuery, gql, ApolloClient, InMemoryCache } from "@apollo/client";
 
-// import TABLE_TICKETS from "../apollo/table";
+import TABLE_TICKETS from "../apollo/queries";
 import Loader from "../pages/loading";
 import Spinner from "../components/spinner";
 
 import "../css/table.css";
 
-// interface DataTable {
-//   id: number;
-//   section: string;
-//   date: string;
-//   theme: string;
-//   last_message: string;
-//   status: string;
-// }
-
-// interface TableTicketsData {
-//   dataTable: DataTable[];
-// }
-
-// const client = new ApolloClient({
-//   uri: "http://localhost:4444/graphql",
-//   cache: new InMemoryCache(),
-// });
-
-// const TABLE_TICKETS = gql`
-//   query q {
-//     ticket(id: 4) {
-//       id
-//       date
-//     }
-//   }
-// `;
-
 function TestTable() {
-  // type TableRow = {
-  //   id: number;
-  //   theme: string;
-  //   status: string;
-  //   [key: string]: string | number;
-  // };
+  type TableRow = {
+    id: number;
+    subTheme: {
+      theme: {
+        unit: {
+          name: {
+            stroke: string;
+          };
+        };
+      };
+    };
+    date: string;
+    subTheme: {
+      theme: {
+        name: {
+          stroke: string;
+        };
+      };
+    };
+    lastMessage: {
+      text: string;
+    };
+    status: {
+      name: {
+        stroke: string;
+      };
+    };
+    [key: string]: string | number;
+  };
 
-  // const { loading, error, data } = useQuery<TicketData>(TABLE_TICKETS);
+  const { loading, error, data } = useQuery(TABLE_TICKETS);
 
-  // if (loading) {
-  //   return <Loader />;
-  // }
+  if (loading) {
+    return <Loader />;
+  }
 
-  // const ticket = data?.ticket;
+  if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  const tickets: TableRow[] = data?.ticketList || [];
 
   // const columns = ["theme", "status"];
   // const columnsName = ["Тема", "Статус"];
 
   // const initialData: TableRow[] = [
-  //   {
-  //     id: 3,
-  //     theme: "B",
-  //     status: "Новый",
-  //   },
-  //   {
-  //     id: 4,
-  //     theme: "A",
-  //     status: "В процессе",
-  //   },
-  //   {
-  //     id: 1,
-  //     theme: "C",
-  //     status: "В ожидании",
-  //   },
-  //   {
-  //     id: 2,
-  //     theme: "D",
-  //     status: "Закрыт",
-  //   },
+  //   // {
+  //   //   id: 3,
+  //   //   theme: "B",
+  //   //   status: "Новый",
+  //   // },
+  //   // {
+  //   //   id: 4,
+  //   //   theme: "A",
+  //   //   status: "В процессе",
+  //   // },
+  //   // {
+  //   //   id: 1,
+  //   //   theme: "C",
+  //   //   status: "В ожидании",
+  //   // },
+  //   // {
+  //   //   id: 2,
+  //   //   theme: "D",
+  //   //   status: "Закрыт",
+  //   // },
   // ];
 
+  // const [dataQuery, setData] = useState(initialData);
   // const [selectedSort, setSelectedSort] = useState(-1);
   // const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">(
   //   "asc"
@@ -87,7 +88,7 @@ function TestTable() {
   //   console.log(field);
   //   // const copyData = [...data];
 
-  //   const sortedData = datas.sort((a, b) => {
+  //   const sortedData = dataQuery.sort((a, b) => {
   //     const aValue: string | number = a[field];
   //     const bValue: string | number = b[field];
 
@@ -106,19 +107,19 @@ function TestTable() {
   // };
 
   // useEffect(() => {
-  //   // sortData("id");
-  //   // setSortDirection("asc");
+  //   //   // sortData("id");
+  //   //   // setSortDirection("asc");
   // }, []);
 
   // const handleSorts = (index: number) => {
-  //   if (selectedSort == index) {
-  //     counter++;
-  //   } else {
-  //     counter = 0;
-  //   }
-  //   if (counter == 1) {
-  //     setSortDirection("asc");
-  //   }
+  //   // if (selectedSort == index) {
+  //   //   counter++;
+  //   // } else {
+  //   //   counter = 0;
+  //   // }
+  //   // if (counter == 1) {
+  //   //   setSortDirection("asc");
+  //   // }
 
   //   sortData(columns[index]);
   //   setSelectedSort(index);
@@ -130,25 +131,6 @@ function TestTable() {
   // const indexOfLastItem = currentPage * itemsPerPage;
   // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   // const currentItems = datas.slice(indexOfFirstItem, indexOfLastItem);
-
-  // const { loading, error, data } = useQuery(TABLE_TICKETS);
-  // const [ticketData, setTicketData] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       if (!loading && !error && data) {
-  //         console.log("Data from GraphQL query:", data);
-  //         // Now you can set the data to your component state or perform other actions
-  //         setTicketData(data.ticket);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [loading, error, data]);
 
   return (
     <>
@@ -175,12 +157,25 @@ function TestTable() {
         <thead>
           <tr>
             <th>ID тикет</th>
-            {/* <th>Тема</th>
-            <th>Статус</th> */}
+            <th>Раздел</th>
+            <th>Дата создания</th>
+            <th>Тема</th>
+            <th>Последнее сообщение</th>
+            <th>сообщений</th>
+            <th>Статус</th>
           </tr>
         </thead>
         <tbody>
-          <tr></tr>
+          {tickets.map((ticket) => (
+            <tr key={ticket.id}>
+              <td>{ticket.id}</td>
+              <td>{ticket.subTheme.theme.unit.name.stroke}</td>
+              <td>{ticket.date}</td>
+              <td>{ticket.subTheme.theme.name.stroke}</td>
+              <td>{ticket.lastMessage.text}</td>
+              <td>{ticket.status.name.stroke}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </>
