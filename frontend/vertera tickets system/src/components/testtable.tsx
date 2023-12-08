@@ -4,7 +4,6 @@ import { useQuery, gql, ApolloClient, InMemoryCache } from "@apollo/client";
 
 import TABLE_TICKETS from "../apollo/queries";
 import Loader from "../pages/loading";
-import Spinner from "../components/spinner";
 
 import "../css/table.css";
 
@@ -18,17 +17,17 @@ function TestTable() {
             stroke: string;
           };
         };
-      };
-    };
-    date: string;
-    subTheme: {
-      theme: {
         name: {
           stroke: string;
         };
       };
     };
+    date: string;
     lastMessage: {
+      text: string;
+    };
+    messages: {
+      length: number;
       text: string;
     };
     status: {
@@ -36,10 +35,36 @@ function TestTable() {
         stroke: string;
       };
     };
-    [key: string]: string | number;
+    [key: string]:
+      | string
+      | number
+      | { text?: string }
+      | { name: { stroke: string } }
+      | {
+          theme: {
+            unit: { name: { stroke: string } };
+            name: { stroke: string };
+          };
+        };
   };
 
+  const [dataQuery, setData] = useState<TableRow[]>([]);
   const { loading, error, data } = useQuery(TABLE_TICKETS);
+
+  const [selectedSort, setSelectedSort] = useState(-1);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">(
+    "asc"
+  );
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    if (data && data.ticketList) {
+      setData(data.ticketList);
+    }
+  }, [data]);
+
+  const tickets: TableRow[] = dataQuery;
 
   if (loading) {
     return <Loader />;
@@ -49,98 +74,75 @@ function TestTable() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  const tickets: TableRow[] = data?.ticketList || [];
+  const columns = [
+    "subTheme.theme.unit.name.stroke",
+    "date",
+    "subTheme.theme.name.stroke",
+    "lastMessage.text",
+    "messages.length",
+  ];
+  const columnsName = [
+    "Раздел",
+    "Дата",
+    "Тема",
+    "Последнее сообщение",
+    "Сообщение",
+  ];
 
-  // const columns = ["theme", "status"];
-  // const columnsName = ["Тема", "Статус"];
+  const getField = (obj: any, path: string) => {
+    const keys = path.split(".");
+    let value = obj;
 
-  // const initialData: TableRow[] = [
-  //   // {
-  //   //   id: 3,
-  //   //   theme: "B",
-  //   //   status: "Новый",
-  //   // },
-  //   // {
-  //   //   id: 4,
-  //   //   theme: "A",
-  //   //   status: "В процессе",
-  //   // },
-  //   // {
-  //   //   id: 1,
-  //   //   theme: "C",
-  //   //   status: "В ожидании",
-  //   // },
-  //   // {
-  //   //   id: 2,
-  //   //   theme: "D",
-  //   //   status: "Закрыт",
-  //   // },
-  // ];
+    for (const key of keys) {
+      value = value[key];
+    }
 
-  // const [dataQuery, setData] = useState(initialData);
-  // const [selectedSort, setSelectedSort] = useState(-1);
-  // const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">(
-  //   "asc"
-  // );
-  // let counter = 0;
+    return value;
+  };
 
-  // const sortData = (field: string) => {
-  //   console.log(field);
-  //   // const copyData = [...data];
+  const sortData = (field: string) => {
+    console.log(field);
+    // const copyData = [...data];
 
-  //   const sortedData = dataQuery.sort((a, b) => {
-  //     const aValue: string | number = a[field];
-  //     const bValue: string | number = b[field];
+    const sortedData = [...dataQuery].sort((a, b) => {
+      const aValue = getField(a, field);
+      const bValue = getField(b, field);
 
-  //     if (typeof aValue === "string" && typeof bValue === "string") {
-  //       return sortDirection === "asc"
-  //         ? aValue.localeCompare(bValue)
-  //         : bValue.localeCompare(aValue);
-  //     } else if (typeof aValue === "number" && typeof bValue === "number") {
-  //       return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-  //     } else {
-  //       return 0;
-  //     }
-  //   });
-  //   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-  //   setData(sortedData);
-  // };
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortDirection === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      } else if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      } else {
+        return 0;
+      }
+    });
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    setData(sortedData);
+  };
 
-  // useEffect(() => {
-  //   //   // sortData("id");
-  //   //   // setSortDirection("asc");
-  // }, []);
+  const handleSorts = (index: number) => {
+    sortData(columns[index]);
+    setSelectedSort(index);
+  };
 
-  // const handleSorts = (index: number) => {
-  //   // if (selectedSort == index) {
-  //   //   counter++;
-  //   // } else {
-  //   //   counter = 0;
-  //   // }
-  //   // if (counter == 1) {
-  //   //   setSortDirection("asc");
-  //   // }
+  const itemsPerPage = 8;
 
-  //   sortData(columns[index]);
-  //   setSelectedSort(index);
-  // };
-
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const itemsPerPage = 8;
-
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = datas.slice(indexOfFirstItem, indexOfLastItem);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = dataQuery.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
-      {/* <div className="table__sorts">
+      <div className="table__sorts">
         <span className="table__sorts-label">Сортировать по:</span>
         {columns.map((column, index) => (
           <span
             key={column}
             onClick={() => {
               handleSorts(index);
+              console.log(index);
             }}
             className={
               selectedSort === index
@@ -151,7 +153,7 @@ function TestTable() {
             {columnsName[index]}
           </span>
         ))}
-      </div> */}
+      </div>
 
       <Table className="table__table" hover>
         <thead>
@@ -161,7 +163,7 @@ function TestTable() {
             <th>Дата создания</th>
             <th>Тема</th>
             <th>Последнее сообщение</th>
-            <th>сообщений</th>
+            <th>Сообщений</th>
             <th>Статус</th>
           </tr>
         </thead>
@@ -173,6 +175,7 @@ function TestTable() {
               <td>{ticket.date}</td>
               <td>{ticket.subTheme.theme.name.stroke}</td>
               <td>{ticket.lastMessage.text}</td>
+              <td>{ticket.messages.length}</td>
               <td>{ticket.status.name.stroke}</td>
             </tr>
           ))}

@@ -31,6 +31,9 @@ const TABLE_TICKETS = gql`
       lastMessage {
         text
       }
+      messages {
+        text
+      }
       status {
         name(lang: "ru") {
           stroke
