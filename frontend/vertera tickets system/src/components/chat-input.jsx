@@ -4,15 +4,11 @@ import { Form, Row } from "react-bootstrap";
 import ButtonCustom from "./button";
 import "../css/chat-input.css";
 
-interface ChatInputProps {
-  onSendMessage: (message: string) => void;
-}
-
-function ChatInput({ onSendMessage }: ChatInputProps) {
+function ChatInput({ onSendMessage }) {
   const [message, setMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event) => {
     const files = event.target.files;
 
     if (files && files.length > 0) {
@@ -55,13 +51,13 @@ function ChatInput({ onSendMessage }: ChatInputProps) {
     navigate("/");
   };
 
-  function handleChange(e: ChangeEvent<HTMLInputElement>): void {
+  function handleChange(e) {
     setMessage(e.target.value);
   }
 
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState(0);
 
-  function handleSubmit(e: FormEvent): void {
+  function handleSubmit(e) {
     e.preventDefault();
     if (message.trim() !== "") {
       onSendMessage(message);

@@ -8,16 +8,6 @@ import ButtonCustom from "./button";
 import "../css/table.css";
 
 function TableTickets() {
-  type TableRow = {
-    id: number;
-    section: string;
-    date: Date;
-    theme: string;
-    last_message: string;
-    message_count: string;
-    status: string;
-  };
-
   const columns = [
     "Раздел",
     "Дата",
@@ -26,7 +16,7 @@ function TableTickets() {
     "Сообщений",
   ];
 
-  const data: TableRow[] = [
+  const data = [
     {
       id: 1,
       section: "Темы",
@@ -65,7 +55,7 @@ function TableTickets() {
     },
   ];
 
-  function getStatusColor(status: string): string {
+  function getStatusColor(status){
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -93,7 +83,7 @@ function TableTickets() {
   /////////////////////////////////////////////////////////
   const [selectedSort, setSelectedSort] = useState(-1);
 
-  const handleSorts = (index: number) => {
+  const handleSorts = (index) => {
     setSelectedSort(index);
   };
   //////////////////////////////////////////

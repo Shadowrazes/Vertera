@@ -1,11 +1,6 @@
 import "../css/chat-message-sender.css";
 
-interface ChatMessageProps {
-  message: string;
-  time: string;
-}
-
-function ChatMessage({ message, time }: ChatMessageProps) {
+function ChatMessage({ message, time }) {
   return (
     <>
       <div className="chat-message-sender__container">

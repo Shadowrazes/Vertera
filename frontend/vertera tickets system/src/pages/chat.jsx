@@ -5,18 +5,13 @@ import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatInput from "../components/chat-input";
 
-interface Message {
-  message: string;
-  time: string;
-}
-
 const timeFormatter = () => {
   const currentDate = new Date();
   const options = {
     year: "numeric",
     month: "long",
     day: "numeric",
-  } as Intl.DateTimeFormatOptions;
+  };
 
   const formatter = new Intl.DateTimeFormat("ru-RU", options);
   let formattedDate = formatter.format(currentDate);
@@ -26,7 +21,7 @@ const timeFormatter = () => {
   const timeOptions = {
     hour: "numeric",
     minute: "numeric",
-  } as Intl.DateTimeFormatOptions;
+  };
 
   const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
   const formattedTime = timeFormatter.format(currentDate);
@@ -35,13 +30,13 @@ const timeFormatter = () => {
 };
 
 function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState([]);
   const { itemId } = useParams();
   const location = useLocation();
   const status = location.state && location.state.status;
 
-  function sendMessage(message: string): void {
-    const newMessage: Message = {
+  function sendMessage(message) {
+    const newMessage = {
       message: message,
       time: timeFormatter(),
     };

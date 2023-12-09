@@ -1,11 +1,7 @@
 import Spinner from "react-bootstrap/Spinner";
 import "../css/spinner.css";
 
-interface SpinnerLoaderProp {
-  progress: number;
-}
-
-function SpinnerLoader({ progress }: SpinnerLoaderProp) {
+function SpinnerLoader({ progress }) {
   return (
     <div className="spinner__container">
       <Spinner
