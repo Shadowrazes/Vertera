@@ -6,6 +6,20 @@ mutation{
   addTicket( ticketFields: {clientId: 1, unitId: 1, themeId: 6, subThemeId: 31}, messageFields: {senderId: 1, recieverId: 2, ticketId: 1, type: "common", text: "test", attachPaths: ["test/a", "test/321"]})
 }
 
+query	{
+  ticketList(filters: {limit: 9999, offset: 0, orderBy: "themeStroke", orderDir: "ASC", lang:"ru"}){
+    id
+    subTheme{
+      theme{
+        id
+        name(lang:"ru"){
+          stroke
+        }
+      }
+    }
+  }
+}
+
 mutation{
   addHelperUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitle: "Куратор", birthday: "2000-11-05", departmentIds: [1, 2]})
 }

@@ -2,6 +2,11 @@ import Entity from "./Entity.js";
 import Helper from "./Helper.js";
 import Message from "./Message.js";
 import User from "./User.js";
+import Unit from "./Unit.js";
+import Theme from "./Theme.js";
+import SubTheme from "./SubTheme.js";
+import Translation from "./Translation.js";
+import MySQL  from 'mysql2';
 
 class Ticket extends Entity{
     static TableName = 'tickets';
@@ -40,11 +45,58 @@ class Ticket extends Entity{
         return result[0];
     }
 
+    // ORDER BY lastMsgDate, themeStroke, unitStroke, date, и другие (по необходимости)
     static async GetList(filter) {
         const usersClientAS = 'clies';
         const usersHelperAS = 'helps';
         const clientCountryAS = 'clientCountry';
         const helperCountryAS = 'helperCountry';
+        const lastMsgDateAS = 'lastMsgDate';
+        const totalMsgAS = 'totalMsg';
+
+        const themeIdAS = 'thmId';
+        const themeTranslationAS = 'themeStroke';
+        const themeJoinTableName = 'themeSubReq';
+
+        const unitIdAS = 'untId';
+        const unitTranslationAS = 'unitStroke';
+        const unitJoinTableName = 'unitSubReq';
+
+        const unitColSql = `${unitJoinTableName}.${unitTranslationAS} AS ${unitTranslationAS},`;
+        const unitJoinSql = `
+            JOIN (
+                SELECT  ${Unit.TableName}.${Unit.PrimaryField} AS ${unitIdAS}, 
+                        ${Translation.TableName}.${filter.lang} AS ${unitTranslationAS} 
+                FROM ${Unit.TableName}
+                JOIN ${Translation.TableName} 
+                ON ${Unit.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
+            ) ${unitJoinTableName}
+            ON ${this.TableName}.${this.UnitField} = ${unitJoinTableName}.${unitIdAS}
+        `;
+
+        const themeColSql = `${themeJoinTableName}.${themeTranslationAS} AS ${themeTranslationAS},`;
+        const themeJoinSql = `
+            JOIN (
+                SELECT  ${Theme.TableName}.${Theme.PrimaryField} AS ${themeIdAS}, 
+                        ${Translation.TableName}.${filter.lang} AS ${themeTranslationAS} 
+                FROM ${Theme.TableName}
+                JOIN ${Translation.TableName} 
+                ON ${Theme.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
+            ) ${themeJoinTableName}
+            ON ${this.TableName}.${this.ThemeField} = ${themeJoinTableName}.${themeIdAS}
+        `;
+
+        const clientColSql = `${usersClientAS}.${User.CountryIdField} AS ${clientCountryAS},`;
+        const clientJoinSql = `
+            JOIN    ${User.TableName} AS ${usersClientAS} 
+            ON ${this.TableName}.${this.ClientIdField} = ${usersClientAS}.${User.PrimaryField}
+        `;
+
+        const helperColSql = `${usersHelperAS}.${User.CountryIdField} AS ${helperCountryAS},`;
+        const helperJoinSql = `
+            JOIN    ${User.TableName} AS ${usersHelperAS} 
+            ON ${this.TableName}.${this.HelperIdField} = ${usersHelperAS}.${User.PrimaryField}
+        `;
 
         // SUM(IF(messages.readed = 0, 1, 0)) AS unreadMsg
         let sql = `
@@ -53,18 +105,19 @@ class Ticket extends Entity{
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, 
-                ${usersClientAS}.${User.CountryIdField} AS ${clientCountryAS},
-                ${usersHelperAS}.${User.CountryIdField} AS ${helperCountryAS},
-                MAX(messages.date) AS lastMsgDate, 
-                COUNT(messages.id) AS totalMsg
+                ${filter.orderBy == unitTranslationAS ? unitColSql : ``}
+                ${filter.orderBy == themeTranslationAS ? themeColSql : ``}
+                ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientColSql : ``}
+                ${filter.helperCountryIds && filter.helperCountryIds.length > 0 ? helperColSql : ``}
+                MAX(${Message.TableName}.${Message.DateField}) AS ${lastMsgDateAS}, 
+                COUNT(${Message.TableName}.${Message.PrimaryField}) AS ${totalMsgAS}
 
         FROM    ${this.TableName} 
 
-        JOIN    ${User.TableName} AS ${usersClientAS} 
-                ON ${this.TableName}.${this.ClientIdField} = ${usersClientAS}.id
-
-        JOIN    ${User.TableName} AS ${usersHelperAS} 
-                ON ${this.TableName}.${this.HelperIdField} = ${usersHelperAS}.id
+        ${filter.orderBy == unitTranslationAS ? unitJoinSql : ``}
+        ${filter.orderBy == themeTranslationAS ? themeJoinSql : ``}
+        ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientJoinSql : ``}
+        ${filter.helperCountryIds && filter.helperCountryIds.length > 0 ? helperJoinSql : ``}
 
         JOIN    ${Message.TableName} 
                 ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
@@ -113,9 +166,10 @@ class Ticket extends Entity{
             sql += ` AND ${this.StatusIdField} IN (?)`;
             fields.push(filter.statusIds);
         }
-        if (filter.date) {
-            sql += ` AND ${this.TableName}.${this.DateField} = ?`;
-            fields.push(filter.date);
+        if (filter.dateAfter && filter.dateBefore) {
+            sql += ` AND ${this.TableName}.${this.DateField} > ? AND ${this.TableName}.${this.DateField} < ?`;
+            fields.push(filter.dateAfter);
+            fields.push(filter.dateBefore);
         }
         if (filter.reaction) {
             sql += ` AND ${this.ReactionField} = ?`;
@@ -123,11 +177,12 @@ class Ticket extends Entity{
         }
   
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
-        sql += ` ORDER BY ? ?`;
+        sql += ` ORDER BY ${MySQL.escapeId(filter.orderBy)} ${filter.orderDir === 'ASC' ? 'ASC' : 'DESC'}`;
         sql += ` LIMIT ? OFFSET ?`;
 
-        fields.push(filter.orderBy, filter.orderDir, filter.limit, filter.offset);
-        return await super.Request(sql, fields);
+        fields.push(filter.limit, filter.offset);
+        const res = await super.Request(sql, fields);
+        return res;
     }
 
     static async TransInsert(args) {

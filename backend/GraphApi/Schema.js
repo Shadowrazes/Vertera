@@ -190,7 +190,8 @@ export const typeDefs = `
         helperIds: [Int]
         helperCountryIds: [Int]
         clientCountryIds: [Int]
-        date: DateTime
+        dateAfter: DateTime
+        dateBefore: DateTime
         reaction: String
         statusIds: [Int]
         replyed: Boolean
@@ -198,6 +199,7 @@ export const typeDefs = `
         orderDir: String!
         limit: Int!
         offset: Int!
+        lang: String!
     }
 
     input UserInsert {
