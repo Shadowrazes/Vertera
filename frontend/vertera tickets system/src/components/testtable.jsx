@@ -8,47 +8,7 @@ import Loader from "../pages/loading";
 import "../css/table.css";
 
 function TestTable() {
-  type TableRow = {
-    id: number;
-    subTheme: {
-      theme: {
-        unit: {
-          name: {
-            stroke: string;
-          };
-        };
-        name: {
-          stroke: string;
-        };
-      };
-    };
-    date: string;
-    lastMessage: {
-      text: string;
-    };
-    messages: {
-      length: number;
-      text: string;
-    };
-    status: {
-      name: {
-        stroke: string;
-      };
-    };
-    [key: string]:
-      | string
-      | number
-      | { text?: string }
-      | { name: { stroke: string } }
-      | {
-          theme: {
-            unit: { name: { stroke: string } };
-            name: { stroke: string };
-          };
-        };
-  };
-
-  const [dataQuery, setData] = useState<TableRow[]>([]);
+  const [dataQuery, setData] = useState([]);
   const { loading, error, data } = useQuery(TABLE_TICKETS);
 
   const [selectedSort, setSelectedSort] = useState(-1);
@@ -64,7 +24,7 @@ function TestTable() {
     }
   }, [data]);
 
-  const tickets: TableRow[] = dataQuery;
+  const tickets = dataQuery;
 
   if (loading) {
     return <Loader />;
@@ -89,7 +49,7 @@ function TestTable() {
     "Сообщение",
   ];
 
-  const getField = (obj: any, path: string) => {
+  const getField = (obj, path) => {
     const keys = path.split(".");
     let value = obj;
 
@@ -100,7 +60,7 @@ function TestTable() {
     return value;
   };
 
-  const sortData = (field: string) => {
+  const sortData = (field) => {
     console.log(field);
     // const copyData = [...data];
 
@@ -122,7 +82,7 @@ function TestTable() {
     setData(sortedData);
   };
 
-  const handleSorts = (index: number) => {
+  const handleSorts = (index) => {
     sortData(columns[index]);
     setSelectedSort(index);
   };

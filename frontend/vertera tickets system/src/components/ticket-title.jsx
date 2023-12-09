@@ -1,6 +1,6 @@
 import "../css/ticket-title.css";
 
-function getStatusColor(status: string): string {
+function getStatusColor(status){
   switch (status) {
     case "Открыта":
       return "#00AB97";
@@ -15,15 +15,7 @@ const handleGoBack = () => {
   window.history.back();
 };
 
-function TicketTitle({
-  title,
-  className,
-  state,
-}: {
-  title: string;
-  className?: string;
-  state: string;
-}) {
+function TicketTitle({title, className, state}) {
   return (
     <>
       <div className="ticket-title__container">

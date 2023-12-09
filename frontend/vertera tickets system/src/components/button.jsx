@@ -1,14 +1,8 @@
 import { Button } from "react-bootstrap";
 import "../css/button.css";
 
-interface ButtonProps {
-  title: string;
-  className?: string;
-  onClick?: () => void;
-  type?: string;
-}
 
-function ButtonCustom({ title, className, onClick }: ButtonProps) {
+function ButtonCustom({ title, className, onClick }) {
   const defaultClassName = "button";
   const combinedClassName = `${defaultClassName} ${className || ""}`;
 
@@ -21,7 +15,7 @@ function ButtonCustom({ title, className, onClick }: ButtonProps) {
         type="submit"
       >
         {title}
-      </Button>
+      </Button> 
     </>
   );
 }

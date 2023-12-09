@@ -12,15 +12,6 @@ import "../css/all-tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
-  type TableRow = {
-    id: number;
-    section: string;
-    date: Date;
-    theme: string;
-    last_message: string;
-    message_count: string;
-    status: string;
-  };
 
   const columns = [
     "Раздел",
@@ -30,7 +21,7 @@ function allTickets() {
     "Сообщений",
   ];
 
-  const data: TableRow[] = [
+  const data = [
     {
       id: 1,
       section: "Темы",
@@ -69,7 +60,7 @@ function allTickets() {
     },
   ];
 
-  function getStatusBGColor(status: string): string {
+  function getStatusBGColor(status) {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -91,7 +82,7 @@ function allTickets() {
     setIsVisible((prevVisibility) => !prevVisibility);
   };
 
-  const handleSorts = (index: number) => {
+  const handleSorts = (index) => {
     setSelectedSort(index);
   };
 

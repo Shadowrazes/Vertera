@@ -3,15 +3,10 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import "../css/dropdown.css";
 
-interface DropdownProps {
-  label: string;
-  items: string[];
-}
+function DropdownBT({ label, items }) {
+  const [selectedItem, setSelectedItem] = useState(null);
 
-function DropdownBT({ label, items }: DropdownProps) {
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-
-  const handleItemClick = (item: string) => {
+  const handleItemClick = (item) => {
     setSelectedItem(item);
   };
 
