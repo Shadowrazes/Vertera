@@ -15,6 +15,7 @@ export const typeDefs = `
 
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): [Ticket]
+        ticketListCount: Int!
 
         message(id: Int!): Message
         messageList(ticketId: Int!): [Message]
