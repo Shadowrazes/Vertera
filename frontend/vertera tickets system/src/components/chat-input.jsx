@@ -92,7 +92,11 @@ function ChatInput({ onSendMessage }) {
                 />
               </Form.Group>
               <Form.Group controlId="FileInputForm">
-                <Form.Control type="file" onChange={handleFileChange} />
+                <Form.Control
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                />
               </Form.Group>
               <div className="chat-input__button-row">
                 <ButtonCustom

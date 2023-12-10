@@ -1,61 +1,129 @@
-import { useState } from "react";
-import { Table, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { Link } from "react-router-dom";
 
+import TABLE_TICKETS from "../apollo/queries";
+import Loader from "../pages/loading";
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
 
 import "../css/table.css";
+import "../css/all-tickets.css";
 
 function TableTickets() {
+  const [dataQuery, setData] = useState([]);
+
+  const [selectedSort, setSelectedSort] = useState(-1);
+  const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
+
+  const [orderDir, setOrderDir] = useState("ASC");
+
+  const itemsPerPage = 8;
+
+  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
+    variables: {
+      filters: {
+        limit: itemsPerPage,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "ASC",
+        lang: "ru",
+      },
+    },
+  });
+
+  const navigate = useNavigate();
+
+  const goToAllTickets = () => {
+    navigate("/all-tickets");
+  };
+
+  useEffect(() => {
+    if (data && data.ticketList) {
+      setData(data.ticketList);
+    }
+
+    if (selectedSort !== prevSelectedSort) {
+      handleSorts(selectedSort);
+      setPrevSelectedSort(selectedSort);
+    }
+  }, [data, selectedSort, prevSelectedSort]);
+
+  const tickets = dataQuery;
+
+  const handleSorts = async (index) => {
+    setSelectedSort(index);
+
+    let _orderBy;
+    let _orderDir;
+
+    if (prevSelectedSort === index) {
+      _orderDir = "DESC";
+    } else {
+      _orderDir = "ASC";
+    }
+
+    switch (index) {
+      case 0:
+        _orderBy = "unitStroke";
+        break;
+
+      case 1:
+        _orderBy = "date";
+        break;
+
+      case 2:
+        _orderBy = "themeStroke";
+        break;
+
+      case 3:
+        _orderBy = "lastMsgDate";
+        break;
+
+      default:
+        _orderBy = "id";
+        break;
+    }
+
+    if (orderDir == "DESC") {
+      setSelectedSort(-1);
+      _orderBy = "id";
+      _orderDir = "ASC";
+    }
+
+    setOrderDir(_orderDir);
+
+    const variables = {
+      filters: {
+        limit: itemsPerPage,
+        offset: 0,
+        orderBy: _orderBy,
+        orderDir: _orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
   const columns = [
-    "Раздел",
-    "Дата",
-    "Тема",
-    "Последнее сообщение",
-    "Сообщений",
+    "subTheme.theme.unit.name.stroke",
+    "date",
+    "subTheme.theme.name.stroke",
+    "lastMessage.text",
   ];
+  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
-  const data = [
-    {
-      id: 1,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "02.10.23| Имя Фамилия",
-      message_count: "3/1",
-      status: "Новый",
-    },
-    {
-      id: 2,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В процессе",
-    },
-    {
-      id: 3,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В ожидании",
-    },
-    {
-      id: 4,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "Закрыт",
-    },
-  ];
-
-  function getStatusColor(status){
+  function getStatusColor(status) {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -69,24 +137,6 @@ function TableTickets() {
         return "white";
     }
   }
-
-  const navigate = useNavigate();
-
-  const goToAllTickets = () => {
-    navigate("/all-tickets");
-  };
-
-  const maxRows = 8;
-
-  const limitedData = data.slice(0, maxRows);
-
-  /////////////////////////////////////////////////////////
-  const [selectedSort, setSelectedSort] = useState(-1);
-
-  const handleSorts = (index) => {
-    setSelectedSort(index);
-  };
-  //////////////////////////////////////////
 
   return (
     <>
@@ -105,7 +155,30 @@ function TableTickets() {
                 : "table__sort"
             }
           >
-            {column}
+            {columnsName[index]}
+            {selectedSort === index && (
+              <span className="table__sort-arrow">
+                <svg
+                  className={
+                    orderDir == "DESC"
+                      ? "table__sort-arrow-svg-rotated"
+                      : "table__sort-arrow-svg"
+                  }
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="7"
+                  height="10"
+                  viewBox="0 0 7 10"
+                  fill="none"
+                >
+                  <path
+                    d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                    stroke="#00AB97"
+                    strokeWidth="0.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            )}
           </span>
         ))}
       </div>
@@ -113,7 +186,7 @@ function TableTickets() {
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th>ID тикет</th>
+            <th style={{ minWidth: "115px" }}>ID тикет</th>
             <th>Раздел</th>
             <th>Дата создания</th>
             <th>Тема</th>
@@ -123,21 +196,80 @@ function TableTickets() {
           </tr>
         </thead>
         <tbody>
-          {limitedData.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.section}</td>
-              <td>{item.date.toLocaleDateString()}</td>
-              <td>{item.theme}</td>
-              <td>{item.last_message}</td>
-              <td>{item.message_count}</td>
+          {tickets.map((ticket) => (
+            <tr key={ticket.id}>
               <td>
-                <span
-                  className="table__status"
-                  style={{ background: getStatusColor(item.status) }}
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
                 >
-                  {item.status}
-                </span>
+                  {ticket.id}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  {ticket.subTheme.theme.unit.name.stroke}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  {ticket.date.replace(/T|-/g, (match) =>
+                    match === "T" ? " " : "."
+                  )}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  {ticket.subTheme.theme.name.stroke}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                  {ticket.lastMessage.text}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  {ticket.messages.length}
+                </Link>
+              </td>
+              <td>
+                <Link
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
+                  className="alltickets__link"
+                >
+                  <span
+                    className="table__status"
+                    style={{
+                      background: getStatusColor(ticket.status.name.stroke),
+                    }}
+                  >
+                    {ticket.status.name.stroke}
+                  </span>
+                </Link>
               </td>
             </tr>
           ))}

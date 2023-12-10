@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 
@@ -9,12 +9,18 @@ import "../css/table.css";
 
 function TestTable() {
   const [dataQuery, setData] = useState([]);
+
+  const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
 
   const [orderBy, setOrderBy] = useState("id");
   const [orderDir, setOrderDir] = useState("ASC");
+  const [offset, setOffset] = useState(0);
 
   const [isVisible, setIsVisible] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
 
   const itemsPerPage = 2;
   const ticketsAmount = 5;
@@ -36,21 +42,18 @@ function TestTable() {
     },
   });
 
-  const [selectedSort, setSelectedSort] = useState(-1);
-
-  const [currentPage, setCurrentPage] = useState(1);
-
   const handleNewPage = async (index) => {
     setCurrentPage(index);
 
     let lastItem = currentPage * itemsPerPage;
-    let offset = lastItem - itemsPerPage;
-    // console.log("offset", offset);
+    let _offset = lastItem - itemsPerPage;
+
+    setOffset(_offset);
 
     const variables = {
       filters: {
         limit: itemsPerPage,
-        offset: offset,
+        offset: _offset,
         orderBy: orderBy,
         orderDir: orderDir,
         lang: "ru",
@@ -67,10 +70,12 @@ function TestTable() {
     if (selectedSort !== prevSelectedSort) {
       handleSorts(selectedSort);
       setPrevSelectedSort(selectedSort);
-      console.log(prevSelectedSort);
     }
 
-    handleNewPage(currentPage);
+    if (currentPage !== prevCurrentPage) {
+      handleNewPage(currentPage);
+      setPrevCurrentPage(currentPage);
+    }
 
     setIsVisible(pageNumbers.length > 1);
   }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
@@ -95,46 +100,53 @@ function TestTable() {
 
   const handleSorts = async (index) => {
     setSelectedSort(index);
-    let newOrderBy;
-    let newOrderDir;
+
+    let _orderBy;
+    let _orderDir;
 
     if (prevSelectedSort === index) {
-      newOrderDir = "DESC";
+      _orderDir = "DESC";
     } else {
-      newOrderDir = "ASC";
+      _orderDir = "ASC";
     }
 
     switch (index) {
       case 0:
-        newOrderBy = "unitStroke";
+        _orderBy = "unitStroke";
         break;
 
       case 1:
-        newOrderBy = "date";
+        _orderBy = "date";
         break;
 
       case 2:
-        newOrderBy = "themeStroke";
+        _orderBy = "themeStroke";
         break;
 
       case 3:
-        newOrderBy = "lastMsgDate";
+        _orderBy = "lastMsgDate";
         break;
 
       default:
-        newOrderBy = "id";
+        _orderBy = "id";
         break;
     }
 
-    setOrderBy(newOrderBy);
-    setOrderDir(newOrderDir);
+    if (orderDir == "DESC") {
+      setSelectedSort(-1);
+      _orderBy = "id";
+      _orderDir = "ASC";
+    }
+
+    setOrderBy(_orderBy);
+    setOrderDir(_orderDir);
 
     const variables = {
       filters: {
         limit: itemsPerPage,
-        offset: 0,
-        orderBy: newOrderBy,
-        orderDir: newOrderDir,
+        offset: offset,
+        orderBy: _orderBy,
+        orderDir: _orderDir,
         lang: "ru",
       },
     };
@@ -162,7 +174,6 @@ function TestTable() {
             key={column}
             onClick={() => {
               handleSorts(index);
-              console.log(index);
             }}
             className={
               selectedSort === index
@@ -171,6 +182,29 @@ function TestTable() {
             }
           >
             {columnsName[index]}
+            {selectedSort === index && (
+              <span className="table__sort-arrow">
+                <svg
+                  className={
+                    orderDir == "DESC"
+                      ? "table__sort-arrow-svg-rotated"
+                      : "table__sort-arrow-svg"
+                  }
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="7"
+                  height="10"
+                  viewBox="0 0 7 10"
+                  fill="none"
+                >
+                  <path
+                    d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                    stroke="#00AB97"
+                    strokeWidth="0.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            )}
           </span>
         ))}
       </div>
@@ -178,7 +212,7 @@ function TestTable() {
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th>ID тикет</th>
+            <th style={{ minWidth: "115px" }}>ID тикет</th>
             <th>Раздел</th>
             <th>Дата создания</th>
             <th>Тема</th>
@@ -194,7 +228,9 @@ function TestTable() {
               <td>{ticket.subTheme.theme.unit.name.stroke}</td>
               <td>{ticket.date}</td>
               <td>{ticket.subTheme.theme.name.stroke}</td>
-              <td>{ticket.lastMessage.text}</td>
+              <td>
+                {ticket.lastMessage.date} - {ticket.lastMessage.text}
+              </td>
               <td>{ticket.messages.length}</td>
               <td>{ticket.status.name.stroke}</td>
             </tr>

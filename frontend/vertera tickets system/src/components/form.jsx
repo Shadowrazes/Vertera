@@ -33,7 +33,7 @@ function FormComponent() {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="FileInputForm">
-              <Form.Control type="file" />
+              <Form.Control type="file" multiple />
             </Form.Group>
             <Button
               variant="primary"

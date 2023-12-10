@@ -23,6 +23,7 @@ export const TABLE_TICKETS = gql`
       }
       lastMessage {
         text
+        date
       }
       messages {
         text
