@@ -45,6 +45,12 @@ class Ticket extends Entity{
         return result[0];
     }
 
+    static async GetCount() {
+        const sql = `SELECT COUNT(*) AS count FROM ${this.TableName}`;
+        const result = await super.Request(sql);
+        return result[0].count;
+    }
+
     // ORDER BY lastMsgDate, themeStroke, unitStroke, date, и другие (по необходимости)
     static async GetList(filter) {
         const usersClientAS = 'clies';
