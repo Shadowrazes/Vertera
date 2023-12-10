@@ -1,15 +1,8 @@
 import { gql } from "@apollo/client";
 
-const TABLE_TICKETS = gql`
-  query TableData {
-    ticketList(
-      filters: {
-        limit: 9999
-        offset: 0
-        orderBy: "lastMsgDate"
-        orderDir: "ASC"
-      }
-    ) {
+export const TABLE_TICKETS = gql`
+  query TableData($filters: TicketFilter!) {
+    ticketList(filters: $filters) {
       id
       subTheme {
         theme {

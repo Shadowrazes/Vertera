@@ -14,15 +14,14 @@ function App() {
   return (
     <div className="container">
       <Header />
-      <Router>
+      {/* <Router>
         <Routes>
           <Route path="/" element={<CreateTicket />} />
           <Route path="/all-tickets" element={<AllTickets />} />
           <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
         </Routes>
-      </Router>
-      {/* <Loader /> */}
-      {/* <TestTable /> */}
+      </Router> */}
+      <TestTable />
     </div>
   );
 }
