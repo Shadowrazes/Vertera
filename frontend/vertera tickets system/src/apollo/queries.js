@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const TABLE_TICKETS = gql`
-  query TableData($filters: TicketFilter!) {
+  query ($filters: TicketFilter!) {
     ticketList(filters: $filters) {
       id
       subTheme {
@@ -22,7 +22,9 @@ export const TABLE_TICKETS = gql`
         }
       }
       lastMessage {
-        text
+        sender {
+          fullName
+        }
         date
       }
       messages {
@@ -50,9 +52,16 @@ export const MESSAGES_CHAT = gql`
       messages {
         text
         sender {
+          id
           role
         }
         date
+      }
+      status {
+        id
+        name(lang: "ru") {
+          stroke
+        }
       }
     }
   }

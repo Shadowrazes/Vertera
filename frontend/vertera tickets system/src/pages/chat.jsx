@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
+import { Form, Row } from "react-bootstrap";
 
 import { MESSAGES_CHAT } from "../apollo/queries";
+import { ADD_MESSAGE } from "../apollo/mutations";
+
 import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
 import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatInput from "../components/chat-input";
+import ButtonCustom from "../components/button";
 
 const timeFormatter = () => {
   const currentDate = new Date();
@@ -34,18 +38,33 @@ const timeFormatter = () => {
 };
 
 function Chat() {
-  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  const status = location.state && location.state.status;
+  // const status = location.state && location.state.status;
+  const [status, setStatus] = useState("");
 
-  let messagesQuery = [];
-  let ticketId;
+  const [ticketId, setTicketId] = useState(null);
+  const [messagesQuery, setMessagesQuery] = useState([]);
 
-  const { loading, error, data, refetch } = useQuery(MESSAGES_CHAT, {
+  const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
       id: parseInt(itemId),
     },
+  });
+
+  useEffect(() => {
+    if (data && data.ticket) {
+      setTicketId(data.ticket.id);
+      setMessagesQuery(data.ticket.messages);
+      setStatus(data.ticket.status.name.stroke);
+    }
+  }, [data]);
+
+  const [addMessage, { error: errorAddMsg }] = useMutation(ADD_MESSAGE, {
+    refetchQueries: [
+      { query: MESSAGES_CHAT, variables: { id: parseInt(itemId) } },
+    ],
   });
 
   if (loading) {
@@ -56,22 +75,29 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (data && data.ticket) {
-    // Данные доступны, теперь вы можете работать с ними
-    ticketId = data.ticket.id;
-    messagesQuery = data.ticket.messages;
+  const sendMsg = (e) => {
+    e.preventDefault();
+    if (errorAddMsg) {
+      return <h2>Что-то пошло не так</h2>;
+    }
 
-    // Ваш код для обработки данных
-    console.log(ticketId, messagesQuery);
-  }
+    addMessage({
+      variables: {
+        fields: {
+          senderId: 2,
+          recieverId: 1,
+          ticketId: parseInt(itemId),
+          type: "common",
+          text: message,
+        },
+      },
+    });
+    setMessage("");
+  };
 
-  function sendMessage(message) {
-    const newMessage = {
-      message: message,
-      time: timeFormatter(),
-    };
-    setMessages([...messages, newMessage]);
-  }
+  const handleChange = (e) => {
+    setMessage(e.target.value);
+  };
 
   return (
     <>
@@ -82,21 +108,61 @@ function Chat() {
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
         )}
         {messagesQuery.map((msg) => (
-          <pre>
-            <ChatMessageSender
-              key={ticketId}
-              message={msg.text}
-              time={msg.date}
-            />
+          <pre key={msg.id}>
+            {msg.sender.role === "client" ? (
+              <ChatMessageSender
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : (
+              <ChatMessageRecepient
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            )}
           </pre>
-          // <ChatMessageRecepient
-          //   key={index}
-          //   message={msg.message}
-          //   time={msg.time}
-          // />
         ))}
       </div>
-      <ChatInput onSendMessage={sendMessage} />
+
+      <div className="chat-input__container">
+        <Form className="chat-input__form" onSubmit={sendMsg}>
+          <Row className="chat-input__row">
+            <Form.Group controlId="TextareaForm">
+              <Form.Control
+                as="textarea"
+                placeholder="Текст сообщения"
+                rows={3}
+                value={message}
+                onChange={handleChange}
+                className="chat-input__textarea"
+              />
+            </Form.Group>
+            <Form.Group controlId="FileInputForm">
+              <Form.Control
+                type="file"
+                multiple
+                // onChange={handleFileChange}
+              />
+            </Form.Group>
+            <div className="chat-input__button-row">
+              <ButtonCustom
+                title="Отправить"
+                className="chat-input__button-send"
+                type="submit"
+              />
+              <ButtonCustom
+                title="Закрыть заявку"
+                className="chat-input__button-close"
+                // onClick={handleClose}
+              />
+            </div>
+          </Row>
+        </Form>
+      </div>
     </>
   );
 }

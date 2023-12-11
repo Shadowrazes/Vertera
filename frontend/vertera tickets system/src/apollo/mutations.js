@@ -22,3 +22,9 @@ export const ADD_TICKET = gql`
     )
   }
 `;
+
+export const ADD_MESSAGE = gql`
+  mutation ($fields: MessageInsert!) {
+    addMessage(fields: $fields)
+  }
+`;

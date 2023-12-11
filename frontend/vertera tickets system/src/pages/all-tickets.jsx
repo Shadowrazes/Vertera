@@ -372,7 +372,7 @@ function allTickets() {
                   className="alltickets__link"
                 >
                   {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                  {ticket.lastMessage.text}
+                  {ticket.lastMessage.sender.fullName}
                 </Link>
               </td>
               <td>
