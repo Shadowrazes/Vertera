@@ -8,6 +8,7 @@ import { LOGIN } from "../apollo/queries";
 
 function Header({user, setUser}) {
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoad, setIsLoad] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -16,16 +17,21 @@ function Header({user, setUser}) {
     password: ""
   })
 
-  
-
   const { loading, error, data, refetch } = useQuery(LOGIN, loginVariables);
 
   const handleClose = () => {
     setShowLoginModal(false);
+    setShowLogoutModal(false);
   };
 
   const handleShow = () => {
-    setShowLoginModal(true)
+    if(user) {
+      setShowLogoutModal(true);
+    }
+    else {
+      setShowLoginModal(true);
+    }
+    
   };
 
   const handleInput = (event) => {
@@ -35,6 +41,10 @@ function Header({user, setUser}) {
   }
 
   async function handleSubmit (event) {
+    if(user) {
+      localStorage.removeItem('user');
+      document.location.href = '/';
+    }
     
     setIsLoad(true);
     setIsError(false);
@@ -122,6 +132,21 @@ function Header({user, setUser}) {
             {isLoad ? (
               <Spinner animation="border" size="sm" />
             ) : "Войти"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Попап авторизации */}
+      <Modal show={showLogoutModal} onHide={handleClose} >
+        <Modal.Header closeButton>
+          <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
+        </Modal.Header>
+        <Modal.Footer>
+          <Button variant="secondary" id="loginCancel" onClick={handleClose}>
+            Отмена
+          </Button>
+          <Button variant="primary" disabled={isLoad} id="loginSubmit" onClick={handleSubmit}>
+            Выйти
           </Button>
         </Modal.Footer>
       </Modal>
