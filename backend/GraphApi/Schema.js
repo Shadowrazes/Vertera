@@ -15,6 +15,7 @@ export const typeDefs = `
 
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): [Ticket]
+        ticketListCount: Int!
 
         message(id: Int!): Message
         messageList(ticketId: Int!): [Message]
@@ -190,7 +191,8 @@ export const typeDefs = `
         helperIds: [Int]
         helperCountryIds: [Int]
         clientCountryIds: [Int]
-        date: DateTime
+        dateAfter: DateTime
+        dateBefore: DateTime
         reaction: String
         statusIds: [Int]
         replyed: Boolean
@@ -198,6 +200,7 @@ export const typeDefs = `
         orderDir: String!
         limit: Int!
         offset: Int!
+        lang: String!
     }
 
     input UserInsert {

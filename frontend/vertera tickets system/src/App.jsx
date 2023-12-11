@@ -1,4 +1,3 @@
-import { Button } from "react-bootstrap";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Header from "./components/header";
@@ -25,7 +24,6 @@ function App() {
           <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
         </Routes>
       </Router>
-      {/* <Loader /> */}
       {/* <TestTable /> */}
     </div>
   );

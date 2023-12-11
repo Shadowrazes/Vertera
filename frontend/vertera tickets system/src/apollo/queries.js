@@ -1,15 +1,8 @@
 import { gql } from "@apollo/client";
 
-const TABLE_TICKETS = gql`
-  query TableData {
-    ticketList(
-      filters: {
-        limit: 9999
-        offset: 0
-        orderBy: "lastMsgDate"
-        orderDir: "ASC"
-      }
-    ) {
+export const TABLE_TICKETS = gql`
+  query TableData($filters: TicketFilter!) {
+    ticketList(filters: $filters) {
       id
       subTheme {
         theme {
@@ -30,6 +23,7 @@ const TABLE_TICKETS = gql`
       }
       lastMessage {
         text
+        date
       }
       messages {
         text
@@ -43,4 +37,23 @@ const TABLE_TICKETS = gql`
   }
 `;
 
-export default TABLE_TICKETS;
+export const TICKETS_AMOUNT = gql`
+  query {
+    ticketListCount
+  }
+`;
+
+export const MESSAGES_CHAT = gql`
+  query ($id: Int!) {
+    ticket(id: $id) {
+      id
+      messages {
+        text
+        sender {
+          role
+        }
+        date
+      }
+    }
+  }
+`;
