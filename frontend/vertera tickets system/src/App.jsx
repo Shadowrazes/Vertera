@@ -5,18 +5,22 @@ import Header from "./components/header";
 import AllTickets from "./pages/all-tickets";
 import Chat from "./pages/chat";
 import CreateTicket from "./pages/create-ticket";
+import Admin from "./pages/admin";
 import Loader from "./pages/loading";
 import TestTable from "./components/testtable";
 
 import "./App.css";
 
 function App() {
+  //[user, setUser] = useState(null);
+
   return (
     <div className="container">
       <Header />
       <Router>
         <Routes>
           <Route path="/" element={<CreateTicket />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/all-tickets" element={<AllTickets />} />
           <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
         </Routes>
