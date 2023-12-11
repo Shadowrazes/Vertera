@@ -41,11 +41,13 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  // const status = location.state && location.state.status;
-  const [status, setStatus] = useState("");
+  const statusInitial = location.state && location.state.status;
+  const [status, setStatus] = useState(statusInitial);
 
   const [ticketId, setTicketId] = useState(null);
   const [messagesQuery, setMessagesQuery] = useState([]);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -58,14 +60,22 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setStatus(data.ticket.status.name.stroke);
-    }
-  }, [data]);
+      console.log(status);
 
-  const [addMessage, { error: errorAddMsg }] = useMutation(ADD_MESSAGE, {
-    refetchQueries: [
-      { query: MESSAGES_CHAT, variables: { id: parseInt(itemId) } },
-    ],
-  });
+      if (status !== "Закрыт") {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    }
+  }, [data, status]);
+
+  const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
+    useMutation(ADD_MESSAGE, {
+      refetchQueries: [
+        { query: MESSAGES_CHAT, variables: { id: parseInt(itemId) } },
+      ],
+    });
 
   if (loading) {
     return <Loader />;
@@ -77,6 +87,9 @@ function Chat() {
 
   const sendMsg = (e) => {
     e.preventDefault();
+    if (loaderAddMsg) {
+      return <Loader />;
+    }
     if (errorAddMsg) {
       return <h2>Что-то пошло не так</h2>;
     }
@@ -84,8 +97,8 @@ function Chat() {
     addMessage({
       variables: {
         fields: {
-          senderId: 2,
-          recieverId: 1,
+          senderId: 1,
+          recieverId: 2,
           ticketId: parseInt(itemId),
           type: "common",
           text: message,
@@ -97,6 +110,11 @@ function Chat() {
 
   const handleChange = (e) => {
     setMessage(e.target.value);
+  };
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setStatus("Закрыт");
   };
 
   return (
@@ -128,41 +146,43 @@ function Chat() {
         ))}
       </div>
 
-      <div className="chat-input__container">
-        <Form className="chat-input__form" onSubmit={sendMsg}>
-          <Row className="chat-input__row">
-            <Form.Group controlId="TextareaForm">
-              <Form.Control
-                as="textarea"
-                placeholder="Текст сообщения"
-                rows={3}
-                value={message}
-                onChange={handleChange}
-                className="chat-input__textarea"
-              />
-            </Form.Group>
-            <Form.Group controlId="FileInputForm">
-              <Form.Control
-                type="file"
-                multiple
-                // onChange={handleFileChange}
-              />
-            </Form.Group>
-            <div className="chat-input__button-row">
-              <ButtonCustom
-                title="Отправить"
-                className="chat-input__button-send"
-                type="submit"
-              />
-              <ButtonCustom
-                title="Закрыть заявку"
-                className="chat-input__button-close"
-                // onClick={handleClose}
-              />
-            </div>
-          </Row>
-        </Form>
-      </div>
+      {isVisible && (
+        <div className="chat-input__container">
+          <Form className="chat-input__form" onSubmit={sendMsg}>
+            <Row className="chat-input__row">
+              <Form.Group controlId="TextareaForm">
+                <Form.Control
+                  as="textarea"
+                  placeholder="Текст сообщения"
+                  rows={3}
+                  value={message}
+                  onChange={handleChange}
+                  className="chat-input__textarea"
+                />
+              </Form.Group>
+              <Form.Group controlId="FileInputForm">
+                <Form.Control
+                  type="file"
+                  multiple
+                  // onChange={handleFileChange}
+                />
+              </Form.Group>
+              <div className="chat-input__button-row">
+                <ButtonCustom
+                  title="Отправить"
+                  className="chat-input__button-send"
+                  type="submit"
+                />
+                <ButtonCustom
+                  title="Закрыть заявку"
+                  className="chat-input__button-close"
+                  onClick={handleClose}
+                />
+              </div>
+            </Row>
+          </Form>
+        </div>
+      )}
     </>
   );
 }

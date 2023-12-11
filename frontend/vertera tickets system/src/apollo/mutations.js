@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { execute } from "graphql";
 
 export const ADD_STATUS = gql`
   mutation addStatus {
@@ -26,5 +25,13 @@ export const ADD_TICKET = gql`
 export const ADD_MESSAGE = gql`
   mutation ($fields: MessageInsert!) {
     addMessage(fields: $fields)
+  }
+`;
+
+export const UPDATE_STATUS = gql`
+  mutation ($id: Int!, $fields: TicketStatusUpdate!) {
+    updateTicketStatus(id: $id, fields: $fields) {
+      changed
+    }
   }
 `;

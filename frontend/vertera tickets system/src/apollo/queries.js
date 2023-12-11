@@ -50,6 +50,7 @@ export const MESSAGES_CHAT = gql`
     ticket(id: $id) {
       id
       messages {
+        id
         text
         sender {
           id

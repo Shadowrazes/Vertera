@@ -1,6 +1,6 @@
 import "../css/ticket-title.css";
 
-function getStatusColor(status){
+function getStatusColor(status) {
   switch (status) {
     case "Открыта":
       return "#00AB97";
@@ -15,7 +15,7 @@ const handleGoBack = () => {
   window.history.back();
 };
 
-function TicketTitle({title, className, state}) {
+function TicketTitle({ title, className, state }) {
   return (
     <>
       <div className="ticket-title__container">
@@ -37,7 +37,7 @@ function TicketTitle({title, className, state}) {
             <path
               d="M17.8378 8.91888L12.4449 14.3117C12.2887 14.4679 12.2887 14.7212 12.4449 14.8774L17.8378 20.2702"
               stroke="white"
-              stroke-linecap="round"
+              strokeLinecap="round"
             />
           </svg>
         </a>
