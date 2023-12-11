@@ -7,15 +7,16 @@ import CreateTicket from "./pages/create-ticket";
 import Admin from "./pages/admin";
 import Loader from "./pages/loading";
 import TestTable from "./components/testtable";
+import {useState} from "react";
 
 import "./App.css";
 
 function App() {
-  //[user, setUser] = useState(null);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
   return (
     <div className="container">
-      <Header />
+      <Header user={user} setUser={setUser} />
       <Router>
         <Routes>
           <Route path="/" element={<CreateTicket />} />
