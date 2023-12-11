@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 
-import TABLE_TICKETS from "../apollo/queries";
+import { TABLE_TICKETS } from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
 
 import "../css/table.css";
 import "../css/all-tickets.css";
+import { TICKETS_AMOUNT } from "../apollo/queries";
 
 function TableTickets() {
   const [dataQuery, setData] = useState([]);
@@ -186,7 +187,7 @@ function TableTickets() {
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th style={{ minWidth: "115px" }}>ID тикет</th>
+            <th>ID тикет</th>
             <th>Раздел</th>
             <th>Дата создания</th>
             <th>Тема</th>

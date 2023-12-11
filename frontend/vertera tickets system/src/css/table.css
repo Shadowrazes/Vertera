@@ -36,6 +36,7 @@
 .table__table th {
   text-align: center;
   padding: 45px 25px 15px 25px !important;
+  min-width: 115px;
   font-size: 17px;
   font-weight: 500;
 }

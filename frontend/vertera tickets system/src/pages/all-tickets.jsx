@@ -4,7 +4,7 @@ import { DateRangePicker } from "rsuite";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import TABLE_TICKETS from "../apollo/queries";
+import { TABLE_TICKETS, TICKETS_AMOUNT } from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import DropdownBT from "../components/dropdown";
@@ -15,6 +15,7 @@ import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
   const [dataQuery, setData] = useState([]);
+  const [dataAmount, setDataAmount] = useState(0);
 
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
@@ -28,8 +29,8 @@ function allTickets() {
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
 
-  const itemsPerPage = 2;
-  const ticketsAmount = 5;
+  const pageNumbers = [];
+  const itemsPerPage = 8;
 
   //filters visibillity
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
@@ -51,10 +52,7 @@ function allTickets() {
     setSelectedFilter(resetState);
   };
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  const { loading: amountLoading, data: amountData } = useQuery(TICKETS_AMOUNT);
 
   const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
     variables: {
@@ -92,6 +90,9 @@ function allTickets() {
     if (data && data.ticketList) {
       setData(data.ticketList);
     }
+    if (amountData && amountData.ticketListCount) {
+      setDataAmount(amountData.ticketListCount);
+    }
 
     if (selectedSort !== prevSelectedSort) {
       handleSorts(selectedSort);
@@ -104,9 +105,17 @@ function allTickets() {
     }
 
     setIsVisible(pageNumbers.length > 1);
+    console.log(pageNumbers.length);
   }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
 
   const tickets = dataQuery;
+
+  const ticketsAmount = dataAmount;
+  console.log(ticketsAmount);
+
+  for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
   if (loading) {
     return <Loader />;
@@ -306,7 +315,7 @@ function allTickets() {
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th style={{ minWidth: "115px" }}>ID тикет</th>
+            <th>ID тикет</th>
             <th>Раздел</th>
             <th>Дата создания</th>
             <th>Тема</th>
@@ -385,6 +394,7 @@ function allTickets() {
                     className="table__status"
                     style={{
                       background: getStatusBGColor(ticket.status.name.stroke),
+                      minWidth: "115px",
                     }}
                   >
                     {ticket.status.name.stroke}

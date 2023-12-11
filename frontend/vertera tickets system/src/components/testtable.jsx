@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 
-import TABLE_TICKETS from "../apollo/queries";
+import { TABLE_TICKETS } from "../apollo/queries";
 import Loader from "../pages/loading";
 
 import "../css/table.css";

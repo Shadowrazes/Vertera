@@ -1,11 +1,9 @@
-import { Button } from "react-bootstrap";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Header from "./components/header";
 import AllTickets from "./pages/all-tickets";
 import Chat from "./pages/chat";
 import CreateTicket from "./pages/create-ticket";
-import Loader from "./pages/loading";
 import TestTable from "./components/testtable";
 
 import "./App.css";

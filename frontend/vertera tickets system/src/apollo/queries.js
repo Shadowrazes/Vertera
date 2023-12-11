@@ -37,4 +37,23 @@ export const TABLE_TICKETS = gql`
   }
 `;
 
-export default TABLE_TICKETS;
+export const TICKETS_AMOUNT = gql`
+  query {
+    ticketListCount
+  }
+`;
+
+export const MESSAGES_CHAT = gql`
+  query ($id: Int!) {
+    ticket(id: $id) {
+      id
+      messages {
+        text
+        sender {
+          role
+        }
+        date
+      }
+    }
+  }
+`;
