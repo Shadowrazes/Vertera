@@ -11,7 +11,6 @@ import ButtonCustom from "./button";
 
 import "../css/table.css";
 import "../css/all-tickets.css";
-import { TICKETS_AMOUNT } from "../apollo/queries";
 
 function TableTickets() {
   const [dataQuery, setData] = useState([]);

@@ -73,3 +73,37 @@ export const LOGIN = gql`
     login(login: $login, password: $password)
   }
 `;
+
+export const THEME_LIST = gql`
+  query {
+    subThemeList {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+      theme {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;
+
+export const DEPARTMENTS_LIST = gql`
+  query {
+    departmentList {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+    }
+  }
+`;

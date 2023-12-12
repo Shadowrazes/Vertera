@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { Form, Row } from "react-bootstrap";
 
@@ -41,13 +41,14 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  const statusInitial = location.state && location.state.status;
-  const [status, setStatus] = useState(statusInitial);
+  const status = location.state && location.state.status;
+  // const [status, setStatus] = useState(statusInitial);
 
   const [ticketId, setTicketId] = useState(null);
   const [messagesQuery, setMessagesQuery] = useState([]);
 
   const [isVisible, setIsVisible] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -59,7 +60,7 @@ function Chat() {
     if (data && data.ticket) {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
-      setStatus(data.ticket.status.name.stroke);
+      // setStatus(data.ticket.status.name.stroke);
       console.log(status);
 
       if (status !== "Закрыт") {
@@ -67,8 +68,18 @@ function Chat() {
       } else {
         setIsVisible(false);
       }
+
+      if (status == "Закрыт" && data.ticket.messages.length > 1) {
+        setIsClosed(true);
+      }
     }
   }, [data, status]);
+
+  const navigate = useNavigate();
+
+  const goToCreateTicket = () => {
+    navigate("/");
+  };
 
   const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
     useMutation(ADD_MESSAGE, {
@@ -114,7 +125,7 @@ function Chat() {
 
   const handleClose = () => {
     setIsVisible(false);
-    setStatus("Закрыт");
+    // setStatus("Закрыт");
   };
 
   return (
@@ -181,6 +192,18 @@ function Chat() {
               </div>
             </Row>
           </Form>
+        </div>
+      )}
+      {!isVisible && (
+        <div className="chat-input__close-container">
+          <div className="chat-input__close-box">
+            <span className="chat-input__close-text">Заявка закрыта</span>
+          </div>
+          <ButtonCustom
+            title="Создать новую заявку"
+            className="chat-input__button-close"
+            onClick={goToCreateTicket}
+          />
         </div>
       )}
     </>
