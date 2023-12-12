@@ -1,15 +1,8 @@
 import { gql } from "@apollo/client";
 
-const TABLE_TICKETS = gql`
-  query TableData {
-    ticketList(
-      filters: {
-        limit: 9999
-        offset: 0
-        orderBy: "lastMsgDate"
-        orderDir: "ASC"
-      }
-    ) {
+export const TABLE_TICKETS = gql`
+  query ($filters: TicketFilter!) {
+    ticketList(filters: $filters) {
       id
       subTheme {
         theme {
@@ -29,7 +22,10 @@ const TABLE_TICKETS = gql`
         }
       }
       lastMessage {
-        text
+        sender {
+          fullName
+        }
+        date
       }
       messages {
         text
@@ -43,4 +39,71 @@ const TABLE_TICKETS = gql`
   }
 `;
 
-export default TABLE_TICKETS;
+export const TICKETS_AMOUNT = gql`
+  query {
+    ticketListCount
+  }
+`;
+
+export const MESSAGES_CHAT = gql`
+  query ($id: Int!) {
+    ticket(id: $id) {
+      id
+      messages {
+        id
+        text
+        sender {
+          id
+          role
+        }
+        date
+      }
+      status {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;
+
+export const LOGIN = gql`
+  query ($login: String!, $password: String!) {
+    login(login: $login, password: $password)
+  }
+`;
+
+export const THEME_LIST = gql`
+  query {
+    subThemeList {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+      theme {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;
+
+export const DEPARTMENTS_LIST = gql`
+  query {
+    departmentList {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+    }
+  }
+`;

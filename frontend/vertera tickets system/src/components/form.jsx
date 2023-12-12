@@ -1,14 +1,136 @@
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  DropdownButton,
+  Dropdown,
+} from "react-bootstrap";
+import { useQuery, useMutation } from "@apollo/client";
+
+import { THEME_LIST, DEPARTMENTS_LIST } from "../apollo/queries";
+import { ADD_TICKET } from "../apollo/mutations";
+
+import Loader from "../pages/loading";
 import DropdownBT from "./dropdown";
 import TitleH2 from "./title";
+
 import "../css/form.css";
 
 function FormComponent() {
-  let itemsSubdivision = ["подразделение1", "подразделение2", "подразделение3"];
-  let itemsType = ["типобращения1", "типобращения2", "типобращения3"];
-  let itemsSubtheme = ["подтема1", "подтема2", "подтема3"];
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [textareaValue, setTextareaValue] = useState("");
 
-  const handleNewTicket = () => {};
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
+
+  const [dataQuery, setData] = useState([]);
+  const [dataQueryTheme, setDataTheme] = useState([]);
+
+  const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
+  const {
+    loading: themeLoading,
+    error: themeError,
+    data: themeData,
+  } = useQuery(THEME_LIST);
+
+  useEffect(() => {
+    if (themeData && themeData.subThemeList) {
+      setDataTheme(themeData.subThemeList);
+    }
+
+    if (data && data.departmentList) {
+      setData(data.departmentList);
+    }
+  }, [data, themeData, selectedDepartment, selectedItem]);
+
+  const [addTicket] = useMutation(ADD_TICKET);
+
+  const handleNewTicket = (e) => {
+    e.preventDefault();
+    console.log(selectedDepartment);
+    console.log(selectedTheme);
+    console.log(selectedSubTheme);
+    console.log(textareaValue);
+
+    const selectedDepartmentId = findDepartmentIdByName(selectedDepartment);
+    console.log(selectedDepartmentId);
+    const selectedThemeId = findThemeIdByName(selectedTheme);
+    console.log(selectedThemeId);
+    const selectedSubThemeId = findSubThemeIdByName(selectedSubTheme);
+    console.log(selectedSubThemeId);
+
+    addTicket({
+      variables: {
+        clientId: 1,
+        unitId: selectedDepartmentId,
+        themeId: selectedThemeId,
+        subThemeId: selectedSubThemeId,
+        senderId: 1,
+        recieverId: 2,
+        ticketId: 1,
+        type: "common",
+        text: textareaValue,
+      },
+    });
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (themeLoading) {
+    return <Loader />;
+  }
+
+  if (themeError) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  const departments = dataQuery.map((department) => department.name.stroke);
+  const themes = dataQueryTheme.map((theme) => theme.theme.id);
+  const subThemes = dataQueryTheme.map((theme) => theme.name.stroke);
+
+  // console.log(themes);
+
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+    setSelectedDepartment(item);
+  };
+
+  const handleTextareaChange = (e) => {
+    setTextareaValue(e.target.value);
+  };
+
+  const findDepartmentIdByName = (departmentName) => {
+    const department = dataQuery.find(
+      (item) => item.name.stroke === departmentName
+    );
+    return department ? department.id : null;
+  };
+
+  const findThemeIdByName = (themeName) => {
+    const theme = dataQueryTheme.find(
+      (item) => item.theme.name.stroke === themeName
+    );
+    return theme ? theme.theme.id : null;
+  };
+
+  const findSubThemeIdByName = (subThemeName) => {
+    const subTheme = dataQueryTheme.find(
+      (item) => item.name.stroke === subThemeName
+    );
+    return subTheme ? subTheme.id : null;
+  };
 
   return (
     <>
@@ -16,12 +138,83 @@ function FormComponent() {
       <Form>
         <Row>
           <Col md={4} className="form__column">
-            <DropdownBT
-              items={itemsSubdivision}
+            {/* <DropdownBT
+              items={departments}
               label="Выберите подразделение"
-            />
-            <DropdownBT items={itemsType} label="Тип обращения" />
-            <DropdownBT items={itemsSubtheme} label="Подтема" />
+              onSelect={(selectedValue) => setSelectedDepartment(selectedValue)}
+            /> */}
+
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedItem || "Выберите подразделение"}
+            >
+              {departments.map((item, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => handleItemClick(item)}
+                  href="#"
+                >
+                  {item}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+
+            {selectedDepartment && (
+              // <DropdownBT items={itemsTheme} label="Тип обращения" />
+
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedTheme || "Тип обращения"}
+              >
+                {Array.from(
+                  new Set(
+                    dataQueryTheme
+                      .filter((subTheme) =>
+                        subTheme.departments.some(
+                          (department) =>
+                            department.name.stroke === selectedDepartment
+                        )
+                      )
+                      .map((subTheme) => subTheme.theme.name.stroke)
+                  )
+                ).map((theme, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => setSelectedTheme(theme)}
+                    href="#"
+                  >
+                    {theme}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            )}
+            {selectedTheme && (
+              // <DropdownBT items={itemsSubTheme} label="Подтема" />
+
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedSubTheme || "Выберите подтему"}
+              >
+                {dataQueryTheme
+                  .filter(
+                    (subTheme) =>
+                      subTheme.theme.name.stroke === selectedTheme &&
+                      subTheme.departments.some(
+                        (department) =>
+                          department.name.stroke === selectedDepartment
+                      )
+                  )
+                  .map((subTheme) => (
+                    <Dropdown.Item
+                      key={subTheme.id}
+                      onClick={() => setSelectedSubTheme(subTheme.name.stroke)}
+                      href="#"
+                    >
+                      {subTheme.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+              </DropdownButton>
+            )}
           </Col>
 
           <Col md={8} className="form__column">
@@ -30,10 +223,12 @@ function FormComponent() {
                 as="textarea"
                 placeholder="Текст сообщения"
                 rows={3}
+                value={textareaValue}
+                onChange={handleTextareaChange}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="FileInputForm">
-              <Form.Control type="file" />
+              <Form.Control type="file" multiple />
             </Form.Group>
             <Button
               variant="primary"

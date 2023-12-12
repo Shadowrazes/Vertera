@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Row, Col, Table, Button } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
+import { TABLE_TICKETS, TICKETS_AMOUNT } from "../apollo/queries";
+import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import DropdownBT from "../components/dropdown";
 import ButtonCustom from "../components/button";
@@ -12,53 +14,191 @@ import "../css/all-tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
+  const [dataQuery, setData] = useState([]);
+  const [dataAmount, setDataAmount] = useState(0);
+
+  const [selectedSort, setSelectedSort] = useState(-1);
+  const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
+
+  const [orderBy, setOrderBy] = useState("id");
+  const [orderDir, setOrderDir] = useState("ASC");
+  const [offset, setOffset] = useState(0);
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
+
+  const pageNumbers = [];
+  const itemsPerPage = 8;
+
+  //filters visibillity
+  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
+
+  const handleHideComponent = () => {
+    setIsVisibleFilters((prevVisibility) => !prevVisibility);
+  };
+
+  let items = ["1", "2", "3"];
+
+  // dropdown reset
+  const initialSelectedFilterState = [-1, -1, -1, -1, -1, -1];
+  const [selectedFilter, setSelectedFilter] = useState(
+    initialSelectedFilterState
+  );
+
+  const handleResetFilters = () => {
+    const resetState = initialSelectedFilterState.map(() => -1);
+    setSelectedFilter(resetState);
+  };
+
+  const { loading: amountLoading, data: amountData } = useQuery(TICKETS_AMOUNT);
+
+  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
+    variables: {
+      filters: {
+        limit: itemsPerPage,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "ASC",
+        lang: "ru",
+      },
+    },
+  });
+
+  const handleNewPage = async (index) => {
+    setCurrentPage(index);
+
+    let lastItem = currentPage * itemsPerPage;
+    let _offset = lastItem - itemsPerPage;
+
+    setOffset(_offset);
+
+    const variables = {
+      filters: {
+        limit: itemsPerPage,
+        offset: _offset,
+        orderBy: orderBy,
+        orderDir: orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
+  };
+
+  useEffect(() => {
+    if (data && data.ticketList) {
+      setData(data.ticketList);
+    }
+    if (amountData && amountData.ticketListCount) {
+      setDataAmount(amountData.ticketListCount);
+    }
+
+    if (selectedSort !== prevSelectedSort) {
+      handleSorts(selectedSort);
+      setPrevSelectedSort(selectedSort);
+    }
+
+    if (currentPage !== prevCurrentPage) {
+      handleNewPage(currentPage);
+      setPrevCurrentPage(currentPage);
+    }
+
+    setIsVisible(pageNumbers.length > 1);
+    console.log(pageNumbers.length);
+  }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
+
+  const tickets = dataQuery;
+
+  const ticketsAmount = dataAmount;
+  console.log(ticketsAmount);
+
+  for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
 
   const columns = [
-    "Раздел",
-    "Дата",
-    "Тема",
-    "Последнее сообщение",
-    "Сообщений",
+    "subTheme.theme.unit.name.stroke",
+    "date",
+    "subTheme.theme.name.stroke",
+    "lastMessage.text",
   ];
+  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
-  const data = [
-    {
-      id: 1,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "02.10.23| Имя Фамилия",
-      message_count: "3/1",
-      status: "Новый",
-    },
-    {
-      id: 2,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В процессе",
-    },
-    {
-      id: 3,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "В ожидании",
-    },
-    {
-      id: 4,
-      section: "Темы",
-      date: new Date("2023-10-17"),
-      theme: "Название темы",
-      last_message: "03.10.23| Имя Фамилия",
-      message_count: "4/1",
-      status: "Закрыт",
-    },
-  ];
+  const handleSorts = async (index) => {
+    setSelectedSort(index);
+
+    let _orderBy;
+    let _orderDir;
+
+    if (prevSelectedSort === index) {
+      _orderDir = "DESC";
+    } else {
+      _orderDir = "ASC";
+    }
+
+    switch (index) {
+      case 0:
+        _orderBy = "unitStroke";
+        break;
+
+      case 1:
+        _orderBy = "date";
+        break;
+
+      case 2:
+        _orderBy = "themeStroke";
+        break;
+
+      case 3:
+        _orderBy = "lastMsgDate";
+        break;
+
+      default:
+        _orderBy = "id";
+        break;
+    }
+
+    if (orderDir == "DESC") {
+      setSelectedSort(-1);
+      _orderBy = "id";
+      _orderDir = "ASC";
+    }
+
+    setOrderBy(_orderBy);
+    setOrderDir(_orderDir);
+
+    const variables = {
+      filters: {
+        limit: itemsPerPage,
+        offset: offset,
+        orderBy: _orderBy,
+        orderDir: _orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(ticketsAmount / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   function getStatusBGColor(status) {
     switch (status) {
@@ -74,65 +214,20 @@ function allTickets() {
         return "white";
     }
   }
-  //filters visibillity
-  const [selectedSort, setSelectedSort] = useState(-1);
-  const [isVisible, setIsVisible] = useState(false);
-
-  const handleHideComponent = () => {
-    setIsVisible((prevVisibility) => !prevVisibility);
-  };
-
-  const handleSorts = (index) => {
-    setSelectedSort(index);
-  };
-
-  let items = ["1", "2", "3"];
-  //paginaton
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(data.length / itemsPerPage); i++) {
-    pageNumbers.push(i);
-  }
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < Math.ceil(data.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-  // dropdown reset
-  const initialSelectedFilterState = [-1, -1, -1, -1, -1, -1];
-  const [selectedFilter, setSelectedFilter] = useState(
-    initialSelectedFilterState
-  );
-
-  const handleResetFilters = () => {
-    const resetState = initialSelectedFilterState.map(() => -1);
-    setSelectedFilter(resetState);
-  };
 
   return (
     <>
       <div className="alltickets__container">
         <TitleH2 title="Все обращения" className="title__heading-nomargin" />
         <ButtonCustom
-          title={isVisible == false ? "Показать фильтр" : "Скрыть фильтр"}
+          title={
+            isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
+          }
           onClick={handleHideComponent}
         />
       </div>
 
-      {isVisible && (
+      {isVisibleFilters && (
         <div className="alltickets__filters-container">
           <Form>
             <Row>
@@ -189,7 +284,30 @@ function allTickets() {
                 : "table__sort"
             }
           >
-            {column}
+            {columnsName[index]}
+            {selectedSort === index && (
+              <span className="table__sort-arrow">
+                <svg
+                  className={
+                    orderDir == "DESC"
+                      ? "table__sort-arrow-svg-rotated"
+                      : "table__sort-arrow-svg"
+                  }
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="7"
+                  height="10"
+                  viewBox="0 0 7 10"
+                  fill="none"
+                >
+                  <path
+                    d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                    stroke="#00AB97"
+                    strokeWidth="0.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            )}
           </span>
         ))}
       </div>
@@ -207,73 +325,79 @@ function allTickets() {
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item) => (
-            <tr key={item.id}>
+          {tickets.map((ticket) => (
+            <tr key={ticket.id}>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.id}
+                  {ticket.id}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.section}
+                  {ticket.subTheme.theme.unit.name.stroke}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.date.toLocaleDateString()}
+                  {ticket.date.replace(/T|-/g, (match) =>
+                    match === "T" ? " " : "."
+                  )}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.theme}
+                  {ticket.subTheme.theme.name.stroke}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.last_message}
+                  {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                  {ticket.lastMessage.sender.fullName}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
-                  {item.message_count}
+                  {ticket.messages.length}
                 </Link>
               </td>
               <td>
                 <Link
-                  to={`/dialog/${item.id}`}
-                  state={{ status: item.status }}
+                  to={`/dialog/${ticket.id}`}
+                  state={{ status: ticket.status.name.stroke }}
                   className="alltickets__link"
                 >
                   <span
                     className="table__status"
-                    style={{ background: getStatusBGColor(item.status) }}
+                    style={{
+                      background: getStatusBGColor(ticket.status.name.stroke),
+                      minWidth: "115px",
+                    }}
                   >
-                    {item.status}
+                    {ticket.status.name.stroke}
                   </span>
                 </Link>
               </td>
@@ -283,21 +407,23 @@ function allTickets() {
       </Table>
 
       <ul className="alltickets__pagination">
-        <button
-          onClick={handlePrevPage}
-          className={
-            currentPage === 1
-              ? "alltickets__page-btn-disabled"
-              : "alltickets__page-btn"
-          }
-          disabled={currentPage === 1}
-        >
-          Предыдущая
-        </button>
+        {isVisible && (
+          <button
+            onClick={handlePrevPage}
+            className={
+              currentPage === 1
+                ? "alltickets__page-btn-disabled"
+                : "alltickets__page-btn"
+            }
+            disabled={currentPage === 1}
+          >
+            Предыдущая
+          </button>
+        )}
         {pageNumbers.map((number) => (
           <li key={number} className="alltickets__page-item">
             <button
-              onClick={() => setCurrentPage(number)}
+              onClick={() => handleNewPage(number)}
               className={
                 number === currentPage
                   ? "alltickets__page-link active-link"
@@ -308,17 +434,19 @@ function allTickets() {
             </button>
           </li>
         ))}
-        <button
-          onClick={handleNextPage}
-          className={
-            currentPage === Math.ceil(data.length / itemsPerPage)
-              ? "alltickets__page-btn-disabled"
-              : "alltickets__page-btn"
-          }
-          disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
-        >
-          Следующая
-        </button>
+        {isVisible && (
+          <button
+            onClick={handleNextPage}
+            className={
+              currentPage === Math.ceil(data.length / itemsPerPage)
+                ? "alltickets__page-btn-disabled"
+                : "alltickets__page-btn"
+            }
+            disabled={currentPage === Math.ceil(ticketsAmount / itemsPerPage)}
+          >
+            Следующая
+          </button>
+        )}
       </ul>
     </>
   );

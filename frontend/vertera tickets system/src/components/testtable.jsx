@@ -1,28 +1,84 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Table, Button } from "react-bootstrap";
-import { useQuery, gql, ApolloClient, InMemoryCache } from "@apollo/client";
+import { Table } from "react-bootstrap";
+import { useQuery } from "@apollo/client";
 
-import TABLE_TICKETS from "../apollo/queries";
+import { TABLE_TICKETS } from "../apollo/queries";
 import Loader from "../pages/loading";
 
 import "../css/table.css";
 
 function TestTable() {
   const [dataQuery, setData] = useState([]);
-  const { loading, error, data } = useQuery(TABLE_TICKETS);
 
   const [selectedSort, setSelectedSort] = useState(-1);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">(
-    "asc"
-  );
+  const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
+
+  const [orderBy, setOrderBy] = useState("id");
+  const [orderDir, setOrderDir] = useState("ASC");
+  const [offset, setOffset] = useState(0);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
+
+  const itemsPerPage = 2;
+  const ticketsAmount = 5;
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
+    variables: {
+      filters: {
+        limit: itemsPerPage,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "ASC",
+        lang: "ru",
+      },
+    },
+  });
+
+  const handleNewPage = async (index) => {
+    setCurrentPage(index);
+
+    let lastItem = currentPage * itemsPerPage;
+    let _offset = lastItem - itemsPerPage;
+
+    setOffset(_offset);
+
+    const variables = {
+      filters: {
+        limit: itemsPerPage,
+        offset: _offset,
+        orderBy: orderBy,
+        orderDir: orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
+  };
 
   useEffect(() => {
     if (data && data.ticketList) {
       setData(data.ticketList);
     }
-  }, [data]);
+
+    if (selectedSort !== prevSelectedSort) {
+      handleSorts(selectedSort);
+      setPrevSelectedSort(selectedSort);
+    }
+
+    if (currentPage !== prevCurrentPage) {
+      handleNewPage(currentPage);
+      setPrevCurrentPage(currentPage);
+    }
+
+    setIsVisible(pageNumbers.length > 1);
+  }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
 
   const tickets = dataQuery;
 
@@ -39,59 +95,75 @@ function TestTable() {
     "date",
     "subTheme.theme.name.stroke",
     "lastMessage.text",
-    "messages.length",
   ];
-  const columnsName = [
-    "Раздел",
-    "Дата",
-    "Тема",
-    "Последнее сообщение",
-    "Сообщение",
-  ];
+  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
-  const getField = (obj, path) => {
-    const keys = path.split(".");
-    let value = obj;
+  const handleSorts = async (index) => {
+    setSelectedSort(index);
 
-    for (const key of keys) {
-      value = value[key];
+    let _orderBy;
+    let _orderDir;
+
+    if (prevSelectedSort === index) {
+      _orderDir = "DESC";
+    } else {
+      _orderDir = "ASC";
     }
 
-    return value;
+    switch (index) {
+      case 0:
+        _orderBy = "unitStroke";
+        break;
+
+      case 1:
+        _orderBy = "date";
+        break;
+
+      case 2:
+        _orderBy = "themeStroke";
+        break;
+
+      case 3:
+        _orderBy = "lastMsgDate";
+        break;
+
+      default:
+        _orderBy = "id";
+        break;
+    }
+
+    if (orderDir == "DESC") {
+      setSelectedSort(-1);
+      _orderBy = "id";
+      _orderDir = "ASC";
+    }
+
+    setOrderBy(_orderBy);
+    setOrderDir(_orderDir);
+
+    const variables = {
+      filters: {
+        limit: itemsPerPage,
+        offset: offset,
+        orderBy: _orderBy,
+        orderDir: _orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
   };
 
-  const sortData = (field) => {
-    console.log(field);
-    // const copyData = [...data];
-
-    const sortedData = [...dataQuery].sort((a, b) => {
-      const aValue = getField(a, field);
-      const bValue = getField(b, field);
-
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      } else if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-      } else {
-        return 0;
-      }
-    });
-    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    setData(sortedData);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
-  const handleSorts = (index) => {
-    sortData(columns[index]);
-    setSelectedSort(index);
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(ticketsAmount / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
   };
-
-  const itemsPerPage = 8;
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = dataQuery.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -102,7 +174,6 @@ function TestTable() {
             key={column}
             onClick={() => {
               handleSorts(index);
-              console.log(index);
             }}
             className={
               selectedSort === index
@@ -111,6 +182,29 @@ function TestTable() {
             }
           >
             {columnsName[index]}
+            {selectedSort === index && (
+              <span className="table__sort-arrow">
+                <svg
+                  className={
+                    orderDir == "DESC"
+                      ? "table__sort-arrow-svg-rotated"
+                      : "table__sort-arrow-svg"
+                  }
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="7"
+                  height="10"
+                  viewBox="0 0 7 10"
+                  fill="none"
+                >
+                  <path
+                    d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                    stroke="#00AB97"
+                    strokeWidth="0.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            )}
           </span>
         ))}
       </div>
@@ -118,7 +212,7 @@ function TestTable() {
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <th>ID тикет</th>
+            <th style={{ minWidth: "115px" }}>ID тикет</th>
             <th>Раздел</th>
             <th>Дата создания</th>
             <th>Тема</th>
@@ -134,13 +228,58 @@ function TestTable() {
               <td>{ticket.subTheme.theme.unit.name.stroke}</td>
               <td>{ticket.date}</td>
               <td>{ticket.subTheme.theme.name.stroke}</td>
-              <td>{ticket.lastMessage.text}</td>
+              <td>
+                {ticket.lastMessage.date} - {ticket.lastMessage.text}
+              </td>
               <td>{ticket.messages.length}</td>
               <td>{ticket.status.name.stroke}</td>
             </tr>
           ))}
         </tbody>
       </Table>
+
+      <ul className="alltickets__pagination">
+        {isVisible && (
+          <button
+            onClick={handlePrevPage}
+            className={
+              currentPage === 1
+                ? "alltickets__page-btn-disabled"
+                : "alltickets__page-btn"
+            }
+            disabled={currentPage === 1}
+          >
+            Предыдущая
+          </button>
+        )}
+        {pageNumbers.map((number) => (
+          <li key={number} className="alltickets__page-item">
+            <button
+              onClick={() => handleNewPage(number)}
+              className={
+                number === currentPage
+                  ? "alltickets__page-link active-link"
+                  : "alltickets__page-link"
+              }
+            >
+              {number}
+            </button>
+          </li>
+        ))}
+        {isVisible && (
+          <button
+            onClick={handleNextPage}
+            className={
+              currentPage === Math.ceil(data.length / itemsPerPage)
+                ? "alltickets__page-btn-disabled"
+                : "alltickets__page-btn"
+            }
+            disabled={currentPage === Math.ceil(ticketsAmount / itemsPerPage)}
+          >
+            Следующая
+          </button>
+        )}
+      </ul>
     </>
   );
 }

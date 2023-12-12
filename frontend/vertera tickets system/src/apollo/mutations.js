@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { execute } from "graphql";
 
 export const ADD_STATUS = gql`
   mutation addStatus {
@@ -7,18 +6,62 @@ export const ADD_STATUS = gql`
   }
 `;
 
+// export const ADD_TICKET = gql`
+//   mutation addTicket {
+//     addTicket(
+//       ticketFields: { clientId: 1, unitId: 1, themeId: 6, subThemeId: 55 }
+//       messageFields: {
+//         senderId: 1
+//         recieverId: 2
+//         ticketId: 1
+//         type: "common"
+//         text: "test"
+//         attachPaths: ["test/a", "test/321"]
+//       }
+//     )
+//   }
+// `;
+
 export const ADD_TICKET = gql`
-  mutation addTicket {
+  mutation addTicket(
+    $clientId: Int!
+    $unitId: Int!
+    $themeId: Int!
+    $subThemeId: Int!
+    $senderId: Int!
+    $recieverId: Int!
+    $ticketId: Int!
+    $type: String!
+    $text: String!
+  ) {
     addTicket(
-      ticketFields: { clientId: 1, unitId: 1, themeId: 6, subThemeId: 55 }
+      ticketFields: {
+        clientId: $clientId
+        unitId: $unitId
+        themeId: $themeId
+        subThemeId: $subThemeId
+      }
       messageFields: {
-        senderId: 1
-        recieverId: 2
-        ticketId: 1
-        type: "common"
-        text: "test"
-        attachPaths: ["test/a", "test/321"]
+        senderId: $senderId
+        recieverId: $recieverId
+        ticketId: $ticketId
+        type: $type
+        text: $text
       }
     )
+  }
+`;
+
+export const ADD_MESSAGE = gql`
+  mutation ($fields: MessageInsert!) {
+    addMessage(fields: $fields)
+  }
+`;
+
+export const UPDATE_STATUS = gql`
+  mutation ($id: Int!, $fields: TicketStatusUpdate!) {
+    updateTicketStatus(id: $id, fields: $fields) {
+      changed
+    }
   }
 `;

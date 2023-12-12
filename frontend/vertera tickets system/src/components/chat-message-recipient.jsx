@@ -6,7 +6,7 @@ function ChatMessage({ message, time }) {
       <div className="chat-message-recipient__container">
         <div className="chat-message-recipient__box">
           <p className="chat-message-recipient__text">{message}</p>
-          <div className="chat-message-recepient__separator"></div>
+          {/* <div className="chat-message-recepient__separator"></div>
           <div className="chat-message-recepient__rate-container">
             <span className="chat-message-recepient__rate-title">
               Оцените ответ
@@ -86,7 +86,7 @@ function ChatMessage({ message, time }) {
                 </span>
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
         <span className="chat-message-recipient__time">{time}</span>
       </div>
