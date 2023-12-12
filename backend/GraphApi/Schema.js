@@ -2,7 +2,7 @@ export const typeDefs = `
     scalar DateTime
 
     type Query {
-        login(login: String!, password: String!): String!
+        login(login: String!, password: String!): LoginInfo!
 
         user(id: Int!): User
         userList(token: String!): [User]
@@ -72,6 +72,11 @@ export const typeDefs = `
         deleteSubTheme(id: Int!) : Int!
         deleteThemeDepartment(id: Int!) : Int!
         deleteDepartment(id: Int!) : Int!
+    }
+
+    type LoginInfo {
+        token: String!
+        userId: Int!
     }
 
     type User {

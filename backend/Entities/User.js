@@ -29,7 +29,7 @@ class User extends Entity{
         const token = await Token.Generate({ userId });
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
 
-        return token;
+        return { token, userId };
     }
 
     static async AccessAllow(level, token) {
