@@ -64,10 +64,11 @@ function Header({user, setUser}) {
 
   useEffect(() => {
     if(data) {
-      console.log(loginVariables);
+      console.log(data);
       localStorage.setItem('user', JSON.stringify({
+        id: data.login.userId,
         login: loginVariables.login,
-        token: data.login
+        token: data.login.token
       }))
       document.location.href = '/admin';
     }

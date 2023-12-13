@@ -70,7 +70,10 @@ export const MESSAGES_CHAT = gql`
 
 export const LOGIN = gql`
   query ($login: String!, $password: String!) {
-    login(login: $login, password: $password)
+    login(login: $login, password: $password) {
+      token
+      userId
+    }
   }
 `;
 

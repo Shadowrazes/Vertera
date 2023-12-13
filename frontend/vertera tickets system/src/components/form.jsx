@@ -6,6 +6,7 @@ import {
   Button,
   DropdownButton,
   Dropdown,
+  Modal,
 } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -28,6 +29,12 @@ function FormComponent() {
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const [dataQuery, setData] = useState([]);
   const [dataQueryTheme, setDataTheme] = useState([]);
@@ -53,17 +60,27 @@ function FormComponent() {
 
   const handleNewTicket = (e) => {
     e.preventDefault();
-    console.log(selectedDepartment);
-    console.log(selectedTheme);
-    console.log(selectedSubTheme);
-    console.log(textareaValue);
+    // console.log(selectedDepartment);
+    // console.log(selectedTheme);
+    // console.log(selectedSubTheme);
+    // console.log(textareaValue);
 
     const selectedDepartmentId = findDepartmentIdByName(selectedDepartment);
-    console.log(selectedDepartmentId);
+    //console.log(selectedDepartmentId);
     const selectedThemeId = findThemeIdByName(selectedTheme);
-    console.log(selectedThemeId);
+    //console.log(selectedThemeId);
     const selectedSubThemeId = findSubThemeIdByName(selectedSubTheme);
-    console.log(selectedSubThemeId);
+    //console.log(selectedSubThemeId);
+
+    if (
+      selectedDepartment == null ||
+      selectedTheme == null ||
+      selectedSubTheme == null
+    ) {
+      console.log("xdd");
+      setIsVisible(true);
+      return;
+    }
 
     addTicket({
       variables: {
@@ -78,6 +95,9 @@ function FormComponent() {
         text: textareaValue,
       },
     });
+
+    setIsVisible(false);
+    handleShow();
   };
 
   if (loading) {
@@ -138,12 +158,6 @@ function FormComponent() {
       <Form>
         <Row>
           <Col md={4} className="form__column">
-            {/* <DropdownBT
-              items={departments}
-              label="Выберите подразделение"
-              onSelect={(selectedValue) => setSelectedDepartment(selectedValue)}
-            /> */}
-
             <DropdownButton
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
@@ -160,8 +174,6 @@ function FormComponent() {
             </DropdownButton>
 
             {selectedDepartment && (
-              // <DropdownBT items={itemsTheme} label="Тип обращения" />
-
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedTheme || "Тип обращения"}
@@ -188,9 +200,8 @@ function FormComponent() {
                 ))}
               </DropdownButton>
             )}
-            {selectedTheme && (
-              // <DropdownBT items={itemsSubTheme} label="Подтема" />
 
+            {selectedTheme && (
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedSubTheme || "Выберите подтему"}
@@ -230,6 +241,7 @@ function FormComponent() {
             <Form.Group className="mb-3" controlId="FileInputForm">
               <Form.Control type="file" multiple />
             </Form.Group>
+            {isVisible && <span className="form__error">Выберите раздел</span>}
             <Button
               variant="primary"
               id="ButtonForm"
@@ -241,6 +253,18 @@ function FormComponent() {
           </Col>
         </Row>
       </Form>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ваше обращение создано</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Ожидайте ответа от помощника</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

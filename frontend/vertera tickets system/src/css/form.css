@@ -1,22 +1,28 @@
 .form__column {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
 #TextareaForm {
-    width: 672px;
-    padding: 20px 13px;
-    resize: none;
+  width: 672px;
+  padding: 20px 13px;
+  resize: none;
 }
 
 #FileInputForm {
-    width: 672px;
+  width: 672px;
+}
+
+.form__error {
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 15px;
+  color: red;
 }
 
 #ButtonForm {
-    width: 672px;
-    background: #00AB97 !important;
-    border-radius: 5px;
-    border: none;
+  width: 672px;
+  background: #00ab97 !important;
+  border-radius: 5px;
+  border: none;
 }
