@@ -26,6 +26,8 @@ class User extends Entity{
         const userId = userResult[0].id;
         const isPassValid = await Account.CheckPassword(password, passwordHash);
 
+        if(!isPassValid) throw new Error('Auth error');
+
         const token = await Token.Generate({ userId });
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
 
