@@ -10,6 +10,7 @@ import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
 import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
+import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
@@ -52,6 +53,14 @@ function Chat() {
   const [isClosed, setIsClosed] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  let userId;
+
+  if (user === null) {
+    userId = 1;
+  } else {
+    userId = user.id;
+  }
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -111,7 +120,7 @@ function Chat() {
     addMessage({
       variables: {
         fields: {
-          senderId: user.id,
+          senderId: userId,
           recieverId: 46,
           ticketId: parseInt(itemId),
           type: "message",
@@ -148,8 +157,15 @@ function Chat() {
                   match === "T" ? " " : "."
                 )}
               />
-            ) : (
+            ) : msg.sender.role === "helper" ? (
               <ChatMessageRecepient
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : (
+              <ChatMessageSystem
                 message={msg.text}
                 time={msg.date.replace(/T|-/g, (match) =>
                   match === "T" ? " " : "."
@@ -161,8 +177,15 @@ function Chat() {
 
         {messagesQuery.map((msg) => (
           <pre key={msg.id}>
-            {msg.sender.id === user.id ? (
+            {msg.sender.id === userId ? (
               <ChatMessageSender
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : msg.sender.role === "system" ? (
+              <ChatMessageSystem
                 message={msg.text}
                 time={msg.date.replace(/T|-/g, (match) =>
                   match === "T" ? " " : "."
