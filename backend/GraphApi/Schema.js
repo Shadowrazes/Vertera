@@ -24,6 +24,7 @@ export const typeDefs = `
         attachmentList(messageId: Int!): [Attachment]
 
         subThemeList: [SubTheme]
+        allThemeTree: [Unit]
 
         departmentList: [Department]
 
@@ -139,11 +140,13 @@ export const typeDefs = `
     type Unit {
         id: Int!
         name(lang: String!): Translation!
+        themes: [Theme]!
     }
 
     type Theme {
         id: Int!
         name(lang: String!): Translation!
+        subThemes: [SubTheme]!
         unit: Unit!
     }
 

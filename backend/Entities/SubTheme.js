@@ -21,6 +21,12 @@ class SubTheme extends Entity{
         return result;
     }
 
+    static async GetListByTheme(themeId) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.ThemeIdField} = ?`;
+        const result = await super.Request(sql, [themeId]);
+        return result;
+    }
+
     static async TransInsert(fields) {
         return await super.Transaction(async (conn) => {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);

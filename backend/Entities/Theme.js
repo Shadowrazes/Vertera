@@ -20,6 +20,12 @@ class Theme extends Entity{
         return result;
     }
 
+    static async GetListByUnit(unitId) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.UnitIdField} = ?`;
+        const result = await super.Request(sql, [unitId]);
+        return result;
+    }
+
     static async TransInsert(fields) {
         return await super.Transaction(async (conn) => {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);

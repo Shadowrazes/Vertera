@@ -73,6 +73,9 @@ export const resolvers = {
         subThemeList: async (_, args) => {
             return await SubTheme.GetList();
         },
+        allThemeTree: async (_, args) => {
+            return await Unit.GetList();
+        },
         departmentList: async (_, args) => {
             return await Department.GetList();
         },
@@ -271,10 +274,16 @@ export const resolvers = {
         name: async (parent, args) => {
             return await Translation.GetByCode(args.lang, parent.nameCode);
         },
+        subThemes: async (parent, args) => {
+            return await SubTheme.GetListByTheme(parent.id);
+        },
     },
     Unit: {
         name: async (parent, args) => {
             return await Translation.GetByCode(args.lang, parent.nameCode);
+        },
+        themes: async (parent, args) => {
+            return await Theme.GetListByUnit(parent.id);
         },
     },
     TicketStatus: {
