@@ -1,12 +1,14 @@
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
-import "../css/header.css";
+
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Modal, Button, Form, Row, Col, Spinner, Alert  } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { LOGIN } from "../apollo/queries";
 
-function Header({user, setUser}) {
+import "../css/header.css";
+
+function Header({ user, setUser }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoad, setIsLoad] = useState(false);
@@ -14,8 +16,8 @@ function Header({user, setUser}) {
 
   const [loginVariables, setLoginVariables] = useState({
     login: "",
-    password: ""
-  })
+    password: "",
+  });
 
   const { loading, error, data, refetch } = useQuery(LOGIN, loginVariables);
 
@@ -25,33 +27,31 @@ function Header({user, setUser}) {
   };
 
   const handleShow = () => {
-    if(user) {
+    if (user) {
       setShowLogoutModal(true);
-    }
-    else {
+    } else {
       setShowLoginModal(true);
     }
-    
   };
 
   const handleInput = (event) => {
     let lastLoginVariables = loginVariables;
     lastLoginVariables[event.target.name] = event.target.value;
     setLoginVariables(lastLoginVariables);
-  }
+  };
 
-  async function handleSubmit (event) {
-    if(user) {
-      localStorage.removeItem('user');
-      document.location.href = '/';
+  async function handleSubmit(event) {
+    if (user) {
+      localStorage.removeItem("user");
+      document.location.href = "/";
     }
-    
+
     setIsLoad(true);
     setIsError(false);
     try {
-      await refetch(loginVariables);
-    }
-    catch (error) {
+      const updatedLoginVariables = { ...loginVariables };
+      refetch(updatedLoginVariables);
+    } catch (error) {
       setTimeout(() => {
         setIsError(true);
       }, 1000);
@@ -59,24 +59,25 @@ function Header({user, setUser}) {
     setTimeout(() => {
       setIsLoad(false);
     }, 1000);
-    
   }
 
   useEffect(() => {
-    if(data) {
-      console.log(data);
-      localStorage.setItem('user', JSON.stringify({
-        id: data.login.userId,
-        login: loginVariables.login,
-        token: data.login.token
-      }))
-      document.location.href = '/admin';
+    if (data) {
+      // console.log(data);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: data.login.userId,
+          login: loginVariables.login,
+          token: data.login.token,
+        })
+      );
+      document.location.href = "/all-tickets";
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
-      
       <section className="header">
         <div className="header__container container">
           <a href="/">
@@ -84,7 +85,7 @@ function Header({user, setUser}) {
           </a>
           <div className="header__btn-group">
             <a className="header__exit" href="#" onClick={handleShow}>
-              {user ? user.login : 'Войти'}
+              {user ? user.login : "Войти"}
             </a>
             <a href="#" className="header__button" onClick={handleShow}>
               <img src={headerBtn} alt="" className="header__button-svg" />
@@ -94,7 +95,7 @@ function Header({user, setUser}) {
       </section>
 
       {/* Попап авторизации */}
-      <Modal show={showLoginModal} onHide={handleClose} >
+      <Modal show={showLoginModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
         </Modal.Header>
@@ -105,7 +106,11 @@ function Header({user, setUser}) {
                 Логин
               </Form.Label>
               <Col sm="12">
-                <Form.Control placeholder="Логин" name="login" onChange={handleInput}/>
+                <Form.Control
+                  placeholder="Логин"
+                  name="login"
+                  onChange={handleInput}
+                />
               </Col>
             </Form.Group>
 
@@ -114,31 +119,39 @@ function Header({user, setUser}) {
                 Пароль
               </Form.Label>
               <Col sm="12">
-                <Form.Control type="password" placeholder="Пароль" name="password" onChange={handleInput}/>
+                <Form.Control
+                  type="password"
+                  placeholder="Пароль"
+                  name="password"
+                  onChange={handleInput}
+                />
               </Col>
             </Form.Group>
           </Form>
 
           {isError && (
-            <Alert variant='danger' className="mt-3">Неверный логин или пароль</Alert>
+            <Alert variant="danger" className="mt-3">
+              Неверный логин или пароль
+            </Alert>
           )}
-          
-
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" id="loginCancel" onClick={handleClose}>
             Отмена
           </Button>
-          <Button variant="primary" disabled={isLoad} id="loginSubmit" onClick={handleSubmit}>
-            {isLoad ? (
-              <Spinner animation="border" size="sm" />
-            ) : "Войти"}
+          <Button
+            variant="primary"
+            disabled={isLoad}
+            id="loginSubmit"
+            onClick={handleSubmit}
+          >
+            {isLoad ? <Spinner animation="border" size="sm" /> : "Войти"}
           </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Попап авторизации */}
-      <Modal show={showLogoutModal} onHide={handleClose} >
+      <Modal show={showLogoutModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
         </Modal.Header>
@@ -146,7 +159,12 @@ function Header({user, setUser}) {
           <Button variant="secondary" id="loginCancel" onClick={handleClose}>
             Отмена
           </Button>
-          <Button variant="primary" disabled={isLoad} id="loginSubmit" onClick={handleSubmit}>
+          <Button
+            variant="primary"
+            disabled={isLoad}
+            id="loginSubmit"
+            onClick={handleSubmit}
+          >
             Выйти
           </Button>
         </Modal.Footer>

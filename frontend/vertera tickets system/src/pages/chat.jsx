@@ -10,8 +10,9 @@ import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
 import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
-import ChatInput from "../components/chat-input";
 import ButtonCustom from "../components/button";
+
+import "../css/chat-input.css";
 
 const timeFormatter = () => {
   const currentDate = new Date();
@@ -49,6 +50,8 @@ function Chat() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -108,10 +111,10 @@ function Chat() {
     addMessage({
       variables: {
         fields: {
-          senderId: 1,
-          recieverId: 2,
+          senderId: user.id,
+          recieverId: 46,
           ticketId: parseInt(itemId),
-          type: "common",
+          type: "message",
           text: message,
         },
       },
@@ -136,9 +139,29 @@ function Chat() {
         ) : (
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
         )}
-        {messagesQuery.map((msg) => (
+        {/* {messagesQuery.map((msg) => (
           <pre key={msg.id}>
             {msg.sender.role === "client" ? (
+              <ChatMessageSender
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : (
+              <ChatMessageRecepient
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            )}
+          </pre>
+        ))} */}
+
+        {messagesQuery.map((msg) => (
+          <pre key={msg.id}>
+            {msg.sender.id === user.id ? (
               <ChatMessageSender
                 message={msg.text}
                 time={msg.date.replace(/T|-/g, (match) =>

@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { THEME_LIST, DEPARTMENTS_LIST } from "../apollo/queries";
+import { THEME_LIST, THEME_LIST_OLD } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
@@ -20,15 +20,18 @@ import TitleH2 from "./title";
 import "../css/form.css";
 
 function FormComponent() {
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
 
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
+
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -37,67 +40,78 @@ function FormComponent() {
   const [isVisible, setIsVisible] = useState(false);
 
   const [dataQuery, setData] = useState([]);
-  const [dataQueryTheme, setDataTheme] = useState([]);
 
-  const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
-  const {
-    loading: themeLoading,
-    error: themeError,
-    data: themeData,
-  } = useQuery(THEME_LIST);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data } = useQuery(THEME_LIST);
+  // const { loading, error, data } = useQuery(THEME_LIST_OLD);
 
   useEffect(() => {
-    if (themeData && themeData.subThemeList) {
-      setDataTheme(themeData.subThemeList);
+    if (data && data.allThemeTree) {
+      setData(data.allThemeTree);
     }
-
-    if (data && data.departmentList) {
-      setData(data.departmentList);
-    }
-  }, [data, themeData, selectedDepartment, selectedItem]);
+  }, [data, selectedUnit, selectedItem]);
 
   const [addTicket] = useMutation(ADD_TICKET);
 
+  const resetState = () => {
+    setSelectedUnit(null);
+    setSelectedTheme(null);
+    setSelectedSubTheme(null);
+    setSelectedItem(null);
+    setTextareaValue("");
+    setSelectedUnitId(null);
+    setSelectedThemeId(null);
+    setSelectedSubThemeId(null);
+  };
+
   const handleNewTicket = (e) => {
     e.preventDefault();
-    // console.log(selectedDepartment);
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
     // console.log(selectedTheme);
+    // console.log(selectedThemeId);
     // console.log(selectedSubTheme);
+    // console.log(selectedSubThemeId);
     // console.log(textareaValue);
 
-    const selectedDepartmentId = findDepartmentIdByName(selectedDepartment);
-    //console.log(selectedDepartmentId);
-    const selectedThemeId = findThemeIdByName(selectedTheme);
-    //console.log(selectedThemeId);
-    const selectedSubThemeId = findSubThemeIdByName(selectedSubTheme);
-    //console.log(selectedSubThemeId);
+    // if (
+    //   selectedDepartment == null ||
+    //   selectedTheme == null ||
+    //   selectedSubTheme == null
+    // ) {
+    //   console.log("xdd");
+    //   setIsVisible(true);
+    //   return;
+    // }
 
-    if (
-      selectedDepartment == null ||
-      selectedTheme == null ||
-      selectedSubTheme == null
-    ) {
-      console.log("xdd");
-      setIsVisible(true);
-      return;
+    //console.log(user);
+    let userId = null;
+
+    if (user === null) {
+      userId = 1;
+    } else {
+      userId = user.id;
     }
 
     addTicket({
       variables: {
         clientId: 1,
-        unitId: selectedDepartmentId,
+        unitId: selectedUnitId,
         themeId: selectedThemeId,
         subThemeId: selectedSubThemeId,
-        senderId: 1,
-        recieverId: 2,
+        senderId: userId,
+        recieverId: 46,
         ticketId: 1,
-        type: "common",
+        type: "message",
         text: textareaValue,
       },
     });
 
     setIsVisible(false);
     handleShow();
+
+    resetState();
   };
 
   if (loading) {
@@ -108,49 +122,80 @@ function FormComponent() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (themeLoading) {
-    return <Loader />;
-  }
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedItem(unit);
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+    console.log(unitId);
 
-  if (themeError) {
-    return <h2>Что-то пошло не так</h2>;
-  }
+    setSelectedTheme(null);
+    setSelectedSubTheme(null);
+  };
 
-  const departments = dataQuery.map((department) => department.name.stroke);
-  const themes = dataQueryTheme.map((theme) => theme.theme.id);
-  const subThemes = dataQueryTheme.map((theme) => theme.name.stroke);
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+    console.log(themeId);
 
-  // console.log(themes);
+    setSelectedSubTheme(null);
 
-  const handleItemClick = (item) => {
-    setSelectedItem(item);
-    setSelectedDepartment(item);
+    switch ((selectedUnitId, themeId)) {
+      case (1, 14):
+        setSelectedSubThemeId(73);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 15):
+        setSelectedSubThemeId(74);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 16):
+        setSelectedSubThemeId(75);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 22):
+        setSelectedSubThemeId(102);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 23):
+        setSelectedSubThemeId(103);
+        setSubThemeDropdownVisible(false);
+        break;
+      default:
+    }
+  };
+
+  const handleSubThemeClick = (subTheme, subThemeId) => {
+    setSelectedSubTheme(subTheme);
+    setSelectedSubTheme(subTheme);
+    setSelectedSubThemeId(subThemeId);
+    console.log(subThemeId);
   };
 
   const handleTextareaChange = (e) => {
     setTextareaValue(e.target.value);
   };
 
-  const findDepartmentIdByName = (departmentName) => {
-    const department = dataQuery.find(
-      (item) => item.name.stroke === departmentName
-    );
-    return department ? department.id : null;
-  };
+  // const findDepartmentIdByName = (departmentName) => {
+  //   const department = dataQuery.find(
+  //     (item) => item.name.stroke === departmentName
+  //   );
+  //   return department ? department.id : null;
+  // };
 
-  const findThemeIdByName = (themeName) => {
-    const theme = dataQueryTheme.find(
-      (item) => item.theme.name.stroke === themeName
-    );
-    return theme ? theme.theme.id : null;
-  };
+  // const findThemeIdByName = (themeName) => {
+  //   const theme = dataQueryTheme.find(
+  //     (item) => item.theme.name.stroke === themeName
+  //   );
+  //   return theme ? theme.theme.id : null;
+  // };
 
-  const findSubThemeIdByName = (subThemeName) => {
-    const subTheme = dataQueryTheme.find(
-      (item) => item.name.stroke === subThemeName
-    );
-    return subTheme ? subTheme.id : null;
-  };
+  // const findSubThemeIdByName = (subThemeName) => {
+  //   const subTheme = dataQueryTheme.find(
+  //     (item) => item.name.stroke === subThemeName
+  //   );
+  //   return subTheme ? subTheme.id : null;
+  // };
 
   return (
     <>
@@ -162,63 +207,52 @@ function FormComponent() {
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
             >
-              {departments.map((item, index) => (
+              {dataQuery.map((unit, index) => (
                 <Dropdown.Item
                   key={index}
-                  onClick={() => handleItemClick(item)}
+                  onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
                   href="#"
                 >
-                  {item}
+                  {unit.name.stroke}
                 </Dropdown.Item>
               ))}
             </DropdownButton>
 
-            {selectedDepartment && (
+            {selectedUnit && (
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedTheme || "Тип обращения"}
               >
-                {Array.from(
-                  new Set(
-                    dataQueryTheme
-                      .filter((subTheme) =>
-                        subTheme.departments.some(
-                          (department) =>
-                            department.name.stroke === selectedDepartment
-                        )
-                      )
-                      .map((subTheme) => subTheme.theme.name.stroke)
-                  )
-                ).map((theme, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => setSelectedTheme(theme)}
-                    href="#"
-                  >
-                    {theme}
-                  </Dropdown.Item>
-                ))}
+                {dataQuery
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.map((theme) => (
+                    <Dropdown.Item
+                      key={theme.id}
+                      onClick={() =>
+                        handleThemeClick(theme.name.stroke, theme.id)
+                      }
+                      href="#"
+                    >
+                      {theme.name.stroke}
+                    </Dropdown.Item>
+                  ))}
               </DropdownButton>
             )}
 
-            {selectedTheme && (
+            {isSubThemeDropdownVisible && selectedTheme && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedSubTheme || "Выберите подтему"}
+                title={selectedSubTheme || "Подтема"}
               >
-                {dataQueryTheme
-                  .filter(
-                    (subTheme) =>
-                      subTheme.theme.name.stroke === selectedTheme &&
-                      subTheme.departments.some(
-                        (department) =>
-                          department.name.stroke === selectedDepartment
-                      )
-                  )
-                  .map((subTheme) => (
+                {dataQuery
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
+                  ?.subThemes.map((subTheme) => (
                     <Dropdown.Item
                       key={subTheme.id}
-                      onClick={() => setSelectedSubTheme(subTheme.name.stroke)}
+                      onClick={() =>
+                        handleSubThemeClick(subTheme.name.stroke, subTheme.id)
+                      }
                       href="#"
                     >
                       {subTheme.name.stroke}
