@@ -20,6 +20,8 @@ function TableTickets() {
 
   const [orderDir, setOrderDir] = useState("ASC");
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const itemsPerPage = 8;
 
   const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {

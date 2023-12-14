@@ -10,8 +10,10 @@ import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
 import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
-import ChatInput from "../components/chat-input";
+import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
+
+import "../css/chat-input.css";
 
 const timeFormatter = () => {
   const currentDate = new Date();
@@ -49,6 +51,16 @@ function Chat() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  let userId;
+
+  if (user === null) {
+    userId = 1;
+  } else {
+    userId = user.id;
+  }
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -108,10 +120,10 @@ function Chat() {
     addMessage({
       variables: {
         fields: {
-          senderId: 1,
-          recieverId: 2,
+          senderId: userId,
+          recieverId: 46,
           ticketId: parseInt(itemId),
-          type: "common",
+          type: "message",
           text: message,
         },
       },
@@ -136,10 +148,44 @@ function Chat() {
         ) : (
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
         )}
-        {messagesQuery.map((msg) => (
+        {/* {messagesQuery.map((msg) => (
           <pre key={msg.id}>
             {msg.sender.role === "client" ? (
               <ChatMessageSender
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : msg.sender.role === "helper" ? (
+              <ChatMessageRecepient
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : (
+              <ChatMessageSystem
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            )}
+          </pre>
+        ))} */}
+
+        {messagesQuery.map((msg) => (
+          <pre key={msg.id}>
+            {msg.sender.id === userId ? (
+              <ChatMessageSender
+                message={msg.text}
+                time={msg.date.replace(/T|-/g, (match) =>
+                  match === "T" ? " " : "."
+                )}
+              />
+            ) : msg.sender.role === "system" ? (
+              <ChatMessageSystem
                 message={msg.text}
                 time={msg.date.replace(/T|-/g, (match) =>
                   match === "T" ? " " : "."

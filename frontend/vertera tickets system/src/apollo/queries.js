@@ -77,7 +77,7 @@ export const LOGIN = gql`
   }
 `;
 
-export const THEME_LIST = gql`
+export const THEME_LIST_OLD = gql`
   query {
     subThemeList {
       id
@@ -94,6 +94,29 @@ export const THEME_LIST = gql`
         id
         name(lang: "ru") {
           stroke
+        }
+      }
+    }
+  }
+`;
+
+export const THEME_LIST = gql`
+  query {
+    allThemeTree {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+      themes {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+        subThemes {
+          id
+          name(lang: "ru") {
+            stroke
+          }
         }
       }
     }
