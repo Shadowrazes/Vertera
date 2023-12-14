@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 class Entity{
     static Pool;
     static EmptyUpdateInfo = { affected: 0, changed: 0, warning: 0 };
