@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 import _ from "lodash";
+=======
+import _ from 'lodash';
+
+class Entity{
+    static Pool;
+    static EmptyUpdateInfo = { affected: 0, changed: 0, warning: 0 };
+>>>>>>> becf28b4bd94fda9b48bdddf7864cde24e3a16fc
 
 class Entity {
   static Pool;
