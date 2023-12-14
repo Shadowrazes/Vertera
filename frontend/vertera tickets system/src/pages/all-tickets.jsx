@@ -29,6 +29,16 @@ function allTickets() {
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  let userId = null;
+
+  if (user === null) {
+    userId = 1;
+  } else {
+    userId = user.id;
+  }
+
   const pageNumbers = [];
   const itemsPerPage = 8;
 
@@ -105,13 +115,13 @@ function allTickets() {
     }
 
     setIsVisible(pageNumbers.length > 1);
-    console.log(pageNumbers.length);
+    // console.log(pageNumbers.length);
   }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
 
   const tickets = dataQuery;
 
   const ticketsAmount = dataAmount;
-  console.log(ticketsAmount);
+  // console.log(ticketsAmount);
 
   for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
     pageNumbers.push(i);
@@ -325,6 +335,10 @@ function allTickets() {
           </tr>
         </thead>
         <tbody>
+          {/* .filter(
+    (ticket) =>
+      user.id === ticket.client.id || user.id === ticket.helper.id
+  ) */}
           {tickets.map((ticket) => (
             <tr key={ticket.id}>
               <td>

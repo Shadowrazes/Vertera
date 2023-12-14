@@ -4,6 +4,12 @@ export const TABLE_TICKETS = gql`
   query ($filters: TicketFilter!) {
     ticketList(filters: $filters) {
       id
+      client {
+        id
+      }
+      helper {
+        id
+      }
       subTheme {
         theme {
           unit {

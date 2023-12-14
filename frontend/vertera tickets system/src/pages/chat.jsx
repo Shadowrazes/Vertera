@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { Form, Row } from "react-bootstrap";
 
 import { MESSAGES_CHAT } from "../apollo/queries";
-import { ADD_MESSAGE } from "../apollo/mutations";
+import { ADD_MESSAGE, UPDATE_STATUS } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
@@ -74,6 +74,7 @@ function Chat() {
       setMessagesQuery(data.ticket.messages);
       // setStatus(data.ticket.status.name.stroke);
       console.log(status);
+      console.log(data.ticket.id);
 
       if (status !== "Закрыт") {
         setIsVisible(true);
@@ -100,6 +101,8 @@ function Chat() {
       ],
     });
 
+    const [updateStatus, { loader: loaderUpdateStatus, error: errorUpdateStatus }] = useMutation(UPDATE_STATUS);
+
   if (loading) {
     return <Loader />;
   }
@@ -122,7 +125,7 @@ function Chat() {
         fields: {
           senderId: userId,
           recieverId: 46,
-          ticketId: parseInt(itemId),
+          ticketId: ticketId,
           type: "message",
           text: message,
         },
@@ -138,12 +141,28 @@ function Chat() {
   const handleClose = () => {
     setIsVisible(false);
     // setStatus("Закрыт");
+
+    if (loaderUpdateStatus) {
+      return <Loader />;
+    }
+    if (errorUpdateStatus) {
+      return <h2>Что-то пошло не так</h2>;
+    }
+
+    updateStatus({
+      variables: {
+        id: ticketId,
+        fields: {
+          statusId: 2
+        }
+      }
+    })
   };
 
   return (
     <>
       <div>
-        {status !== "Закрыт" ? (
+        {status !== null && status !== "Закрыт" ? (
           <TicketTitle title={`Обращение #${itemId}`} state="Открыта" />
         ) : (
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />

@@ -130,6 +130,7 @@ function FormComponent() {
 
     setSelectedTheme(null);
     setSelectedSubTheme(null);
+    setSubThemeDropdownVisible(true);
   };
 
   const handleThemeClick = (theme, themeId) => {
@@ -139,6 +140,7 @@ function FormComponent() {
     console.log(themeId);
 
     setSelectedSubTheme(null);
+    setSubThemeDropdownVisible(true);
 
     switch ((selectedUnitId, themeId)) {
       case (1, 14):
