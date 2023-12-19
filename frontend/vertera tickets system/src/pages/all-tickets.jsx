@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Table, Button } from "react-bootstrap";
+import { Form, Row, Col, Table, DropdownButton, Dropdown } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { TABLE_TICKETS, TICKETS_AMOUNT } from "../apollo/queries";
+import { TABLE_TICKETS, TICKETS_AMOUNT, THEME_LIST } from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import DropdownBT from "../components/dropdown";
@@ -14,8 +14,24 @@ import "../css/all-tickets.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
-  const [dataQuery, setData] = useState([]);
+  const [dataTableTickets, setDataTableTickets] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
+  const [dataTheme, setDataTheme] = useState([]);
+
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedReaction, setSelectedReaction] = useState(null);
+  const [queryReaction, setQueryReaction] = useState(null);
+  const [selectedDateBefore, setSelectedDateBefore] = useState(null);
+  const [selectedDateAfter, setSelectedDateAfter] = useState(null);
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
+
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
@@ -47,9 +63,10 @@ function allTickets() {
 
   const handleHideComponent = () => {
     setIsVisibleFilters((prevVisibility) => !prevVisibility);
+    // console.log(dataTheme);
   };
 
-  let items = ["1", "2", "3"];
+  let reactions = ["Понравилось", "Не понравилось", "Все реакции"];
 
   // dropdown reset
   const initialSelectedFilterState = [-1, -1, -1, -1, -1, -1];
@@ -76,6 +93,8 @@ function allTickets() {
     },
   });
 
+  const { loading: themeLoading, error: themeError, data: themeData } = useQuery(THEME_LIST);
+
   const handleNewPage = async (index) => {
     setCurrentPage(index);
 
@@ -98,10 +117,15 @@ function allTickets() {
 
   useEffect(() => {
     if (data && data.ticketList) {
-      setData(data.ticketList);
+      setDataTableTickets(data.ticketList);
     }
+
     if (amountData && amountData.ticketListCount) {
       setDataAmount(amountData.ticketListCount);
+    }
+
+    if (themeData && themeData.allThemeTree) {
+      setDataTheme(themeData.allThemeTree);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -118,7 +142,7 @@ function allTickets() {
     // console.log(pageNumbers.length);
   }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
 
-  const tickets = dataQuery;
+  const tickets = dataTableTickets;
 
   const ticketsAmount = dataAmount;
   // console.log(ticketsAmount);
@@ -210,7 +234,96 @@ function allTickets() {
     }
   };
 
-  function getStatusBGColor(status) {
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedItem(unit);
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+    // console.log(unitId);
+
+    setSelectedTheme(null);
+    setSelectedSubTheme(null);
+    setSubThemeDropdownVisible(true);
+  };
+
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+    // console.log(themeId);
+
+    setSelectedSubTheme(null);
+    setSubThemeDropdownVisible(true);
+
+    switch ((selectedUnitId, themeId)) {
+      case (1, 14):
+        setSelectedSubThemeId(73);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 15):
+        setSelectedSubThemeId(74);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 16):
+        setSelectedSubThemeId(75);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 22):
+        setSelectedSubThemeId(102);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 23):
+        setSelectedSubThemeId(103);
+        setSubThemeDropdownVisible(false);
+        break;
+      default:
+    }
+  };
+
+  const handleSubThemeClick = (subTheme, subThemeId) => {
+    setSelectedSubTheme(subTheme);
+    setSelectedSubThemeId(subThemeId);
+    // console.log(subThemeId);
+  };
+
+  const handlePeriodClick = (period) => {   
+    const formattedDate = period.map((originalDate) => {
+      const year = originalDate.getFullYear();
+      const month = ('0' + (originalDate.getMonth() + 1)).slice(-2);
+      const day = ('0' + originalDate.getDate()).slice(-2);
+    
+      return `${year}-${month}-${day}`;
+    });
+    
+    setSelectedDateBefore(formattedDate[0]);
+    setSelectedDateAfter(formattedDate[1]);
+    // console.log(formattedDate[0]);
+  }
+
+  const handleReactionClick = (reaction) => {
+    setSelectedReaction(reaction);
+    switch(reaction) {
+      case "Понравилось":
+        setQueryReaction("like");
+        break;
+      case "Не понравилось":
+        setQueryReaction("dislike");
+        break;
+      default:
+        setQueryReaction(null);
+    }
+    // console.log(queryReaction);
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(selectedUnit);
+    console.log(selectedTheme);
+    console.log(selectedSubTheme);
+    console.log(selectedDateBefore);
+    console.log(selectedDateAfter);
+    console.log(queryReaction);
+  }
+
+  const getStatusBGColor = (status) => {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -242,9 +355,63 @@ function allTickets() {
           <Form>
             <Row>
               <Col className="alltickets__column">
-                <DropdownBT items={items} label="Подразделение" />
-                <DropdownBT items={items} label="Тема" />
-                <DropdownBT items={items} label="Подтема" />
+              <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedItem || "Выберите подразделение"}
+            >
+              {dataTheme.map((unit, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                  href="#"
+                >
+                  {unit.name.stroke}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+
+            {selectedUnit && (
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedTheme || "Тип обращения"}
+              >
+                {dataTheme
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.map((theme) => (
+                    <Dropdown.Item
+                      key={theme.id}
+                      onClick={() =>
+                        handleThemeClick(theme.name.stroke, theme.id)
+                      }
+                      href="#"
+                    >
+                      {theme.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+              </DropdownButton>
+            )}
+
+            {isSubThemeDropdownVisible && selectedTheme && (
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedSubTheme || "Подтема"}
+              >
+                {dataTheme
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
+                  ?.subThemes.map((subTheme) => (
+                    <Dropdown.Item
+                      key={subTheme.id}
+                      onClick={() =>
+                        handleSubThemeClick(subTheme.name.stroke, subTheme.id)
+                      }
+                      href="#"
+                    >
+                      {subTheme.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+              </DropdownButton>
+            )}
               </Col>
               <Col className="alltickets__column">
                 <DateRangePicker
@@ -263,13 +430,28 @@ function allTickets() {
                     yesterday: "Вчера",
                     last7Days: "Последние 7 дней",
                   }}
+                  onChange={handlePeriodClick}
                 />
-                <DropdownBT items={items} label="Мои реакции" />
-                <DropdownBT items={items} label="Есть слова" />
+                <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedReaction || "Мои реакции"}
+              >
+                {reactions.map((reaction, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() =>
+                        handleReactionClick(reaction)
+                      }
+                      href="#"
+                    >
+                      {reaction}
+                    </Dropdown.Item>
+                  ))}
+              </DropdownButton>
               </Col>
             </Row>
             <Row className="alltickets__button-row">
-              <ButtonCustom title="Применить" />
+              <ButtonCustom title="Применить" onClick={handleSubmit} />
               <ButtonCustom
                 title="Сбросить"
                 className="alltickets__button-two"

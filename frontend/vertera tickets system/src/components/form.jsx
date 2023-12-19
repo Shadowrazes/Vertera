@@ -10,11 +10,10 @@ import {
 } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { THEME_LIST, THEME_LIST_OLD } from "../apollo/queries";
+import { THEME_LIST } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
-import DropdownBT from "./dropdown";
 import TitleH2 from "./title";
 
 import "../css/form.css";
@@ -44,7 +43,6 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   const { loading, error, data } = useQuery(THEME_LIST);
-  // const { loading, error, data } = useQuery(THEME_LIST_OLD);
 
   useEffect(() => {
     if (data && data.allThemeTree) {
@@ -135,7 +133,6 @@ function FormComponent() {
 
   const handleThemeClick = (theme, themeId) => {
     setSelectedTheme(theme);
-    setSelectedTheme(theme);
     setSelectedThemeId(themeId);
     console.log(themeId);
 
@@ -169,7 +166,6 @@ function FormComponent() {
 
   const handleSubThemeClick = (subTheme, subThemeId) => {
     setSelectedSubTheme(subTheme);
-    setSelectedSubTheme(subTheme);
     setSelectedSubThemeId(subThemeId);
     console.log(subThemeId);
   };
@@ -177,27 +173,6 @@ function FormComponent() {
   const handleTextareaChange = (e) => {
     setTextareaValue(e.target.value);
   };
-
-  // const findDepartmentIdByName = (departmentName) => {
-  //   const department = dataQuery.find(
-  //     (item) => item.name.stroke === departmentName
-  //   );
-  //   return department ? department.id : null;
-  // };
-
-  // const findThemeIdByName = (themeName) => {
-  //   const theme = dataQueryTheme.find(
-  //     (item) => item.theme.name.stroke === themeName
-  //   );
-  //   return theme ? theme.theme.id : null;
-  // };
-
-  // const findSubThemeIdByName = (subThemeName) => {
-  //   const subTheme = dataQueryTheme.find(
-  //     (item) => item.name.stroke === subThemeName
-  //   );
-  //   return subTheme ? subTheme.id : null;
-  // };
 
   return (
     <>
