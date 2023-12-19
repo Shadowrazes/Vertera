@@ -81,6 +81,8 @@ function allTickets() {
 
   const { loading: amountLoading, data: amountData } = useQuery(TICKETS_AMOUNT);
 
+  const { loading: themeLoading, error: themeError, data: themeData } = useQuery(THEME_LIST);
+
   const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
     variables: {
       filters: {
@@ -93,8 +95,6 @@ function allTickets() {
     },
   });
 
-  const { loading: themeLoading, error: themeError, data: themeData } = useQuery(THEME_LIST);
-
   const handleNewPage = async (index) => {
     setCurrentPage(index);
 
@@ -105,6 +105,12 @@ function allTickets() {
 
     const variables = {
       filters: {
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+        reaction: queryReaction,
         limit: itemsPerPage,
         offset: _offset,
         orderBy: orderBy,
@@ -120,12 +126,12 @@ function allTickets() {
       setDataTableTickets(data.ticketList);
     }
 
-    if (amountData && amountData.ticketListCount) {
-      setDataAmount(amountData.ticketListCount);
-    }
-
     if (themeData && themeData.allThemeTree) {
       setDataTheme(themeData.allThemeTree);
+    }
+
+    if (amountData && amountData.ticketListCount) {
+      setDataAmount(amountData.ticketListCount);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -140,7 +146,7 @@ function allTickets() {
 
     setIsVisible(pageNumbers.length > 1);
     // console.log(pageNumbers.length);
-  }, [data, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
+  }, [data, themeData, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
 
   const tickets = dataTableTickets;
 
@@ -212,6 +218,12 @@ function allTickets() {
 
     const variables = {
       filters: {
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+        reaction: queryReaction,
         limit: itemsPerPage,
         offset: offset,
         orderBy: _orderBy,
@@ -293,8 +305,8 @@ function allTickets() {
       return `${year}-${month}-${day}`;
     });
     
-    setSelectedDateBefore(formattedDate[0]);
-    setSelectedDateAfter(formattedDate[1]);
+    setSelectedDateAfter(formattedDate[0] + " 00:00:00");
+    setSelectedDateBefore(formattedDate[1] + " 23:59:59");
     // console.log(formattedDate[0]);
   }
 
@@ -313,7 +325,7 @@ function allTickets() {
     // console.log(queryReaction);
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(selectedUnit);
     console.log(selectedTheme);
@@ -321,6 +333,23 @@ function allTickets() {
     console.log(selectedDateBefore);
     console.log(selectedDateAfter);
     console.log(queryReaction);
+
+    const variables = {
+      filters: {
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+        reaction: queryReaction,
+        limit: itemsPerPage,
+        offset: offset,
+        orderBy: orderBy,
+        orderDir: orderDir,
+        lang: "ru",
+      },
+    };
+    await refetch(variables);
   }
 
   const getStatusBGColor = (status) => {

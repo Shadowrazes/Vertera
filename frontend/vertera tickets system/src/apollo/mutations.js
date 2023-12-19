@@ -33,6 +33,7 @@ export const ADD_TICKET = gql`
     $ticketId: Int!
     $type: String!
     $text: String!
+    $attachPaths: [String]
   ) {
     addTicket(
       ticketFields: {
@@ -47,6 +48,7 @@ export const ADD_TICKET = gql`
         ticketId: $ticketId
         type: $type
         text: $text
+        attachPaths: $attachPaths
       }
     )
   }

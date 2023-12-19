@@ -40,6 +40,8 @@ function FormComponent() {
 
   const [dataQuery, setData] = useState([]);
 
+  const [filePath, setFilePath] = useState(null);
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   const { loading, error, data } = useQuery(THEME_LIST);
@@ -72,9 +74,28 @@ function FormComponent() {
     // console.log(selectedSubTheme);
     // console.log(selectedSubThemeId);
     // console.log(textareaValue);
+    // console.log(imageUrl);
+
+    const fileInput = document.getElementById('FileInputForm');
+    if (fileInput.files.length > 0){
+      let formdata = new FormData();
+      formdata.append("fileFields", fileInput.files[0], fileInput.files[0].name);
+      formdata.append("ticketId", "3");
+  
+      let requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+      };
+  
+      fetch("http://localhost:4444/upload", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+    }
 
     // if (
-    //   selectedDepartment == null ||
+    //   selectedUnit == null ||
     //   selectedTheme == null ||
     //   selectedSubTheme == null
     // ) {
@@ -92,19 +113,20 @@ function FormComponent() {
       userId = user.id;
     }
 
-    addTicket({
-      variables: {
-        clientId: 1,
-        unitId: selectedUnitId,
-        themeId: selectedThemeId,
-        subThemeId: selectedSubThemeId,
-        senderId: userId,
-        recieverId: 46,
-        ticketId: 1,
-        type: "message",
-        text: textareaValue,
-      },
-    });
+    // addTicket({
+    //   variables: {
+    //     clientId: userId,
+    //     unitId: selectedUnitId,
+    //     themeId: selectedThemeId,
+    //     subThemeId: selectedSubThemeId,
+    //     senderId: userId,
+    //     recieverId: 1,
+    //     ticketId: 1,
+    //     type: "message",
+    //     text: textareaValue,
+    //     attachPaths: imageUrl, 
+    //   },
+    // });
 
     setIsVisible(false);
     handleShow();
@@ -124,7 +146,7 @@ function FormComponent() {
     setSelectedItem(unit);
     setSelectedUnit(unit);
     setSelectedUnitId(unitId);
-    console.log(unitId);
+    // console.log(unitId);
 
     setSelectedTheme(null);
     setSelectedSubTheme(null);
@@ -134,7 +156,7 @@ function FormComponent() {
   const handleThemeClick = (theme, themeId) => {
     setSelectedTheme(theme);
     setSelectedThemeId(themeId);
-    console.log(themeId);
+    // console.log(themeId);
 
     setSelectedSubTheme(null);
     setSubThemeDropdownVisible(true);
@@ -167,17 +189,24 @@ function FormComponent() {
   const handleSubThemeClick = (subTheme, subThemeId) => {
     setSelectedSubTheme(subTheme);
     setSelectedSubThemeId(subThemeId);
-    console.log(subThemeId);
+    // console.log(subThemeId);
   };
 
   const handleTextareaChange = (e) => {
     setTextareaValue(e.target.value);
   };
 
+  const handleFileInput = (e) => {
+    const files = e.target.files;
+    const firstFilePath = URL.createObjectURL(files[0]);
+    setFilePath(firstFilePath);
+    console.log(firstFilePath);
+  }
+
   return (
     <>
       <TitleH2 title="Создать обращение" className="title__heading" />
-      <Form>
+      <Form method="post">
         <Row>
           <Col md={4} className="form__column">
             <DropdownButton
@@ -250,7 +279,7 @@ function FormComponent() {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="FileInputForm">
-              <Form.Control type="file" multiple />
+              <Form.Control type="file" multiple onChange={handleFileInput} />
             </Form.Group>
             {isVisible && <span className="form__error">Выберите раздел</span>}
             <Button
