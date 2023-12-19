@@ -187,7 +187,7 @@ class Ticket extends Entity{
             fields.push(filter.statusIds);
         }
         if (filter.dateAfter && filter.dateBefore) {
-            sql += ` AND ${this.TableName}.${this.DateField} > ? AND ${this.TableName}.${this.DateField} < ?`;
+            sql += ` AND ${this.TableName}.${this.DateField} >= ? AND ${this.TableName}.${this.DateField} <= ?`;
             fields.push(filter.dateAfter);
             fields.push(filter.dateBefore);
         }
