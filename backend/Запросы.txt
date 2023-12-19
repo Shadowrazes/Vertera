@@ -20,6 +20,20 @@ query	{
   }
 }
 
+query	{
+  ticketList(filters: {
+    dateAfter:"2021-09-20 00:00:00",
+    dateBefore:"2023-12-21 00:00:00", 
+    limit: 9999, 
+    offset: 0, 
+    orderBy: "id", 
+    orderDir: "ASC", 
+    lang:"ru"}
+  ){
+    id
+  }
+}
+
 mutation{
   addHelperUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitle: "Куратор", birthday: "2000-11-05", departmentIds: [1, 2]})
 }

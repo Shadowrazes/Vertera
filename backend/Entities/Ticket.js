@@ -51,8 +51,22 @@ class Ticket extends Entity{
         return result[0].count;
     }
 
+    static async GetCountByUser(userId) {
+        const sql = `
+            SELECT COUNT(*) AS count 
+            FROM ${this.TableName} 
+            WHERE ${this.ClientIdField} = ${userId} OR ${this.HelperIdField} = ${userId}
+        `;
+        const result = await super.Request(sql);
+        return result[0].count;
+    }
+
+    static async GetListByClient(clientId, filter) {
+        return await this.GetList(filter, clientId)
+    }
+
     // ORDER BY lastMsgDate, themeStroke, unitStroke, date, и другие (по необходимости)
-    static async GetList(filter) {
+    static async GetList(filter, clientId) {
         const usersClientAS = 'clies';
         const usersHelperAS = 'helps';
         const clientCountryAS = 'clientCountry';
@@ -128,7 +142,7 @@ class Ticket extends Entity{
         JOIN    ${Message.TableName} 
                 ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
 
-        WHERE   1=1
+        WHERE   1=1 ${clientId ? `AND ${this.ClientIdField} = ${clientId}` : ``}
         `;
 
         let fields = [];
@@ -137,7 +151,7 @@ class Ticket extends Entity{
             fields.push(filter.unitIds);
         }
         if (filter.themeIds && filter.themeIds.length > 0) {
-            sql += ` AND ${this.ThemeField} IN (?)`;
+            sql += ` AND ${this.TableName}.${this.ThemeField} IN (?)`;
             fields.push(filter.themeIds);
         }
         if (filter.subThemeIds && filter.subThemeIds.length > 0) {
