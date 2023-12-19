@@ -51,11 +51,17 @@ export const resolvers = {
             return await Ticket.GetById(id);
         },
         ticketList: async (_, args) => {
-            // user
             return await Ticket.GetList(args.filters);
+        },
+        ticketListByClient: async (_, args) => {
+            // user
+            return await Ticket.GetListByClient(args.clientId, args.filters);
         },
         ticketListCount: async (_, args) => {
             return await Ticket.GetCount();
+        },
+        ticketListCountByUser: async (_, { userId }) => {
+            return await Ticket.GetCountByUser(userId);
         },
         message: async (_, { id }) => {
             return await Message.GetById(id);

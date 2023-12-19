@@ -15,7 +15,9 @@ export const typeDefs = `
 
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): [Ticket]
+        ticketListByClient(clientId: Int!, filters: TicketClientFilter!): [Ticket]
         ticketListCount: Int!
+        ticketListCountByUser(userId: Int!): Int!
 
         message(id: Int!): Message
         messageList(ticketId: Int!): [Message]
@@ -204,6 +206,20 @@ export const typeDefs = `
         reaction: String
         statusIds: [Int]
         replyed: Boolean
+        orderBy: String!
+        orderDir: String!
+        limit: Int!
+        offset: Int!
+        lang: String!
+    }
+
+    input TicketClientFilter {
+        unitIds: [Int]
+        themeIds: [Int]
+        subThemeIds: [Int]
+        dateAfter: DateTime
+        dateBefore: DateTime
+        reaction: String
         orderBy: String!
         orderDir: String!
         limit: Int!
