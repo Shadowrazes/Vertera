@@ -59,8 +59,8 @@ export const ADD_MESSAGE = gql`
 `;
 
 export const UPDATE_STATUS = gql`
-  mutation ($id: Int!, $fields: TicketStatusUpdate!) {
-    updateTicketStatus(id: $id, fields: $fields) {
+  mutation ($id: Int!, $fields: TicketUpdate!) {
+    updateTicket(id: $id, fields: $fields) {
       changed
     }
   }
