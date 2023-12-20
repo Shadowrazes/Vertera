@@ -29,6 +29,8 @@ function FormComponent() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
+  const [fileNamess, setFileNamess] = useState(["test/111"]);
+
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
 
@@ -39,8 +41,6 @@ function FormComponent() {
   const [isVisible, setIsVisible] = useState(false);
 
   const [dataQuery, setData] = useState([]);
-
-  const [filePath, setFilePath] = useState(null);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -65,6 +65,8 @@ function FormComponent() {
     setSelectedSubThemeId(null);
   };
 
+  const filesUpload = async () => {};
+
   const handleNewTicket = (e) => {
     e.preventDefault();
     // console.log(selectedUnit);
@@ -76,23 +78,48 @@ function FormComponent() {
     // console.log(textareaValue);
     // console.log(imageUrl);
 
-    const fileInput = document.getElementById('FileInputForm');
-    if (fileInput.files.length > 0){
+    const fileInput = document.getElementById("FileInputForm");
+    let fileNames = [];
+    if (fileInput.files.length > 0) {
+      const maxFileSize = 2 * 1024 * 1024;
+
       let formdata = new FormData();
-      formdata.append("fileFields", fileInput.files[0], fileInput.files[0].name);
-      formdata.append("ticketId", "3");
-  
-      let requestOptions = {
-        method: 'POST',
-        body: formdata,
-        redirect: 'follow'
-      };
-  
-      fetch("http://localhost:4444/upload", requestOptions)
-        .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+      let filesValid = true;
+
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+
+        if (file.size > maxFileSize) {
+          console.log(`Файл ${file.name} превышает максимальный размер (2MB)`);
+          filesValid = false;
+          break;
+        }
+
+        formdata.append(`fileFields`, file);
+      }
+
+      if (filesValid) {
+        formdata.append("ticketId", "3");
+
+        let requestOptions = {
+          method: "POST",
+          body: formdata,
+          redirect: "follow",
+        };
+
+        fetch("http://localhost:4444/upload", requestOptions)
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result);
+            fileNames = result.data.map((file) => file.name);
+            //console.log(fileNames);
+            // setFileNamess(fileNames);
+          })
+          .catch((error) => console.log("error", error));
+      }
     }
+
+    console.log(fileNamess);
 
     // if (
     //   selectedUnit == null ||
@@ -113,20 +140,20 @@ function FormComponent() {
       userId = user.id;
     }
 
-    // addTicket({
-    //   variables: {
-    //     clientId: userId,
-    //     unitId: selectedUnitId,
-    //     themeId: selectedThemeId,
-    //     subThemeId: selectedSubThemeId,
-    //     senderId: userId,
-    //     recieverId: 1,
-    //     ticketId: 1,
-    //     type: "message",
-    //     text: textareaValue,
-    //     attachPaths: imageUrl, 
-    //   },
-    // });
+    addTicket({
+      variables: {
+        clientId: userId,
+        unitId: selectedUnitId,
+        themeId: selectedThemeId,
+        subThemeId: selectedSubThemeId,
+        senderId: userId,
+        recieverId: 1,
+        ticketId: 1,
+        type: "message",
+        text: textareaValue,
+        attachPaths: fileNamess,
+      },
+    });
 
     setIsVisible(false);
     handleShow();
@@ -196,12 +223,7 @@ function FormComponent() {
     setTextareaValue(e.target.value);
   };
 
-  const handleFileInput = (e) => {
-    const files = e.target.files;
-    const firstFilePath = URL.createObjectURL(files[0]);
-    setFilePath(firstFilePath);
-    console.log(firstFilePath);
-  }
+  const handleFileInput = (e) => {};
 
   return (
     <>
