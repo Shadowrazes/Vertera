@@ -101,7 +101,10 @@ function Chat() {
       ],
     });
 
-    const [updateStatus, { loader: loaderUpdateStatus, error: errorUpdateStatus }] = useMutation(UPDATE_STATUS);
+  const [
+    updateStatus,
+    { loader: loaderUpdateStatus, error: errorUpdateStatus },
+  ] = useMutation(UPDATE_STATUS);
 
   if (loading) {
     return <Loader />;
@@ -120,6 +123,33 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
+    const fileInput = document.getElementById("FileInputForm");
+
+    if (fileInput.files.length > 0) {
+      const maxFileSize = 2 * 1024 * 1024;
+      const file = fileInput.files[0];
+
+      if (file.size > maxFileSize) {
+        console.log("Файл превышает максимальный размер (2MB)");
+        return;
+      }
+
+      let formdata = new FormData();
+      formdata.append("fileFields", file);
+      formdata.append("ticketId", "3");
+
+      let requestOptions = {
+        method: "POST",
+        body: formdata,
+        redirect: "follow",
+      };
+
+      fetch("http://localhost:4444/upload", requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
+    }
+
     addMessage({
       variables: {
         fields: {
@@ -128,6 +158,7 @@ function Chat() {
           ticketId: ticketId,
           type: "message",
           text: message,
+          attachPaths: imageUrl,
         },
       },
     });
@@ -153,10 +184,10 @@ function Chat() {
       variables: {
         id: ticketId,
         fields: {
-          statusId: 2
-        }
-      }
-    })
+          statusId: 2,
+        },
+      },
+    });
   };
 
   return (
