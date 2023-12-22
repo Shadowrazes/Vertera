@@ -23,14 +23,17 @@ query	{
 query	{
   ticketList(filters: {
     dateAfter:"2021-09-20 00:00:00",
-    dateBefore:"2023-12-21 00:00:00", 
+    dateBefore:"2022-12-21 00:00:00",
     limit: 9999, 
     offset: 0, 
     orderBy: "id", 
     orderDir: "ASC", 
     lang:"ru"}
   ){
-    id
+    count
+    array{
+      id
+    }
   }
 }
 

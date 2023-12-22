@@ -45,26 +45,6 @@ class Ticket extends Entity{
         return result[0];
     }
 
-    static async GetCount() {
-        const sql = `SELECT COUNT(*) AS count FROM ${this.TableName}`;
-        const result = await super.Request(sql);
-        return result[0].count;
-    }
-
-    static async GetCountByUser(userId) {
-        const sql = `
-            SELECT COUNT(*) AS count 
-            FROM ${this.TableName} 
-            WHERE ${this.ClientIdField} = ${userId} OR ${this.HelperIdField} = ${userId}
-        `;
-        const result = await super.Request(sql);
-        return result[0].count;
-    }
-
-    static async GetListByClient(clientId, filter) {
-        return await this.GetList(filter, clientId)
-    }
-
     // ORDER BY lastMsgDate, themeStroke, unitStroke, date, и другие (по необходимости)
     static async GetList(filter, clientId) {
         const usersClientAS = 'clies';
@@ -197,12 +177,16 @@ class Ticket extends Entity{
         }
   
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
+
+        const countSql = `SELECT COUNT(*) as total FROM ( ${sql} ) as subquery`;
+        const countRes = await super.Request(countSql, fields);
+
         sql += ` ORDER BY ${MySQL.escapeId(filter.orderBy)} ${filter.orderDir === 'ASC' ? 'ASC' : 'DESC'}`;
         sql += ` LIMIT ? OFFSET ?`;
 
         fields.push(filter.limit, filter.offset);
         const res = await super.Request(sql, fields);
-        return res;
+        return {count: countRes[0].total, array: res};
     }
 
     static async TransInsert(args) {

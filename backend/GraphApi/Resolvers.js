@@ -55,13 +55,7 @@ export const resolvers = {
         },
         ticketListByClient: async (_, args) => {
             // user
-            return await Ticket.GetListByClient(args.clientId, args.filters);
-        },
-        ticketListCount: async (_, args) => {
-            return await Ticket.GetCount();
-        },
-        ticketListCountByUser: async (_, { userId }) => {
-            return await Ticket.GetCountByUser(userId);
+            return await Ticket.GetList(args.filters, args.clientId);
         },
         message: async (_, { id }) => {
             return await Message.GetById(id);

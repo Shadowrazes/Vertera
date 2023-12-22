@@ -14,10 +14,8 @@ export const typeDefs = `
         helperList: [Helper]
 
         ticket(id: Int!): Ticket
-        ticketList(filters: TicketFilter!): [Ticket]
-        ticketListByClient(clientId: Int!, filters: TicketClientFilter!): [Ticket]
-        ticketListCount: Int!
-        ticketListCountByUser(userId: Int!): Int!
+        ticketList(filters: TicketFilter!): TicketList!
+        ticketListByClient(clientId: Int!, filters: TicketClientFilter!): TicketList!
 
         message(id: Int!): Message
         messageList(ticketId: Int!): [Message]
@@ -126,6 +124,11 @@ export const typeDefs = `
         messages: [Message]
         lastMessage: Message!
         msgStats: TicketMsgStats!
+    }
+
+    type TicketList {
+        count: Int!
+        array: [Ticket]!
     }
 
     type TicketStatus {
