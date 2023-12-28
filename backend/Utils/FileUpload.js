@@ -1,16 +1,11 @@
 export async function FilelUpload(req, res) {
     const basePath = './uploads/';
     const publicPrefix = '/files/';
-    const allowedExtension = ['png', 'jpg', 'jpeg', 'mp4'];
+    const allowedExtension = ['png', 'jpg', 'jpeg', 'webp', 'mp4', 'webm'];
     
     try {
         if (!req.files) {
             res.status(400).send({ message: 'There are no files in the request' });
-            return;
-        }
-
-        if (!req.body.ticketId) {
-            res.status(400).send({ message: 'No ticket id' });
             return;
         }
 
@@ -27,12 +22,20 @@ export async function FilelUpload(req, res) {
             const extension = file.name.substring(file.name.lastIndexOf('.') + 1);
     
             if (!allowedExtension.includes(extension)) {
-                delete file.data;
-                res.status(400).send({ message: `.${extension} files are not allowed`, file });
+                res.status(400).send({ message: `Incorrect file type`});
                 return;
             }
+
+            if(isOneFile) break;
+        }
+
+        for (const key in req.files.fileFields) {
+            const file = !isOneFile ? req.files.fileFields[key] : req.files.fileFields;
+            const extension = file.name.substring(file.name.lastIndexOf('.') + 1);
     
-            const filePath = `${req.body.ticketId}/` + file.md5 + '.' + extension;
+            const date = new Date();
+            const strDate = date.toISOString().split('T')[0];
+            const filePath = `${strDate}/` + file.md5 + '.' + extension;
             file.mv(basePath + filePath);
     
             data.push({
@@ -46,7 +49,7 @@ export async function FilelUpload(req, res) {
             if(isOneFile) break;
         }
     
-        res.status(200).send({ message: 'all files are uploaded', data });
+        res.status(200).send({ message: 'Success', data });
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
