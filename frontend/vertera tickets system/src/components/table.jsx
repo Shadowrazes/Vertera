@@ -43,8 +43,8 @@ function TableTickets() {
   };
 
   useEffect(() => {
-    if (data && data.ticketList) {
-      setData(data.ticketList);
+    if (data && data.ticketList.array) {
+      setData(data.ticketList.array);
     }
 
     if (selectedSort !== prevSelectedSort) {

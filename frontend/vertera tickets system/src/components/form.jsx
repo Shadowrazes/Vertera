@@ -29,7 +29,7 @@ function FormComponent() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
-  const [fileNamess, setFileNamess] = useState(["test/111"]);
+  const [fileNamess, setFileNamess] = useState([""]);
 
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
@@ -107,15 +107,16 @@ function FormComponent() {
           redirect: "follow",
         };
 
-        fetch("http://localhost:4444/upload", requestOptions)
+        setFileNamess(fetch("http://localhost:4444/upload", requestOptions)
           .then((response) => response.json())
           .then((result) => {
             console.log(result);
             fileNames = result.data.map((file) => file.name);
             //console.log(fileNames);
             // setFileNamess(fileNames);
+            return fileNames;
           })
-          .catch((error) => console.log("error", error));
+          .catch((error) => console.log("error", error)));
       }
     }
 
@@ -140,20 +141,20 @@ function FormComponent() {
       userId = user.id;
     }
 
-    addTicket({
-      variables: {
-        clientId: userId,
-        unitId: selectedUnitId,
-        themeId: selectedThemeId,
-        subThemeId: selectedSubThemeId,
-        senderId: userId,
-        recieverId: 1,
-        ticketId: 1,
-        type: "message",
-        text: textareaValue,
-        attachPaths: fileNamess,
-      },
-    });
+    // addTicket({
+    //   variables: {
+    //     clientId: userId,
+    //     unitId: selectedUnitId,
+    //     themeId: selectedThemeId,
+    //     subThemeId: selectedSubThemeId,
+    //     senderId: userId,
+    //     recieverId: 1,
+    //     ticketId: 1,
+    //     type: "message",
+    //     text: textareaValue,
+    //     attachPaths: fileNamess,
+    //   },
+    // });
 
     setIsVisible(false);
     handleShow();
