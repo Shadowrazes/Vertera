@@ -23,7 +23,7 @@ const port = '4444'
 app.use(fileUpload({
     createParentPath: true,
     limits: {
-        fileSize: 2 * 1024 * 1024 // Bytes
+        fileSize: 10 * 1024 * 1024 // Bytes
     },
 }));
 

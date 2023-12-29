@@ -1,7 +1,10 @@
 export async function FilelUpload(req, res) {
     const basePath = './uploads/';
     const publicPrefix = '/files/';
-    const allowedExtension = ['png', 'jpg', 'jpeg', 'webp', 'mp4', 'webm'];
+    const allowedExtension = [
+        'png', 'jpg', 'jpeg', 'webp', 'mp4', 'webm', 'gif', 'pdf', 'txt', 'rtf', 'doc', 'docx',
+        'zip', 'rar', 'tar', '7zip', 'mp3'
+    ];
     
     try {
         if (!req.files) {
@@ -19,7 +22,7 @@ export async function FilelUpload(req, res) {
 
         for (const key in req.files.fileFields) {
             const file = !isOneFile ? req.files.fileFields[key] : req.files.fileFields;
-            const extension = file.name.substring(file.name.lastIndexOf('.') + 1);
+            const extension = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase();
     
             if (!allowedExtension.includes(extension)) {
                 res.status(400).send({ message: `Incorrect file type`});
@@ -31,7 +34,7 @@ export async function FilelUpload(req, res) {
 
         for (const key in req.files.fileFields) {
             const file = !isOneFile ? req.files.fileFields[key] : req.files.fileFields;
-            const extension = file.name.substring(file.name.lastIndexOf('.') + 1);
+            const extension = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase();
     
             const date = new Date();
             const strDate = date.toISOString().split('T')[0];
