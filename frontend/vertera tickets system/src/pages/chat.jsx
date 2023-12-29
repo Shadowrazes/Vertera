@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { Form, Row } from "react-bootstrap";
 
-import { MESSAGES_CHAT } from "../apollo/queries";
+import { MESSAGES_CHAT, ATTACHEMNTS_LIST } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
@@ -68,6 +68,12 @@ function Chat() {
     },
   });
 
+  // const { loading: attachmentsLoading, error: attachmentsError, data: attachmentsData } = useQuery(ATTACHEMNTS_LIST, {
+  //   variables: {
+  //     messageId: ,
+  //   },
+  // });
+
   useEffect(() => {
     if (data && data.ticket) {
       setTicketId(data.ticket.id);
@@ -114,6 +120,54 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  async function uploadFiles() {
+    const fileInput = document.getElementById("FileInputForm");
+    let fileNames = [];
+  
+    if (fileInput.files.length > 0) {
+      const maxFileSize = 10 * 1024 * 1024;
+      let formdata = new FormData();
+      let filesValid = true;
+  
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+  
+        if (file.size > maxFileSize) {
+          console.log(`Файл ${file.name} превышает максимальный размер (10MB)`);
+          filesValid = false;
+          break;
+        }
+  
+        formdata.append(`fileFields`, file);
+      }
+  
+      if (filesValid) {
+  
+        try {
+          let requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+  
+          const response = await fetch("http://localhost:4444/upload", requestOptions);
+          const result = await response.json();
+  
+          console.log(result);
+          fileNames = result.data.map((file) => file.name);
+          // console.log(fileNames);
+  
+          return fileNames;
+        } catch (error) {
+          console.log("error", error);
+          throw error;
+        }
+      }
+    }
+  
+    return fileNames;
+  }
+
   const sendMsg = (e) => {
     e.preventDefault();
     if (loaderAddMsg) {
@@ -123,33 +177,8 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    const fileInput = document.getElementById("FileInputForm");
-
-    if (fileInput.files.length > 0) {
-      const maxFileSize = 2 * 1024 * 1024;
-      const file = fileInput.files[0];
-
-      if (file.size > maxFileSize) {
-        console.log("Файл превышает максимальный размер (2MB)");
-        return;
-      }
-
-      let formdata = new FormData();
-      formdata.append("fileFields", file);
-      formdata.append("ticketId", "3");
-
-      let requestOptions = {
-        method: "POST",
-        body: formdata,
-        redirect: "follow",
-      };
-
-      fetch("http://localhost:4444/upload", requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.log("error", error));
-    }
-
+    uploadFiles()
+  .then((fileNames) => {
     addMessage({
       variables: {
         fields: {
@@ -158,10 +187,14 @@ function Chat() {
           ticketId: ticketId,
           type: "message",
           text: message,
-          attachPaths: imageUrl,
+          attachPaths: fileNames,
         },
       },
     });
+  })
+  .catch((error) => {
+    console.error("Ошибка при загрузке файлов:", error);
+  });
     setMessage("");
   };
 

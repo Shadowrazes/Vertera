@@ -4,10 +4,9 @@ import { DateRangePicker } from "rsuite";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { TABLE_TICKETS, THEME_LIST } from "../apollo/queries";
+import { TABLE_TICKETS, TABLE_TICKETS_USER, THEME_LIST } from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
-import DropdownBT from "../components/dropdown";
 import ButtonCustom from "../components/button";
 
 import "../css/all-tickets.css";
@@ -81,8 +80,9 @@ function allTickets() {
 
   const { loading: themeLoading, error: themeError, data: themeData } = useQuery(THEME_LIST);
 
-  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
+  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
     variables: {
+      clientId: userId, 
       filters: {
         limit: itemsPerPage,
         offset: 0,
@@ -120,16 +120,16 @@ function allTickets() {
   };
 
   useEffect(() => {
-    if (data && data.ticketList.array) {
-      setDataTableTickets(data.ticketList.array);
+    if (data && data.ticketListByClient.array) {
+      setDataTableTickets(data.ticketListByClient.array);
     }
 
     if (themeData && themeData.allThemeTree) {
       setDataTheme(themeData.allThemeTree);
     }
 
-    if (data && data.ticketList.count) {
-      setDataAmount(data.ticketList.count);
+    if (data && data.ticketListByClient.count) {
+      setDataAmount(data.ticketListByClient.count);
     }
 
     if (selectedSort !== prevSelectedSort) {

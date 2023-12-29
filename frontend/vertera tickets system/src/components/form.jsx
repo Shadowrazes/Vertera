@@ -29,13 +29,14 @@ function FormComponent() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
-  const [fileNamess, setFileNamess] = useState([""]);
-
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
 
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    window.location.reload();
+  }
   const handleShow = () => setShow(true);
 
   const [isVisible, setIsVisible] = useState(false);
@@ -65,7 +66,53 @@ function FormComponent() {
     setSelectedSubThemeId(null);
   };
 
-  const filesUpload = async () => {};
+  async function uploadFiles() {
+    const fileInput = document.getElementById("FileInputForm");
+    let fileNames = [];
+  
+    if (fileInput.files.length > 0) {
+      const maxFileSize = 10 * 1024 * 1024;
+      let formdata = new FormData();
+      let filesValid = true;
+  
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+  
+        if (file.size > maxFileSize) {
+          console.log(`Файл ${file.name} превышает максимальный размер (10MB)`);
+          filesValid = false;
+          break;
+        }
+  
+        formdata.append(`fileFields`, file);
+      }
+  
+      if (filesValid) {
+  
+        try {
+          let requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+  
+          const response = await fetch("http://localhost:4444/upload", requestOptions);
+          const result = await response.json();
+  
+          console.log(result);
+          fileNames = result.data.map((file) => file.name);
+          // console.log(fileNames);
+  
+          return fileNames;
+        } catch (error) {
+          console.log("error", error);
+          throw error;
+        }
+      }
+    }
+  
+    return fileNames;
+  }
 
   const handleNewTicket = (e) => {
     e.preventDefault();
@@ -78,49 +125,35 @@ function FormComponent() {
     // console.log(textareaValue);
     // console.log(imageUrl);
 
-    const fileInput = document.getElementById("FileInputForm");
-    let fileNames = [];
-    if (fileInput.files.length > 0) {
-      const maxFileSize = 2 * 1024 * 1024;
+    let userId = null;
 
-      let formdata = new FormData();
-      let filesValid = true;
-
-      for (let i = 0; i < fileInput.files.length; i++) {
-        const file = fileInput.files[i];
-
-        if (file.size > maxFileSize) {
-          console.log(`Файл ${file.name} превышает максимальный размер (2MB)`);
-          filesValid = false;
-          break;
-        }
-
-        formdata.append(`fileFields`, file);
-      }
-
-      if (filesValid) {
-        formdata.append("ticketId", "3");
-
-        let requestOptions = {
-          method: "POST",
-          body: formdata,
-          redirect: "follow",
-        };
-
-        setFileNamess(fetch("http://localhost:4444/upload", requestOptions)
-          .then((response) => response.json())
-          .then((result) => {
-            console.log(result);
-            fileNames = result.data.map((file) => file.name);
-            //console.log(fileNames);
-            // setFileNamess(fileNames);
-            return fileNames;
-          })
-          .catch((error) => console.log("error", error)));
-      }
+    if (user === null) {
+      userId = 1;
+    } else {
+      userId = user.id;
     }
 
-    console.log(fileNamess);
+    uploadFiles()
+  .then((fileNames) => {
+    // console.log(fileNames);
+    addTicket({
+      variables: {
+        clientId: userId,
+        unitId: selectedUnitId,
+        themeId: selectedThemeId,
+        subThemeId: selectedSubThemeId,
+        senderId: userId,
+        recieverId: 1,
+        ticketId: 1,
+        type: "message",
+        text: textareaValue,
+        attachPaths: fileNames,
+      },
+    });
+  })
+  .catch((error) => {
+    console.error("Ошибка при загрузке файлов:", error);
+  });
 
     // if (
     //   selectedUnit == null ||
@@ -133,28 +166,6 @@ function FormComponent() {
     // }
 
     //console.log(user);
-    let userId = null;
-
-    if (user === null) {
-      userId = 1;
-    } else {
-      userId = user.id;
-    }
-
-    // addTicket({
-    //   variables: {
-    //     clientId: userId,
-    //     unitId: selectedUnitId,
-    //     themeId: selectedThemeId,
-    //     subThemeId: selectedSubThemeId,
-    //     senderId: userId,
-    //     recieverId: 1,
-    //     ticketId: 1,
-    //     type: "message",
-    //     text: textareaValue,
-    //     attachPaths: fileNamess,
-    //   },
-    // });
 
     setIsVisible(false);
     handleShow();
