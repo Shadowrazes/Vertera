@@ -114,3 +114,16 @@
   background: white;
   color: #8c8c8c;
 }
+
+.alltickets__empty-table {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.alltickets__text {
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 20px;
+}

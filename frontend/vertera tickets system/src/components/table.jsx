@@ -80,7 +80,6 @@ function TableTickets() {
       handleSorts(selectedSort);
       setPrevSelectedSort(selectedSort);
     }
-
   }, [data, isTableVisibility, selectedSort, prevSelectedSort]);
 
   const tickets = dataQuery;
@@ -155,7 +154,7 @@ function TableTickets() {
   ];
   const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
-  function getStatusColor(status) {
+  const getStatusColor = (status) => {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -168,48 +167,55 @@ function TableTickets() {
       default:
         return "white";
     }
-  }
+  };
 
   return (
     <>
-    {!loading && dataAmount > 0 && (
-      <>
-      <TitleH2 title="Мои обращения" className="title__heading" /><div className="table__sorts">
-          <span className="table__sorts-label">Сортировать по:</span>
-          {columns.map((column, index) => (
-            <span
-              key={column}
-              onClick={() => {
-                handleSorts(index);
-              } }
-              className={selectedSort === index
-                ? "table__sort table__sort-active"
-                : "table__sort"}
-            >
-              {columnsName[index]}
-              {selectedSort === index && (
-                <span className="table__sort-arrow">
-                  <svg
-                    className={orderDir == "DESC"
-                      ? "table__sort-arrow-svg-rotated"
-                      : "table__sort-arrow-svg"}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="7"
-                    height="10"
-                    viewBox="0 0 7 10"
-                    fill="none"
-                  >
-                    <path
-                      d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                      stroke="#00AB97"
-                      strokeWidth="0.8"
-                      strokeLinecap="round" />
-                  </svg>
-                </span>
-              )}
-            </span>
-          ))}
-        </div><Table className="table__table" hover>
+      {!loading && dataAmount > 0 && (
+        <>
+          <TitleH2 title="Мои обращения" className="title__heading" />
+          <div className="table__sorts">
+            <span className="table__sorts-label">Сортировать по:</span>
+            {columns.map((column, index) => (
+              <span
+                key={column}
+                onClick={() => {
+                  handleSorts(index);
+                }}
+                className={
+                  selectedSort === index
+                    ? "table__sort table__sort-active"
+                    : "table__sort"
+                }
+              >
+                {columnsName[index]}
+                {selectedSort === index && (
+                  <span className="table__sort-arrow">
+                    <svg
+                      className={
+                        orderDir == "DESC"
+                          ? "table__sort-arrow-svg-rotated"
+                          : "table__sort-arrow-svg"
+                      }
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="7"
+                      height="10"
+                      viewBox="0 0 7 10"
+                      fill="none"
+                    >
+                      <path
+                        d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                        stroke="#00AB97"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+          <Table className="table__table" hover>
             <thead>
               <tr>
                 <th>ID тикет</th>
@@ -248,7 +254,8 @@ function TableTickets() {
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
-                      {ticket.date.replace(/T|-/g, (match) => match === "T" ? " " : "."
+                      {ticket.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
                       )}
                     </Link>
                   </td>
@@ -299,10 +306,13 @@ function TableTickets() {
                 </tr>
               ))}
             </tbody>
-          </Table><ButtonCustom title="Показать все обращения" onClick={goToAllTickets} />
-          </>
-    )}
-      
+          </Table>
+          <ButtonCustom
+            title="Показать все обращения"
+            onClick={goToAllTickets}
+          />
+        </>
+      )}
     </>
   );
 }

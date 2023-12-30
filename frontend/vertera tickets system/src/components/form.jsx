@@ -36,10 +36,13 @@ function FormComponent() {
   const handleClose = () => {
     setShow(false);
     window.location.reload();
-  }
+  };
   const handleShow = () => setShow(true);
 
   const [isVisible, setIsVisible] = useState(false);
+
+  const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
+  const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
   const [dataQuery, setData] = useState([]);
 
@@ -51,58 +54,41 @@ function FormComponent() {
     if (data && data.allThemeTree) {
       setData(data.allThemeTree);
     }
-  }, [data, selectedUnit, selectedItem]);
+  }, [data]);
 
   const [addTicket] = useMutation(ADD_TICKET);
-
-  const resetState = () => {
-    setSelectedUnit(null);
-    setSelectedTheme(null);
-    setSelectedSubTheme(null);
-    setSelectedItem(null);
-    setTextareaValue("");
-    setSelectedUnitId(null);
-    setSelectedThemeId(null);
-    setSelectedSubThemeId(null);
-  };
 
   async function uploadFiles() {
     const fileInput = document.getElementById("FileInputForm");
     let fileNames = [];
-  
+
     if (fileInput.files.length > 0) {
-      const maxFileSize = 10 * 1024 * 1024;
       let formdata = new FormData();
       let filesValid = true;
-  
+
       for (let i = 0; i < fileInput.files.length; i++) {
         const file = fileInput.files[i];
-  
-        if (file.size > maxFileSize) {
-          console.log(`Файл ${file.name} превышает максимальный размер (10MB)`);
-          filesValid = false;
-          break;
-        }
-  
         formdata.append(`fileFields`, file);
       }
-  
+
       if (filesValid) {
-  
         try {
           let requestOptions = {
             method: "POST",
             body: formdata,
             redirect: "follow",
           };
-  
-          const response = await fetch("http://localhost:4444/upload", requestOptions);
+
+          const response = await fetch(
+            "http://localhost:4444/upload",
+            requestOptions
+          );
           const result = await response.json();
-  
+
           console.log(result);
           fileNames = result.data.map((file) => file.name);
           // console.log(fileNames);
-  
+
           return fileNames;
         } catch (error) {
           console.log("error", error);
@@ -110,68 +96,9 @@ function FormComponent() {
         }
       }
     }
-  
+
     return fileNames;
   }
-
-  const handleNewTicket = (e) => {
-    e.preventDefault();
-    // console.log(selectedUnit);
-    // console.log(selectedUnitId);
-    // console.log(selectedTheme);
-    // console.log(selectedThemeId);
-    // console.log(selectedSubTheme);
-    // console.log(selectedSubThemeId);
-    // console.log(textareaValue);
-    // console.log(imageUrl);
-
-    let userId = null;
-
-    if (user === null) {
-      userId = 1;
-    } else {
-      userId = user.id;
-    }
-
-    uploadFiles()
-  .then((fileNames) => {
-    // console.log(fileNames);
-    addTicket({
-      variables: {
-        clientId: userId,
-        unitId: selectedUnitId,
-        themeId: selectedThemeId,
-        subThemeId: selectedSubThemeId,
-        senderId: userId,
-        recieverId: 1,
-        ticketId: 1,
-        type: "message",
-        text: textareaValue,
-        attachPaths: fileNames,
-      },
-    });
-  })
-  .catch((error) => {
-    console.error("Ошибка при загрузке файлов:", error);
-  });
-
-    // if (
-    //   selectedUnit == null ||
-    //   selectedTheme == null ||
-    //   selectedSubTheme == null
-    // ) {
-    //   console.log("xdd");
-    //   setIsVisible(true);
-    //   return;
-    // }
-
-    //console.log(user);
-
-    setIsVisible(false);
-    handleShow();
-
-    resetState();
-  };
 
   if (loading) {
     return <Loader />;
@@ -190,6 +117,7 @@ function FormComponent() {
     setSelectedTheme(null);
     setSelectedSubTheme(null);
     setSubThemeDropdownVisible(true);
+    setIsVisible(false);
   };
 
   const handleThemeClick = (theme, themeId) => {
@@ -199,6 +127,7 @@ function FormComponent() {
 
     setSelectedSubTheme(null);
     setSubThemeDropdownVisible(true);
+    setIsVisible(false);
 
     switch ((selectedUnitId, themeId)) {
       case (1, 14):
@@ -229,13 +158,135 @@ function FormComponent() {
     setSelectedSubTheme(subTheme);
     setSelectedSubThemeId(subThemeId);
     // console.log(subThemeId);
+
+    setIsVisible(false);
   };
 
   const handleTextareaChange = (e) => {
     setTextareaValue(e.target.value);
   };
 
-  const handleFileInput = (e) => {};
+  const resetState = (e) => {
+    setSelectedUnit(null);
+    setSelectedTheme(null);
+    setSelectedSubTheme(null);
+    setSelectedItem(null);
+    setTextareaValue("");
+    setSelectedUnitId(null);
+    setSelectedThemeId(null);
+    setSelectedSubThemeId(null);
+  };
+
+  const errorMsg = () => {
+    let error = "";
+
+    if (isFilesSizeExceeded) {
+      error = "Максимальный размер файла - 10 Мб";
+    } else if (isFilesLimitExceeded) {
+      error = "Вы можете загружать до 5 файлов";
+    } else if (selectedUnitId == null) {
+      error = "Выберите подразделение";
+    } else if (selectedThemeId == null) {
+      error = "Выберите тип обращения";
+    } else if (selectedSubThemeId == null) {
+      error = "Выберите подтему";
+    } else if (textareaValue.trim() == "") {
+      error = "Опишите Вашу проблему";
+    }
+
+    return error;
+  };
+
+  const handleNewTicket = (e) => {
+    e.preventDefault();
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
+    // console.log(selectedTheme);
+    // console.log(selectedThemeId);
+    // console.log(selectedSubTheme);
+    // console.log(selectedSubThemeId);
+    // console.log(textareaValue);
+    // console.log(imageUrl);
+
+    if (
+      selectedUnitId == null ||
+      selectedThemeId == null ||
+      selectedSubThemeId == null ||
+      textareaValue.trim() == ""
+    ) {
+      // console.log("xdd");
+      setIsVisible(true);
+      return;
+    }
+
+    let userId = null;
+
+    if (user === null) {
+      userId = 1;
+    } else {
+      userId = user.id;
+    }
+
+    uploadFiles()
+      .then((fileNames) => {
+        // console.log(fileNames);
+        addTicket({
+          variables: {
+            clientId: userId,
+            unitId: selectedUnitId,
+            themeId: selectedThemeId,
+            subThemeId: selectedSubThemeId,
+            senderId: userId,
+            recieverId: 1,
+            ticketId: 1,
+            type: "message",
+            text: textareaValue,
+            attachPaths: fileNames,
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("Ошибка при загрузке файлов:", error);
+      });
+
+    setIsVisible(false);
+    handleShow();
+
+    resetState();
+  };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    let isFileSizeExceeded = false;
+
+    if (files.length > 5) {
+      e.target.value = null;
+      setIsVisible(true);
+      setIsFilesLimitExceeded(true);
+      console.log("Вы можете загружать до 5 файлов");
+      return;
+    }
+
+    Array.from(files).forEach((file) => {
+      const fileSizeInMB = file.size / (1024 * 1024);
+      const maxFileSize = 10;
+
+      if (fileSizeInMB > maxFileSize) {
+        isFileSizeExceeded = true;
+      }
+    });
+
+    if (isFileSizeExceeded) {
+      e.target.value = null;
+      setIsVisible(true);
+      setIsFilesSizeExceeded(true);
+      console.log("Размер файла не должен превышать 10 МБ");
+      return;
+    }
+
+    setIsFilesLimitExceeded(false);
+    setIsVisible(false);
+  };
 
   return (
     <>
@@ -313,9 +364,14 @@ function FormComponent() {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="FileInputForm">
-              <Form.Control type="file" multiple onChange={handleFileInput} />
+              <Form.Control
+                type="file"
+                multiple
+                accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                onChange={handleFileChange}
+              />
             </Form.Group>
-            {isVisible && <span className="form__error">Выберите раздел</span>}
+            {isVisible && <span className="form__error">{errorMsg()}</span>}
             <Button
               variant="primary"
               id="ButtonForm"
