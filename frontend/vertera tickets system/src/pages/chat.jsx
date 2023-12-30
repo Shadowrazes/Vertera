@@ -322,7 +322,7 @@ function Chat() {
                     time={msg.date.replace(/T|-/g, (match) =>
                       match === "T" ? " " : "."
                     )}
-                    attachs={msg.attachs.path}
+                    attachs={msg.attachs}
                   />
                 ) : msg.sender.role === "system" ? (
                   <ChatMessageSystem
