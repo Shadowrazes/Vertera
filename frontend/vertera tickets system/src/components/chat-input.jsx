@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Row } from "react-bootstrap";
 import ButtonCustom from "./button";
@@ -7,6 +7,13 @@ import "../css/chat-input.css";
 function ChatInput({ onSendMessage }) {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const location = useLocation();
+  let initialStatus = location.state && location.state.status;
+
+  const [status, setStatus] = useState(initialStatus);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleFileChange = (event) => {
     const files = event.target.files;
@@ -17,13 +24,6 @@ function ChatInput({ onSendMessage }) {
     }
   };
 
-  const location = useLocation();
-  let initialStatus = location.state && location.state.status;
-
-  const [status, setStatus] = useState(initialStatus);
-
-  const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
     if (status !== "Закрыт") {
       setIsVisible(true);
@@ -31,14 +31,6 @@ function ChatInput({ onSendMessage }) {
       setIsVisible(false);
     }
   }, [status]);
-
-  const [isVisible2, setIsVisible2] = useState(false);
-
-  useEffect(() => {
-    if (status == "Закрыт" && count > 1) {
-      setIsVisible2(true);
-    }
-  });
 
   const handleClose = () => {
     setIsVisible(false);
@@ -68,15 +60,6 @@ function ChatInput({ onSendMessage }) {
 
   return (
     <>
-      {isVisible2 && (
-        <div className="chat-input__more">
-          <span className="chat-input__more-text">
-            <a href="#" className="chat-input__more-link">
-              Показать {count} скрытых сообщения
-            </a>
-          </span>
-        </div>
-      )}
       {isVisible && (
         <div className="chat-input__container">
           <Form className="chat-input__form" onSubmit={handleSubmit}>

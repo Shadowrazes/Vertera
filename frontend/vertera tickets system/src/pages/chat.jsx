@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { Form, Row } from "react-bootstrap";
 
-import { MESSAGES_CHAT, ATTACHEMNTS_LIST } from "../apollo/queries";
+import { MESSAGES_CHAT } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
@@ -43,8 +43,15 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  const status = location.state && location.state.status;
-  // const [status, setStatus] = useState(statusInitial);
+  // const status = location.state && location.state.status;
+  // const [status, setStatus] = useState("");
+
+  const [isLoadingClose, setIsLoadingClose] = useState(false);
+  const [ticketStatus, setTicketStatus] = useState(
+    location.state && location.state.status
+  );
+
+  const [isHideMessages, setIsHideMessages] = useState(true);
 
   const [ticketId, setTicketId] = useState(null);
   const [messagesQuery, setMessagesQuery] = useState([]);
@@ -53,7 +60,7 @@ function Chat() {
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [isClosed, setIsClosed] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -72,31 +79,25 @@ function Chat() {
     },
   });
 
-  // const { loading: attachmentsLoading, error: attachmentsError, data: attachmentsData } = useQuery(ATTACHEMNTS_LIST, {
-  //   variables: {
-  //     messageId: ,
-  //   },
-  // });
-
   useEffect(() => {
     if (data && data.ticket) {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       // setStatus(data.ticket.status.name.stroke);
-      //console.log(status);
+      // console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
 
-      if (status !== "Закрыт") {
+      if (data.ticket.status.name.stroke !== "Закрыт") {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
 
-      if (status == "Закрыт" && data.ticket.messages.length > 1) {
-        setIsClosed(true);
-      }
+      // if (status == "Закрыт" && data.ticket.messages.length > 1) {
+      //   setIsClosed(true);
+      // }
     }
-  }, [data, status]);
+  }, [data]);
 
   const navigate = useNavigate();
 
@@ -124,6 +125,11 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  const handleMoreMessages = (e) => {
+    e.preventDefault();
+    setIsHideMessages(false);
+  };
+
   const errorMsg = () => {
     let error = "";
 
@@ -131,6 +137,8 @@ function Chat() {
       error = "Максимальный размер файла - 10 Мб";
     } else if (isFilesLimitExceeded) {
       error = "Вы можете загружать до 5 файлов";
+    } else if (message.trim() == "") {
+      error = "Введите текст сообщения";
     }
 
     return error;
@@ -223,7 +231,7 @@ function Chat() {
     setMessage(e.target.value);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     setIsVisible(false);
     // setStatus("Закрыт");
 
@@ -234,14 +242,25 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    updateStatus({
-      variables: {
-        id: ticketId,
-        fields: {
-          statusId: 2,
+    try {
+      setIsLoadingClose(true);
+
+      await updateStatus({
+        variables: {
+          id: ticketId,
+          fields: {
+            statusId: 2,
+          },
         },
-      },
-    });
+      });
+      setTicketStatus("Закрыт");
+      // console.log(ticketStatus);
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при закрытии заявки:", error);
+
+      setIsLoadingClose(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -277,71 +296,104 @@ function Chat() {
     setIsVisibleError(false);
   };
 
+  const handleSubmit = () => {
+    if (message.trim() == "") {
+      setIsVisibleError(true);
+    }
+  };
+
   return (
     <>
-      <div>
-        {status !== null && status !== "Закрыт" ? (
+      {isLoadingClose && <Loader />}
+      <div
+        className={ticketStatus == "Закрыт" ? "" : "chat-messages__container"}
+      >
+        {ticketStatus !== null && ticketStatus !== "Закрыт" ? (
           <TicketTitle title={`Обращение #${itemId}`} state="Открыта" />
         ) : (
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
         )}
-        {/* {messagesQuery.map((msg) => (
-          <pre key={msg.id}>
-            {msg.sender.role === "client" ? (
-              <ChatMessageSender
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : msg.sender.role === "helper" ? (
-              <ChatMessageRecepient
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : (
-              <ChatMessageSystem
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            )}
-          </pre>
-        ))} */}
 
-        {messagesQuery.map(
-          (msg) =>
-            msg.text !== "" && (
-              <pre key={msg.id}>
-                {msg.sender.id === userId ? (
-                  <ChatMessageSender
-                    message={msg.text}
-                    time={msg.date.replace(/T|-/g, (match) =>
-                      match === "T" ? " " : "."
-                    )}
-                    attachs={msg.attachs}
-                  />
-                ) : msg.sender.role === "system" ? (
-                  <ChatMessageSystem
-                    message={msg.text}
-                    time={msg.date.replace(/T|-/g, (match) =>
-                      match === "T" ? " " : "."
-                    )}
-                  />
-                ) : (
-                  <ChatMessageRecepient
-                    message={msg.text}
-                    time={msg.date.replace(/T|-/g, (match) =>
-                      match === "T" ? " " : "."
-                    )}
-                  />
-                )}
-              </pre>
-            )
+        {isHideMessages &&
+          messagesQuery.map(
+            (msg, index) =>
+              index === 0 &&
+              msg.text !== "" && (
+                <pre key={msg.id}>
+                  {msg.sender.id === userId ? (
+                    <ChatMessageSender
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  ) : msg.sender.role === "system" ? (
+                    <ChatMessageSystem
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                    />
+                  ) : (
+                    <ChatMessageRecepient
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  )}
+                </pre>
+              )
+          )}
+
+        {isHideMessages && (
+          <div className="chat-input__more">
+            <span className="chat-input__more-text">
+              <a
+                href="#"
+                onClick={handleMoreMessages}
+                className="chat-input__more-link"
+              >
+                Показать {messagesQuery.length - 1} скрытых сообщения
+              </a>
+            </span>
+          </div>
         )}
+
+        {!isHideMessages &&
+          messagesQuery.map(
+            (msg) =>
+              msg.text !== "" && (
+                <pre key={msg.id}>
+                  {msg.sender.id === userId ? (
+                    <ChatMessageSender
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  ) : msg.sender.role === "system" ? (
+                    <ChatMessageSystem
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                    />
+                  ) : (
+                    <ChatMessageRecepient
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  )}
+                </pre>
+              )
+          )}
       </div>
 
       {isVisible && (
@@ -374,6 +426,7 @@ function Chat() {
                   title="Отправить"
                   className="chat-input__button-send"
                   type="submit"
+                  onClick={handleSubmit}
                 />
                 <ButtonCustom
                   title="Закрыть заявку"
