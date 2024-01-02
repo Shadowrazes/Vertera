@@ -1,11 +1,43 @@
 import "../css/chat-message-recipient.css";
 
-function ChatMessage({ message, time }) {
+function ChatMessage({ message, time, attachs }) {
+  let isVisible;
+
+  if (attachs.length == 0) {
+    isVisible = true;
+  } else {
+    isVisible = false;
+  }
   return (
     <>
       <div className="chat-message-recipient__container">
         <div className="chat-message-recipient__box">
-          <p className="chat-message-recipient__text">{message}</p>
+          <div className="chat-message-recipient__text">{message}</div>
+          {!isVisible && (
+            <>
+              <span className="chat-message-recipient__attachs-title">
+                Прикрепленные файлы:
+              </span>
+              <div className="chat-message-recipient__attachs">
+                {attachs &&
+                  attachs.map((attach) => (
+                    <div key={attach.id}>
+                      <a
+                        className="chat-message-recipient__attach-link"
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={"http://localhost:4444" + attach.path}
+                      >
+                        <span className="chat-message-recipient__attach">
+                          {attach.id}
+                        </span>
+                      </a>
+                    </div>
+                  ))}
+              </div>
+            </>
+          )}
           {/* <div className="chat-message-recepient__separator"></div>
           <div className="chat-message-recepient__rate-container">
             <span className="chat-message-recepient__rate-title">

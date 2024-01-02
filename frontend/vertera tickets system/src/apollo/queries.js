@@ -48,6 +48,54 @@ export const TABLE_TICKETS = gql`
   }
 `;
 
+export const TABLE_TICKETS_USER = gql`
+  query ($clientId: Int!, $filters: TicketClientFilter!) {
+    ticketListByClient(clientId: $clientId, filters: $filters) {
+      count
+      array {
+        id
+        client {
+          id
+        }
+        helper {
+          id
+        }
+        subTheme {
+          theme {
+            unit {
+              name(lang: "ru") {
+                stroke
+              }
+            }
+          }
+        }
+        date
+        subTheme {
+          theme {
+            name(lang: "ru") {
+              stroke
+            }
+          }
+        }
+        lastMessage {
+          sender {
+            fullName
+          }
+          date
+        }
+        messages {
+          text
+        }
+        status {
+          name(lang: "ru") {
+            stroke
+          }
+        }
+      }
+    }
+  }
+`;
+
 // export const TICKETS_AMOUNT = gql`
 //   query {
 //     ticketListCount
@@ -61,6 +109,10 @@ export const MESSAGES_CHAT = gql`
       messages {
         id
         text
+        attachs {
+          id
+          path
+        }
         sender {
           id
           role
@@ -116,6 +168,15 @@ export const DEPARTMENTS_LIST = gql`
       name(lang: "ru") {
         stroke
       }
+    }
+  }
+`;
+
+export const ATTACHEMNTS_LIST = gql`
+  query ($messageId: Int!) {
+    attachmentList(messageId: $messageId) {
+      id
+      path
     }
   }
 `;

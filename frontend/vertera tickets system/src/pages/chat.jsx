@@ -43,13 +43,24 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  const status = location.state && location.state.status;
-  // const [status, setStatus] = useState(statusInitial);
+  // const status = location.state && location.state.status;
+  // const [status, setStatus] = useState("");
+
+  const [isLoadingClose, setIsLoadingClose] = useState(false);
+  const [ticketStatus, setTicketStatus] = useState(
+    location.state && location.state.status
+  );
+
+  const [isHideMessages, setIsHideMessages] = useState(true);
 
   const [ticketId, setTicketId] = useState(null);
   const [messagesQuery, setMessagesQuery] = useState([]);
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleError, setIsVisibleError] = useState(false);
+  const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
+  const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
+
+  const [isVisible, setIsVisible] = useState(true);
   const [isClosed, setIsClosed] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -73,20 +84,20 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       // setStatus(data.ticket.status.name.stroke);
-      console.log(status);
-      console.log(data.ticket.id);
+      // console.log(data.ticket.status.name.stroke);
+      //console.log(data.ticket.id);
 
-      if (status !== "Закрыт") {
+      if (data.ticket.status.name.stroke !== "Закрыт") {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
 
-      if (status == "Закрыт" && data.ticket.messages.length > 1) {
-        setIsClosed(true);
-      }
+      // if (status == "Закрыт" && data.ticket.messages.length > 1) {
+      //   setIsClosed(true);
+      // }
     }
-  }, [data, status]);
+  }, [data]);
 
   const navigate = useNavigate();
 
@@ -114,8 +125,80 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  const handleMoreMessages = (e) => {
+    e.preventDefault();
+    setIsHideMessages(false);
+  };
+
+  const errorMsg = () => {
+    let error = "";
+
+    if (isFilesSizeExceeded) {
+      error = "Максимальный размер файла - 10 Мб";
+    } else if (isFilesLimitExceeded) {
+      error = "Вы можете загружать до 5 файлов";
+    } else if (message.trim() == "") {
+      error = "Введите текст сообщения";
+    }
+
+    return error;
+  };
+
+  async function uploadFiles() {
+    const fileInput = document.getElementById("FileInputForm");
+    let fileNames = [];
+
+    if (fileInput.files.length > 0) {
+      const maxFileSize = 10 * 1024 * 1024;
+      let formdata = new FormData();
+      let filesValid = true;
+
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+
+        if (file.size > maxFileSize) {
+          console.log(`Файл ${file.name} превышает максимальный размер (10MB)`);
+          filesValid = false;
+          setIsVisibleError(true);
+          setIsFilesSizeExceeded(false);
+          break;
+        }
+
+        formdata.append(`fileFields`, file);
+      }
+
+      if (filesValid) {
+        try {
+          let requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+
+          const response = await fetch(
+            "http://localhost:4444/upload",
+            requestOptions
+          );
+          const result = await response.json();
+
+          //console.log(result);
+          fileNames = result.data.map((file) => file.name);
+          // console.log(fileNames);
+
+          return fileNames;
+        } catch (error) {
+          console.log("error", error);
+          throw error;
+        }
+      }
+    }
+
+    return fileNames;
+  }
+
   const sendMsg = (e) => {
     e.preventDefault();
+
     if (loaderAddMsg) {
       return <Loader />;
     }
@@ -123,45 +206,24 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    const fileInput = document.getElementById("FileInputForm");
-
-    if (fileInput.files.length > 0) {
-      const maxFileSize = 2 * 1024 * 1024;
-      const file = fileInput.files[0];
-
-      if (file.size > maxFileSize) {
-        console.log("Файл превышает максимальный размер (2MB)");
-        return;
-      }
-
-      let formdata = new FormData();
-      formdata.append("fileFields", file);
-      formdata.append("ticketId", "3");
-
-      let requestOptions = {
-        method: "POST",
-        body: formdata,
-        redirect: "follow",
-      };
-
-      fetch("http://localhost:4444/upload", requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.log("error", error));
-    }
-
-    addMessage({
-      variables: {
-        fields: {
-          senderId: userId,
-          recieverId: 46,
-          ticketId: ticketId,
-          type: "message",
-          text: message,
-          attachPaths: imageUrl,
-        },
-      },
-    });
+    uploadFiles()
+      .then((fileNames) => {
+        addMessage({
+          variables: {
+            fields: {
+              senderId: userId,
+              recieverId: 46,
+              ticketId: ticketId,
+              type: "message",
+              text: message,
+              attachPaths: fileNames,
+            },
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("Ошибка при загрузке файлов:", error);
+      });
     setMessage("");
   };
 
@@ -169,7 +231,7 @@ function Chat() {
     setMessage(e.target.value);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     setIsVisible(false);
     // setStatus("Закрыт");
 
@@ -180,77 +242,158 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    updateStatus({
-      variables: {
-        id: ticketId,
-        fields: {
-          statusId: 2,
+    try {
+      setIsLoadingClose(true);
+
+      await updateStatus({
+        variables: {
+          id: ticketId,
+          fields: {
+            statusId: 2,
+          },
         },
-      },
+      });
+      setTicketStatus("Закрыт");
+      // console.log(ticketStatus);
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при закрытии заявки:", error);
+
+      setIsLoadingClose(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    let isFileSizeExceeded = false;
+
+    if (files.length > 5) {
+      e.target.value = null;
+      setIsVisibleError(true);
+      setIsFilesLimitExceeded(true);
+      console.log("Вы можете загружать до 5 файлов");
+      return;
+    }
+
+    Array.from(files).forEach((file) => {
+      const fileSizeInMB = file.size / (1024 * 1024);
+      const maxFileSize = 10;
+
+      if (fileSizeInMB > maxFileSize) {
+        isFileSizeExceeded = true;
+      }
     });
+
+    if (isFileSizeExceeded) {
+      e.target.value = null;
+      setIsVisibleError(true);
+      setIsFilesSizeExceeded(true);
+      console.log("Размер файла не должен превышать 10 МБ");
+      return;
+    }
+
+    setIsFilesLimitExceeded(false);
+    setIsVisibleError(false);
+  };
+
+  const handleSubmit = () => {
+    if (message.trim() == "") {
+      setIsVisibleError(true);
+    }
   };
 
   return (
     <>
-      <div>
-        {status !== null && status !== "Закрыт" ? (
+      {isLoadingClose && <Loader />}
+      <div
+        className={ticketStatus == "Закрыт" ? "" : "chat-messages__container"}
+      >
+        {ticketStatus !== null && ticketStatus !== "Закрыт" ? (
           <TicketTitle title={`Обращение #${itemId}`} state="Открыта" />
         ) : (
           <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
         )}
-        {/* {messagesQuery.map((msg) => (
-          <pre key={msg.id}>
-            {msg.sender.role === "client" ? (
-              <ChatMessageSender
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : msg.sender.role === "helper" ? (
-              <ChatMessageRecepient
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : (
-              <ChatMessageSystem
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            )}
-          </pre>
-        ))} */}
 
-        {messagesQuery.map((msg) => (
-          <pre key={msg.id}>
-            {msg.sender.id === userId ? (
-              <ChatMessageSender
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : msg.sender.role === "system" ? (
-              <ChatMessageSystem
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            ) : (
-              <ChatMessageRecepient
-                message={msg.text}
-                time={msg.date.replace(/T|-/g, (match) =>
-                  match === "T" ? " " : "."
-                )}
-              />
-            )}
-          </pre>
-        ))}
+        {isHideMessages &&
+          messagesQuery.map(
+            (msg, index) =>
+              index === 0 &&
+              msg.text !== "" && (
+                <pre key={msg.id}>
+                  {msg.sender.id === userId ? (
+                    <ChatMessageSender
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  ) : msg.sender.role === "system" ? (
+                    <ChatMessageSystem
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                    />
+                  ) : (
+                    <ChatMessageRecepient
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  )}
+                </pre>
+              )
+          )}
+
+        {isHideMessages && (
+          <div className="chat-input__more">
+            <span className="chat-input__more-text">
+              <a
+                href="#"
+                onClick={handleMoreMessages}
+                className="chat-input__more-link"
+              >
+                Показать {messagesQuery.length - 1} скрытых сообщения
+              </a>
+            </span>
+          </div>
+        )}
+
+        {!isHideMessages &&
+          messagesQuery.map(
+            (msg) =>
+              msg.text !== "" && (
+                <pre key={msg.id}>
+                  {msg.sender.id === userId ? (
+                    <ChatMessageSender
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  ) : msg.sender.role === "system" ? (
+                    <ChatMessageSystem
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                    />
+                  ) : (
+                    <ChatMessageRecepient
+                      message={msg.text}
+                      time={msg.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                      attachs={msg.attachs}
+                    />
+                  )}
+                </pre>
+              )
+          )}
       </div>
 
       {isVisible && (
@@ -271,14 +414,19 @@ function Chat() {
                 <Form.Control
                   type="file"
                   multiple
-                  // onChange={handleFileChange}
+                  accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                  onChange={handleFileChange}
                 />
               </Form.Group>
+              {isVisibleError && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
               <div className="chat-input__button-row">
                 <ButtonCustom
                   title="Отправить"
                   className="chat-input__button-send"
                   type="submit"
+                  onClick={handleSubmit}
                 />
                 <ButtonCustom
                   title="Закрыть заявку"

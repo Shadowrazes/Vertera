@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Table, DropdownButton, Dropdown } from "react-bootstrap";
+import {
+  Form,
+  Row,
+  Col,
+  Table,
+  DropdownButton,
+  Dropdown,
+} from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { TABLE_TICKETS, THEME_LIST } from "../apollo/queries";
+import { TABLE_TICKETS_USER, THEME_LIST } from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
-import DropdownBT from "../components/dropdown";
 import ButtonCustom from "../components/button";
 
 import "../css/all-tickets.css";
@@ -58,6 +64,12 @@ function allTickets() {
   const pageNumbers = [];
   const itemsPerPage = 8;
 
+  const navigate = useNavigate();
+
+  const goToCreateTicket = () => {
+    navigate("/");
+  };
+
   //filters visibillity
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
 
@@ -79,10 +91,15 @@ function allTickets() {
     setSelectedFilter(resetState);
   };
 
-  const { loading: themeLoading, error: themeError, data: themeData } = useQuery(THEME_LIST);
+  const {
+    loading: themeLoading,
+    error: themeError,
+    data: themeData,
+  } = useQuery(THEME_LIST);
 
-  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS, {
+  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
     variables: {
+      clientId: userId,
       filters: {
         limit: itemsPerPage,
         offset: 0,
@@ -120,16 +137,16 @@ function allTickets() {
   };
 
   useEffect(() => {
-    if (data && data.ticketList.array) {
-      setDataTableTickets(data.ticketList.array);
+    if (data && data.ticketListByClient.array) {
+      setDataTableTickets(data.ticketListByClient.array);
     }
 
     if (themeData && themeData.allThemeTree) {
       setDataTheme(themeData.allThemeTree);
     }
 
-    if (data && data.ticketList.count) {
-      setDataAmount(data.ticketList.count);
+    if (data && data.ticketListByClient.count) {
+      setDataAmount(data.ticketListByClient.count);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -144,7 +161,14 @@ function allTickets() {
 
     setIsVisible(pageNumbers.length > 1);
     // console.log(pageNumbers.length);
-  }, [data, themeData, selectedSort, prevSelectedSort, currentPage, pageNumbers]);
+  }, [
+    data,
+    themeData,
+    selectedSort,
+    prevSelectedSort,
+    currentPage,
+    pageNumbers,
+  ]);
 
   const tickets = dataTableTickets;
 
@@ -294,23 +318,23 @@ function allTickets() {
     // console.log(subThemeId);
   };
 
-  const handlePeriodClick = (period) => {   
+  const handlePeriodClick = (period) => {
     const formattedDate = period.map((originalDate) => {
       const year = originalDate.getFullYear();
-      const month = ('0' + (originalDate.getMonth() + 1)).slice(-2);
-      const day = ('0' + originalDate.getDate()).slice(-2);
-    
+      const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
+      const day = ("0" + originalDate.getDate()).slice(-2);
+
       return `${year}-${month}-${day}`;
     });
-    
+
     setSelectedDateAfter(formattedDate[0] + " 00:00:00");
     setSelectedDateBefore(formattedDate[1] + " 23:59:59");
     // console.log(formattedDate[0]);
-  }
+  };
 
   const handleReactionClick = (reaction) => {
     setSelectedReaction(reaction);
-    switch(reaction) {
+    switch (reaction) {
       case "Понравилось":
         setQueryReaction("like");
         break;
@@ -321,16 +345,16 @@ function allTickets() {
         setQueryReaction(null);
     }
     // console.log(queryReaction);
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(selectedUnit);
-    console.log(selectedTheme);
-    console.log(selectedSubTheme);
-    console.log(selectedDateBefore);
-    console.log(selectedDateAfter);
-    console.log(queryReaction);
+    // console.log(selectedUnit);
+    // console.log(selectedTheme);
+    // console.log(selectedSubTheme);
+    // console.log(selectedDateBefore);
+    // console.log(selectedDateAfter);
+    // console.log(queryReaction);
 
     const variables = {
       filters: {
@@ -348,9 +372,9 @@ function allTickets() {
       },
     };
     await refetch(variables);
-  }
+  };
 
-  const getStatusBGColor = (status) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "Новый":
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
@@ -363,314 +387,330 @@ function allTickets() {
       default:
         return "white";
     }
-  }
+  };
 
   return (
     <>
       <div className="alltickets__container">
         <TitleH2 title="Все обращения" className="title__heading-nomargin" />
-        <ButtonCustom
-          title={
-            isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
-          }
-          onClick={handleHideComponent}
-        />
+        {!loading && dataAmount > 0 && (
+          <ButtonCustom
+            title={
+              isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
+            }
+            onClick={handleHideComponent}
+          />
+        )}
       </div>
+      {!loading && dataAmount > 0 && (
+        <>
+          {isVisibleFilters && (
+            <div className="alltickets__filters-container">
+              <Form>
+                <Row>
+                  <Col className="alltickets__column">
+                    <DropdownButton
+                      id="dropdown-custom-1"
+                      title={selectedItem || "Выберите подразделение"}
+                    >
+                      {dataTheme.map((unit, index) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() =>
+                            handleUnitClick(unit.name.stroke, unit.id)
+                          }
+                          href="#"
+                        >
+                          {unit.name.stroke}
+                        </Dropdown.Item>
+                      ))}
+                    </DropdownButton>
 
-      {isVisibleFilters && (
-        <div className="alltickets__filters-container">
-          <Form>
-            <Row>
-              <Col className="alltickets__column">
-              <DropdownButton
-              id="dropdown-custom-1"
-              title={selectedItem || "Выберите подразделение"}
-            >
-              {dataTheme.map((unit, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                  href="#"
-                >
-                  {unit.name.stroke}
-                </Dropdown.Item>
+                    {selectedUnit && (
+                      <DropdownButton
+                        id="dropdown-custom-1"
+                        title={selectedTheme || "Тип обращения"}
+                      >
+                        {dataTheme
+                          .find((unit) => unit.name.stroke === selectedUnit)
+                          ?.themes.map((theme) => (
+                            <Dropdown.Item
+                              key={theme.id}
+                              onClick={() =>
+                                handleThemeClick(theme.name.stroke, theme.id)
+                              }
+                              href="#"
+                            >
+                              {theme.name.stroke}
+                            </Dropdown.Item>
+                          ))}
+                      </DropdownButton>
+                    )}
+
+                    {isSubThemeDropdownVisible && selectedTheme && (
+                      <DropdownButton
+                        id="dropdown-custom-1"
+                        title={selectedSubTheme || "Подтема"}
+                      >
+                        {dataTheme
+                          .find((unit) => unit.name.stroke === selectedUnit)
+                          ?.themes.find(
+                            (theme) => theme.name.stroke === selectedTheme
+                          )
+                          ?.subThemes.map((subTheme) => (
+                            <Dropdown.Item
+                              key={subTheme.id}
+                              onClick={() =>
+                                handleSubThemeClick(
+                                  subTheme.name.stroke,
+                                  subTheme.id
+                                )
+                              }
+                              href="#"
+                            >
+                              {subTheme.name.stroke}
+                            </Dropdown.Item>
+                          ))}
+                      </DropdownButton>
+                    )}
+                  </Col>
+                  <Col className="alltickets__column">
+                    <DateRangePicker
+                      className="alltickets__date-range-picker"
+                      placeholder="Задать период"
+                      locale={{
+                        sunday: "Вс",
+                        monday: "Пн",
+                        tuesday: "Вт",
+                        wednesday: "Ср",
+                        thursday: "Чт",
+                        friday: "Пт",
+                        saturday: "Сб",
+                        ok: "ОК",
+                        today: "Сегодня",
+                        yesterday: "Вчера",
+                        last7Days: "Последние 7 дней",
+                      }}
+                      onChange={handlePeriodClick}
+                    />
+                    <DropdownButton
+                      id="dropdown-custom-1"
+                      title={selectedReaction || "Мои реакции"}
+                    >
+                      {reactions.map((reaction, index) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => handleReactionClick(reaction)}
+                          href="#"
+                        >
+                          {reaction}
+                        </Dropdown.Item>
+                      ))}
+                    </DropdownButton>
+                  </Col>
+                </Row>
+                <Row className="alltickets__button-row">
+                  <ButtonCustom title="Применить" onClick={handleSubmit} />
+                  <ButtonCustom
+                    title="Сбросить"
+                    className="alltickets__button-two"
+                    onClick={handleResetFilters}
+                  />
+                </Row>
+              </Form>
+            </div>
+          )}
+          <div className="table__sorts">
+            <span className="table__sorts-label">Сортировать по:</span>
+            {columns.map((column, index) => (
+              <span
+                key={column}
+                onClick={() => {
+                  handleSorts(index);
+                }}
+                className={
+                  selectedSort === index
+                    ? "table__sort table__sort-active"
+                    : "table__sort"
+                }
+              >
+                {columnsName[index]}
+                {selectedSort === index && (
+                  <span className="table__sort-arrow">
+                    <svg
+                      className={
+                        orderDir == "DESC"
+                          ? "table__sort-arrow-svg-rotated"
+                          : "table__sort-arrow-svg"
+                      }
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="7"
+                      height="10"
+                      viewBox="0 0 7 10"
+                      fill="none"
+                    >
+                      <path
+                        d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                        stroke="#00AB97"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+          <Table className="table__table" hover>
+            <thead>
+              <tr>
+                <th>ID тикет</th>
+                <th>Раздел</th>
+                <th>Дата создания</th>
+                <th>Тема</th>
+                <th>Последнее сообщение</th>
+                <th>Сообщений</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((ticket) => (
+                <tr key={ticket.id}>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.id}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.subTheme.theme.unit.name.stroke}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.date.replace(/T|-/g, (match) =>
+                        match === "T" ? " " : "."
+                      )}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.subTheme.theme.name.stroke}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                      {ticket.lastMessage.sender.fullName}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      {ticket.messages.length}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke }}
+                      className="alltickets__link"
+                    >
+                      <span
+                        className="table__status"
+                        style={{
+                          background: getStatusColor(ticket.status.name.stroke),
+                          minWidth: "115px",
+                        }}
+                      >
+                        {ticket.status.name.stroke}
+                      </span>
+                    </Link>
+                  </td>
+                </tr>
               ))}
-            </DropdownButton>
-
-            {selectedUnit && (
-              <DropdownButton
-                id="dropdown-custom-1"
-                title={selectedTheme || "Тип обращения"}
+            </tbody>
+          </Table>
+          <ul className="alltickets__pagination">
+            {isVisible && (
+              <button
+                onClick={handlePrevPage}
+                className={
+                  currentPage === 1
+                    ? "alltickets__page-btn-disabled"
+                    : "alltickets__page-btn"
+                }
+                disabled={currentPage === 1}
               >
-                {dataTheme
-                  .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.map((theme) => (
-                    <Dropdown.Item
-                      key={theme.id}
-                      onClick={() =>
-                        handleThemeClick(theme.name.stroke, theme.id)
-                      }
-                      href="#"
-                    >
-                      {theme.name.stroke}
-                    </Dropdown.Item>
-                  ))}
-              </DropdownButton>
+                Предыдущая
+              </button>
             )}
-
-            {isSubThemeDropdownVisible && selectedTheme && (
-              <DropdownButton
-                id="dropdown-custom-1"
-                title={selectedSubTheme || "Подтема"}
+            {pageNumbers.map((number) => (
+              <li key={number} className="alltickets__page-item">
+                <button
+                  onClick={() => handleNewPage(number)}
+                  className={
+                    number === currentPage
+                      ? "alltickets__page-link active-link"
+                      : "alltickets__page-link"
+                  }
+                >
+                  {number}
+                </button>
+              </li>
+            ))}
+            {isVisible && (
+              <button
+                onClick={handleNextPage}
+                className={
+                  currentPage === Math.ceil(data.length / itemsPerPage)
+                    ? "alltickets__page-btn-disabled"
+                    : "alltickets__page-btn"
+                }
+                disabled={
+                  currentPage === Math.ceil(ticketsAmount / itemsPerPage)
+                }
               >
-                {dataTheme
-                  .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-                  ?.subThemes.map((subTheme) => (
-                    <Dropdown.Item
-                      key={subTheme.id}
-                      onClick={() =>
-                        handleSubThemeClick(subTheme.name.stroke, subTheme.id)
-                      }
-                      href="#"
-                    >
-                      {subTheme.name.stroke}
-                    </Dropdown.Item>
-                  ))}
-              </DropdownButton>
+                Следующая
+              </button>
             )}
-              </Col>
-              <Col className="alltickets__column">
-                <DateRangePicker
-                  className="alltickets__date-range-picker"
-                  placeholder="Задать период"
-                  locale={{
-                    sunday: "Вс",
-                    monday: "Пн",
-                    tuesday: "Вт",
-                    wednesday: "Ср",
-                    thursday: "Чт",
-                    friday: "Пт",
-                    saturday: "Сб",
-                    ok: "ОК",
-                    today: "Сегодня",
-                    yesterday: "Вчера",
-                    last7Days: "Последние 7 дней",
-                  }}
-                  onChange={handlePeriodClick}
-                />
-                <DropdownButton
-                id="dropdown-custom-1"
-                title={selectedReaction || "Мои реакции"}
-              >
-                {reactions.map((reaction, index) => (
-                    <Dropdown.Item
-                      key={index}
-                      onClick={() =>
-                        handleReactionClick(reaction)
-                      }
-                      href="#"
-                    >
-                      {reaction}
-                    </Dropdown.Item>
-                  ))}
-              </DropdownButton>
-              </Col>
-            </Row>
-            <Row className="alltickets__button-row">
-              <ButtonCustom title="Применить" onClick={handleSubmit} />
-              <ButtonCustom
-                title="Сбросить"
-                className="alltickets__button-two"
-                onClick={handleResetFilters}
-              />
-            </Row>
-          </Form>
+          </ul>
+        </>
+      )}
+      {dataAmount == 0 && (
+        <div className="alltickets__empty-table">
+          <span className="alltickets__text">
+            У вас нет тикетов, чтобы создать обращение нажмите на кнопку
+          </span>
+          <ButtonCustom
+            title="Создать новое обращение"
+            onClick={goToCreateTicket}
+          />
         </div>
       )}
-
-      <div className="table__sorts">
-        <span className="table__sorts-label">Сортировать по:</span>
-        {columns.map((column, index) => (
-          <span
-            key={column}
-            onClick={() => {
-              handleSorts(index);
-            }}
-            className={
-              selectedSort === index
-                ? "table__sort table__sort-active"
-                : "table__sort"
-            }
-          >
-            {columnsName[index]}
-            {selectedSort === index && (
-              <span className="table__sort-arrow">
-                <svg
-                  className={
-                    orderDir == "DESC"
-                      ? "table__sort-arrow-svg-rotated"
-                      : "table__sort-arrow-svg"
-                  }
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="7"
-                  height="10"
-                  viewBox="0 0 7 10"
-                  fill="none"
-                >
-                  <path
-                    d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                    stroke="#00AB97"
-                    strokeWidth="0.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            )}
-          </span>
-        ))}
-      </div>
-
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <th>ID тикет</th>
-            <th>Раздел</th>
-            <th>Дата создания</th>
-            <th>Тема</th>
-            <th>Последнее сообщение</th>
-            <th>Сообщений</th>
-            <th>Статус</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* .filter(
-    (ticket) =>
-      user.id === ticket.client.id || user.id === ticket.helper.id
-  ) */}
-          {tickets.map((ticket) => (
-            <tr key={ticket.id}>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.id}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.subTheme.theme.unit.name.stroke}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.date.replace(/T|-/g, (match) =>
-                    match === "T" ? " " : "."
-                  )}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.subTheme.theme.name.stroke}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                  {ticket.lastMessage.sender.fullName}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  {ticket.messages.length}
-                </Link>
-              </td>
-              <td>
-                <Link
-                  to={`/dialog/${ticket.id}`}
-                  state={{ status: ticket.status.name.stroke }}
-                  className="alltickets__link"
-                >
-                  <span
-                    className="table__status"
-                    style={{
-                      background: getStatusBGColor(ticket.status.name.stroke),
-                      minWidth: "115px",
-                    }}
-                  >
-                    {ticket.status.name.stroke}
-                  </span>
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      <ul className="alltickets__pagination">
-        {isVisible && (
-          <button
-            onClick={handlePrevPage}
-            className={
-              currentPage === 1
-                ? "alltickets__page-btn-disabled"
-                : "alltickets__page-btn"
-            }
-            disabled={currentPage === 1}
-          >
-            Предыдущая
-          </button>
-        )}
-        {pageNumbers.map((number) => (
-          <li key={number} className="alltickets__page-item">
-            <button
-              onClick={() => handleNewPage(number)}
-              className={
-                number === currentPage
-                  ? "alltickets__page-link active-link"
-                  : "alltickets__page-link"
-              }
-            >
-              {number}
-            </button>
-          </li>
-        ))}
-        {isVisible && (
-          <button
-            onClick={handleNextPage}
-            className={
-              currentPage === Math.ceil(data.length / itemsPerPage)
-                ? "alltickets__page-btn-disabled"
-                : "alltickets__page-btn"
-            }
-            disabled={currentPage === Math.ceil(ticketsAmount / itemsPerPage)}
-          >
-            Следующая
-          </button>
-        )}
-      </ul>
     </>
   );
 }
