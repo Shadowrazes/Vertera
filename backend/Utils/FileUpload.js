@@ -42,7 +42,8 @@ export async function FilelUpload(req, res) {
             file.mv(basePath + filePath);
     
             data.push({
-                name: publicPrefix + filePath,
+                path: publicPrefix + filePath,
+                name: file.md5 + '.' + extension,
                 oldName: file.name,
                 extension,
                 mimetype: file.mimetype,
