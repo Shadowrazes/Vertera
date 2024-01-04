@@ -1,5 +1,8 @@
 import Attachment from "./Attachment.js";
 import Entity from "./Entity.js";
+import Client from "./Client.js";
+import User from "./User.js";
+import EmailSender from "../Utils/EmailSender.js";
 
 class Message extends Entity{
     static TableName = 'messages';
@@ -35,8 +38,19 @@ class Message extends Entity{
             if(args.attachPaths){
                 const attachResult = await Attachment.TransInsert(conn, result.insertId, args.attachPaths);
             }
+
+            const userResult = await User.GetById(args.senderId);
+
+            if(userResult.role && userResult.role == 'helper'){
+                const clientResult = await Client.GetById(args.recieverId);
+                const dialogLink = `http://localhost:5173/dialog/${args.recieverId}/${args.ticketId}/`
+                const emailText = `На ваше обрашение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
+                EmailSender.Notify(clientResult.email, emailText);
+            }
+
             return result.insertId;
         };
+
         if(!conn){
             return await super.Transaction(async (conn) => {
                 return await transFunc(conn, args);

@@ -1,9 +1,9 @@
 mutation{
-  addMessage(fields: {senderId: 1, recieverId: 2, ticketId: 1, type: "common", text: "test", attachPaths: ["test/a", "test/321"]})
+  addMessage(fields: {senderId: 1, recieverId: 2, ticketId: 1, type: "message", text: "test", attachPaths: ["test/a", "test/321"]})
 }
 
 mutation{
-  addTicket( ticketFields: {clientId: 1, unitId: 1, themeId: 6, subThemeId: 31}, messageFields: {senderId: 1, recieverId: 2, ticketId: 1, type: "common", text: "test", attachPaths: ["test/a", "test/321"]})
+  addTicket( ticketFields: {clientId: 1, unitId: 1, themeId: 6, subThemeId: 31}, messageFields: {senderId: 1, recieverId: 2, ticketId: 1, type: "message", text: "test", attachPaths: ["test/a", "test/321"]})
 }
 
 query	{

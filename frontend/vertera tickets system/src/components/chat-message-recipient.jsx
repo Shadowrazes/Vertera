@@ -30,7 +30,7 @@ function ChatMessage({ message, time, attachs }) {
                         href={"http://localhost:4444" + attach.path}
                       >
                         <span className="chat-message-recipient__attach">
-                          {attach.id}
+                          {attach.name}
                         </span>
                       </a>
                     </div>

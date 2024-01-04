@@ -6,7 +6,9 @@ import Unit from "./Unit.js";
 import Theme from "./Theme.js";
 import SubTheme from "./SubTheme.js";
 import Translation from "./Translation.js";
+import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
+import Client from "./Client.js";
 
 class Ticket extends Entity{
     static TableName = 'tickets';
@@ -212,7 +214,13 @@ class Ticket extends Entity{
                                    ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
             const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
-            return result.insertId;
+            const userResult = await User.GetById(ticketFields.clientId);
+            const clientResult = await Client.GetById(ticketFields.clientId);
+            const dialogLink = `http://localhost:5173/dialog/${ticketFields.clientId}/${result.insertId}/`
+            const emailText = `Здравствуйте, ${userResult.fullName}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
+            EmailSender.Notify(clientResult.email, emailText);
+ 
+            return {id: result.insertId, clientId: ticketFields.clientId, link: dialogLink};
         });
     }
 

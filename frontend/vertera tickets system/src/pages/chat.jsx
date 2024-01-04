@@ -43,8 +43,10 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  // const status = location.state && location.state.status;
-  // const [status, setStatus] = useState("");
+  // const linkPrev = location.state && location.state.linkPrev;
+  const [linkPrev, setLinkPrev] = useState(null);
+  
+  console.log(linkPrev);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
   const [ticketStatus, setTicketStatus] = useState(
@@ -93,11 +95,15 @@ function Chat() {
         setIsVisible(false);
       }
 
+      if (location.state && location.state.linkPrev) {
+        setLinkPrev(location.state.linkPrev);
+      }
+
       // if (status == "Закрыт" && data.ticket.messages.length > 1) {
       //   setIsClosed(true);
       // }
     }
-  }, [data]);
+  }, [data, location.state]);
 
   const navigate = useNavigate();
 
@@ -309,9 +315,9 @@ function Chat() {
         className={ticketStatus == "Закрыт" ? "" : "chat-messages__container"}
       >
         {ticketStatus !== null && ticketStatus !== "Закрыт" ? (
-          <TicketTitle title={`Обращение #${itemId}`} state="Открыта" />
+          <TicketTitle title={`Обращение #${itemId}`} state="Открыта" linkPrev={linkPrev} />
         ) : (
-          <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
+          <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" linkPrev={linkPrev} />
         )}
 
         {isHideMessages &&
