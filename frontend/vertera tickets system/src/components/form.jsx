@@ -243,7 +243,10 @@ function FormComponent() {
             text: textareaValue,
             attachPaths: fileNames,
           },
+        }).then((data) => {
+          console.log(data);
         });
+        
       })
       .catch((error) => {
         console.error("Ошибка при загрузке файлов:", error);
@@ -354,12 +357,16 @@ function FormComponent() {
           </Col>
 
           <Col md={8} className="form__column">
-            <Form.Group controlId="NameForm">
-              <Form.Control type="text" placeholder="Ваше имя"/>
-            </Form.Group>
-            <Form.Group controlId="EmailForm">
-              <Form.Control type="email" placeholder="Ваш email"/>
-            </Form.Group>
+            {!user && 
+              <Form.Group controlId="NameForm">
+                <Form.Control type="text" placeholder="Ваше имя"/>
+              </Form.Group>
+            }
+            {!user && 
+              <Form.Group controlId="EmailForm">
+                <Form.Control type="email" placeholder="Ваш email"/>
+              </Form.Group>
+            }
             <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"
