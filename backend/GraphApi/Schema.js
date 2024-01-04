@@ -189,6 +189,7 @@ export const typeDefs = `
     type Attachment {
         id: Int!
         path: String!
+        name: String!
     }
 
     type UpdateInfo {

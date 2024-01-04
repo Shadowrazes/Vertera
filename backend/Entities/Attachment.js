@@ -6,16 +6,25 @@ class Attachment extends Entity {
     static MessageIdField = 'messageId'
     static PathField = 'path';
 
+    static AddMd5Name(res) {
+        for(const attach of res){
+            const path = attach.path;
+            attach.name = path.substring(path.lastIndexOf('/') + 1);
+        }
+
+        return res;
+    }
+
     static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
-        return result[0];
+        return this.AddMd5Name(result)[0];
     }
 
     static async GetListByMsg(messageId) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.MessageIdField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.MessageIdField} = ?`;
         const result = await super.Request(sql, [messageId]);
-        return result;
+        return this.AddMd5Name(result);
     }
 
     static async TransInsert(conn, messageId, attachs) {
