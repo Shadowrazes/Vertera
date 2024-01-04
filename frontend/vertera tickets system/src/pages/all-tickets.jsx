@@ -56,7 +56,7 @@ function allTickets() {
   let userId = null;
 
   if (user === null) {
-    userId = 1;
+    userId = 999;
   } else {
     userId = user.id;
   }
@@ -578,7 +578,7 @@ function allTickets() {
                 <tr key={ticket.id}>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -587,7 +587,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -596,7 +596,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -607,7 +607,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -616,7 +616,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -626,7 +626,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
@@ -635,7 +635,7 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
+                      to={`/dialog/${user.id}/${ticket.id}`}
                       state={{ status: ticket.status.name.stroke }}
                       className="alltickets__link"
                     >
