@@ -28,7 +28,9 @@ function TableTickets() {
   let userId = null;
 
   if (user === null) {
-    userId = 1;
+    return (
+      <></>
+    )
   } else {
     userId = user.id;
   }
