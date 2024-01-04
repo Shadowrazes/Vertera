@@ -41,7 +41,7 @@ export const typeDefs = `
     type Mutation {
         addClientUser(userFields: UserInsert!, clientFields: ClientInsert!): Int!
         addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
-        addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): Int!
+        addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): TicketInsertInfo!
         addMessage(fields: MessageInsert!): Int!
 
         addTranslation(fields: TranslationInsert!): String!
@@ -196,6 +196,12 @@ export const typeDefs = `
         affected: Int!
         changed: Int!
         warning: Int!
+    }
+
+    type TicketInsertInfo {
+        id: Int!
+        clientId: Int!
+        link: String!
     }
 
     input TicketFilter {
