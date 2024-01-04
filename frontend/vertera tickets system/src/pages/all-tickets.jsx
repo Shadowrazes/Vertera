@@ -578,8 +578,9 @@ function allTickets() {
                 <tr key={ticket.id}>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.id}
@@ -587,8 +588,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.unit.name.stroke}
@@ -596,8 +598,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.date.replace(/T|-/g, (match) =>
@@ -607,8 +610,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.name.stroke}
@@ -616,8 +620,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
@@ -626,8 +631,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.messages.length}
@@ -635,8 +641,9 @@ function allTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${user.id}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      to={`/dialog/${ticket.id}`}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       <span
