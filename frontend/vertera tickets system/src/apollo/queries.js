@@ -112,6 +112,7 @@ export const MESSAGES_CHAT = gql`
         attachs {
           id
           path
+          name
         }
         sender {
           id
