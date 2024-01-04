@@ -43,8 +43,9 @@ function Chat() {
   const [message, setMessage] = useState("");
   const { itemId } = useParams();
   const location = useLocation();
-  // const status = location.state && location.state.status;
-  // const [status, setStatus] = useState("");
+  const linkPrev = location.state && location.state.linkPrev;
+  
+  console.log(linkPrev);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
   const [ticketStatus, setTicketStatus] = useState(
@@ -309,9 +310,9 @@ function Chat() {
         className={ticketStatus == "Закрыт" ? "" : "chat-messages__container"}
       >
         {ticketStatus !== null && ticketStatus !== "Закрыт" ? (
-          <TicketTitle title={`Обращение #${itemId}`} state="Открыта" />
+          <TicketTitle title={`Обращение #${itemId}`} state="Открыта" linkPrev={linkPrev} />
         ) : (
-          <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" />
+          <TicketTitle title={`Обращение #${itemId}`} state="Закрыта" linkPrev={linkPrev} />
         )}
 
         {isHideMessages &&

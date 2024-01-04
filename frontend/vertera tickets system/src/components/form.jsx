@@ -354,6 +354,12 @@ function FormComponent() {
           </Col>
 
           <Col md={8} className="form__column">
+            <Form.Group controlId="NameForm">
+              <Form.Control type="text" placeholder="Ваше имя"/>
+            </Form.Group>
+            <Form.Group controlId="EmailForm">
+              <Form.Control type="email" placeholder="Ваш email"/>
+            </Form.Group>
             <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"

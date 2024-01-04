@@ -56,7 +56,7 @@ function allTickets() {
   let userId = null;
 
   if (user === null) {
-    userId = 1;
+    userId = 999;
   } else {
     userId = user.id;
   }
@@ -579,7 +579,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.id}
@@ -588,7 +589,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.unit.name.stroke}
@@ -597,7 +599,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.date.replace(/T|-/g, (match) =>
@@ -608,7 +611,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.name.stroke}
@@ -617,7 +621,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
@@ -627,7 +632,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       {ticket.messages.length}
@@ -636,7 +642,8 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke }}
+                      state={{ status: ticket.status.name.stroke,
+                      linkPrev: window.location.href }}
                       className="alltickets__link"
                     >
                       <span

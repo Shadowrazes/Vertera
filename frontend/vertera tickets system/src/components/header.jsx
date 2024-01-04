@@ -1,11 +1,11 @@
-import Logo from "../assets/logo.svg";
-import headerBtn from "../assets/header_exit.svg";
-
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
+
 import { LOGIN } from "../apollo/queries";
 
+import Logo from "../assets/logo.svg";
+import headerBtn from "../assets/header_exit.svg";
 import "../css/header.css";
 
 function Header({ user, setUser }) {
@@ -19,7 +19,7 @@ function Header({ user, setUser }) {
     password: "",
   });
 
-  const { loading, error, data, refetch } = useQuery(LOGIN, loginVariables);
+  const { loading, error, data, refetch } = useQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -35,12 +35,13 @@ function Header({ user, setUser }) {
   };
 
   const handleInput = (event) => {
-    let lastLoginVariables = loginVariables;
-    lastLoginVariables[event.target.name] = event.target.value;
-    setLoginVariables(lastLoginVariables);
+    setLoginVariables({
+      ...loginVariables,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  async function handleSubmit(event) {
+  const handleSubmit = async () => {
     if (user) {
       localStorage.removeItem("user");
       document.location.href = "/";
@@ -49,17 +50,28 @@ function Header({ user, setUser }) {
     setIsLoad(true);
     setIsError(false);
     try {
-      const updatedLoginVariables = { ...loginVariables };
-      refetch(updatedLoginVariables);
+      const { loading: loginLoading, error: loginError, data: loginData } = await refetch(loginVariables);
+      if (loginData) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: loginData.login.userId,
+            login: loginVariables.login,
+            token: loginData.login.token,
+          })
+        );
+        document.location.href = "/all-tickets";
+      }
     } catch (error) {
       setTimeout(() => {
         setIsError(true);
       }, 1000);
+    } finally {
+      setTimeout(() => {
+        setIsLoad(false);
+      }, 1000);
     }
-    setTimeout(() => {
-      setIsLoad(false);
-    }, 1000);
-  }
+  };
 
   useEffect(() => {
     if (data) {
@@ -74,7 +86,7 @@ function Header({ user, setUser }) {
       );
       document.location.href = "/all-tickets";
     }
-  }, [data]);
+  }, [data, loginVariables]);
 
   return (
     <>
@@ -150,7 +162,7 @@ function Header({ user, setUser }) {
         </Modal.Footer>
       </Modal>
 
-      {/* Попап авторизации */}
+      {/* Попап выхода */}
       <Modal show={showLogoutModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
