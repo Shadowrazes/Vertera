@@ -50,7 +50,11 @@ export const ADD_TICKET = gql`
         text: $text
         attachPaths: $attachPaths
       }
-    )
+    ) {
+      id
+      clientId
+      link
+    }
   }
 `;
 
