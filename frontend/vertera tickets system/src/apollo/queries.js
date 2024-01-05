@@ -106,6 +106,7 @@ export const MESSAGES_CHAT = gql`
   query ($id: Int!) {
     ticket(id: $id) {
       id
+      reaction
       messages {
         id
         text

@@ -25,7 +25,7 @@
 .chat-message-recepient__separator {
   border-bottom: 1px solid black;
   width: 110%;
-  margin-bottom: 50px;
+  margin: 50px 0;
 }
 
 .chat-message-recepient__rate-container {
@@ -43,7 +43,7 @@
   font-size: 36px;
 }
 
-.chat-message-recepient__rate-like {
+.chat-message-recepient__rate {
   display: flex;
   gap: 40px;
 }
@@ -66,6 +66,11 @@
   height: 43px;
   border-radius: 4.649px;
   background: rgba(0, 171, 151, 0.11);
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
 }
 
 .chat-message-recipient__time {

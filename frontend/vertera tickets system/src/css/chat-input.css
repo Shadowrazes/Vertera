@@ -40,6 +40,10 @@
   font-family: "TT Norms Pro", sans-serif;
 }
 
+.single {
+  width: 100% !important;
+}
+
 .chat-input__button-row .chat-input__button-close {
   padding: 15px;
   background: #fff !important;
@@ -93,12 +97,12 @@
 }
 
 .chat-input__close-box {
-  display: flex;
+  /* display: flex;
   align-items: center;
-  padding-left: 50px;
+  padding-left: 50px; */
+  width: 1075px;
+  padding: 50px 150px 50px 50px;
   margin-bottom: 50px;
-  width: 1074px;
-  height: 124px;
   border-radius: 15px;
   border: 1px solid #dee2e6;
 }

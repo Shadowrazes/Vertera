@@ -8,12 +8,9 @@ function ChatInput({ onSendMessage }) {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const location = useLocation();
-  let initialStatus = location.state && location.state.status;
-
-  const [status, setStatus] = useState(initialStatus);
-
   const [isVisible, setIsVisible] = useState(false);
+
+  const [isHelper, setIsHelper] = useState(false);
 
   const handleFileChange = (event) => {
     const files = event.target.files;
@@ -25,16 +22,12 @@ function ChatInput({ onSendMessage }) {
   };
 
   useEffect(() => {
-    if (status !== "Закрыт") {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  }, [status]);
+
+    // if (user)
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
-    setStatus("Закрыт");
   };
 
   const navigate = useNavigate();
@@ -46,8 +39,6 @@ function ChatInput({ onSendMessage }) {
   function handleChange(e) {
     setMessage(e.target.value);
   }
-
-  const [count, setCount] = useState(0);
 
   function handleSubmit(e) {
     e.preventDefault();
