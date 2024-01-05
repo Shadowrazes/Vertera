@@ -96,12 +96,6 @@ export const TABLE_TICKETS_USER = gql`
   }
 `;
 
-// export const TICKETS_AMOUNT = gql`
-//   query {
-//     ticketListCount
-//   }
-// `;
-
 export const MESSAGES_CHAT = gql`
   query ($id: Int!) {
     ticket(id: $id) {

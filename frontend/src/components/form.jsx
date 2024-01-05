@@ -33,7 +33,8 @@ function FormComponent() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
-  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] = useState(true);
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
 
   const [show, setShow] = useState(false);
 
@@ -48,7 +49,7 @@ function FormComponent() {
   const handleCopy = () => {
     navigator.clipboard.writeText(newTicketLink);
     setIsCopy(true);
-  }
+  };
 
   //const [popupTicketID, setPopupTicketID] = useState(null);
   //const [popupUserID, setPopupUserID] = useState(null);
@@ -57,9 +58,17 @@ function FormComponent() {
   let popupUserID = null;
 
   const handleShow = () => {
-    setNewTicketLink("http://" + window.location.hostname + ':5173/dialog/' + popupUserID + '/' + popupTicketID + '/');
+    setNewTicketLink(
+      "http://" +
+        window.location.hostname +
+        ":5173/dialog/" +
+        popupUserID +
+        "/" +
+        popupTicketID +
+        "/"
+    );
     setShow(true);
-  }
+  };
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -85,7 +94,7 @@ function FormComponent() {
 
   async function uploadFiles() {
     const fileInput = document.getElementById("FileInputForm");
-    let fileNames = [];
+    let filePaths = [];
 
     if (fileInput.files.length > 0) {
       let formdata = new FormData();
@@ -111,10 +120,10 @@ function FormComponent() {
           const result = await response.json();
 
           console.log(result);
-          fileNames = result.data.map((file) => file.name);
-          // console.log(fileNames);
+          filePaths = result.data.map((file) => file.path);
+          console.log(filePaths);
 
-          return fileNames;
+          return filePaths;
         } catch (error) {
           console.log("error", error);
           throw error;
@@ -122,7 +131,7 @@ function FormComponent() {
       }
     }
 
-    return fileNames;
+    return filePaths;
   }
 
   if (loading) {
@@ -238,36 +247,35 @@ function FormComponent() {
 
   const addTicketWithFiles = () => {
     uploadFiles()
-    .then((fileNames) => {
-      addTicket({
-        variables: {
-          clientId: userId,
-          unitId: selectedUnitId,
-          themeId: selectedThemeId,
-          subThemeId: selectedSubThemeId,
-          senderId: userId,
-          recieverId: 1,
-          ticketId: 1,
-          type: "message",
-          text: textareaValue,
-          attachPaths: fileNames,
-        },
-      }).then((data) => {
-        console.log(data.data.addTicket);
-        popupUserID = data.data.addTicket.id;
-        popupTicketID = data.data.addTicket.clientId;
-        //setPopupTicketID(data.data.addTicket.id);
-        //setPopupUserID(data.data.addTicket.clientId);
-        setIsVisible(false);
-        handleShow();
-        //resetState();
+      .then((filePaths) => {
+        addTicket({
+          variables: {
+            clientId: userId,
+            unitId: selectedUnitId,
+            themeId: selectedThemeId,
+            subThemeId: selectedSubThemeId,
+            senderId: userId,
+            recieverId: 1,
+            ticketId: 1,
+            type: "message",
+            text: textareaValue,
+            attachPaths: filePaths,
+          },
+        }).then((data) => {
+          console.log(data.data.addTicket);
+          popupUserID = data.data.addTicket.id;
+          popupTicketID = data.data.addTicket.clientId;
+          //setPopupTicketID(data.data.addTicket.id);
+          //setPopupUserID(data.data.addTicket.clientId);
+          setIsVisible(false);
+          handleShow();
+          //resetState();
+        });
+      })
+      .catch((error) => {
+        console.error("Ошибка при загрузке файлов:", error);
       });
-      
-    })
-    .catch((error) => {
-      console.error("Ошибка при загрузке файлов:", error);
-    });
-  }
+  };
 
   const handleNewTicket = (e) => {
     e.preventDefault();
@@ -295,11 +303,11 @@ function FormComponent() {
       addClientUser({
         variables: {
           fullName: nameValue,
-          login: emailValue.split('@')[0],
+          login: emailValue.split("@")[0],
           password: "crown12345",
           phone: "+79991112233",
-          email: emailValue
-        }
+          email: emailValue,
+        },
       }).then((newUserId) => {
         console.log(newUserId);
         userId = newUserId.data.addClientUser;
@@ -309,8 +317,6 @@ function FormComponent() {
       userId = user.id;
       addTicketWithFiles();
     }
-
-    
   };
 
   const handleFileChange = (e) => {
@@ -412,16 +418,26 @@ function FormComponent() {
           </Col>
 
           <Col md={8} className="form__column">
-            {!user && 
+            {!user && (
               <Form.Group controlId="NameForm">
-                <Form.Control type="text" placeholder="Ваше имя" value={nameValue} onChange={handleNameChange}/>
+                <Form.Control
+                  type="text"
+                  placeholder="Ваше имя"
+                  value={nameValue}
+                  onChange={handleNameChange}
+                />
               </Form.Group>
-            }
-            {!user && 
+            )}
+            {!user && (
               <Form.Group controlId="EmailForm">
-                <Form.Control type="email" placeholder="Ваш email" value={emailValue} onChange={handleEmailChange}/>
+                <Form.Control
+                  type="email"
+                  placeholder="Ваш email"
+                  value={emailValue}
+                  onChange={handleEmailChange}
+                />
               </Form.Group>
-            }
+            )}
             <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"
@@ -456,8 +472,15 @@ function FormComponent() {
         <Modal.Header closeButton>
           <Modal.Title>Ваше обращение создано</Modal.Title>
         </Modal.Header>
-        <Modal.Body><p>Ваше обращение в техподдержку VERTERA принято в обработку. В ближайшее время вы получите ответ.</p>
-                    <p>Отслеживать статус обращения вы можете <a href={newTicketLink}>по ссылке:</a></p>
+        <Modal.Body>
+          <p>
+            Ваше обращение в техподдержку VERTERA принято в обработку. В
+            ближайшее время вы получите ответ.
+          </p>
+          <p>
+            Отслеживать статус обращения вы можете{" "}
+            <a href={newTicketLink}>по ссылке:</a>
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleCopy}>

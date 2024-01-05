@@ -16,8 +16,6 @@ function TableTickets() {
   const [dataQuery, setData] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
 
-  const [isTableVisibility, setTableVisibility] = useState(true);
-
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
 
@@ -28,15 +26,17 @@ function TableTickets() {
   let userId = null;
 
   if (user === null) {
-    return (
-      <></>
-    )
+    return <></>;
   } else {
     userId = user.id;
   }
   // console.log(userId);
 
   const itemsPerPage = 8;
+
+  if (user.role == "helper") {
+  } else {
+  }
 
   const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
     variables: {
@@ -70,7 +70,7 @@ function TableTickets() {
       handleSorts(selectedSort);
       setPrevSelectedSort(selectedSort);
     }
-  }, [data, isTableVisibility, selectedSort, prevSelectedSort]);
+  }, [data, selectedSort, prevSelectedSort]);
 
   const tickets = dataQuery;
 
@@ -223,8 +223,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.id}
@@ -233,8 +235,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.unit.name.stroke}
@@ -243,8 +247,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.date.replace(/T|-/g, (match) =>
@@ -255,8 +261,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.name.stroke}
@@ -265,8 +273,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
@@ -276,8 +286,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.messages.length}
@@ -286,8 +298,10 @@ function TableTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       <span
