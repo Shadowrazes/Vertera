@@ -71,3 +71,9 @@ export const UPDATE_STATUS = gql`
     }
   }
 `;
+
+export const ADD_CLIENT_USER = gql`
+  mutation ($fullName: String!, $login: String, $password: String, $phone: String, $email: String!){
+    addClientUser( userFields: {fullName: $fullName, countryId: 1, login: $login, password: $password, phone: $phone}, clientFields: {email: $email}) 
+  }
+`;
