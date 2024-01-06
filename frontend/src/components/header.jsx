@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 
 import { LOGIN, USER } from "../apollo/queries";
 
@@ -44,6 +46,7 @@ function Header({ user }) {
   const handleSubmit = async () => {
     if (user) {
       localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
       document.location.href = "/";
     }
 
@@ -108,6 +111,18 @@ function Header({ user }) {
       //console.log(JSON.parse(localStorage.getItem("userRole")).role);
     }, [data, dataUser, loginVariables]);
   }
+
+  const popover = (
+    <Popover id="popover-basic">
+      <Popover.Body>
+        <ul>
+          <li>Все обращения</li>
+          <li>Все кураторы</li>
+          <li>Выйти</li>
+        </ul>
+      </Popover.Body>
+    </Popover>
+  );
 
   return (
     <>

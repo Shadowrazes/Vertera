@@ -78,6 +78,9 @@ function FormComponent() {
   const [dataQuery, setData] = useState([]);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole"))?.role
+  );
 
   const { loading, error, data } = useQuery(THEME_LIST);
 
@@ -140,6 +143,11 @@ function FormComponent() {
 
   if (error) {
     return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (userRole && (userRole === "helper") || (userRole === "system")) {
+    console.log(132);
+    return <></>;
   }
 
   const handleUnitClick = (unit, unitId) => {
