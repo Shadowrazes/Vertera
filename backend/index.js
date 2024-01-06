@@ -14,11 +14,16 @@ import { FilelUpload } from './Utils/FileUpload.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
+import * as https from 'https';
+import * as fs from 'fs';
+
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = Express();
-const port = '4444'
+const port = '4444';
+
+const isBuild = process.argv[2] === 'build';
 
 app.use(fileUpload({
     createParentPath: true,
@@ -40,10 +45,23 @@ app.post('/upload', async (req, res) => {
     FilelUpload(req, res);
 });
 
-app.listen(port, (err) => {
-    if(err){
-        return console.log(err);
-    }
+if(!isBuild) {
+    app.listen(port, (err) => {
+        if(err){
+            return console.log(err);
+        }
+    
+        console.log('Server started');
+    });
+}
+else {
+    const options = {
+        cert: fs.readFileSync('/etc/letsencrypt/live/vertera-ticket.yasanyabeats.ru/fullchain.pem'),
+        key: fs.readFileSync('/etc/letsencrypt/live/vertera-ticket.yasanyabeats.ru/privkey.pem')
+    };
+    //express.listen(port);
+    https.createServer(options, app).listen(port);
+    console.log('Server HTTPS started');
+}
 
-    console.log('Server started');
-});
+
