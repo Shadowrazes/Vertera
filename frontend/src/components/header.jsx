@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
 
-import { LOGIN } from "../apollo/queries";
+import { LOGIN, USER } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
 import "../css/header.css";
 
-function Header({ user, setUser }) {
+function Header({ user }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoad, setIsLoad] = useState(false);
@@ -19,7 +19,7 @@ function Header({ user, setUser }) {
     password: "",
   });
 
-  const { loading, error, data, refetch } = useQuery(LOGIN);
+  const { data, refetch } = useQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -50,7 +50,7 @@ function Header({ user, setUser }) {
     setIsLoad(true);
     setIsError(false);
     try {
-      const { loading: loginLoading, error: loginError, data: loginData } = await refetch(loginVariables);
+      const { data: loginData } = await refetch(loginVariables);
       if (loginData) {
         localStorage.setItem(
           "user",
@@ -73,20 +73,41 @@ function Header({ user, setUser }) {
     }
   };
 
-  useEffect(() => {
-    if (data) {
-      // console.log(data);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: data.login.userId,
-          login: loginVariables.login,
-          token: data.login.token,
-        })
-      );
-      document.location.href = "/all-tickets";
-    }
-  }, [data, loginVariables]);
+  const userInLocalStorage = JSON.parse(localStorage.getItem("user"));
+
+  if (userInLocalStorage !== null) {
+    const { error: loadingUser, data: dataUser } = useQuery(USER, {
+      variables: {
+        id: userInLocalStorage.id,
+      },
+    });
+
+    useEffect(() => {
+      if (data) {
+        // console.log(data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: data.login.userId,
+            login: loginVariables.login,
+            token: data.login.token,
+          })
+        );
+        document.location.href = "/all-tickets";
+      }
+
+      if (dataUser && dataUser.user) {
+        const userRole = dataUser.user.role;
+        localStorage.setItem(
+          "userRole",
+          JSON.stringify({
+            role: userRole,
+          })
+        );
+      }
+      //console.log(JSON.parse(localStorage.getItem("userRole")).role);
+    }, [data, dataUser, loginVariables]);
+  }
 
   return (
     <>

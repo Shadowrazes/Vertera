@@ -44,8 +44,8 @@ function Chat() {
   const { itemId } = useParams();
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState(null);
 
-  const [isHelper, setIsHelper] = useState(false);
   const [reaction, setReaction] = useState(null);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
@@ -63,9 +63,11 @@ function Chat() {
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
   const [isVisible, setIsVisible] = useState(true);
-  const [isClosed, setIsClosed] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole")).role
+  );
 
   let userId;
 
@@ -74,6 +76,10 @@ function Chat() {
   } else {
     userId = user.id;
   }
+
+  const isAdmin = () => {
+    return userRole === "helper";
+  };
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
@@ -85,8 +91,8 @@ function Chat() {
     if (data && data.ticket) {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
-      // setStatus(data.ticket.status.name.stroke);
-      // console.log(data.ticket.status.name.stroke);
+      setCurrentStatus(data.ticket.status.name.stroke);
+      console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
 
       if (data.ticket.status.name.stroke !== "Закрыт") {
@@ -99,12 +105,6 @@ function Chat() {
         setLinkPrev(location.state.linkPrev);
       }
 
-      if (user.role == "helper") {
-        setIsHelper(true);
-      } else {
-        setIsHelper(false);
-      }
-
       if (data.ticket.reaction == "like") {
         setReaction("like");
       } else if (data.ticket.reaction == "dislike") {
@@ -113,7 +113,7 @@ function Chat() {
         setReaction(null);
       }
     }
-  }, [data, location.state, isHelper]);
+  }, [data, location.state, currentStatus]);
 
   const navigate = useNavigate();
 
@@ -478,14 +478,14 @@ function Chat() {
                 <ButtonCustom
                   title="Отправить"
                   className={
-                    isHelper
+                    isAdmin()
                       ? "chat-input__button-send"
                       : "chat-input__button-send single"
                   }
                   type="submit"
                   onClick={handleSubmit}
                 />
-                {isHelper && (
+                {isAdmin() && (
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"

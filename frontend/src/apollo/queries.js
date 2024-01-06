@@ -134,6 +134,14 @@ export const LOGIN = gql`
   }
 `;
 
+export const USER = gql`
+  query ($id: Int!) {
+    user(id: $id) {
+      role
+    }
+  }
+`;
+
 export const THEME_LIST = gql`
   query {
     allThemeTree {

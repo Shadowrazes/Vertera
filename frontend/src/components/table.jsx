@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 
-import { TABLE_TICKETS_USER } from "../apollo/queries";
+import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../apollo/queries";
+
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
@@ -22,6 +23,9 @@ function TableTickets() {
   const [orderDir, setOrderDir] = useState("ASC");
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole")).role
+  );
 
   let userId = null;
 
@@ -34,22 +38,43 @@ function TableTickets() {
 
   const itemsPerPage = 8;
 
-  if (user.role == "helper") {
-  } else {
-  }
+  const isAdmin = () => {
+    return userRole === "helper";
+  };
 
-  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
-    variables: {
-      clientId: userId,
-      filters: {
-        limit: itemsPerPage,
-        offset: 0,
-        orderBy: "id",
-        orderDir: "ASC",
-        lang: "ru",
+  const adminRequest = () => {
+    return useQuery(TABLE_TICKETS, {
+      variables: {
+        filters: {
+          helperIds: userId,
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
       },
-    },
-  });
+    });
+  };
+
+  const clientRequest = () => {
+    return useQuery(TABLE_TICKETS_USER, {
+      variables: {
+        clientId: userId,
+        filters: {
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
+      },
+    });
+  };
+
+  const { loading, error, data, refetch } = isAdmin()
+    ? adminRequest()
+    : clientRequest();
 
   const navigate = useNavigate();
 
@@ -58,12 +83,22 @@ function TableTickets() {
   };
 
   useEffect(() => {
-    if (data && data.ticketListByClient.array) {
-      setData(data.ticketListByClient.array);
-    }
+    if (isAdmin()) {
+      if (data && data.ticketList.array) {
+        setData(data.ticketList.array);
+      }
 
-    if (data && data.ticketListByClient.count) {
-      setDataAmount(data.ticketListByClient.count);
+      if (data && data.ticketList.count) {
+        setDataAmount(data.ticketList.count);
+      }
+    } else {
+      if (data && data.ticketListByClient.array) {
+        setData(data.ticketListByClient.array);
+      }
+
+      if (data && data.ticketListByClient.count) {
+        setDataAmount(data.ticketListByClient.count);
+      }
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -115,17 +150,32 @@ function TableTickets() {
     }
 
     setOrderDir(_orderDir);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: userId,
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
 
-    const variables = {
-      filters: {
-        limit: itemsPerPage,
-        offset: 0,
-        orderBy: _orderBy,
-        orderDir: _orderDir,
-        lang: "ru",
-      },
-    };
-    await refetch(variables);
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
+
+      await refetch(variables);
+    }
   };
 
   if (loading) {

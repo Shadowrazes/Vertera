@@ -11,7 +11,11 @@ import { DateRangePicker } from "rsuite";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { TABLE_TICKETS_USER, THEME_LIST } from "../apollo/queries";
+import {
+  TABLE_TICKETS,
+  TABLE_TICKETS_USER,
+  THEME_LIST,
+} from "../apollo/queries";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -52,6 +56,9 @@ function allTickets() {
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole")).role
+  );
 
   let userId = null;
 
@@ -63,6 +70,10 @@ function allTickets() {
 
   const pageNumbers = [];
   const itemsPerPage = 8;
+
+  const isAdmin = () => {
+    return userRole === "helper";
+  };
 
   const navigate = useNavigate();
 
@@ -86,7 +97,8 @@ function allTickets() {
     initialSelectedFilterState
   );
 
-  const handleResetFilters = () => {
+  const handleResetFilters = (e) => {
+    e.preventDefault();
     const resetState = initialSelectedFilterState.map(() => -1);
     setSelectedFilter(resetState);
   };
@@ -97,18 +109,52 @@ function allTickets() {
     data: themeData,
   } = useQuery(THEME_LIST);
 
-  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
-    variables: {
-      clientId: userId,
-      filters: {
-        limit: itemsPerPage,
-        offset: 0,
-        orderBy: "id",
-        orderDir: "ASC",
-        lang: "ru",
+  // const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
+  //   variables: {
+  //     clientId: userId,
+  //     filters: {
+  //       limit: itemsPerPage,
+  //       offset: 0,
+  //       orderBy: "id",
+  //       orderDir: "ASC",
+  //       lang: "ru",
+  //     },
+  //   },
+  // });
+
+  const adminRequest = () => {
+    return useQuery(TABLE_TICKETS, {
+      variables: {
+        filters: {
+          helperIds: userId,
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
       },
-    },
-  });
+    });
+  };
+
+  const clientRequest = () => {
+    return useQuery(TABLE_TICKETS_USER, {
+      variables: {
+        clientId: userId,
+        filters: {
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
+      },
+    });
+  };
+
+  const { loading, error, data, refetch } = isAdmin()
+    ? adminRequest()
+    : clientRequest();
 
   const handleNewPage = async (index) => {
     setCurrentPage(index);
@@ -118,35 +164,73 @@ function allTickets() {
 
     setOffset(_offset);
 
-    const variables = {
-      filters: {
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
-        reaction: queryReaction,
-        limit: itemsPerPage,
-        offset: _offset,
-        orderBy: orderBy,
-        orderDir: orderDir,
-        lang: "ru",
-      },
-    };
-    await refetch(variables);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: userId,
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: _offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: _offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    }
   };
 
   useEffect(() => {
-    if (data && data.ticketListByClient.array) {
-      setDataTableTickets(data.ticketListByClient.array);
+    // if (data && data.ticketListByClient.array) {
+    //   setDataTableTickets(data.ticketListByClient.array);
+    // }
+
+    // if (data && data.ticketListByClient.count) {
+    //   setDataAmount(data.ticketListByClient.count);
+    // }
+
+    if (isAdmin()) {
+      if (data && data.ticketList.array) {
+        setDataTableTickets(data.ticketList.array);
+      }
+
+      if (data && data.ticketList.count) {
+        setDataAmount(data.ticketList.count);
+      }
+    } else {
+      if (data && data.ticketListByClient.array) {
+        setDataTableTickets(data.ticketListByClient.array);
+      }
+
+      if (data && data.ticketListByClient.count) {
+        setDataAmount(data.ticketListByClient.count);
+      }
     }
 
     if (themeData && themeData.allThemeTree) {
       setDataTheme(themeData.allThemeTree);
-    }
-
-    if (data && data.ticketListByClient.count) {
-      setDataAmount(data.ticketListByClient.count);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -238,22 +322,42 @@ function allTickets() {
     setOrderBy(_orderBy);
     setOrderDir(_orderDir);
 
-    const variables = {
-      filters: {
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
-        reaction: queryReaction,
-        limit: itemsPerPage,
-        offset: offset,
-        orderBy: _orderBy,
-        orderDir: _orderDir,
-        lang: "ru",
-      },
-    };
-    await refetch(variables);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: userId,
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    }
   };
 
   const handlePrevPage = () => {
@@ -356,22 +460,42 @@ function allTickets() {
     // console.log(selectedDateAfter);
     // console.log(queryReaction);
 
-    const variables = {
-      filters: {
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
-        reaction: queryReaction,
-        limit: itemsPerPage,
-        offset: offset,
-        orderBy: orderBy,
-        orderDir: orderDir,
-        lang: "ru",
-      },
-    };
-    await refetch(variables);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: userId,
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -579,8 +703,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.id}
@@ -589,8 +715,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.unit.name.stroke}
@@ -599,8 +727,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.date.replace(/T|-/g, (match) =>
@@ -611,8 +741,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.name.stroke}
@@ -621,8 +753,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
@@ -632,8 +766,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.messages.length}
@@ -642,8 +778,10 @@ function allTickets() {
                   <td>
                     <Link
                       to={`/dialog/${userId}/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       <span
