@@ -61,7 +61,7 @@ function FormComponent() {
     setNewTicketLink(
       "http://" +
         window.location.hostname +
-        ":5173/dialog/" +
+        "/dialog/" +
         popupUserID +
         "/" +
         popupTicketID +
