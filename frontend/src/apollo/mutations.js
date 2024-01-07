@@ -6,22 +6,6 @@ export const ADD_STATUS = gql`
   }
 `;
 
-// export const ADD_TICKET = gql`
-//   mutation addTicket {
-//     addTicket(
-//       ticketFields: { clientId: 1, unitId: 1, themeId: 6, subThemeId: 55 }
-//       messageFields: {
-//         senderId: 1
-//         recieverId: 2
-//         ticketId: 1
-//         type: "common"
-//         text: "test"
-//         attachPaths: ["test/a", "test/321"]
-//       }
-//     )
-//   }
-// `;
-
 export const ADD_TICKET = gql`
   mutation addTicket(
     $clientId: Int!
@@ -73,7 +57,22 @@ export const UPDATE_STATUS = gql`
 `;
 
 export const ADD_CLIENT_USER = gql`
-  mutation ($fullName: String!, $login: String, $password: String, $phone: String, $email: String!){
-    addClientUser( userFields: {fullName: $fullName, countryId: 1, login: $login, password: $password, phone: $phone}, clientFields: {email: $email}) 
+  mutation (
+    $fullName: String!
+    $login: String
+    $password: String
+    $phone: String
+    $email: String!
+  ) {
+    addClientUser(
+      userFields: {
+        fullName: $fullName
+        countryId: 1
+        login: $login
+        password: $password
+        phone: $phone
+      }
+      clientFields: { email: $email }
+    )
   }
 `;

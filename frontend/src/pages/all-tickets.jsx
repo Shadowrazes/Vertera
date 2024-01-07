@@ -60,6 +60,8 @@ function allTickets() {
     JSON.parse(localStorage.getItem("userRole"))?.role
   );
 
+  const [dateRange, setDateRange] = useState([]);
+
   let userId = null;
 
   if (user === null) {
@@ -81,7 +83,6 @@ function allTickets() {
     navigate("/");
   };
 
-  //filters visibillity
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
 
   const handleHideComponent = () => {
@@ -91,16 +92,22 @@ function allTickets() {
 
   let reactions = ["Понравилось", "Не понравилось", "Все реакции"];
 
-  // dropdown reset
-  const initialSelectedFilterState = [-1, -1, -1, -1, -1, -1];
-  const [selectedFilter, setSelectedFilter] = useState(
-    initialSelectedFilterState
-  );
-
   const handleResetFilters = (e) => {
     e.preventDefault();
-    const resetState = initialSelectedFilterState.map(() => -1);
-    setSelectedFilter(resetState);
+    // const resetState = initialSelectedFilterState.map(() => -1);
+    // setSelectedFilter(resetState);
+    setSelectedUnit(null);
+    setSelectedUnitId(null);
+    setSelectedItem(null);
+    setSelectedTheme(null);
+    setSelectedThemeId(null);
+    setSelectedSubTheme(null);
+    setSelectedSubThemeId(null);
+    setDateRange([]);
+    setSelectedDateAfter(null);
+    setSelectedDateBefore(null);
+    setSelectedReaction(null);
+    setQueryReaction(null);
   };
 
   const {
@@ -430,7 +437,7 @@ function allTickets() {
 
       return `${year}-${month}-${day}`;
     });
-
+    setDateRange(period);
     setSelectedDateAfter(formattedDate[0] + " 00:00:00");
     setSelectedDateBefore(formattedDate[1] + " 23:59:59");
     // console.log(formattedDate[0]);
@@ -616,6 +623,7 @@ function allTickets() {
                         last7Days: "Последние 7 дней",
                       }}
                       onChange={handlePeriodClick}
+                      value={dateRange}
                     />
                     <DropdownButton
                       id="dropdown-custom-1"
