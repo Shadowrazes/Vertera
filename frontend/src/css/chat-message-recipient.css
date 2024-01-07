@@ -48,6 +48,10 @@
   gap: 40px;
 }
 
+.chat-message-recepient__text {
+  font-size: 20px;
+}
+
 .chat-message-recepient__rate-icon-dislike {
   display: flex;
   justify-content: center;
