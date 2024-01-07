@@ -15,32 +15,33 @@ import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
 
-const timeFormatter = () => {
-  const currentDate = new Date();
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
+// const timeFormatter = () => {
+//   const currentDate = new Date();
+//   const options = {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//   };
 
-  const formatter = new Intl.DateTimeFormat("ru-RU", options);
-  let formattedDate = formatter.format(currentDate);
+//   const formatter = new Intl.DateTimeFormat("ru-RU", options);
+//   let formattedDate = formatter.format(currentDate);
 
-  formattedDate = formattedDate.slice(0, -3);
+//   formattedDate = formattedDate.slice(0, -3);
 
-  const timeOptions = {
-    hour: "numeric",
-    minute: "numeric",
-  };
+//   const timeOptions = {
+//     hour: "numeric",
+//     minute: "numeric",
+//   };
 
-  const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
-  const formattedTime = timeFormatter.format(currentDate);
+//   const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
+//   const formattedTime = timeFormatter.format(currentDate);
 
-  return `${formattedDate}, ${formattedTime}`;
-};
+//   return `${formattedDate}, ${formattedTime}`;
+// };
 
 function Chat() {
   const [message, setMessage] = useState("");
+  const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
@@ -74,7 +75,7 @@ function Chat() {
   let userId;
 
   if (user === null) {
-    userId = 1;
+    userId = 999;
   } else {
     userId = user.id;
   }
@@ -226,6 +227,7 @@ function Chat() {
 
     uploadFiles()
       .then((filePaths) => {
+        setMessageDate(new Date());
         addMessage({
           variables: {
             fields: {
@@ -335,7 +337,7 @@ function Chat() {
       },
     });
     setReaction("like");
-    console.log(reaction);
+    // console.log(reaction);
   };
 
   const handleDislike = (e) => {
@@ -349,7 +351,7 @@ function Chat() {
       },
     });
     setReaction("dislike");
-    console.log(reaction);
+    // console.log(reaction);
   };
 
   return (
