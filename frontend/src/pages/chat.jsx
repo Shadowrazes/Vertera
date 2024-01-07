@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 import { Form, Row } from "react-bootstrap";
@@ -49,9 +49,9 @@ function Chat() {
   const [reaction, setReaction] = useState(null);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
-  const [ticketStatus, setTicketStatus] = useState(
-    location.state && location.state.status
-  );
+  // const [ticketStatus, setTicketStatus] = useState(
+  //   location.state && location.state.status
+  // );
 
   const [isHideMessages, setIsHideMessages] = useState(true);
 
@@ -68,6 +68,8 @@ function Chat() {
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole")).role
   );
+
+  const inputRef = useRef(null);
 
   let userId;
 
@@ -113,7 +115,7 @@ function Chat() {
         setReaction(null);
       }
     }
-  }, [data, location.state, currentStatus]);
+  }, [data, location.state]);
 
   const navigate = useNavigate();
 
@@ -241,6 +243,9 @@ function Chat() {
         console.error("Ошибка при загрузке файлов:", error);
       });
     setMessage("");
+    if (inputRef.current) {
+      inputRef.current.value = null;
+    }
   };
 
   const handleChange = (e) => {
@@ -269,7 +274,8 @@ function Chat() {
           },
         },
       });
-      setTicketStatus("Закрыт");
+      // setTicketStatus("Закрыт");
+      setCurrentStatus("Закрыт");
       // console.log(ticketStatus);
       setIsLoadingClose(false);
     } catch (error) {
@@ -316,7 +322,6 @@ function Chat() {
     if (message.trim() == "") {
       setIsVisibleError(true);
     }
-    const files = e.target.files;
   };
 
   const handleLike = (e) => {
@@ -351,9 +356,9 @@ function Chat() {
     <>
       {isLoadingClose && <Loader />}
       <div
-        className={ticketStatus == "Закрыт" ? "" : "chat-messages__container"}
+        className={currentStatus == "Закрыт" ? "" : "chat-messages__container"}
       >
-        {ticketStatus !== null && ticketStatus !== "Закрыт" ? (
+        {currentStatus !== null && currentStatus !== "Закрыт" ? (
           <TicketTitle
             title={`Обращение #${itemId}`}
             state="Открыта"
@@ -469,6 +474,7 @@ function Chat() {
                   multiple
                   accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
                   onChange={handleFileChange}
+                  ref={inputRef}
                 />
               </Form.Group>
               {isVisibleError && (
