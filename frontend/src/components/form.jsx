@@ -12,6 +12,7 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { THEME_LIST } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
+import { ADD_CLIENT_USER } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
@@ -25,6 +26,9 @@ function FormComponent() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
 
+  const [nameValue, setNameValue] = useState("");
+  const [emailValue, setEmailValue] = useState("");
+
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
@@ -33,11 +37,38 @@ function FormComponent() {
     useState(true);
 
   const [show, setShow] = useState(false);
+
+  const [newTicketLink, setNewTicketLink] = useState(null);
+
+  const [isCopy, setIsCopy] = useState(false);
+
   const handleClose = () => {
     setShow(false);
     window.location.reload();
   };
-  const handleShow = () => setShow(true);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(newTicketLink);
+    setIsCopy(true);
+  };
+
+  //const [popupTicketID, setPopupTicketID] = useState(null);
+  //const [popupUserID, setPopupUserID] = useState(null);
+
+  let popupTicketID = null;
+  let popupUserID = null;
+
+  const handleShow = () => {
+    setNewTicketLink(
+      "http://" +
+        window.location.hostname +
+        "/dialog/" +
+        popupUserID +
+        "/" +
+        popupTicketID +
+        "/"
+    );
+    setShow(true);
+  };
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -47,8 +78,13 @@ function FormComponent() {
   const [dataQuery, setData] = useState([]);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole"))?.role
+  );
 
   const { loading, error, data } = useQuery(THEME_LIST);
+
+  let userId = user ? user.id : 1;
 
   useEffect(() => {
     if (data && data.allThemeTree) {
@@ -57,10 +93,11 @@ function FormComponent() {
   }, [data]);
 
   const [addTicket] = useMutation(ADD_TICKET);
+  const [addClientUser] = useMutation(ADD_CLIENT_USER);
 
   async function uploadFiles() {
     const fileInput = document.getElementById("FileInputForm");
-    let fileNames = [];
+    let filePaths = [];
 
     if (fileInput.files.length > 0) {
       let formdata = new FormData();
@@ -86,10 +123,10 @@ function FormComponent() {
           const result = await response.json();
 
           console.log(result);
-          fileNames = result.data.map((file) => file.name);
-          // console.log(fileNames);
+          filePaths = result.data.map((file) => file.path);
+          console.log(filePaths);
 
-          return fileNames;
+          return filePaths;
         } catch (error) {
           console.log("error", error);
           throw error;
@@ -97,7 +134,7 @@ function FormComponent() {
       }
     }
 
-    return fileNames;
+    return filePaths;
   }
 
   if (loading) {
@@ -106,6 +143,11 @@ function FormComponent() {
 
   if (error) {
     return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (userRole && (userRole === "helper") || (userRole === "system")) {
+    console.log(132);
+    return <></>;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -166,12 +208,22 @@ function FormComponent() {
     setTextareaValue(e.target.value);
   };
 
+  const handleNameChange = (e) => {
+    setNameValue(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmailValue(e.target.value);
+  };
+
   const resetState = (e) => {
     setSelectedUnit(null);
     setSelectedTheme(null);
     setSelectedSubTheme(null);
     setSelectedItem(null);
     setTextareaValue("");
+    setNameValue("");
+    setEmailValue("");
     setSelectedUnitId(null);
     setSelectedThemeId(null);
     setSelectedSubThemeId(null);
@@ -192,9 +244,45 @@ function FormComponent() {
       error = "Выберите подтему";
     } else if (textareaValue.trim() == "") {
       error = "Опишите Вашу проблему";
+    } else if (nameValue.trim() == "") {
+      error = "Введите ваше имя";
+    } else if (emailValue.trim() == "") {
+      error = "Введите ваш email";
     }
 
     return error;
+  };
+
+  const addTicketWithFiles = () => {
+    uploadFiles()
+      .then((filePaths) => {
+        addTicket({
+          variables: {
+            clientId: userId,
+            unitId: selectedUnitId,
+            themeId: selectedThemeId,
+            subThemeId: selectedSubThemeId,
+            senderId: userId,
+            recieverId: 1,
+            ticketId: 1,
+            type: "message",
+            text: textareaValue,
+            attachPaths: filePaths,
+          },
+        }).then((data) => {
+          console.log(data.data.addTicket);
+          popupUserID = data.data.addTicket.id;
+          popupTicketID = data.data.addTicket.clientId;
+          //setPopupTicketID(data.data.addTicket.id);
+          //setPopupUserID(data.data.addTicket.clientId);
+          setIsVisible(false);
+          handleShow();
+          //resetState();
+        });
+      })
+      .catch((error) => {
+        console.error("Ошибка при загрузке файлов:", error);
+      });
   };
 
   const handleNewTicket = (e) => {
@@ -219,40 +307,24 @@ function FormComponent() {
       return;
     }
 
-    let userId = null;
-
     if (user === null) {
-      userId = 1;
+      addClientUser({
+        variables: {
+          fullName: nameValue,
+          login: emailValue.split("@")[0],
+          password: "crown12345",
+          phone: "+79991112233",
+          email: emailValue,
+        },
+      }).then((newUserId) => {
+        console.log(newUserId);
+        userId = newUserId.data.addClientUser;
+        addTicketWithFiles();
+      });
     } else {
       userId = user.id;
+      addTicketWithFiles();
     }
-
-    uploadFiles()
-      .then((fileNames) => {
-        // console.log(fileNames);
-        addTicket({
-          variables: {
-            clientId: userId,
-            unitId: selectedUnitId,
-            themeId: selectedThemeId,
-            subThemeId: selectedSubThemeId,
-            senderId: userId,
-            recieverId: 1,
-            ticketId: 1,
-            type: "message",
-            text: textareaValue,
-            attachPaths: fileNames,
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Ошибка при загрузке файлов:", error);
-      });
-
-    setIsVisible(false);
-    handleShow();
-
-    resetState();
   };
 
   const handleFileChange = (e) => {
@@ -354,12 +426,26 @@ function FormComponent() {
           </Col>
 
           <Col md={8} className="form__column">
-            <Form.Group controlId="NameForm">
-              <Form.Control type="text" placeholder="Ваше имя"/>
-            </Form.Group>
-            <Form.Group controlId="EmailForm">
-              <Form.Control type="email" placeholder="Ваш email"/>
-            </Form.Group>
+            {!user && (
+              <Form.Group controlId="NameForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Ваше имя"
+                  value={nameValue}
+                  onChange={handleNameChange}
+                />
+              </Form.Group>
+            )}
+            {!user && (
+              <Form.Group controlId="EmailForm">
+                <Form.Control
+                  type="email"
+                  placeholder="Ваш email"
+                  value={emailValue}
+                  onChange={handleEmailChange}
+                />
+              </Form.Group>
+            )}
             <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"
@@ -394,8 +480,20 @@ function FormComponent() {
         <Modal.Header closeButton>
           <Modal.Title>Ваше обращение создано</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Ожидайте ответа от помощника</Modal.Body>
+        <Modal.Body>
+          <p>
+            Ваше обращение в техподдержку VERTERA принято в обработку. В
+            ближайшее время вы получите ответ.
+          </p>
+          <p>
+            Отслеживать статус обращения вы можете{" "}
+            <a href={newTicketLink}>по ссылке:</a>
+          </p>
+        </Modal.Body>
         <Modal.Footer>
+          <Button variant="primary" onClick={handleCopy}>
+            {!isCopy ? "Скопировать ссылку" : "Ссылка скопирована"}
+          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Закрыть
           </Button>

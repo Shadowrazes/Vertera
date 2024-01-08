@@ -96,16 +96,11 @@ export const TABLE_TICKETS_USER = gql`
   }
 `;
 
-// export const TICKETS_AMOUNT = gql`
-//   query {
-//     ticketListCount
-//   }
-// `;
-
 export const MESSAGES_CHAT = gql`
   query ($id: Int!) {
     ticket(id: $id) {
       id
+      reaction
       messages {
         id
         text
@@ -135,6 +130,14 @@ export const LOGIN = gql`
     login(login: $login, password: $password) {
       token
       userId
+    }
+  }
+`;
+
+export const USER = gql`
+  query ($id: Int!) {
+    user(id: $id) {
+      role
     }
   }
 `;

@@ -13,8 +13,8 @@ const getStatusColor = (status) => {
 
 function TicketTitle({ title, className, state, linkPrev }) {
   const handleGoBack = () => {
-    console.log(linkPrev);
-    // window.location.href = linkPrev;
+    // console.log(linkPrev);
+    window.location.href = linkPrev;
   };
 
   return (

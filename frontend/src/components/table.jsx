@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 
-import { TABLE_TICKETS_USER } from "../apollo/queries";
+import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../apollo/queries";
+
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
 import ButtonCustom from "./button";
@@ -16,21 +17,20 @@ function TableTickets() {
   const [dataQuery, setData] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
 
-  const [isTableVisibility, setTableVisibility] = useState(true);
-
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
 
   const [orderDir, setOrderDir] = useState("ASC");
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [userRole, setUserRole] = useState(
+    JSON.parse(localStorage.getItem("userRole"))?.role
+  );
 
   let userId = null;
 
   if (user === null) {
-    return (
-      <></>
-    )
+    return <></>;
   } else {
     userId = user.id;
   }
@@ -38,18 +38,43 @@ function TableTickets() {
 
   const itemsPerPage = 8;
 
-  const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
-    variables: {
-      clientId: userId,
-      filters: {
-        limit: itemsPerPage,
-        offset: 0,
-        orderBy: "id",
-        orderDir: "ASC",
-        lang: "ru",
+  const isAdmin = () => {
+    return userRole === "helper";
+  };
+
+  const adminRequest = () => {
+    return useQuery(TABLE_TICKETS, {
+      variables: {
+        filters: {
+          helperIds: userId,
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
       },
-    },
-  });
+    });
+  };
+
+  const clientRequest = () => {
+    return useQuery(TABLE_TICKETS_USER, {
+      variables: {
+        clientId: userId,
+        filters: {
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: "id",
+          orderDir: "ASC",
+          lang: "ru",
+        },
+      },
+    });
+  };
+
+  const { loading, error, data, refetch } = isAdmin()
+    ? adminRequest()
+    : clientRequest();
 
   const navigate = useNavigate();
 
@@ -58,19 +83,29 @@ function TableTickets() {
   };
 
   useEffect(() => {
-    if (data && data.ticketListByClient.array) {
-      setData(data.ticketListByClient.array);
-    }
+    if (isAdmin()) {
+      if (data && data.ticketList.array) {
+        setData(data.ticketList.array);
+      }
 
-    if (data && data.ticketListByClient.count) {
-      setDataAmount(data.ticketListByClient.count);
+      if (data && data.ticketList.count) {
+        setDataAmount(data.ticketList.count);
+      }
+    } else {
+      if (data && data.ticketListByClient.array) {
+        setData(data.ticketListByClient.array);
+      }
+
+      if (data && data.ticketListByClient.count) {
+        setDataAmount(data.ticketListByClient.count);
+      }
     }
 
     if (selectedSort !== prevSelectedSort) {
       handleSorts(selectedSort);
       setPrevSelectedSort(selectedSort);
     }
-  }, [data, isTableVisibility, selectedSort, prevSelectedSort]);
+  }, [data, selectedSort, prevSelectedSort]);
 
   const tickets = dataQuery;
 
@@ -115,17 +150,32 @@ function TableTickets() {
     }
 
     setOrderDir(_orderDir);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: userId,
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
 
-    const variables = {
-      filters: {
-        limit: itemsPerPage,
-        offset: 0,
-        orderBy: _orderBy,
-        orderDir: _orderDir,
-        lang: "ru",
-      },
-    };
-    await refetch(variables);
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          limit: itemsPerPage,
+          offset: 0,
+          orderBy: _orderBy,
+          orderDir: _orderDir,
+          lang: "ru",
+        },
+      };
+
+      await refetch(variables);
+    }
   };
 
   if (loading) {
@@ -222,9 +272,11 @@ function TableTickets() {
                 <tr key={ticket.id}>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.id}
@@ -232,9 +284,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.unit.name.stroke}
@@ -242,9 +296,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.date.replace(/T|-/g, (match) =>
@@ -254,9 +310,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.subTheme.theme.name.stroke}
@@ -264,9 +322,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
@@ -275,9 +335,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       {ticket.messages.length}
@@ -285,9 +347,11 @@ function TableTickets() {
                   </td>
                   <td>
                     <Link
-                      to={`/dialog/${ticket.id}`}
-                      state={{ status: ticket.status.name.stroke,
-                      linkPrev: window.location.href }}
+                      to={`/dialog/${userId}/${ticket.id}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
                       className="alltickets__link"
                     >
                       <span

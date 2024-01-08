@@ -21,7 +21,7 @@ function App() {
           <Route path="/" element={<CreateTicket />} />
           {/* <Route path="/all-tickets" element={<AllTickets />} /> */}
           <Route path="/all-tickets" element={<AllTickets />} />
-          <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
+          <Route path="/dialog/:userId/:itemId" Component={Chat} element={<Chat />} />
         </Routes>
       </Router>
     </div>
