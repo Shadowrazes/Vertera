@@ -61,8 +61,15 @@ class Message extends Entity{
         }
     }
 
-    static async Update(id) {
+    static async TransUpdate(id, fields) {
+        return await super.Transaction(async (conn) => {
+            if(super.IsArgsEmpty(fields)) throw new Error('Empty fields');
 
+            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [fields, id]);
+
+            return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        });
     }
 
     static async Delete(id) {
