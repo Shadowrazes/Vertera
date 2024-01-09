@@ -171,6 +171,9 @@ export const resolvers = {
         updateTranslation: async (_, args) => {
             return await Translation.Update(args.fields);
         },
+        updateMessage: async (_, args) => {
+            return await Message.TransUpdate(args.id, args.fields);
+        },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
         },

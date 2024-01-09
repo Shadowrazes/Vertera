@@ -56,6 +56,7 @@ export const typeDefs = `
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
+        updateMessage(id: Int!, fields: MessageUpdate!): UpdateInfo!
 
         updateTranslation(fields: TranslationUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
@@ -323,6 +324,10 @@ export const typeDefs = `
         themeId: Int
         subThemeId: Int
         reaction: String
+    }
+
+    input MessageUpdate {
+        readed: Boolean
     }
 
     input UserUpdate {
