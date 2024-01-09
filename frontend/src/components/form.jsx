@@ -81,6 +81,7 @@ function FormComponent() {
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
+  const isBuild = process.argv[2] === "build";
 
   const { loading, error, data } = useQuery(THEME_LIST);
 
@@ -117,7 +118,9 @@ function FormComponent() {
           };
 
           const response = await fetch(
-            "http://localhost:4444/upload",
+            isBuild
+              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              : "http://localhost:4444/upload",
             requestOptions
           );
           const result = await response.json();

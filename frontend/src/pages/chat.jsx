@@ -43,8 +43,9 @@ function Chat() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole")).role.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
+  const isBuild = process.argv[2] === "build";
   console.log(userRole);
 
   const inputRef = useRef(null);
@@ -179,7 +180,9 @@ function Chat() {
           };
 
           const response = await fetch(
-            "http://localhost:4444/upload",
+            isBuild
+              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              : "http://localhost:4444/upload",
             requestOptions
           );
           const result = await response.json();

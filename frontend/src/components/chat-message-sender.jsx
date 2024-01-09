@@ -2,6 +2,7 @@ import "../css/chat-message-sender.css";
 
 function ChatMessage({ message, time, attachs }) {
   let isVisible;
+  const isBuild = process.argv[2] === "build";
 
   if (attachs.length == 0) {
     isVisible = true;
@@ -28,7 +29,12 @@ function ChatMessage({ message, time, attachs }) {
                         download
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={"http://localhost:4444" + attach.path}
+                        href={
+                          isBuild
+                            ? "http://vertera-ticket.yasanyabeats.ru/" +
+                              attach.path
+                            : "http://localhost:4444" + attach.path
+                        }
                       >
                         <span className="chat-message-sender__attach">
                           {attach.name}
