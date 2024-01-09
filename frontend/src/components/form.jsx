@@ -84,7 +84,7 @@ function FormComponent() {
 
   const { loading, error, data } = useQuery(THEME_LIST);
 
-  let userId = user ? user.id : 1;
+  let userId = user ? user.id : 999;
 
   useEffect(() => {
     if (data && data.allThemeTree) {
@@ -145,7 +145,7 @@ function FormComponent() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (userRole && (userRole === "helper") || (userRole === "system")) {
+  if ((userRole && userRole === "helper") || userRole === "system") {
     console.log(132);
     return <></>;
   }
