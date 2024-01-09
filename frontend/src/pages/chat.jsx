@@ -45,7 +45,7 @@ function Chat() {
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
-  const isBuild = process.argv[2] === "build";
+  const isBuild = import.meta.env.DEV.argv[2] !== "build";
   console.log(userRole);
 
   const inputRef = useRef(null);
