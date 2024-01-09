@@ -62,9 +62,9 @@ function FormComponent() {
       "http://" +
         window.location.hostname +
         "/dialog/" +
-        popupUserID +
-        "/" +
         popupTicketID +
+        "/" +
+        popupUserID +
         "/"
     );
     setShow(true);
