@@ -57,7 +57,7 @@ function Chat() {
     userId = user.id;
   }
 
-  if (userRoel === null) {
+  if (userRole === null) {
     userCurRole = "client";
   } else {
     userCurRole = userRole;
