@@ -63,11 +63,18 @@ function allTickets() {
   const [dateRange, setDateRange] = useState([]);
 
   let userId = null;
+  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
   } else {
     userId = user.id;
+  }
+
+  if (userRole === null) {
+    userCurRole = "client";
+  } else {
+    userCurRole = userRole;
   }
 
   const pageNumbers = [];

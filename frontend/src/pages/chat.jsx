@@ -15,30 +15,6 @@ import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
 
-// const timeFormatter = () => {
-//   const currentDate = new Date();
-//   const options = {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//   };
-
-//   const formatter = new Intl.DateTimeFormat("ru-RU", options);
-//   let formattedDate = formatter.format(currentDate);
-
-//   formattedDate = formattedDate.slice(0, -3);
-
-//   const timeOptions = {
-//     hour: "numeric",
-//     minute: "numeric",
-//   };
-
-//   const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
-//   const formattedTime = timeFormatter.format(currentDate);
-
-//   return `${formattedDate}, ${formattedTime}`;
-// };
-
 function Chat() {
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
@@ -72,7 +48,8 @@ function Chat() {
 
   const inputRef = useRef(null);
 
-  let userId;
+  let userId = null;
+  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
@@ -80,8 +57,14 @@ function Chat() {
     userId = user.id;
   }
 
+  if (userRoel === null) {
+    userCurRole = "client";
+  } else {
+    userCurRole = userRole;
+  }
+
   const isAdmin = () => {
-    return userRole === "helper";
+    return userCurRole === "helper";
   };
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
