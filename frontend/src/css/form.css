@@ -26,3 +26,26 @@
   border-radius: 5px;
   border: none;
 }
+
+
+@media screen and (max-width: 768px) {
+  #TextareaForm {
+    width: 100%;
+  }
+  
+  #FileInputForm {
+    width: 100%;
+  }
+  
+  #ButtonForm {
+    width: 100%;
+  }
+  
+  .form__row {
+    gap: 20px;
+  }
+
+  .dropdown button{
+    font-size: 16px !important;
+  }
+}
