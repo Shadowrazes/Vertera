@@ -79,7 +79,7 @@ function FormComponent() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
 
   const { loading, error, data } = useQuery(THEME_LIST);
