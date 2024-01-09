@@ -81,7 +81,7 @@ function FormComponent() {
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
-  const isBuild = import.meta.env.DEV.argv[2] !== "build";
+  const isBuild = import.meta.env.DEV !== "build";
 
   const { loading, error, data } = useQuery(THEME_LIST);
 

@@ -2,7 +2,7 @@ import "../css/chat-message-recipient.css";
 
 function ChatMessage({ message, time, attachs }) {
   let isVisible;
-  const isBuild = import.meta.env.DEV.argv[2] !== "build";
+  const isBuild = import.meta.env.DEV !== "build";
 
   if (attachs.length == 0) {
     isVisible = true;
