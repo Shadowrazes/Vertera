@@ -43,7 +43,7 @@ function Chat() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole")).role.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
   console.log(userRole);
 
