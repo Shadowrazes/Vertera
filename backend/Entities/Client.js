@@ -13,6 +13,20 @@ class Client extends Entity{
         return result[0];
     }
 
+    static async GetByEmail(email) {
+        let sql = `
+        SELECT  * FROM ${this.TableName} 
+
+        JOIN    ${User.TableName} 
+                ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField}
+
+        WHERE   1=1 AND ${this.EmailField} = ?
+        `;
+
+        const result = await super.Request(sql, [email]);
+        return result;
+    }
+
     static async GetList() {
         const sql = `SELECT * from ${this.TableName}`;
         const result = await super.Request(sql);
@@ -20,14 +34,22 @@ class Client extends Entity{
     }
 
     static async TransInsert(userFields, clientFields) {
-        return await super.Transaction(async (conn) => {
-            userFields.role = 'client';
-            const id = await User.TransInsert(conn, userFields);
-            const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, email: clientFields.email};
-            const result = await super.TransRequest(conn, sql, [fields]);
-            return id;
-        });
+        const exsistUser = await this.GetByEmail(clientFields.email);
+
+        if(exsistUser.length == 0){
+            return await super.Transaction(async (conn) => {
+                userFields.role = 'client';
+                const id = await User.TransInsert(conn, userFields);
+                const sql = `INSERT INTO ${this.TableName} SET ?`;
+                const fields = {id, email: clientFields.email};
+                const result = await super.TransRequest(conn, sql, [fields]);
+                return id;
+            });
+        }
+        else{
+            const updExistUser = await this.TransUpdate(exsistUser[0].id, userFields, clientFields);
+            return exsistUser[0].id;
+        }
     }
     
     static async TransUpdate(id, userFields, clientFields) {
