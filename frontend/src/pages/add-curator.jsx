@@ -42,9 +42,13 @@ function AddCurator() {
     }
   }, [data, dataJobTitle, location.state]);
 
-  const handleNameChange = () => {};
+  const handleNameChange = (e) => {
+    setNameValue(e.target.value);
+  };
 
-  const handlePhoneChange = () => {};
+  const handlePhoneChange = (e) => {
+    setPhoneValue(e.target.value);
+  };
 
   const handleDepartmentClick = (department, departmentId) => {
     setSelectedItem(department);
@@ -56,6 +60,10 @@ function AddCurator() {
     setSelectedItemJobTitle(jobTitle);
     setSelectedJobTitle(jobTitle);
     setSelectedJotTitleId(jobTitleId);
+  };
+
+  const handleAddCurator = (e) => {
+    e.preventDefault();
   };
 
   return (
@@ -113,6 +121,14 @@ function AddCurator() {
               </Dropdown.Item>
             ))}
           </DropdownButton>
+          <Button
+            variant="primary"
+            id="ButtonForm"
+            type="submit"
+            onClick={handleAddCurator}
+          >
+            Применить
+          </Button>
         </Col>
       </Row>
     </>
