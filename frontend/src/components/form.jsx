@@ -62,9 +62,9 @@ function FormComponent() {
       "http://" +
         window.location.hostname +
         "/dialog/" +
-        popupUserID +
-        "/" +
         popupTicketID +
+        "/" +
+        popupUserID +
         "/"
     );
     setShow(true);
@@ -79,12 +79,13 @@ function FormComponent() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
+  const isBuild = import.meta.env.DEV !== "build";
 
   const { loading, error, data } = useQuery(THEME_LIST);
 
-  let userId = user ? user.id : 1;
+  let userId = user ? user.id : 999;
 
   useEffect(() => {
     if (data && data.allThemeTree) {
@@ -117,7 +118,9 @@ function FormComponent() {
           };
 
           const response = await fetch(
-            "http://localhost:4444/upload",
+            isBuild
+              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              : "http://localhost:4444/upload",
             requestOptions
           );
           const result = await response.json();
@@ -145,7 +148,7 @@ function FormComponent() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (userRole && (userRole === "helper") || (userRole === "system")) {
+  if ((userRole && userRole === "helper") || userRole === "system") {
     console.log(132);
     return <></>;
   }
@@ -364,8 +367,8 @@ function FormComponent() {
     <>
       <TitleH2 title="Создать обращение" className="title__heading" />
       <Form method="post">
-        <Row>
-          <Col md={4} className="form__column">
+        <Row className="form__row">
+          <Col md={4} col={12} className="form__column">
             <DropdownButton
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
@@ -425,7 +428,7 @@ function FormComponent() {
             )}
           </Col>
 
-          <Col md={8} className="form__column">
+          <Col md={8} col={12} className="form__column">
             {!user && (
               <Form.Group controlId="NameForm">
                 <Form.Control

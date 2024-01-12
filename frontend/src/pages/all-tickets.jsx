@@ -57,17 +57,24 @@ function allTickets() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
 
   const [dateRange, setDateRange] = useState([]);
 
   let userId = null;
+  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
   } else {
     userId = user.id;
+  }
+
+  if (userRole === null) {
+    userCurRole = "client";
+  } else {
+    userCurRole = userRole;
   }
 
   const pageNumbers = [];
@@ -115,19 +122,6 @@ function allTickets() {
     error: themeError,
     data: themeData,
   } = useQuery(THEME_LIST);
-
-  // const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
-  //   variables: {
-  //     clientId: userId,
-  //     filters: {
-  //       limit: itemsPerPage,
-  //       offset: 0,
-  //       orderBy: "id",
-  //       orderDir: "ASC",
-  //       lang: "ru",
-  //     },
-  //   },
-  // });
 
   const adminRequest = () => {
     return useQuery(TABLE_TICKETS, {

@@ -24,22 +24,29 @@ function TableTickets() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
 
   let userId = null;
+  let userCurRole = null;
 
   if (user === null) {
     return <></>;
   } else {
     userId = user.id;
   }
+
+  if (userRole === null) {
+    userCurRole = "client";
+  } else {
+    userCurRole = userRole;
+  }
   // console.log(userId);
 
   const itemsPerPage = 8;
 
   const isAdmin = () => {
-    return userRole === "helper";
+    return userCurRole === "helper";
   };
 
   const adminRequest = () => {

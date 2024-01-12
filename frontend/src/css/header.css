@@ -1,5 +1,6 @@
 .header {
     margin-top: 50px;
+    width: 100%;
 }
 .header__container {
     display: flex;
@@ -15,4 +16,17 @@
     font-size: 24px;
     color: black;
     text-decoration: none;
+}
+
+@media screen and (max-width: 768px) {
+    .header__logo {
+        width: 100px;
+    }
+    .header__exit {
+        display: none;
+    }
+    .header__button-svg {
+        width: 40px;
+        height: 40px;
+    }
 }

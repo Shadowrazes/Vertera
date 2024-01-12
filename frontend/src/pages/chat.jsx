@@ -15,30 +15,6 @@ import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
 
-// const timeFormatter = () => {
-//   const currentDate = new Date();
-//   const options = {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//   };
-
-//   const formatter = new Intl.DateTimeFormat("ru-RU", options);
-//   let formattedDate = formatter.format(currentDate);
-
-//   formattedDate = formattedDate.slice(0, -3);
-
-//   const timeOptions = {
-//     hour: "numeric",
-//     minute: "numeric",
-//   };
-
-//   const timeFormatter = new Intl.DateTimeFormat("ru-RU", timeOptions);
-//   const formattedTime = timeFormatter.format(currentDate);
-
-//   return `${formattedDate}, ${formattedTime}`;
-// };
-
 function Chat() {
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
@@ -50,9 +26,6 @@ function Chat() {
   const [reaction, setReaction] = useState(null);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
-  // const [ticketStatus, setTicketStatus] = useState(
-  //   location.state && location.state.status
-  // );
 
   const [isHideMessages, setIsHideMessages] = useState(true);
 
@@ -67,12 +40,15 @@ function Chat() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole")).role
+    JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
+  const isBuild = import.meta.env.DEV !== "build";
+  // console.log(userRole);
 
   const inputRef = useRef(null);
 
-  let userId;
+  let userId = null;
+  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
@@ -80,8 +56,14 @@ function Chat() {
     userId = user.id;
   }
 
+  if (userRole === null) {
+    userCurRole = "client";
+  } else {
+    userCurRole = userRole;
+  }
+
   const isAdmin = () => {
-    return userRole === "helper";
+    return userCurRole === "helper";
   };
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
@@ -95,7 +77,7 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
-      console.log(data.ticket.status.name.stroke);
+      //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
 
       if (data.ticket.status.name.stroke !== "Закрыт") {
@@ -195,7 +177,9 @@ function Chat() {
           };
 
           const response = await fetch(
-            "http://localhost:4444/upload",
+            isBuild
+              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              : "http://localhost:4444/upload",
             requestOptions
           );
           const result = await response.json();
@@ -279,6 +263,33 @@ function Chat() {
       // setTicketStatus("Закрыт");
       setCurrentStatus("Закрыт");
       // console.log(ticketStatus);
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при закрытии заявки:", error);
+
+      setIsLoadingClose(false);
+    }
+  };
+
+  const handleInProgress = async () => {
+    if (loaderUpdateStatus) {
+      return <Loader />;
+    }
+    if (errorUpdateStatus) {
+      return <h2>Что-то пошло не так</h2>;
+    }
+
+    try {
+      setIsLoadingClose(true);
+
+      await updateStatus({
+        variables: {
+          id: ticketId,
+          fields: {
+            statusId: 3,
+          },
+        },
+      });
       setIsLoadingClose(false);
     } catch (error) {
       console.error("Ошибка при закрытии заявки:", error);
@@ -493,7 +504,13 @@ function Chat() {
                   type="submit"
                   onClick={handleSubmit}
                 />
-                {isAdmin() && (
+                {isAdmin() && currentStatus == "Новый" ? (
+                  <ButtonCustom
+                    title="Начать работу"
+                    className="chat-input__button-close"
+                    onClick={handleInProgress}
+                  />
+                ) : (
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"

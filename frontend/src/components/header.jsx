@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
 
 import { LOGIN, USER } from "../apollo/queries";
 
@@ -100,11 +100,10 @@ function Header({ user }) {
       }
 
       if (dataUser && dataUser.user) {
-        const userRole = dataUser.user.role;
         localStorage.setItem(
           "userRole",
           JSON.stringify({
-            role: userRole,
+            role: dataUser.user,
           })
         );
       }
