@@ -123,19 +123,6 @@ function allTickets() {
     data: themeData,
   } = useQuery(THEME_LIST);
 
-  // const { loading, error, data, refetch } = useQuery(TABLE_TICKETS_USER, {
-  //   variables: {
-  //     clientId: userId,
-  //     filters: {
-  //       limit: itemsPerPage,
-  //       offset: 0,
-  //       orderBy: "id",
-  //       orderDir: "ASC",
-  //       lang: "ru",
-  //     },
-  //   },
-  // });
-
   const adminRequest = () => {
     return useQuery(TABLE_TICKETS, {
       variables: {

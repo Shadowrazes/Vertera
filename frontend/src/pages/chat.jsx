@@ -26,9 +26,6 @@ function Chat() {
   const [reaction, setReaction] = useState(null);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
-  // const [ticketStatus, setTicketStatus] = useState(
-  //   location.state && location.state.status
-  // );
 
   const [isHideMessages, setIsHideMessages] = useState(true);
 
@@ -46,7 +43,7 @@ function Chat() {
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
   const isBuild = import.meta.env.DEV !== "build";
-  console.log(userRole);
+  // console.log(userRole);
 
   const inputRef = useRef(null);
 
@@ -80,7 +77,7 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
-      console.log(data.ticket.status.name.stroke);
+      //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
 
       if (data.ticket.status.name.stroke !== "Закрыт") {
@@ -266,6 +263,33 @@ function Chat() {
       // setTicketStatus("Закрыт");
       setCurrentStatus("Закрыт");
       // console.log(ticketStatus);
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при закрытии заявки:", error);
+
+      setIsLoadingClose(false);
+    }
+  };
+
+  const handleInProgress = async () => {
+    if (loaderUpdateStatus) {
+      return <Loader />;
+    }
+    if (errorUpdateStatus) {
+      return <h2>Что-то пошло не так</h2>;
+    }
+
+    try {
+      setIsLoadingClose(true);
+
+      await updateStatus({
+        variables: {
+          id: ticketId,
+          fields: {
+            statusId: 3,
+          },
+        },
+      });
       setIsLoadingClose(false);
     } catch (error) {
       console.error("Ошибка при закрытии заявки:", error);
@@ -480,7 +504,13 @@ function Chat() {
                   type="submit"
                   onClick={handleSubmit}
                 />
-                {isAdmin() && (
+                {isAdmin() && currentStatus == "Новый" ? (
+                  <ButtonCustom
+                    title="Начать работу"
+                    className="chat-input__button-close"
+                    onClick={handleInProgress}
+                  />
+                ) : (
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"
