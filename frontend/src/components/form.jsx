@@ -119,7 +119,7 @@ function FormComponent() {
 
           const response = await fetch(
             isBuild
-              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              ? "http://vertera-ticket.yasanyabeats.ru:4444/upload"
               : "http://localhost:4444/upload",
             requestOptions
           );
