@@ -31,7 +31,7 @@ function ChatMessage({ message, time, attachs }) {
                         rel="noopener noreferrer"
                         href={
                           isBuild
-                            ? "http://vertera-ticket.yasanyabeats.ru/" +
+                            ? "http://vertera-ticket.yasanyabeats.ru:4444/" +
                               attach.path
                             : "http://localhost:4444" + attach.path
                         }
