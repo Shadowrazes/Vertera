@@ -70,7 +70,7 @@ class Helper extends Entity{
             userFields.role = 'helper';
             const id = await User.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, jobTitle: helperFields.jobTitle, birthday: helperFields.birthday, 
+            const fields = {id, jobTitleId: helperFields.jobTitleId, birthday: helperFields.birthday, 
                             startWorkDate: new Date()};
             const result = await super.TransRequest(conn, sql, [fields]);
 
