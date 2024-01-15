@@ -1,0 +1,71 @@
+.add-curator__heading {
+  margin-bottom: 50px;
+}
+
+.add-curator__row {
+  margin-top: 50px;
+}
+
+.add-curator__column {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.add-currator__input {
+  width: 416px !important;
+  font-size: 20px !important;
+  border: 1px solid #8c8c8c !important;
+}
+
+.dropdown button {
+  width: 416px !important;
+}
+
+.add-curator__date-picker {
+  width: 416px !important;
+  background: white;
+  max-width: 566px !important;
+  width: 100%;
+  border-radius: 7px;
+  border: 1px solid #8c8c8c;
+}
+
+.rs-picker-toggle {
+  border: none !important;
+}
+
+.add-curator__date-picker:hover {
+  border-color: #8c8c8c !important;
+}
+
+.rs-picker-toggle:hover {
+  border-color: #8c8c8c !important;
+}
+
+.rs-picker-toggle:focus {
+  border-color: #8c8c8c !important;
+}
+
+.rs-btn:focus-visible {
+  outline: none !important;
+}
+
+.add-curator__date-picker input {
+  width: 175px !important;
+  color: black;
+  font-size: 20px;
+}
+
+#DatePicker .rs-btn-close {
+  width: fit-content !important;
+}
+
+.add-curator__date-picker span {
+  color: black !important;
+  font-size: 20px;
+}
+
+.add-curator__btn {
+  width: 416px !important;
+}

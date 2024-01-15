@@ -204,14 +204,6 @@ function allTickets() {
   };
 
   useEffect(() => {
-    // if (data && data.ticketListByClient.array) {
-    //   setDataTableTickets(data.ticketListByClient.array);
-    // }
-
-    // if (data && data.ticketListByClient.count) {
-    //   setDataAmount(data.ticketListByClient.count);
-    // }
-
     if (isAdmin()) {
       if (data && data.ticketList.array) {
         setDataTableTickets(data.ticketList.array);
@@ -434,7 +426,7 @@ function allTickets() {
     setDateRange(period);
     setSelectedDateAfter(formattedDate[0] + " 00:00:00");
     setSelectedDateBefore(formattedDate[1] + " 23:59:59");
-    // console.log(formattedDate[0]);
+    console.log(formattedDate[0]);
   };
 
   const handleReactionClick = (reaction) => {

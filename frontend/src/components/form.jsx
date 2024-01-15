@@ -320,7 +320,7 @@ function FormComponent() {
           email: emailValue,
         },
       }).then((newUserId) => {
-        console.log(newUserId);
+        // console.log(newUserId);
         userId = newUserId.data.addClientUser;
         addTicketWithFiles();
       });
@@ -434,6 +434,7 @@ function FormComponent() {
                 <Form.Control
                   type="text"
                   placeholder="Ваше имя"
+                  className="form__input"
                   value={nameValue}
                   onChange={handleNameChange}
                 />
@@ -444,6 +445,7 @@ function FormComponent() {
                 <Form.Control
                   type="email"
                   placeholder="Ваш email"
+                  className="form__input"
                   value={emailValue}
                   onChange={handleEmailChange}
                 />

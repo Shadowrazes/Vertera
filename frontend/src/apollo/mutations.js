@@ -76,3 +76,22 @@ export const ADD_CLIENT_USER = gql`
     )
   }
 `;
+
+export const ADD_HELPER = gql`
+  mutation (
+    $fullName: String!
+    $phone: String
+    $jobTitleId: Int!
+    $birthday: DateTime!
+    $departmentId: [Int]!
+  ) {
+    addHelperUser(
+      userFields: { fullName: $fullName, phone: $phone, countryId: 1 }
+      helperFields: {
+        jobTitleId: $jobTitleId
+        birthday: $birthday
+        departmentIds: $departmentId
+      }
+    )
+  }
+`;
