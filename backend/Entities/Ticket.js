@@ -10,6 +10,9 @@ import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
 import Client from "./Client.js";
 
+const isBuild = process.argv[2] === 'build';
+const baseUrl = isBuild ? 'https://vertera-ticket.yasanyabeats.ru' : 'http://localhost:5173';
+
 class Ticket extends Entity{
     static TableName = 'tickets';
     static PrimaryField = 'id';
@@ -216,7 +219,7 @@ class Ticket extends Entity{
 
             const userResult = await User.GetById(ticketFields.clientId);
             const clientResult = await Client.GetById(ticketFields.clientId);
-            const dialogLink = `http://localhost:5173/dialog/${ticketFields.clientId}/${result.insertId}/`
+            const dialogLink = baseUrl + `/dialog/${ticketFields.clientId}/${result.insertId}/`
             const emailText = `Здравствуйте, ${userResult.fullName}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
             EmailSender.Notify(clientResult.email, emailText);
  

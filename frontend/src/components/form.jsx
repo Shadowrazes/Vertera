@@ -62,9 +62,9 @@ function FormComponent() {
       "http://" +
         window.location.hostname +
         "/dialog/" +
-        popupTicketID +
-        "/" +
         popupUserID +
+        "/" +
+        popupTicketID +
         "/"
     );
     setShow(true);
@@ -119,7 +119,7 @@ function FormComponent() {
 
           const response = await fetch(
             isBuild
-              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              ? "https://vertera-ticket.yasanyabeats.ru:4444/upload"
               : "http://localhost:4444/upload",
             requestOptions
           );
@@ -274,8 +274,8 @@ function FormComponent() {
           },
         }).then((data) => {
           console.log(data.data.addTicket);
-          popupUserID = data.data.addTicket.id;
-          popupTicketID = data.data.addTicket.clientId;
+          popupTicketID = data.data.addTicket.id;
+          popupUserID = data.data.addTicket.clientId;
           //setPopupTicketID(data.data.addTicket.id);
           //setPopupUserID(data.data.addTicket.clientId);
           setIsVisible(false);

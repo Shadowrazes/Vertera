@@ -22,6 +22,14 @@ function TableTickets() {
 
   const [orderDir, setOrderDir] = useState("ASC");
 
+  const columns = [
+    "subTheme.theme.unit.name.stroke",
+    "date",
+    "subTheme.theme.name.stroke",
+    "lastMessage.text",
+  ];
+  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole"))?.role.role
@@ -192,14 +200,6 @@ function TableTickets() {
   if (error) {
     return <h2>Что-то пошло не так</h2>;
   }
-
-  const columns = [
-    "subTheme.theme.unit.name.stroke",
-    "date",
-    "subTheme.theme.name.stroke",
-    "lastMessage.text",
-  ];
-  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
   const getStatusColor = (status) => {
     switch (status) {

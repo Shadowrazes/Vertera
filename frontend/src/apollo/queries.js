@@ -184,3 +184,28 @@ export const ATTACHEMNTS_LIST = gql`
     }
   }
 `;
+
+export const CURATORS_LIST = gql`
+  query {
+    helperList {
+      user {
+        id
+        fullName
+      }
+      birthday
+      id
+      startWorkDate
+    }
+  }
+`;
+
+export const JOB_TITLE_LIST = gql`
+  query {
+    jobTitleList {
+      id
+      name(lang: "ru") {
+        stroke
+      }
+    }
+  }
+`;

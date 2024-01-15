@@ -178,7 +178,7 @@ function Chat() {
 
           const response = await fetch(
             isBuild
-              ? "http://vertera-ticket.yasanyabeats.ru/upload"
+              ? "https://vertera-ticket.yasanyabeats.ru:4444/upload"
               : "http://localhost:4444/upload",
             requestOptions
           );
@@ -207,6 +207,10 @@ function Chat() {
     }
     if (errorAddMsg) {
       return <h2>Что-то пошло не так</h2>;
+    }
+
+    if (message.trim() == "") {
+      return;
     }
 
     uploadFiles()
@@ -240,7 +244,6 @@ function Chat() {
 
   const handleClose = async () => {
     setIsVisible(false);
-    // setStatus("Закрыт");
 
     if (loaderUpdateStatus) {
       return <Loader />;
@@ -290,9 +293,10 @@ function Chat() {
           },
         },
       });
+      setCurrentStatus("В процессе");
       setIsLoadingClose(false);
     } catch (error) {
-      console.error("Ошибка при закрытии заявки:", error);
+      console.error("Ошибка при смене статуса:", error);
 
       setIsLoadingClose(false);
     }
@@ -510,12 +514,14 @@ function Chat() {
                     className="chat-input__button-close"
                     onClick={handleInProgress}
                   />
-                ) : (
+                ) : isAdmin() ? (
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"
                     onClick={handleClose}
                   />
+                ) : (
+                  <></>
                 )}
               </div>
             </Row>

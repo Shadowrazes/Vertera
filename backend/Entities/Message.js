@@ -43,7 +43,7 @@ class Message extends Entity{
 
             if(userResult.role && userResult.role == 'helper'){
                 const clientResult = await Client.GetById(args.recieverId);
-                const dialogLink = `http://vertera-ticket.yasanyabeats.ru/dialog/${args.recieverId}/${args.ticketId}/`
+                const dialogLink = `https://vertera-ticket.yasanyabeats.ru/dialog/${args.recieverId}/${args.ticketId}/`
                 const emailText = `На ваше обрашение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
                 EmailSender.Notify(clientResult.email, emailText);
             }
