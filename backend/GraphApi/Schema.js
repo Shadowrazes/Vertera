@@ -109,6 +109,18 @@ export const typeDefs = `
         user: User!
     }
 
+    type HelperStats {
+        totalTickets: Int!
+        newTickets: Int!
+        inProgressTickets: Int!
+        closedTickets: Int!
+        avgReplyTime: Float!
+        likes: Int!
+        dislikes: Int!
+        notRated: Int!
+        fantasy: Float!
+    }
+
     type HelperJobTitle {
         id: Int!
         name(lang: String!): Translation!

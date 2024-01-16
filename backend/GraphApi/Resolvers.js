@@ -211,7 +211,7 @@ export const resolvers = {
             return await User.GetById(parent.id);
         },
         jobTitle: async (parent, args) => {
-            return await HelperJobTitle.GetById(parent.id);
+            return await HelperJobTitle.GetById(parent.jobTitleId);
         },
         departments: async (parent, args) => {
             return await HelperDepartment.GetListByHelperId(parent.id);

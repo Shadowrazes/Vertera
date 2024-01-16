@@ -23,7 +23,7 @@ class Message extends Entity{
     }
 
     static async GetListByTicket(ticketId) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.TicketIdField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.TicketIdField} = ?`;
         const result = await super.Request(sql, [ticketId]);
         return result;
     }

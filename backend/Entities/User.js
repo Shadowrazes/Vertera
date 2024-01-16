@@ -64,7 +64,7 @@ class User extends Entity{
     static async TransInsert(conn, fields) {
         const sql = `INSERT INTO ${this.TableName} SET ?`;
 
-        if(fields.password && !fields.login || !fields.password && fields.login){
+        if(!fields.login || !fields.password){
             throw new Error('No password or login');
         }
 
