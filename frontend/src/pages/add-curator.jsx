@@ -1,12 +1,26 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
+import { useQuery, useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import {
+  Form,
+  Row,
+  Col,
+  Dropdown,
+  DropdownButton,
+  Modal,
+  Button,
+} from "react-bootstrap";
 
+import { DatePicker } from "rsuite";
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
+import { ADD_HELPER } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
+import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+
+import "../css/add-curator.css";
 
 function AddCurator() {
   const [departmentList, setDepartmentList] = useState([]);
@@ -14,14 +28,22 @@ function AddCurator() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [selectedJobTitle, setSelectedJobTitle] = useState(null);
-  const [selectedJotTitleId, setSelectedJotTitleId] = useState(null);
+  const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemJobTitle, setSelectedItemJobTitle] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
 
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [show, setShow] = useState(false);
+
   const [nameValue, setNameValue] = useState("");
+  const [surnameValue, setSurnameValue] = useState("");
+  const [patronymicValue, setPatronymicValue] = useState("");
   const [phoneValue, setPhoneValue] = useState("");
+  const [loginValue, setLoginValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
   const {
@@ -29,6 +51,12 @@ function AddCurator() {
     error: errorJobTitle,
     data: dataJobTitle,
   } = useQuery(JOB_TITLE_LIST);
+
+  const navigate = useNavigate();
+
+  const goToAllCurators = () => {
+    navigate("/curators");
+  };
 
   useEffect(() => {
     if (data && data.departmentList) {
@@ -42,8 +70,34 @@ function AddCurator() {
     }
   }, [data, dataJobTitle, location.state]);
 
+  const [addHelper] = useMutation(ADD_HELPER);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
   const handleNameChange = (e) => {
     setNameValue(e.target.value);
+  };
+
+  const handleSurnameChange = (e) => {
+    setSurnameValue(e.target.value);
+  };
+
+  const handlePatronymicChange = (e) => {
+    setPatronymicValue(e.target.value);
+  };
+
+  const handleLoginChange = (e) => {
+    setLoginValue(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordValue(e.target.value);
   };
 
   const handlePhoneChange = (e) => {
@@ -59,35 +113,200 @@ function AddCurator() {
   const handleJobTitleClick = (jobTitle, jobTitleId) => {
     setSelectedItemJobTitle(jobTitle);
     setSelectedJobTitle(jobTitle);
-    setSelectedJotTitleId(jobTitleId);
+    setSelectedJobTitleId(jobTitleId);
   };
 
-  const handleAddCurator = (e) => {
+  const handlePeriodClick = (originalDate) => {
+    const year = originalDate.getFullYear();
+    const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + originalDate.getDate()).slice(-2);
+
+    const formattedDate = `${year}-${month}-${day}`;
+
+    setSelectedDate(formattedDate);
+
+    // console.log(formattedDate);
+  };
+
+  const errorMsg = () => {
+    let error = "";
+
+    if (nameValue.trim() == "") {
+      error = "Введите имя";
+    } else if (surnameValue.trim() == "") {
+      error = "Введите Фамилию";
+    } else if (phoneValue.trim() == "") {
+      error = "Введите номер телефона";
+    } else if (selectedDate == null) {
+      error = "Выберите дату рождения";
+    } else if (loginValue.trim() == "") {
+      error = "Укажите логин";
+    } else if (passwordValue.trim() == "") {
+      error = "Укажите пароль";
+    } else if (passwordValue.trim().length < 6) {
+      error = "Плохой пароль";
+    } else if (selectedDepartmentId == null) {
+      error = "Выберите департамент";
+    } else if (selectedJobTitleId == null) {
+      error = "Выберите должность";
+    } else {
+      error = "Ошибка при добавлении куратора";
+    }
+
+    return error;
+  };
+
+  const handleAddCurator = async (e) => {
     e.preventDefault();
+
+    console.log(nameValue);
+    console.log(surnameValue);
+    console.log(patronymicValue);
+    console.log(phoneValue);
+    console.log(selectedDate);
+    console.log(loginValue);
+    console.log(passwordValue);
+    console.log(selectedDepartment);
+    console.log(selectedDepartmentId);
+    console.log(selectedJobTitle);
+    console.log(selectedJobTitleId);
+
+    if (
+      nameValue.trim() == "" ||
+      surnameValue.trim() == "" ||
+      patronymicValue.trim() == "" ||
+      phoneValue.trim() == "" ||
+      selectedDate == null ||
+      loginValue.trim() == "" ||
+      passwordValue.trim() == "" ||
+      passwordValue.trim().length < 6 ||
+      selectedDepartmentId == null ||
+      selectedJobTitleId == null
+    ) {
+      setIsErrorVisible(true);
+      return;
+    }
+
+    setIsErrorVisible(false);
+
+    try {
+      const result = await addHelper({
+        variables: {
+          fullName: nameValue,
+          phone: phoneValue,
+          login: loginValue,
+          password: passwordValue,
+          departmentId: selectedDepartmentId,
+          birthday: selectedDate,
+          jobTitleId: selectedJobTitleId,
+        },
+      });
+
+      console.log("Куратор успешно добавлен:", result);
+      handleShow();
+    } catch (error) {
+      console.error("Ошибка при добавлении куратора:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
+  const handleShow = () => {
+    setShow(true);
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    goToAllCurators();
   };
 
   return (
     <>
       <BackTitle title="Все кураторы" linkPrev={linkPrev} />
-      <h2>Добавить куратора</h2>
-      <Row className="form__row">
-        <Col md={4} col={12} className="form__column">
+      <h2 className="add-curator__heading">Добавить куратора</h2>
+      <Row className="add-curator__row">
+        <Col className="add-curator__column">
           <Form.Group controlId="NameForm">
             <Form.Control
               type="text"
-              placeholder="ФИО"
+              placeholder="Имя"
               value={nameValue}
+              className="add-currator__input"
               onChange={handleNameChange}
             />
           </Form.Group>
+
+          <Form.Group controlId="SurNameForm">
+            <Form.Control
+              type="text"
+              placeholder="Фамилия"
+              value={surnameValue}
+              className="add-currator__input"
+              onChange={handleSurnameChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="PatronymicForm">
+            <Form.Control
+              type="text"
+              placeholder="Отчество (при наличии)"
+              value={patronymicValue}
+              className="add-currator__input"
+              onChange={handlePatronymicChange}
+            />
+          </Form.Group>
+
           <Form.Group controlId="PhoneForm">
             <Form.Control
               type="phone"
               placeholder="Номер телефона"
               value={phoneValue}
+              className="add-currator__input"
               onChange={handlePhoneChange}
             />
           </Form.Group>
+
+          <DatePicker
+            id="DatePicker"
+            placeholder="Дата рождения"
+            className="add-curator__date-picker"
+            locale={{
+              sunday: "Вс",
+              monday: "Пн",
+              tuesday: "Вт",
+              wednesday: "Ср",
+              thursday: "Чт",
+              friday: "Пн",
+              saturday: "Сб",
+              ok: "OK",
+              today: "Сегодня",
+              yesterday: "Вчера",
+            }}
+            format="dd.MM.yyyy"
+            onChange={handlePeriodClick}
+          />
+        </Col>
+
+        <Col className="add-curator__column">
+          <Form.Group controlId="LoginForm">
+            <Form.Control
+              type="text"
+              placeholder="Логин"
+              value={loginValue}
+              className="add-currator__input"
+              onChange={handleLoginChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="PasswordForm">
+            <Form.Control
+              type="text"
+              placeholder="Пароль"
+              value={passwordValue}
+              className="add-currator__input"
+              onChange={handlePasswordChange}
+            />
+          </Form.Group>
+
           <DropdownButton
             id="dropdown-custom-1"
             title={selectedItem || "Выбрать департамент"}
@@ -121,16 +340,28 @@ function AddCurator() {
               </Dropdown.Item>
             ))}
           </DropdownButton>
-          <Button
-            variant="primary"
-            id="ButtonForm"
-            type="submit"
+          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
+          <ButtonCustom
+            title="Применить"
+            className={"add-curator__btn"}
             onClick={handleAddCurator}
-          >
-            Применить
-          </Button>
+          />
         </Col>
       </Row>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ваше обращение создано</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Новый куратор успешно добавлен</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

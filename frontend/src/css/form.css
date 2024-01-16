@@ -4,10 +4,18 @@
   gap: 25px;
 }
 
+.form__input {
+  width: 672px !important;
+  font-size: 20px !important;
+  border: 1px solid #8c8c8c !important;
+}
+
 #TextareaForm {
   width: 672px;
   padding: 20px 13px;
   resize: none;
+  font-size: 20px;
+  border: 1px solid #8c8c8c !important;
 }
 
 #FileInputForm {
@@ -27,25 +35,28 @@
   border: none;
 }
 
-
 @media screen and (max-width: 768px) {
   #TextareaForm {
     width: 100%;
   }
-  
+
   #FileInputForm {
-    width: 100%;
+    width: 100% !important;
   }
-  
+
+  .form__input {
+    width: 100% !important;
+  }
+
   #ButtonForm {
     width: 100%;
   }
-  
+
   .form__row {
     gap: 20px;
   }
 
-  .dropdown button{
+  .dropdown button {
     font-size: 16px !important;
   }
 }

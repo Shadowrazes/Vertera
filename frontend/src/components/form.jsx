@@ -320,7 +320,7 @@ function FormComponent() {
           email: emailValue,
         },
       }).then((newUserId) => {
-        console.log(newUserId);
+        // console.log(newUserId);
         userId = newUserId.data.addClientUser;
         addTicketWithFiles();
       });
@@ -368,7 +368,7 @@ function FormComponent() {
       <TitleH2 title="Создать обращение" className="title__heading" />
       <Form method="post">
         <Row className="form__row">
-          <Col md={4} col={12} className="form__column">
+          <Col className="form__column">
             <DropdownButton
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
@@ -428,12 +428,13 @@ function FormComponent() {
             )}
           </Col>
 
-          <Col md={8} col={12} className="form__column">
+          <Col className="form__column">
             {!user && (
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
                   placeholder="Ваше имя"
+                  className="form__input"
                   value={nameValue}
                   onChange={handleNameChange}
                 />
@@ -444,6 +445,7 @@ function FormComponent() {
                 <Form.Control
                   type="email"
                   placeholder="Ваш email"
+                  className="form__input"
                   value={emailValue}
                   onChange={handleEmailChange}
                 />
