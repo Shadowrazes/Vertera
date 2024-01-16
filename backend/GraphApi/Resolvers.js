@@ -216,6 +216,9 @@ export const resolvers = {
         departments: async (parent, args) => {
             return await HelperDepartment.GetListByHelperId(parent.id);
         },
+        stats: async (parent, args) => {
+            return await Helper.GetStatsById(parent.id);
+        },
     },
     HelperJobTitle: {
         name: async (parent, args) => {

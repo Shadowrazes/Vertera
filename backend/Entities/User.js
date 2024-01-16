@@ -56,7 +56,7 @@ class User extends Entity{
     }
 
     static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} <> 0`;
         const result = await super.Request(sql);
         return result;
     }

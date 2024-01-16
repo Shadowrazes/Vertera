@@ -106,6 +106,7 @@ export const typeDefs = `
         birthday: DateTime!
         departments: [Department]!
         startWorkDate: DateTime!
+        stats: HelperStats!
         user: User!
     }
 

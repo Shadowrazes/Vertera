@@ -19,20 +19,20 @@ class Helper extends Entity{
     }
 
     static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} <> 0`;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetStats(helperId) {
+    static async GetStatsById(helperId) {
         const sql = `
             SELECT 
                 COUNT(*) AS totalTickets,
-                SUM(statusId = 1) AS newTickets,
-                SUM(statusId = 2) AS closedTickets,
-                SUM(statusId = 3) AS inProgressTickets,
-                SUM(reaction = 'like') AS likes,
-                SUM(reaction = 'dislike') AS dislikes,
+                COALESCE(SUM(statusId = 1), 0) AS newTickets,
+                COALESCE(SUM(statusId = 2), 0) AS closedTickets,
+                COALESCE(SUM(statusId = 3), 0) AS inProgressTickets,
+                COALESCE(SUM(reaction = 'like'), 0) AS likes,
+                COALESCE(SUM(reaction = 'dislike'), 0) AS dislikes,
                 COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
             WHERE ${Ticket.HelperIdField} = ?;
@@ -40,8 +40,6 @@ class Helper extends Entity{
         const result = await super.Request(sql, [helperId]);
 
         let stats = result[0];
-        console.log(stats);
-
 
         const msgSql = `
             SELECT  ${Message.SenderIdField}, ${Message.DateField}  
@@ -49,7 +47,6 @@ class Helper extends Entity{
             WHERE   ${Message.SenderIdField} = ? OR ${Message.RecieverIdField} = ?
         `;
         const msgResult = await super.Request(msgSql, [helperId, helperId]);
-        console.log(msgResult);
 
         // первое сообщение всегда от клиента
         let clientMsg = msgResult[0];
@@ -57,7 +54,6 @@ class Helper extends Entity{
         let skipToNextClient = false;
 
         for(const curMsg of msgResult){
-            console.log(curMsg.senderId);
             if(skipToNextClient){
                 if(curMsg.senderId != helperId){
                     clientMsg = curMsg;
@@ -69,11 +65,14 @@ class Helper extends Entity{
             if(curMsg.senderId == helperId){
                 dateDiffs.push(curMsg.date - clientMsg.date);
                 skipToNextClient = true;
-                console.log(curMsg.date);
             }
         }
 
-        console.log(dateDiffs);
+        const avgTimeMilli = dateDiffs.reduce((sum, current) => sum + current, 0) / dateDiffs.length;
+        const avgTimeHours = +((avgTimeMilli / 60000 / 60).toFixed(2));
+        stats.avgReplyTime = isNaN(avgTimeHours) ? 1 : avgTimeHours;
+        stats.fantasy = +((1 / stats.avgReplyTime + 0.2 * stats.likes - 0.15 * stats.dislikes).toFixed(3));
+
         return stats;
     }
 
