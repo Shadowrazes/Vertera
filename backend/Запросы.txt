@@ -37,6 +37,37 @@ query	{
   }
 }
 
+query{
+  helperStatList(orderBy: "fantasy", orderDir:"desc", limit: 5, offset: 0){
+    helper{
+      id
+      jobTitle{
+        name(lang:"ru"){
+          stroke
+        }
+      }
+      birthday
+      departments{
+        id
+      }
+      user{
+        name
+      }
+    }
+    stats{
+      totalTickets
+      newTickets
+      inProgressTickets
+      closedTickets
+      avgReplyTime
+      likes
+      dislikes
+      notRated
+      fantasy
+    }
+  }
+}
+
 mutation{
   addHelperUser(userFields: {name: "test", surname:"testic", patronymic: "xddd", countryId: 1, phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitleId: 2, birthday: "2000-11-05", departmentIds: [2, 3]})
 }

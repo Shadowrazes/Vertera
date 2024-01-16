@@ -12,6 +12,7 @@ export const typeDefs = `
 
         helper(id: Int!): Helper
         helperList: [Helper]
+        helperStatList(orderBy: String!, orderDir: String!, limit: Int!, offset: Int!): [HelperStatListItem]
 
         ticket(id: Int!): Ticket
         ticketList(filters: TicketFilter!): TicketList!
@@ -122,6 +123,11 @@ export const typeDefs = `
         dislikes: Int!
         notRated: Int!
         fantasy: Float!
+    }
+
+    type HelperStatListItem {
+        helper: Helper!
+        stats: HelperStats!
     }
 
     type HelperJobTitle {

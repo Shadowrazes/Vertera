@@ -39,6 +39,9 @@ export const resolvers = {
         helperList: async (_, args) => {
             return await Helper.GetList();
         },
+        helperStatList: async (_, args) => {
+            return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
+        },
         client: async (_, { id }) => {
             // user
             return await Client.GetById(id);

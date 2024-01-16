@@ -37,6 +37,7 @@ class Helper extends Entity{
             FROM ${Ticket.TableName}
             WHERE ${Ticket.HelperIdField} = ?;
         `;
+
         const result = await super.Request(sql, [helperId]);
 
         let stats = result[0];
@@ -74,6 +75,29 @@ class Helper extends Entity{
         stats.fantasy = +((1 / stats.avgReplyTime + 0.2 * stats.likes - 0.15 * stats.dislikes).toFixed(3));
 
         return stats;
+    }
+
+    static async GetStatsList(orderBy, orderDir, limit, offset) {
+        let result = [];
+        const helpers = await this.GetList();
+
+        for(const helper of helpers) {
+            let helperStatData = {};
+            helperStatData.helper = helper;
+            helperStatData.stats = await this.GetStatsById(helper.id);
+            result.push(helperStatData);
+        }
+
+        if (orderDir === 'desc') {
+            result.sort((a, b) => b.stats[orderBy] - a.stats[orderBy]);
+        }
+        else {
+            result.sort((a, b) => a.stats[orderBy] - b.stats[orderBy]);
+        }
+
+        const limitedResult = result.slice(0 + offset, limit + offset);
+
+        return limitedResult;
     }
 
     static async GetMostFreeHelper(subThemeId, departmentId) {
