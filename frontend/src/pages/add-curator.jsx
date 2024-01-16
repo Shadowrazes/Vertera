@@ -13,7 +13,10 @@ import {
 } from "react-bootstrap";
 
 import { DatePicker } from "rsuite";
-import { MDBSelect } from "mdb-react-ui-kit";
+import Select from "react-select";
+// import MDBSelect from "mdb-react-ui-kit";
+// import Multiselect from "multiselect-react-dropdown";
+import { MultiSelect } from "primereact/multiselect";
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
 import { ADD_HELPER } from "../apollo/mutations";
 
@@ -26,8 +29,8 @@ import "../css/add-curator.css";
 function AddCurator() {
   const [departmentList, setDepartmentList] = useState([]);
   const [jobTitleList, setJobTitleList] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState(null);
   const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -46,19 +49,20 @@ function AddCurator() {
   const [loginValue, setLoginValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
 
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const options = [
+    { value: "chocolate", label: "1" },
+    { value: "strawberry", label: "2" },
+    { value: "vanilla", label: "3" },
+  ];
 
-  const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
-
-  const handleToggleOption = (option) => {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(
-        selectedOptions.filter((selected) => selected !== option)
-      );
-    } else {
-      setSelectedOptions([...selectedOptions, option]);
-    }
-  };
+  const [selectedCities, setSelectedCities] = useState([]);
+  const cities = [
+    { name: "New York", code: "NY" },
+    { name: "Rome", code: "RM" },
+    { name: "London", code: "LDN" },
+    { name: "Istanbul", code: "IST" },
+    { name: "Paris", code: "PRS" },
+  ];
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
   const {
@@ -125,6 +129,12 @@ function AddCurator() {
     setSelectedDepartmentId(departmentId);
   };
 
+  const handleDepartmentsOnChange = (departments) => {
+    setSelectedDepartments(departments);
+    setSelectedDepartmentsId(departments.map((id) => id.id));
+    console.log(departments);
+  };
+
   const handleJobTitleClick = (jobTitle, jobTitleId) => {
     setSelectedItemJobTitle(jobTitle);
     setSelectedJobTitle(jobTitle);
@@ -160,7 +170,7 @@ function AddCurator() {
       error = "Укажите пароль";
     } else if (passwordValue.trim().length < 6) {
       error = "Плохой пароль";
-    } else if (selectedDepartmentId == null) {
+    } else if (selectedDepartmentsId == []) {
       error = "Выберите департамент";
     } else if (selectedJobTitleId == null) {
       error = "Выберите должность";
@@ -181,8 +191,7 @@ function AddCurator() {
     console.log(selectedDate);
     console.log(loginValue);
     console.log(passwordValue);
-    console.log(selectedDepartment);
-    console.log(selectedDepartmentId);
+    console.log(selectedDepartmentsId);
     console.log(selectedJobTitle);
     console.log(selectedJobTitleId);
 
@@ -195,7 +204,7 @@ function AddCurator() {
       loginValue.trim() == "" ||
       passwordValue.trim() == "" ||
       passwordValue.trim().length < 6 ||
-      selectedDepartmentId == null ||
+      selectedDepartmentsId == [] ||
       selectedJobTitleId == null
     ) {
       setIsErrorVisible(true);
@@ -207,11 +216,13 @@ function AddCurator() {
     try {
       const result = await addHelper({
         variables: {
-          fullName: nameValue,
+          name: nameValue,
+          surname: surnameValue,
+          patronymic: patronymicValue,
           phone: phoneValue,
           login: loginValue,
           password: passwordValue,
-          departmentId: selectedDepartmentId,
+          departmentId: selectedDepartmentsId,
           birthday: selectedDate,
           jobTitleId: selectedJobTitleId,
         },
@@ -233,6 +244,11 @@ function AddCurator() {
     setShow(false);
     goToAllCurators();
   };
+
+  const newDepartmentList = departmentList.map((department) => ({
+    name: department.name.stroke,
+    id: department.id,
+  }));
 
   return (
     <>
@@ -322,7 +338,7 @@ function AddCurator() {
             />
           </Form.Group>
 
-          <DropdownButton
+          {/* <DropdownButton
             id="dropdown-custom-1"
             title={selectedItem || "Выбрать департамент"}
           >
@@ -337,7 +353,16 @@ function AddCurator() {
                 {department.name.stroke}
               </Dropdown.Item>
             ))}
-          </DropdownButton>
+          </DropdownButton> */}
+
+          <MultiSelect
+            value={selectedDepartments}
+            onChange={(e) => handleDepartmentsOnChange(e.value)}
+            options={newDepartmentList}
+            optionLabel="name"
+            placeholder="Выбрать департамент"
+            className="add-curator__multiselect"
+          />
 
           <DropdownButton
             id="dropdown-custom-1"
@@ -363,6 +388,47 @@ function AddCurator() {
           />
         </Col>
       </Row>
+
+      {/* <Select options={options} /> */}
+      {/* <Multiselect
+        displayValue="key"
+        hideSelectedList
+        onKeyPressFn={function noRefCheck() {}}
+        onRemove={function noRefCheck() {}}
+        onSearch={function noRefCheck() {}}
+        onSelect={function noRefCheck() {}}
+        options={[
+          {
+            cat: "Group 1",
+            key: "Option 1",
+          },
+          {
+            cat: "Group 1",
+            key: "Option 2",
+          },
+          {
+            cat: "Group 1",
+            key: "Option 3",
+          },
+          {
+            cat: "Group 2",
+            key: "Option 4",
+          },
+          {
+            cat: "Group 2",
+            key: "Option 5",
+          },
+          {
+            cat: "Group 2",
+            key: "Option 6",
+          },
+          {
+            cat: "Group 2",
+            key: "Option 7",
+          },
+        ]}
+        showCheckbox
+      /> */}
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

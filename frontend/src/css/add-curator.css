@@ -19,6 +19,72 @@
   border: 1px solid #8c8c8c !important;
 }
 
+.add-curator__multiselect {
+  width:416px;
+  border: 1px solid #8c8c8c;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 20px;
+}
+
+/* .p-multiselect-items-wrapper {
+  background: white;
+  border: 1px solid #8c8c8c;
+  border-top: 1px solid white;
+  border-radius: 6px;
+}
+*/
+
+.p-multiselect-header {
+  background: rgb(249, 250, 251);
+  border-top: 1px solid #8c8c8c;
+  border-bottom: 1px solid rgb(229, 231, 235);
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+  padding: .4rem .8rem;
+  margin-bottom: 10px;
+} 
+
+.p-multiselect-close {
+  padding: .3rem;
+  border-radius: 12px;
+  transition: background-color 0.2s ease 0s, color 0.2s ease 0s, box-shadow 0.2s ease 0s;
+}
+
+.p-multiselect-close:hover {
+  color: rgb(55, 65, 81);
+  border-color: transparent;
+  border-radius: 12px;
+  background: rgb(219, 219, 219);
+}
+
+.p-multiselect-items {
+  padding-left: 0px;
+}
+
+.p-multiselect-item {
+  gap: 10px;
+  padding: 4px 16px;
+  font-size: 20px;;
+}
+
+.p-multiselect-panel {
+  background: white;
+  border: 1px solid #8c8c8c;
+  border-radius: 6px;
+}
+
+.p-checkbox-box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #8c8c8c;
+  border-radius: 6px;
+}
+
+.dropdown-menu {
+  width: 416px !important;
+}
+
 .dropdown button {
   width: 416px !important;
 }
