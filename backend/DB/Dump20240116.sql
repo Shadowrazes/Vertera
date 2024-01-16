@@ -65,7 +65,7 @@ CREATE TABLE `clients` (
 
 LOCK TABLES `clients` WRITE;
 /*!40000 ALTER TABLE `clients` DISABLE KEYS */;
-INSERT INTO `clients` VALUES (1,'hugo@razes.ru'),(4,'alexandr191261@yandex.ru'),(46,'alexandr191261@yandex.ru'),(47,'test@mail.ru'),(48,'reply@mail.ru');
+INSERT INTO `clients` VALUES (1,'hugo@razes.ru'),(4,'alexandr191261@yandex.ru');
 /*!40000 ALTER TABLE `clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -444,7 +444,9 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `fullName` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `surname` varchar(255) NOT NULL,
+  `patronymic` varchar(255) DEFAULT NULL,
   `role` varchar(255) NOT NULL,
   `countryId` int NOT NULL,
   `phone` varchar(45) DEFAULT NULL,
@@ -453,7 +455,7 @@ CREATE TABLE `users` (
   `token` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login_UNIQUE` (`login`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -462,7 +464,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (0,'system','system',1,'','admin','$2b$10$/ROlAMt.QF5wEkDPPAvWp.CMD1ULODFwizUZf.W0ideQPeao7a7tC','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwiaWF0IjoxNzAyNDQ1NjYwLCJleHAiOjE3MDI0NzQ0NjB9.D1rB0ShdEhxkzITO3MzvT9I2AM4KrO031WlW3Zvg1B4'),(1,'sanya','client',1,'797866786',NULL,NULL,NULL),(2,'misha','helper',2,'387654678645','misha','$2b$10$5JIiJqFiZQripQuWGr6Treg1XNXoyZhZjwG.9hXuZfkFzg1ZjUXrK',NULL),(3,'lesha','helper',3,'543345672132','lesha','$2b$10$5JIiJqFiZQripQuWGr6Treg1XNXoyZhZjwG.9hXuZfkFzg1ZjUXrK',NULL),(4,'kostya','client',4,'456575675',NULL,NULL,NULL),(5,'nikita','helper',5,'98728749384','nikita','$2b$10$RIB9SNmYE0QqA1rr8dgHHe4BDr5.qyKkK92rjEIMgntSCCZRHBGjO',NULL),(46,'test testich','client',1,'79999999','test','$2b$10$GgnULXdvdLkH1c3qFTIGCePrwBbovZ2fCNR1/74yzDfwRzHpsV0sG','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDYsImlhdCI6MTcwMjQzNjU4NCwiZXhwIjoxNzAyNDY1Mzg0fQ.sggh29YPEcwDjb1PakaEUuSDOvonwpFZK2MdDJhLYGQ'),(47,'repeat','client',2,'79999999','repeat','$2b$10$F.iBAtedtqOfZQozi1AI4uJeeVvQ3/HbFqoKc0kht0AeafRsV5OLq',NULL),(48,'test testich','client',1,NULL,NULL,NULL,NULL);
+INSERT INTO `users` VALUES (0,'system','system',NULL,'system',1,'','admin','$2b$10$/ROlAMt.QF5wEkDPPAvWp.CMD1ULODFwizUZf.W0ideQPeao7a7tC','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwiaWF0IjoxNzAyNDQ1NjYwLCJleHAiOjE3MDI0NzQ0NjB9.D1rB0ShdEhxkzITO3MzvT9I2AM4KrO031WlW3Zvg1B4'),(1,'sanya','beats','bass','client',1,'797866786',NULL,NULL,NULL),(2,'misha','ghoul',NULL,'helper',2,'387654678645','misha','$2b$10$5JIiJqFiZQripQuWGr6Treg1XNXoyZhZjwG.9hXuZfkFzg1ZjUXrK',NULL),(3,'lesha','tatika','父称','helper',3,'543345672132','lesha','$2b$10$5JIiJqFiZQripQuWGr6Treg1XNXoyZhZjwG.9hXuZfkFzg1ZjUXrK',NULL),(4,'kostya','alcohole',NULL,'client',4,'456575675',NULL,NULL,NULL),(5,'nikita','crown',NULL,'helper',5,'98728749384','nikita','$2b$10$RIB9SNmYE0QqA1rr8dgHHe4BDr5.qyKkK92rjEIMgntSCCZRHBGjO',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -475,4 +477,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-01-12 12:36:07
+-- Dump completed on 2024-01-16 15:10:09

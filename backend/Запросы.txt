@@ -38,11 +38,14 @@ query	{
 }
 
 mutation{
-  addHelperUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitle: "Куратор", birthday: "2000-11-05", departmentIds: [1, 2]})
+  addHelperUser(userFields: {name: "test", surname:"testic", patronymic: "xddd", countryId: 1, phone: "79999999", login: "test1", password: "testtik"}, helperFields: {jobTitleId: 2, birthday: "2000-11-05", departmentIds: [2, 3]})
 }
 
 mutation{
-  addClientUser(userFields: {fullName: "test testich", country: "russia", phone: "79999999", login: "test", password: "testtik"}, clientFields: {email: "test@mail.ru"})
+  addClientUser(
+    userFields: {name: "test", surname:"testic", patronymic: "xddd", countryId: 1, phone: "79999999", 
+      login: "test", password: "testtik"},
+    clientFields: {email: "testasd@mail.ru"})
 }
 
 mutation{

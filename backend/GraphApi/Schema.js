@@ -83,7 +83,9 @@ export const typeDefs = `
 
     type User {
         id: Int!
-        fullName: String!
+        name: String!
+        surname: String!
+        patronymic: String
         role: String!
         country: Country!
         phone: String
@@ -252,7 +254,9 @@ export const typeDefs = `
     }
 
     input UserInsert {
-        fullName: String!
+        name: String!
+        surname: String!
+        patronymic: String
         countryId: Int!
         login: String
         password: String
@@ -344,7 +348,9 @@ export const typeDefs = `
     }
 
     input UserUpdate {
-        fullName: String
+        name: String
+        surname: String
+        patronymic: String
         countryId: Int
         password: String
         phone: String

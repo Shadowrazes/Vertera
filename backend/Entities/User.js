@@ -5,7 +5,9 @@ import Token from "../Utils/Token.js"
 class User extends Entity{
     static TableName = 'users';
     static PrimaryField = 'id';
-    static FullNameField = 'fullName';
+    static NameField = 'name';
+    static SurnameField = 'surname';
+    static PatronymicField = 'patronymic';
     static RoleField = 'role';
     static CountryIdField = 'countryId';
     static LoginField = 'login';

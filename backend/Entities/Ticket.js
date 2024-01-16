@@ -210,8 +210,7 @@ class Ticket extends Entity{
             const messageResult = await Message.TransInsert(messageFields, conn);
 
             const helperResult = await User.GetById(helperId);
-            const helperFullNameSplit = helperResult.fullName.trim().split(' ');
-            const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
+            const helperName = helperResult.name ? helperResult.name : 'Anonymous';
 
             const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
                                    ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
@@ -220,7 +219,7 @@ class Ticket extends Entity{
             const userResult = await User.GetById(ticketFields.clientId);
             const clientResult = await Client.GetById(ticketFields.clientId);
             const dialogLink = baseUrl + `/dialog/${ticketFields.clientId}/${result.insertId}/`
-            const emailText = `Здравствуйте, ${userResult.fullName}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
+            const emailText = `Здравствуйте, ${userResult.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
             EmailSender.Notify(clientResult.email, emailText);
  
             return {id: result.insertId, clientId: ticketFields.clientId, link: dialogLink};
@@ -242,8 +241,7 @@ class Ticket extends Entity{
                 }
 
                 const helperResult = await User.GetById(fields.helperId);
-                const helperFullNameSplit = helperResult.fullName.trim().split(' ');
-                const helperName = helperFullNameSplit.length > 1 ? helperFullNameSplit[1] : helperFullNameSplit[0];
+                const helperName = helperResult.name ? helperResult.name : 'Anonymous';
     
                 const msgFields = { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
                                     ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
