@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 
 import { DatePicker } from "rsuite";
+import { MDBSelect } from "mdb-react-ui-kit";
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
 import { ADD_HELPER } from "../apollo/mutations";
 
@@ -44,6 +45,20 @@ function AddCurator() {
   const [phoneValue, setPhoneValue] = useState("");
   const [loginValue, setLoginValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
+
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
+
+  const handleToggleOption = (option) => {
+    if (selectedOptions.includes(option)) {
+      setSelectedOptions(
+        selectedOptions.filter((selected) => selected !== option)
+      );
+    } else {
+      setSelectedOptions([...selectedOptions, option]);
+    }
+  };
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
   const {
