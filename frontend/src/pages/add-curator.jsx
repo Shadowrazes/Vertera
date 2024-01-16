@@ -39,7 +39,11 @@ function AddCurator() {
   const [show, setShow] = useState(false);
 
   const [nameValue, setNameValue] = useState("");
+  const [surnameValue, setSurnameValue] = useState("");
+  const [patronymicValue, setPatronymicValue] = useState("");
   const [phoneValue, setPhoneValue] = useState("");
+  const [loginValue, setLoginValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
   const {
@@ -80,6 +84,22 @@ function AddCurator() {
     setNameValue(e.target.value);
   };
 
+  const handleSurnameChange = (e) => {
+    setSurnameValue(e.target.value);
+  };
+
+  const handlePatronymicChange = (e) => {
+    setPatronymicValue(e.target.value);
+  };
+
+  const handleLoginChange = (e) => {
+    setLoginValue(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordValue(e.target.value);
+  };
+
   const handlePhoneChange = (e) => {
     setPhoneValue(e.target.value);
   };
@@ -111,14 +131,24 @@ function AddCurator() {
   const errorMsg = () => {
     let error = "";
 
-    if (selectedDepartmentId == null) {
+    if (nameValue.trim() == "") {
+      error = "Введите имя";
+    } else if (surnameValue.trim() == "") {
+      error = "Введите Фамилию";
+    } else if (phoneValue.trim() == "") {
+      error = "Введите номер телефона";
+    } else if (selectedDate == null) {
+      error = "Выберите дату рождения";
+    } else if (loginValue.trim() == "") {
+      error = "Укажите логин";
+    } else if (passwordValue.trim() == "") {
+      error = "Укажите пароль";
+    } else if (passwordValue.trim().length < 6) {
+      error = "Плохой пароль";
+    } else if (selectedDepartmentId == null) {
       error = "Выберите департамент";
     } else if (selectedJobTitleId == null) {
       error = "Выберите должность";
-    } else if (nameValue.trim() == "") {
-      error = "Введите имя";
-    } else if (phoneValue.trim() == "") {
-      error = "Введите номер телефона";
     } else {
       error = "Ошибка при добавлении куратора";
     }
@@ -130,8 +160,12 @@ function AddCurator() {
     e.preventDefault();
 
     console.log(nameValue);
+    console.log(surnameValue);
+    console.log(patronymicValue);
     console.log(phoneValue);
     console.log(selectedDate);
+    console.log(loginValue);
+    console.log(passwordValue);
     console.log(selectedDepartment);
     console.log(selectedDepartmentId);
     console.log(selectedJobTitle);
@@ -139,7 +173,13 @@ function AddCurator() {
 
     if (
       nameValue.trim() == "" ||
+      surnameValue.trim() == "" ||
+      patronymicValue.trim() == "" ||
       phoneValue.trim() == "" ||
+      selectedDate == null ||
+      loginValue.trim() == "" ||
+      passwordValue.trim() == "" ||
+      passwordValue.trim().length < 6 ||
       selectedDepartmentId == null ||
       selectedJobTitleId == null
     ) {
@@ -154,6 +194,8 @@ function AddCurator() {
         variables: {
           fullName: nameValue,
           phone: phoneValue,
+          login: loginValue,
+          password: passwordValue,
           departmentId: selectedDepartmentId,
           birthday: selectedDate,
           jobTitleId: selectedJobTitleId,
@@ -186,12 +228,33 @@ function AddCurator() {
           <Form.Group controlId="NameForm">
             <Form.Control
               type="text"
-              placeholder="ФИО"
+              placeholder="Имя"
               value={nameValue}
               className="add-currator__input"
               onChange={handleNameChange}
             />
           </Form.Group>
+
+          <Form.Group controlId="SurNameForm">
+            <Form.Control
+              type="text"
+              placeholder="Фамилия"
+              value={surnameValue}
+              className="add-currator__input"
+              onChange={handleSurnameChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="PatronymicForm">
+            <Form.Control
+              type="text"
+              placeholder="Отчество (при наличии)"
+              value={patronymicValue}
+              className="add-currator__input"
+              onChange={handlePatronymicChange}
+            />
+          </Form.Group>
+
           <Form.Group controlId="PhoneForm">
             <Form.Control
               type="phone"
@@ -221,6 +284,28 @@ function AddCurator() {
             format="dd.MM.yyyy"
             onChange={handlePeriodClick}
           />
+        </Col>
+
+        <Col className="add-curator__column">
+          <Form.Group controlId="LoginForm">
+            <Form.Control
+              type="text"
+              placeholder="Логин"
+              value={loginValue}
+              className="add-currator__input"
+              onChange={handleLoginChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="PasswordForm">
+            <Form.Control
+              type="text"
+              placeholder="Пароль"
+              value={passwordValue}
+              className="add-currator__input"
+              onChange={handlePasswordChange}
+            />
+          </Form.Group>
 
           <DropdownButton
             id="dropdown-custom-1"

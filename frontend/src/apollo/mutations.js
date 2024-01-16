@@ -81,12 +81,20 @@ export const ADD_HELPER = gql`
   mutation (
     $fullName: String!
     $phone: String
+    $login: String
+    $password: String
     $jobTitleId: Int!
     $birthday: DateTime!
     $departmentId: [Int]!
   ) {
     addHelperUser(
-      userFields: { fullName: $fullName, phone: $phone, countryId: 1 }
+      userFields: {
+        fullName: $fullName
+        phone: $phone
+        login: $login
+        password: $password
+        countryId: 1
+      }
       helperFields: {
         jobTitleId: $jobTitleId
         birthday: $birthday
