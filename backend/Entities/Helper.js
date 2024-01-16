@@ -1,6 +1,7 @@
 import Entity from "./Entity.js";
 import User from "./User.js";
 import Ticket from "./Ticket.js";
+import Message from "./Message.js";
 import HelperDepartment from "./HelperDepartment.js";
 import ThemeDepartment from "./ThemeDepartment.js";
 
@@ -21,6 +22,59 @@ class Helper extends Entity{
         const sql = `SELECT * FROM ${this.TableName}`;
         const result = await super.Request(sql);
         return result;
+    }
+
+    static async GetStats(helperId) {
+        const sql = `
+            SELECT 
+                COUNT(*) AS totalTickets,
+                SUM(statusId = 1) AS newTickets,
+                SUM(statusId = 2) AS closedTickets,
+                SUM(statusId = 3) AS inProgressTickets,
+                SUM(reaction = 'like') AS likes,
+                SUM(reaction = 'dislike') AS dislikes,
+                COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
+            FROM ${Ticket.TableName}
+            WHERE ${Ticket.HelperIdField} = ?;
+        `;
+        const result = await super.Request(sql, [helperId]);
+
+        let stats = result[0];
+        console.log(stats);
+
+
+        const msgSql = `
+            SELECT  ${Message.SenderIdField}, ${Message.DateField}  
+            FROM    ${Message.TableName} 
+            WHERE   ${Message.SenderIdField} = ? OR ${Message.RecieverIdField} = ?
+        `;
+        const msgResult = await super.Request(msgSql, [helperId, helperId]);
+        console.log(msgResult);
+
+        // первое сообщение всегда от клиента
+        let clientMsg = msgResult[0];
+        let dateDiffs = [];
+        let skipToNextClient = false;
+
+        for(const curMsg of msgResult){
+            console.log(curMsg.senderId);
+            if(skipToNextClient){
+                if(curMsg.senderId != helperId){
+                    clientMsg = curMsg;
+                    skipToNextClient = false;
+                }
+                continue;
+            }
+
+            if(curMsg.senderId == helperId){
+                dateDiffs.push(curMsg.date - clientMsg.date);
+                skipToNextClient = true;
+                console.log(curMsg.date);
+            }
+        }
+
+        console.log(dateDiffs);
+        return stats;
     }
 
     static async GetMostFreeHelper(subThemeId, departmentId) {

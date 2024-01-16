@@ -63,3 +63,6 @@ else {
     https.createServer(options, app).listen(port);
     console.log('Server HTTPS started');
 }
+
+import Helper from './Entities/Helper.js';
+//const a = Helper.GetStats(2);
