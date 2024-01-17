@@ -39,9 +39,9 @@ class User extends Entity{
     static async AccessAllow(level, token) {
         const userRole = await this.GetRoleByToken(token);
 
-        if(level == 'user') return this.userAccess.includes(userRole);
-        if(level == 'helper') return this.helperAccess.includes(userRole);
-        if(level == 'admin') return this.adminAccess.includes(userRole);
+        if(level == 'client') return this.userAccess.includes(userRole);
+        else if(level == 'helper') return this.helperAccess.includes(userRole);
+        else if(level == 'system') return this.adminAccess.includes(userRole);
     }
 
     static async GetRoleByToken(token) {
@@ -66,7 +66,7 @@ class User extends Entity{
     static async TransInsert(conn, fields) {
         const sql = `INSERT INTO ${this.TableName} SET ?`;
 
-        if(!fields.login || !fields.password){
+        if(fields.password && !fields.login || !fields.password && fields.login){
             throw new Error('No password or login');
         }
 
