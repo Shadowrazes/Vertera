@@ -86,6 +86,10 @@ function Chat() {
         setIsVisible(false);
       }
 
+      if (data.ticket.messages.length == 1) {
+        setIsHideMessages(false);
+      }
+
       if (location.state && location.state.linkPrev) {
         setLinkPrev(location.state.linkPrev);
       }

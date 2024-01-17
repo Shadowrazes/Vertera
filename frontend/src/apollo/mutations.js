@@ -58,7 +58,9 @@ export const UPDATE_STATUS = gql`
 
 export const ADD_CLIENT_USER = gql`
   mutation (
-    $fullName: String!
+    $name: String!
+    $surname: String!
+    $patronymic: String
     $login: String
     $password: String
     $phone: String
@@ -66,7 +68,9 @@ export const ADD_CLIENT_USER = gql`
   ) {
     addClientUser(
       userFields: {
-        name: $fullName
+        name: $name
+        surname: $surname
+        patronymic: $patronymic
         countryId: 1
         login: $login
         password: $password
@@ -77,7 +81,7 @@ export const ADD_CLIENT_USER = gql`
   }
 `;
 
-export const ADD_HELPER = gql`
+export const ADD_HELPER_USER = gql`
   mutation (
     $name: String!
     $surname: String!

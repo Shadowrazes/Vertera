@@ -26,8 +26,10 @@ function FormComponent() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
 
-  const [nameValue, setNameValue] = useState("");
-  const [emailValue, setEmailValue] = useState("");
+  const [nameValue, setNameValue] = useState(null);
+  const [surnameValue, setSurnameValue] = useState(null);
+  const [patronymicValue, setPatronymicValue] = useState(null);
+  const [emailValue, setEmailValue] = useState(null);
 
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
@@ -149,7 +151,7 @@ function FormComponent() {
   }
 
   if ((userRole && userRole === "helper") || userRole === "system") {
-    console.log(132);
+    // console.log(132);
     return <></>;
   }
 
@@ -215,6 +217,14 @@ function FormComponent() {
     setNameValue(e.target.value);
   };
 
+  const handleSurnameChange = (e) => {
+    setSurnameValue(e.target.value);
+  };
+
+  const handlePatronymicChange = (e) => {
+    setPatronymicValue(e.target.value);
+  };
+
   const handleEmailChange = (e) => {
     setEmailValue(e.target.value);
   };
@@ -247,10 +257,14 @@ function FormComponent() {
       error = "Выберите подтему";
     } else if (textareaValue.trim() == "") {
       error = "Опишите Вашу проблему";
-    } else if (nameValue.trim() == "") {
-      error = "Введите ваше имя";
-    } else if (emailValue.trim() == "") {
+    } else if (nameValue?.trim() == "") {
+      error = "Укажите ваше имя";
+    } else if (surnameValue?.trim() == "") {
+      error = "Укажите вашу фамилию";
+    } else if (emailValue?.trim() == "") {
       error = "Введите ваш email";
+    } else if (!emailValue?.includes("@")) {
+      error = "Неверно указан email";
     }
 
     return error;
@@ -303,7 +317,11 @@ function FormComponent() {
       selectedUnitId == null ||
       selectedThemeId == null ||
       selectedSubThemeId == null ||
-      textareaValue.trim() == ""
+      nameValue?.trim() == "" ||
+      surnameValue?.trim() == "" ||
+      textareaValue.trim() == "" ||
+      emailValue?.trim() == "" ||
+      (emailValue !== null && !emailValue.includes("@"))
     ) {
       // console.log("xdd");
       setIsVisible(true);
@@ -311,19 +329,38 @@ function FormComponent() {
     }
 
     if (user === null) {
-      addClientUser({
-        variables: {
-          fullName: nameValue,
-          login: emailValue.split("@")[0],
-          password: "crown12345",
-          phone: "+79991112233",
-          email: emailValue,
-        },
-      }).then((newUserId) => {
-        // console.log(newUserId);
-        userId = newUserId.data.addClientUser;
-        addTicketWithFiles();
-      });
+      if (patronymicValue.trim() == "") {
+        addClientUser({
+          variables: {
+            name: nameValue.trim(),
+            surname: surnameValue.trim(),
+            login: emailValue.split("@")[0],
+            password: "crown12345",
+            phone: "+79991112233",
+            email: emailValue.trim(),
+          },
+        }).then((newUserId) => {
+          // console.log(newUserId);
+          userId = newUserId.data.addClientUser;
+          addTicketWithFiles();
+        });
+      } else {
+        addClientUser({
+          variables: {
+            name: nameValue.trim(),
+            surname: surnameValue.trim(),
+            patronymic: patronymicValue.trim(),
+            login: emailValue.split("@")[0],
+            password: "crown12345",
+            phone: "+79991112233",
+            email: emailValue.trim(),
+          },
+        }).then((newUserId) => {
+          // console.log(newUserId);
+          userId = newUserId.data.addClientUser;
+          addTicketWithFiles();
+        });
+      }
     } else {
       userId = user.id;
       addTicketWithFiles();
@@ -430,15 +467,35 @@ function FormComponent() {
 
           <Col className="form__column">
             {!user && (
-              <Form.Group controlId="NameForm">
-                <Form.Control
-                  type="text"
-                  placeholder="Ваше имя"
-                  className="form__input"
-                  value={nameValue}
-                  onChange={handleNameChange}
-                />
-              </Form.Group>
+              <>
+                <Form.Group controlId="NameForm">
+                  <Form.Control
+                    type="text"
+                    placeholder="Ваше имя"
+                    className="form__input"
+                    value={nameValue}
+                    onChange={handleNameChange}
+                  />
+                </Form.Group>
+                <Form.Group controlId="SurnameForm">
+                  <Form.Control
+                    type="text"
+                    placeholder="Ваша фамилия"
+                    className="form__input"
+                    value={surnameValue}
+                    onChange={handleSurnameChange}
+                  />
+                </Form.Group>
+                <Form.Group controlId="panronymicForm">
+                  <Form.Control
+                    type="text"
+                    placeholder="Ваше отчество (при наличии)"
+                    className="form__input"
+                    value={patronymicValue}
+                    onChange={handlePatronymicChange}
+                  />
+                </Form.Group>
+              </>
             )}
             {!user && (
               <Form.Group controlId="EmailForm">

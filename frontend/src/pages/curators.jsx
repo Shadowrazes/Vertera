@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { CURATORS_LIST } from "../apollo/queries";
 
@@ -79,7 +79,11 @@ function Curators() {
         <tbody>
           {curators.map((curator) => (
             <tr key={curator.id}>
-              <td>{curator.user.fullName}</td>
+              <td>
+                {`${curator.user.surname} ${curator.user.name} ${
+                  curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+                }`}
+              </td>
               <td>
                 {curator.birthday.replace(
                   /^(\d{4})-(\d{2})-(\d{2}).*/,
@@ -94,7 +98,15 @@ function Curators() {
                 )}
               </td>
               <td>
-                <img src={EditIcon} alt="" />
+                <Link
+                  to={`/edit-curator/${curator.id}`}
+                  state={{
+                    linkPrev: window.location.href,
+                  }}
+                  className="alltickets__link"
+                >
+                  <img src={EditIcon} alt="" />
+                </Link>
               </td>
             </tr>
           ))}
