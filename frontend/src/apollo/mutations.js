@@ -66,7 +66,7 @@ export const ADD_CLIENT_USER = gql`
   ) {
     addClientUser(
       userFields: {
-        fullName: $fullName
+        name: $fullName
         countryId: 1
         login: $login
         password: $password
@@ -79,7 +79,9 @@ export const ADD_CLIENT_USER = gql`
 
 export const ADD_HELPER = gql`
   mutation (
-    $fullName: String!
+    $name: String!
+    $surname: String!
+    $patronymic: String
     $phone: String
     $login: String
     $password: String
@@ -89,7 +91,9 @@ export const ADD_HELPER = gql`
   ) {
     addHelperUser(
       userFields: {
-        fullName: $fullName
+        name: $name
+        surname: $surname
+        patronymic: $patronymic
         phone: $phone
         login: $login
         password: $password
