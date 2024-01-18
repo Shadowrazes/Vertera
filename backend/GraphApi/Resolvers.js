@@ -57,6 +57,8 @@ export const resolvers = {
             //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
             return await Client.GetList();
         },
+        //если есть токен, валидируем, если нет, то проверяем клиента тикета, если аноним, то пускаем
+        // если нет, то пошел нахуй
         ticket: async (_, { id }) => {
             return await Ticket.GetById(id);
         },

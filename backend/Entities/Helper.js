@@ -8,7 +8,7 @@ import ThemeDepartment from "./ThemeDepartment.js";
 class Helper extends Entity{
     static TableName = 'helpers';
     static PrimaryField = 'id';
-    static JobTitleField = 'jobTitle';
+    static JobTitleIdField = 'jobTitleId';
     static BirthdayField = 'birthday';
     static StartWorkDateField = 'startWorkDate';
 
@@ -163,7 +163,7 @@ class Helper extends Entity{
 
             let helperResult = super.EmptyUpdateInfo;
             if(super.ArgsSize(helperArgs) != 1 && helperArgs.departmentIds){
-                const helperFields = { jobTitle: helperArgs.jobTitle, birthday: helperArgs.birthday };
+                const helperFields = { jobTitleId: helperArgs.jobTitleId, birthday: helperArgs.birthday };
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
             }
