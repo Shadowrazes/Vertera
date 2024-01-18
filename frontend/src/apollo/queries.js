@@ -31,7 +31,9 @@ export const TABLE_TICKETS = gql`
         }
         lastMessage {
           sender {
-            fullName
+            name
+            surname
+            patronymic
           }
           date
         }
@@ -79,7 +81,9 @@ export const TABLE_TICKETS_USER = gql`
         }
         lastMessage {
           sender {
-            fullName
+            name
+            surname
+            patronymic
           }
           date
         }
@@ -188,13 +192,21 @@ export const ATTACHEMNTS_LIST = gql`
 export const CURATORS_LIST = gql`
   query {
     helperList {
-      user {
+      id
+      jobTitle {
         id
-        fullName
+        name(lang: "ru") {
+          stroke
+        }
       }
       birthday
-      id
       startWorkDate
+      user {
+        id
+        name
+        surname
+        patronymic
+      }
     }
   }
 `;
@@ -205,6 +217,28 @@ export const JOB_TITLE_LIST = gql`
       id
       name(lang: "ru") {
         stroke
+      }
+    }
+  }
+`;
+
+export const HELPER = gql`
+  query ($id: Int!) {
+    helper(id: $id) {
+      id
+      jobTitle {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+      birthday
+      startWorkDate
+      user {
+        id
+        name
+        surname
+        patronymic
       }
     }
   }

@@ -7,6 +7,7 @@ import Chat from "./pages/chat";
 import CreateTicket from "./pages/create-ticket";
 import Curators from "./pages/curators";
 import AddCurator from "./pages/add-curator";
+import EditCurator from "./pages/edit-curator";
 import Admin from "./pages/admin";
 import Loader from "./pages/loading";
 
@@ -21,7 +22,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<CreateTicket />} />
-          {/* <Route path="/all-tickets" element={<AllTickets />} /> */}
           <Route path="/all-tickets" element={<AllTickets />} />
           <Route
             path="/dialog/:userId/:itemId"
@@ -30,6 +30,11 @@ function App() {
           />
           <Route path="/curators" element={<Curators />} />
           <Route path="/add-curator" element={<AddCurator />} />
+          <Route
+            path="/edit-curator/:curatorId"
+            Component={EditCurator}
+            element={<EditCurator />}
+          />
         </Routes>
       </Router>
     </div>

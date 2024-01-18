@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Form,
   Row,
@@ -13,12 +12,9 @@ import {
 } from "react-bootstrap";
 
 import { DatePicker } from "rsuite";
-import Select from "react-select";
-// import MDBSelect from "mdb-react-ui-kit";
-// import Multiselect from "multiselect-react-dropdown";
 import { MultiSelect } from "primereact/multiselect";
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
-import { ADD_HELPER } from "../apollo/mutations";
+import { ADD_HELPER_USER } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
@@ -49,21 +45,6 @@ function AddCurator() {
   const [loginValue, setLoginValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
 
-  const options = [
-    { value: "chocolate", label: "1" },
-    { value: "strawberry", label: "2" },
-    { value: "vanilla", label: "3" },
-  ];
-
-  const [selectedCities, setSelectedCities] = useState([]);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
   const {
     loading: loadingJobTitle,
@@ -89,7 +70,7 @@ function AddCurator() {
     }
   }, [data, dataJobTitle, location.state]);
 
-  const [addHelper] = useMutation(ADD_HELPER);
+  const [addHelperUser] = useMutation(ADD_HELPER_USER);
 
   if (loading) {
     return <Loader />;
@@ -123,16 +104,10 @@ function AddCurator() {
     setPhoneValue(e.target.value);
   };
 
-  const handleDepartmentClick = (department, departmentId) => {
-    setSelectedItem(department);
-    setSelectedDepartment(department);
-    setSelectedDepartmentId(departmentId);
-  };
-
   const handleDepartmentsOnChange = (departments) => {
     setSelectedDepartments(departments);
     setSelectedDepartmentsId(departments.map((id) => id.id));
-    console.log(departments);
+    // console.log(departments);
   };
 
   const handleJobTitleClick = (jobTitle, jobTitleId) => {
@@ -184,21 +159,20 @@ function AddCurator() {
   const handleAddCurator = async (e) => {
     e.preventDefault();
 
-    console.log(nameValue);
-    console.log(surnameValue);
-    console.log(patronymicValue);
-    console.log(phoneValue);
-    console.log(selectedDate);
-    console.log(loginValue);
-    console.log(passwordValue);
-    console.log(selectedDepartmentsId);
-    console.log(selectedJobTitle);
-    console.log(selectedJobTitleId);
+    // console.log(nameValue);
+    // console.log(surnameValue);
+    // console.log(patronymicValue);
+    // console.log(phoneValue);
+    // console.log(selectedDate);
+    // console.log(loginValue);
+    // console.log(passwordValue);
+    // console.log(selectedDepartmentsId);
+    // console.log(selectedJobTitle);
+    // console.log(selectedJobTitleId);
 
     if (
       nameValue.trim() == "" ||
       surnameValue.trim() == "" ||
-      patronymicValue.trim() == "" ||
       phoneValue.trim() == "" ||
       selectedDate == null ||
       loginValue.trim() == "" ||
@@ -214,19 +188,35 @@ function AddCurator() {
     setIsErrorVisible(false);
 
     try {
-      const result = await addHelper({
-        variables: {
-          name: nameValue,
-          surname: surnameValue,
-          patronymic: patronymicValue,
-          phone: phoneValue,
-          login: loginValue,
-          password: passwordValue,
-          departmentId: selectedDepartmentsId,
-          birthday: selectedDate,
-          jobTitleId: selectedJobTitleId,
-        },
-      });
+      let result;
+      if (patronymicValue.trim() == "") {
+        result = await addHelperUser({
+          variables: {
+            name: nameValue.trim(),
+            surname: surnameValue.trim(),
+            phone: phoneValue.trim(),
+            login: loginValue.trim(),
+            password: passwordValue.trim(),
+            departmentId: selectedDepartmentsId,
+            birthday: selectedDate.trim(),
+            jobTitleId: selectedJobTitleId,
+          },
+        });
+      } else {
+        result = await addHelperUser({
+          variables: {
+            name: nameValue.trim(),
+            surname: surnameValue.trim(),
+            patronymic: patronymicValue.trim(),
+            phone: phoneValue.trim(),
+            login: loginValue.trim(),
+            password: passwordValue.trim(),
+            departmentId: selectedDepartmentsId,
+            birthday: selectedDate.trim(),
+            jobTitleId: selectedJobTitleId,
+          },
+        });
+      }
 
       console.log("Куратор успешно добавлен:", result);
       handleShow();
@@ -337,23 +327,6 @@ function AddCurator() {
               onChange={handlePasswordChange}
             />
           </Form.Group>
-
-          {/* <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem || "Выбрать департамент"}
-          >
-            {departmentList.map((department, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() =>
-                  handleDepartmentClick(department.name.stroke, department.id)
-                }
-                href="#"
-              >
-                {department.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton> */}
 
           <MultiSelect
             value={selectedDepartments}
