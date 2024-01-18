@@ -119,7 +119,7 @@ function Chat() {
 
   const [
     updateStatus,
-    { loader: loaderUpdateStatus, error: errorUpdateStatus },
+    { loading: loaderUpdateStatus, error: errorUpdateStatus },
   ] = useMutation(UPDATE_STATUS);
 
   if (loading) {

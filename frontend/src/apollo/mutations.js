@@ -111,3 +111,33 @@ export const ADD_HELPER_USER = gql`
     )
   }
 `;
+
+export const EDIT_HELPER_USER = gql`
+  mutation (
+    $id: Int!
+    $name: String!
+    $surname: String!
+    $patronymic: String
+    $birthday: DateTime!
+    $countryId: Int!
+    $departmentId: [Int]!
+    $jobTitleId: Int!
+  ) {
+    updateHelperUser(
+      id: $id
+      userFields: {
+        name: $name
+        surname: $surname
+        patronymic: $patronymic
+        countryId: $countryId
+      }
+      helperFields: {
+        jobTitleId: $jobTitleId
+        birthday: $birthday
+        departmentIds: $departmentId
+      }
+    ) {
+      changed
+    }
+  }
+`;

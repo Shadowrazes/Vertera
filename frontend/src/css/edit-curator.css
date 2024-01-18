@@ -1,0 +1,23 @@
+.edit-curator__row {
+    display: flex;
+}
+
+.edit-curator__column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.edit-curator__field-label {
+    font-family: 'TT Norms Pro', sans-serif;
+    font-size: 20px;
+}
+
+.edit-curator__field-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-curator__btn {
+    width: 250px !important;
+}
