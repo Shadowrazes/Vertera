@@ -85,7 +85,7 @@ class Translation extends Entity{
     // Code come from other entities, only internal
     // Cascade updating translation & dependent tables by other entities
     static async TransUpdate(conn, fields, code) {
-        if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
+        //if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
 
         const sql = `
             UPDATE ${this.TableName} 
