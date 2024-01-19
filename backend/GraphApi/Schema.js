@@ -26,10 +26,10 @@ export const typeDefs = `
 
         subThemeList: [SubTheme]
         allThemeTree: [Unit]
-        
-        unit:(id: Int!) Unit
-        theme:(id: Int!) Theme
-        subTheme:(id: Int!) SubTheme
+
+        unit(id: Int!): Unit
+        theme(id: Int!): Theme
+        subTheme(id: Int!): SubTheme
 
         departmentList: [Department]
 
