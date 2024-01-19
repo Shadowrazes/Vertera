@@ -292,3 +292,31 @@ export const THEME = gql`
     }
   }
 `;
+
+export const SUBTHEME = gql`
+  query ($id: Int!) {
+    subTheme(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+      theme {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+        unit {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+      }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;

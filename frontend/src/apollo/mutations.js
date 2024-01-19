@@ -175,7 +175,7 @@ export const ADD_THEME = gql`
 `;
 
 export const EDIT_THEME = gql`
-  mutation ($id: Int!, $unitId: Int!, $stroke: String!, $lang: String!) {
+  mutation ($id: Int!, $unitId: Int, $stroke: String, $lang: String!) {
     updateTheme(
       id: $id
       fields: { unitId: $unitId, stroke: $stroke, lang: $lang }
@@ -188,5 +188,51 @@ export const EDIT_THEME = gql`
 export const DELETE_THEME = gql`
   mutation ($id: Int!) {
     deleteTheme(id: $id)
+  }
+`;
+
+export const ADD_SUBTHEME = gql`
+  mutation (
+    $themeId: Int!
+    $stroke: String!
+    $lang: String!
+    $departmentIds: [Int]!
+  ) {
+    addSubTheme(
+      fields: {
+        themeId: $themeId
+        stroke: $stroke
+        lang: $lang
+        departmentIds: $departmentIds
+      }
+    )
+  }
+`;
+
+export const EDIT_SUBTHEME = gql`
+  mutation (
+    $id: Int!
+    $themeId: Int
+    $stroke: String
+    $lang: String!
+    $departmentIds: [Int]
+  ) {
+    updateSubTheme(
+      id: $id
+      fields: {
+        themeId: $themeId
+        stroke: $stroke
+        lang: $lang
+        departmentIds: $departmentIds
+      }
+    ) {
+      changed
+    }
+  }
+`;
+
+export const DELETE_SUBTHEME = gql`
+  mutation ($id: Int!) {
+    deleteSubTheme(id: $id)
   }
 `;

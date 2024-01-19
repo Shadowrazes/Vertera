@@ -433,6 +433,7 @@ function EditCurator() {
             <Form.Label className="edit-curator__field-label">
               Департаменты
             </Form.Label>
+
             <MultiSelect
               value={selectedDepartments}
               onChange={(e) => handleDepartmentsOnChange(e.value)}

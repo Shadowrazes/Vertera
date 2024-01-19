@@ -110,6 +110,8 @@ function EditTheme() {
 
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
+
+    setIsErrorVisible(false);
   };
 
   const errorMsg = () => {

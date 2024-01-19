@@ -15,6 +15,8 @@ import Themes from "./pages/themes";
 import AddTheme from "./pages/add-theme";
 import EditTheme from "./pages/edit-theme";
 import SubThemes from "./pages/subthemes";
+import AddSubtheme from "./pages/add-subtheme";
+import EditSubtheme from "./pages/edit-subtheme";
 
 import "./App.css";
 
@@ -55,6 +57,12 @@ function App() {
             element={<EditTheme />}
           />
           <Route path="/subthemes" element={<SubThemes />} />
+          <Route path="/add-subtheme" element={<AddSubtheme />} />
+          <Route
+            path="/edit-subtheme/:subthemeId"
+            Component={EditSubtheme}
+            element={<EditSubtheme />}
+          />
         </Routes>
       </Router>
     </div>

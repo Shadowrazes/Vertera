@@ -11,17 +11,17 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { THEME_LIST } from "../apollo/queries";
-import { ADD_THEME } from "../apollo/mutations";
+import { THEME_LIST, DEPARTMENTS_LIST } from "../apollo/queries";
+import { ADD_SUBTHEME } from "../apollo/mutations";
 
+import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
 
-import "../css/add-theme.css";
-
-function AddTheme() {
+function AddSubtheme() {
   const [dataQuery, setData] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
 
@@ -30,15 +30,24 @@ function AddTheme() {
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [nameValue, setNameValue] = useState("");
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
 
   const { loading, error, data } = useQuery(THEME_LIST);
+  const {
+    loading: loadingDepartmentList,
+    error: errorDepartmentList,
+    data: dataDepartmentList,
+  } = useQuery(DEPARTMENTS_LIST);
 
   const navigate = useNavigate();
 
-  const goToAllThemes = () => {
-    navigate("/themes");
+  const goToAllSubthemes = () => {
+    navigate("/subthemes");
   };
 
   useEffect(() => {
@@ -46,12 +55,16 @@ function AddTheme() {
       setData(data.allThemeTree);
     }
 
+    if (dataDepartmentList && dataDepartmentList.departmentList) {
+      setDepartmentList(dataDepartmentList.departmentList);
+    }
+
     if (location.state && location.state.linkPrev) {
       setLinkPrev(location.state.linkPrev);
     }
-  }, [data, location.state]);
+  }, [data, dataDepartmentList, location.state]);
 
-  const [addTheme] = useMutation(ADD_THEME);
+  const [addSubtheme] = useMutation(ADD_SUBTHEME);
 
   if (loading) {
     return <Loader />;
@@ -70,6 +83,14 @@ function AddTheme() {
     // console.log(unitId);
   };
 
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+
+    setIsErrorVisible(false);
+    // console.log(unitId);
+  };
+
   const handleNameChange = (e) => {
     setNameValue(e.target.value);
     setIsErrorVisible(false);
@@ -80,8 +101,10 @@ function AddTheme() {
 
     if (selectedUnit == null) {
       error = "Выберите название раздела";
+    } else if (selectedTheme == null) {
+      error = "Выберите подтему";
     } else if (nameValue.trim() == "") {
-      error = "Укажите название темы";
+      error = "Укажите название подтемы";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -89,14 +112,28 @@ function AddTheme() {
     return error;
   };
 
-  const handleAddTheme = async (e) => {
+  const handleDepartmentsOnChange = (departments) => {
+    setSelectedDepartments(departments);
+    setSelectedDepartmentsId(departments.map((department) => department.id));
+    // console.log(departments);
+  };
+
+  const handleAddSubtheme = async (e) => {
     e.preventDefault();
 
     console.log(selectedUnit);
     console.log(selectedUnitId);
+    console.log(selectedTheme);
+    console.log(selectedThemeId);
+    console.log(selectedDepartments);
+    console.log(selectedDepartmentsId);
     console.log(nameValue);
 
-    if (nameValue.trim() == "" || selectedUnit == null) {
+    if (
+      nameValue.trim() == "" ||
+      selectedUnit == null ||
+      selectedTheme == null
+    ) {
       setIsErrorVisible(true);
       return;
     }
@@ -104,18 +141,19 @@ function AddTheme() {
     setIsErrorVisible(false);
 
     try {
-      const result = await addTheme({
+      const result = await addSubtheme({
         variables: {
-          unitId: selectedUnitId,
+          themeId: selectedThemeId,
           stroke: nameValue.trim(),
           lang: "ru",
+          departmentIds: selectedDepartmentsId,
         },
       });
 
-      console.log("Тема успешно добавлена:", result);
+      console.log("Подтема успешно добавлена:", result);
       handleShow();
     } catch (error) {
-      console.error("Ошибка при добавлении темы:", error);
+      console.error("Ошибка при добавлении подтемы:", error);
       setIsErrorVisible(true);
     }
   };
@@ -126,12 +164,17 @@ function AddTheme() {
 
   const handleClose = () => {
     setShow(false);
-    goToAllThemes();
+    goToAllSubthemes();
   };
+
+  const newDepartmentList = departmentList.map((department) => ({
+    name: department.name.stroke,
+    id: department.id,
+  }));
 
   return (
     <>
-      <BackTitle title="Добавить тему" linkPrev={linkPrev} />
+      <BackTitle title="Добавить подтему" linkPrev={linkPrev} />
 
       <DropdownButton
         id="dropdown-custom-1"
@@ -149,32 +192,63 @@ function AddTheme() {
         ))}
       </DropdownButton>
 
+      {selectedUnit && (
+        <DropdownButton
+          id="dropdown-custom-1"
+          title={selectedTheme || "Тип обращения"}
+          className="add-theme__dropdown"
+        >
+          {dataQuery
+            .find((unit) => unit.name.stroke === selectedUnit)
+            ?.themes.map((theme) => (
+              <Dropdown.Item
+                key={theme.id}
+                onClick={() => handleThemeClick(theme.name.stroke, theme.id)}
+                href="#"
+              >
+                {theme.name.stroke}
+              </Dropdown.Item>
+            ))}
+        </DropdownButton>
+      )}
+
       <Row className="add-curator__row">
         <Col className="add-curator__column">
           <Form.Group controlId="NameForm">
             <Form.Control
               type="text"
-              placeholder="Название темы"
+              placeholder="Название подтемы"
               value={nameValue}
               className="add-currator__input"
               onChange={handleNameChange}
             />
           </Form.Group>
+
+          <MultiSelect
+            value={selectedDepartments}
+            onChange={(e) => handleDepartmentsOnChange(e.value)}
+            options={newDepartmentList}
+            optionLabel="name"
+            placeholder="Выбрать департамент"
+            className="add-curator__multiselect"
+          />
+
           {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
+
           <ButtonCustom
             title="Применить"
             className={"add-curator__btn"}
-            onClick={handleAddTheme}
+            onClick={handleAddSubtheme}
           />
         </Col>
       </Row>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Тема создана</Modal.Title>
+          <Modal.Title>Подтема создана</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Новая тема успешно создана</p>
+          <p>Новая подтема успешно создана</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -186,4 +260,4 @@ function AddTheme() {
   );
 }
 
-export default AddTheme;
+export default AddSubtheme;

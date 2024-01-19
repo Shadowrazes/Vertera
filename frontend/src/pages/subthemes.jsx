@@ -16,7 +16,6 @@ function Subthemes() {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
-  const [selectedThemeId, setSelectedThemeId] = useState(null);
 
   const { loading, error, data, refetch } = useQuery(THEME_LIST);
 
@@ -57,9 +56,9 @@ function Subthemes() {
     setSelectedTheme(null);
   };
 
-  const handleThemeClick = (theme, themeId) => {
+  const handleThemeClick = (theme) => {
     setSelectedTheme(theme);
-    setSelectedThemeId(themeId);
+
     // console.log(themeId);
 
     // switch ((selectedUnitId, themeId)) {
@@ -117,7 +116,7 @@ function Subthemes() {
             ?.themes.map((theme) => (
               <Dropdown.Item
                 key={theme.id}
-                onClick={() => handleThemeClick(theme.name.stroke, theme.id)}
+                onClick={() => handleThemeClick(theme.name.stroke)}
                 href="#"
               >
                 {theme.name.stroke}
@@ -125,6 +124,7 @@ function Subthemes() {
             ))}
         </DropdownButton>
       )}
+
       <Table className="table__table" hover>
         <thead>
           <tr>
@@ -144,7 +144,7 @@ function Subthemes() {
 
                 <td>
                   <Link
-                    to={`/edit-theme/${subTheme.id}`}
+                    to={`/edit-subtheme/${subTheme.id}`}
                     state={{
                       linkPrev: window.location.href,
                     }}

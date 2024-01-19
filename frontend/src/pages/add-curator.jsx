@@ -58,9 +58,11 @@ function AddCurator() {
     if (data && data.departmentList) {
       setDepartmentList(data.departmentList);
     }
+
     if (dataJobTitle && dataJobTitle.jobTitleList) {
       setJobTitleList(dataJobTitle.jobTitleList);
     }
+
     if (location.state && location.state.linkPrev) {
       setLinkPrev(location.state.linkPrev);
     }
