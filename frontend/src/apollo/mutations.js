@@ -141,3 +141,9 @@ export const EDIT_HELPER_USER = gql`
     }
   }
 `;
+
+export const DELETE_USER = gql`
+  mutation ($id: Int!) {
+    deleteUser(id: $id)
+  }
+`;

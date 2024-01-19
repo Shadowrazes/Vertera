@@ -17,7 +17,7 @@ import {
   JOB_TITLE_LIST,
   COUNTRY_LIST,
 } from "../apollo/queries";
-import { EDIT_HELPER_USER } from "../apollo/mutations";
+import { DELETE_USER, EDIT_HELPER_USER } from "../apollo/mutations";
 
 import { DatePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
@@ -26,6 +26,7 @@ import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 
 import "../css/edit-curator.css";
+import "../css/dropdown.css";
 
 function EditCurator() {
   const { curatorId } = useParams();
@@ -49,6 +50,8 @@ function EditCurator() {
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
+  const [showTwo, setShowTwo] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const { loading, error, data } = useQuery(HELPER, {
     variables: {
@@ -62,6 +65,8 @@ function EditCurator() {
 
   const [editHelperUser, { loading: loadingEditHelper }] =
     useMutation(EDIT_HELPER_USER);
+
+  const [deleteUser, { loading: loadingDeleteUser }] = useMutation(DELETE_USER);
 
   const navigate = useNavigate();
 
@@ -139,6 +144,10 @@ function EditCurator() {
     return <Loader />;
   }
 
+  if (loadingDeleteUser) {
+    return <Loader />;
+  }
+
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
   };
@@ -183,6 +192,8 @@ function EditCurator() {
 
     if (selectedDepartmentsId.length == 0) {
       error = "Выберите департамент";
+    } else {
+      error = "Ошибка при обработке куратора";
     }
 
     return error;
@@ -248,12 +259,47 @@ function EditCurator() {
     }
   };
 
+  const handleDeleteCurator = (e) => {
+    e.preventDefault();
+    handleShowWarning();
+  };
+
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    setShowWarning(false);
+
+    try {
+      const result = await deleteUser({
+        variables: {
+          id: parseInt(curatorId),
+        },
+      });
+      console.log("Куратор успешно Удален:", result);
+      setShowTwo(true);
+    } catch (error) {
+      console.error("Ошибка удалении куратора:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
   const handleShow = () => {
     setShow(true);
   };
 
+  const handleShowWarning = () => {
+    setShowWarning(true);
+  };
+
   const handleClose = () => {
     setShow(false);
+    setShowTwo(false);
+    setShowWarning(false);
+  };
+
+  const handleCloseLeave = () => {
+    setShow(false);
+    setShowTwo(false);
+    setShowWarning(false);
     goToAllCurators();
   };
 
@@ -399,19 +445,55 @@ function EditCurator() {
             className={"add-curator__btn edit-curator__btn"}
             onClick={handleEditCurator}
           />
+          <ButtonCustom
+            title="Удалить куратора"
+            className={"add-curator__btn edit-curator__btn"}
+            onClick={handleDeleteCurator}
+          />
         </Col>
       </Row>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleCloseLeave}>
         <Modal.Header closeButton>
-          <Modal.Title>Ваше обращение создано</Modal.Title>
+          <Modal.Title>Куратор обновлен</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>Данные куратора успешно обновлены</p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleCloseLeave}>
             Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showTwo} onHide={handleCloseLeave}>
+        <Modal.Header closeButton>
+          <Modal.Title>Куратор удален</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Куратор успешно удален</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseLeave}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showWarning} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Предупреждение</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Вы уверены, что хотите удалить куратора?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Отмена
+          </Button>
+          <Button variant="primary" onClick={handleConfirm}>
+            Продолжить
           </Button>
         </Modal.Footer>
       </Modal>
