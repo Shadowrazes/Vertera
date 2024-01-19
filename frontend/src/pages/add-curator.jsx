@@ -10,6 +10,7 @@ import {
   Modal,
   Button,
 } from "react-bootstrap";
+
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
 import { ADD_HELPER_USER } from "../apollo/mutations";
 
@@ -237,8 +238,7 @@ function AddCurator() {
 
   return (
     <>
-      <BackTitle title="Все кураторы" linkPrev={linkPrev} />
-      <h2 className="add-curator__heading">Добавить куратора</h2>
+      <BackTitle title="Добавить куратора" linkPrev={linkPrev} />
       <Row className="add-curator__row">
         <Col className="add-curator__column">
           <Form.Group controlId="NameForm">

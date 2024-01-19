@@ -8,7 +8,9 @@ import CreateTicket from "./pages/create-ticket";
 import Curators from "./pages/curators";
 import AddCurator from "./pages/add-curator";
 import EditCurator from "./pages/edit-curator";
-import Units from "./pages/Units";
+import Units from "./pages/units";
+import AddUnit from "./pages/add-unit";
+import EditUnit from "./pages/edit-unit";
 
 import "./App.css";
 
@@ -35,6 +37,12 @@ function App() {
             element={<EditCurator />}
           />
           <Route path="/Units" element={<Units />} />
+          <Route path="/add-unit" element={<AddUnit />} />
+          <Route
+            path="/edit-unit/:unitId"
+            Component={EditUnit}
+            element={<EditUnit />}
+          />
         </Routes>
       </Router>
     </div>

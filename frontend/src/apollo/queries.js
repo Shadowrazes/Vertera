@@ -266,3 +266,13 @@ export const COUNTRY_LIST = gql`
     }
   }
 `;
+
+export const UNIT = gql`
+  query ($id: Int!) {
+    unit(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+    }
+  }
+`;

@@ -274,7 +274,7 @@ function EditCurator() {
           id: parseInt(curatorId),
         },
       });
-      console.log("Куратор успешно Удален:", result);
+      console.log("Куратор успешно удален:", result);
       setShowTwo(true);
     } catch (error) {
       console.error("Ошибка удалении куратора:", error);
@@ -439,17 +439,23 @@ function EditCurator() {
               ))}
             </DropdownButton>
           </Form.Group>
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <ButtonCustom
-            title="Применить"
-            className={"add-curator__btn edit-curator__btn"}
-            onClick={handleEditCurator}
-          />
-          <ButtonCustom
-            title="Удалить куратора"
-            className={"add-curator__btn edit-curator__btn"}
-            onClick={handleDeleteCurator}
-          />
+          <div className="edit-curator__btn-row">
+            {isErrorVisible && (
+              <span className="form__error">{errorMsg()}</span>
+            )}
+            <ButtonCustom
+              title="Применить"
+              className={"add-curator__btn edit-curator__btn"}
+              onClick={handleEditCurator}
+            />
+            <ButtonCustom
+              title="Удалить куратора"
+              className={
+                "add-curator__btn edit-curator__btn alltickets__button-two"
+              }
+              onClick={handleDeleteCurator}
+            />
+          </div>
         </Col>
       </Row>
 

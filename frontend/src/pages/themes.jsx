@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { useLocation, useParams, useNavigate, Link } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
 
 import { THEME_LIST } from "../apollo/queries";
@@ -11,23 +11,15 @@ import Loader from "./loading";
 
 import EditIcon from "../assets/edit_icon.svg";
 
-function Units() {
+function Theme() {
   const [dataQuery, setData] = useState([]);
-  const { loading, error, data, refetch } = useQuery(THEME_LIST);
-
-  const navigate = useNavigate();
-
-  const goToAddUnit = () => {
-    navigate("/add-unit");
-  };
+  const { loading, error, data } = useQuery(THEME_LIST);
 
   useEffect(() => {
     if (data && data.allThemeTree) {
       setData(data.allThemeTree);
-      // console.log(data.allThemeTree.map((unit) => unit.id));
+      console.log(data.allThemeTree.map((unit) => unit.id));
     }
-
-    refetch();
   }, [data]);
 
   const units = dataQuery;
@@ -42,12 +34,12 @@ function Units() {
 
   return (
     <>
-      <TitleH2 title="Разделения" className="title__heading" />
+      <TitleH2 title="Темы" className="title__heading" />
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <td>Раздел ID</td>
-            <td>Название разделения</td>
+            <td>Тема ID</td>
+            <td>Название темы</td>
             <td>Редактировать</td>
           </tr>
         </thead>
@@ -57,23 +49,14 @@ function Units() {
               <td>{unit.id}</td>
               <td>{unit.name.stroke}</td>
               <td>
-                <Link
-                  to={`/edit-unit/${unit.id}`}
-                  state={{
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  <img src={EditIcon} alt="" />
-                </Link>
+                <img src={EditIcon} alt="" />
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
-      <ButtonCustom title="Добавить раздел" onClick={goToAddUnit} />
     </>
   );
 }
 
-export default Units;
+export default Theme;

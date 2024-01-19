@@ -147,3 +147,23 @@ export const DELETE_USER = gql`
     deleteUser(id: $id)
   }
 `;
+
+export const ADD_UNIT = gql`
+  mutation ($stroke: String!, $lang: String!) {
+    addUnit(fields: { stroke: $stroke, lang: $lang })
+  }
+`;
+
+export const EDIT_UNIT = gql`
+  mutation ($id: Int!, $stroke: String!, $lang: String!) {
+    updateUnit(id: $id, fields: { stroke: $stroke, lang: $lang }) {
+      changed
+    }
+  }
+`;
+
+export const DELETE_UNIT = gql`
+  mutation ($id: Int!) {
+    deleteUnit(id: $id)
+  }
+`;
