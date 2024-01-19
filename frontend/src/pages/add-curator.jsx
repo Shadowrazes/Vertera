@@ -10,12 +10,11 @@ import {
   Modal,
   Button,
 } from "react-bootstrap";
-
-import { DatePicker } from "rsuite";
-import { MultiSelect } from "primereact/multiselect";
 import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
 import { ADD_HELPER_USER } from "../apollo/mutations";
 
+import { DatePicker } from "rsuite";
+import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
@@ -46,11 +45,7 @@ function AddCurator() {
   const [passwordValue, setPasswordValue] = useState("");
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
-  const {
-    loading: loadingJobTitle,
-    error: errorJobTitle,
-    data: dataJobTitle,
-  } = useQuery(JOB_TITLE_LIST);
+  const { data: dataJobTitle } = useQuery(JOB_TITLE_LIST);
 
   const navigate = useNavigate();
 
@@ -106,7 +101,7 @@ function AddCurator() {
 
   const handleDepartmentsOnChange = (departments) => {
     setSelectedDepartments(departments);
-    setSelectedDepartmentsId(departments.map((id) => id.id));
+    setSelectedDepartmentsId(departments.map((department) => department.id));
     // console.log(departments);
   };
 
@@ -361,47 +356,6 @@ function AddCurator() {
           />
         </Col>
       </Row>
-
-      {/* <Select options={options} /> */}
-      {/* <Multiselect
-        displayValue="key"
-        hideSelectedList
-        onKeyPressFn={function noRefCheck() {}}
-        onRemove={function noRefCheck() {}}
-        onSearch={function noRefCheck() {}}
-        onSelect={function noRefCheck() {}}
-        options={[
-          {
-            cat: "Group 1",
-            key: "Option 1",
-          },
-          {
-            cat: "Group 1",
-            key: "Option 2",
-          },
-          {
-            cat: "Group 1",
-            key: "Option 3",
-          },
-          {
-            cat: "Group 2",
-            key: "Option 4",
-          },
-          {
-            cat: "Group 2",
-            key: "Option 5",
-          },
-          {
-            cat: "Group 2",
-            key: "Option 6",
-          },
-          {
-            cat: "Group 2",
-            key: "Option 7",
-          },
-        ]}
-        showCheckbox
-      /> */}
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

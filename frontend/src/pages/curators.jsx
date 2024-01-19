@@ -38,7 +38,7 @@ function Curators() {
     return userCurRole === "helper";
   };
 
-  const { loading, error, data } = useQuery(CURATORS_LIST);
+  const { loading, error, data, refetch } = useQuery(CURATORS_LIST);
 
   const navigate = useNavigate();
 
@@ -50,6 +50,8 @@ function Curators() {
     if (data && data.helperList) {
       setData(data.helperList);
     }
+
+    refetch();
   }, [data]);
 
   const curators = dataQuery;

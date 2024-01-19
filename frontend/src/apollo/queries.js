@@ -232,6 +232,12 @@ export const HELPER = gql`
           stroke
         }
       }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
       birthday
       startWorkDate
       user {
@@ -239,6 +245,23 @@ export const HELPER = gql`
         name
         surname
         patronymic
+        country {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const COUNTRY_LIST = gql`
+  query {
+    countryList {
+      id
+      name(lang: "ru") {
+        stroke
       }
     }
   }
