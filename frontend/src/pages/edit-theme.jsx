@@ -1,20 +1,31 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { Form, Col, Modal, Button } from "react-bootstrap";
+import {
+  Form,
+  Col,
+  Dropdown,
+  DropdownButton,
+  Modal,
+  Button,
+} from "react-bootstrap";
 
-import { UNIT } from "../apollo/queries";
-import { EDIT_UNIT, DELETE_UNIT } from "../apollo/mutations";
+import { THEME, THEME_LIST } from "../apollo/queries";
+import { EDIT_THEME, DELETE_THEME } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 
-function EditUnit() {
-  const { unitId } = useParams();
+function EditTheme() {
+  const { themeId } = useParams();
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
 
+  const [dataQuery, setData] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
@@ -22,25 +33,39 @@ function EditUnit() {
   const [showTwo, setShowTwo] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
-  const { loading, error, data, refetch } = useQuery(UNIT, {
+  const {
+    loading: loadingTheme,
+    error: errorTheme,
+    data: dataTheme,
+  } = useQuery(THEME_LIST);
+  const { loading, error, data, refetch } = useQuery(THEME, {
     variables: {
-      id: parseInt(unitId),
+      id: parseInt(themeId),
     },
   });
 
-  const [editUnit, { loading: loadingEditUnit }] = useMutation(EDIT_UNIT);
-  const [deleteUnit, { loading: loadingDeleteUnit }] = useMutation(DELETE_UNIT);
+  const [editTheme, { loading: loadingEditTheme }] = useMutation(EDIT_THEME);
+  const [deleteTheme, { loading: loadingDeleteTheme }] =
+    useMutation(DELETE_THEME);
 
   const navigate = useNavigate();
 
-  const goToAllUnits = () => {
-    navigate("/units");
+  const goToAllThemes = () => {
+    navigate("/themes");
   };
 
   useEffect(() => {
-    if (data && data.unit) {
-      setNameValue(data.unit.name.stroke);
-      console.log(data.unit.name.stroke);
+    if (dataTheme && dataTheme.allThemeTree) {
+      setData(dataTheme.allThemeTree);
+      // console.log(data.allThemeTree.map((unit) => unit.id));
+    }
+
+    if (data && data.theme) {
+      setNameValue(data.theme.name.stroke);
+      setSelectedUnit(data.theme.unit.name.stroke);
+      setSelectedUnitId(data.theme.unit.id);
+      setSelectedItem(data.theme.unit.name.stroke);
+      // console.log(data.theme.unit.id);
     }
 
     if (location.state && location.state.linkPrev) {
@@ -48,7 +73,7 @@ function EditUnit() {
     }
 
     refetch();
-  }, [data, location.state]);
+  }, [data, dataTheme, location.state]);
 
   if (loading) {
     return <Loader />;
@@ -58,13 +83,30 @@ function EditUnit() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (loadingEditUnit) {
+  if (loadingTheme) {
     return <Loader />;
   }
 
-  if (loadingDeleteUnit) {
+  if (errorTheme) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingEditTheme) {
     return <Loader />;
   }
+
+  if (loadingDeleteTheme) {
+    return <Loader />;
+  }
+
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedItem(unit);
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+
+    setIsErrorVisible(false);
+    // console.log(unitId);
+  };
 
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
@@ -73,42 +115,49 @@ function EditUnit() {
   const errorMsg = () => {
     let error = "";
 
-    if (nameValue.trim() == "") {
-      error = "Укажите название раздела";
+    if (selectedUnit == null) {
+      error = "Выберите раздел";
+    } else if (nameValue.trim() == "") {
+      error = "Укажите название темы";
     } else {
-      error = "Ошибка при обработке раздела";
+      error = "Ошибка при обработке темы";
     }
 
     return error;
   };
 
-  const handleEditUnit = async (e) => {
+  const handleEditTheme = async (e) => {
     e.preventDefault();
 
-    if (nameValue.trim() == "") {
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
+    // console.log(nameValue);
+
+    if (nameValue.trim() == "" || selectedUnit == null) {
       setIsErrorVisible(true);
       return;
     }
     setIsErrorVisible(false);
 
     try {
-      const result = await editUnit({
+      const result = await editTheme({
         variables: {
-          id: parseInt(unitId),
+          id: parseInt(themeId),
+          unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
         },
       });
 
-      console.log("Раздел успешно обновлен:", result);
+      console.log("Тема успешно обновлена:", result);
       handleShow();
     } catch (error) {
-      console.error("Ошибка при обновлении раздела:", error);
+      console.error("Ошибка при обновлении темы:", error);
       setIsErrorVisible(true);
     }
   };
 
-  const handleDeleteUnit = (e) => {
+  const handleDeleteTheme = (e) => {
     e.preventDefault();
     handleShowWarning();
   };
@@ -118,15 +167,15 @@ function EditUnit() {
     setShowWarning(false);
 
     try {
-      const result = await deleteUnit({
+      const result = await deleteTheme({
         variables: {
-          id: parseInt(unitId),
+          id: parseInt(themeId),
         },
       });
-      console.log("Раздел успешно удален:", result);
+      console.log("Тема успешно удалена:", result);
       setShowTwo(true);
     } catch (error) {
-      console.error("Ошибка удалении раздела:", error);
+      console.error("Ошибка удалении темы:", error);
       setIsErrorVisible(true);
     }
   };
@@ -149,19 +198,31 @@ function EditUnit() {
     setShow(false);
     setShowTwo(false);
     setShowWarning(false);
-    goToAllUnits();
+    goToAllThemes();
   };
 
   return (
     <>
-      <BackTitle
-        title={`Редактировать раздел #${unitId}`}
-        linkPrev={linkPrev}
-      />
+      <BackTitle title={`Редактировать тему #${themeId}`} linkPrev={linkPrev} />
+      <DropdownButton
+        id="dropdown-custom-1"
+        title={selectedItem}
+        className="add-theme__dropdown"
+      >
+        {dataQuery.map((unit, index) => (
+          <Dropdown.Item
+            key={index}
+            onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+            href="#"
+          >
+            {unit.name.stroke}
+          </Dropdown.Item>
+        ))}
+      </DropdownButton>
       <Col className="edit-curator__column">
         <Form.Group controlId="NameForm">
           <Form.Label className="edit-curator__field-label">
-            Название раздела
+            Название темы
           </Form.Label>
           <Form.Control
             type="text"
@@ -177,14 +238,14 @@ function EditUnit() {
             <ButtonCustom
               title="Применить"
               className={"add-curator__btn edit-curator__btn"}
-              onClick={handleEditUnit}
+              onClick={handleEditTheme}
             />
             <ButtonCustom
-              title="Удалить раздел"
+              title="Удалить тему"
               className={
                 "add-curator__btn edit-curator__btn alltickets__button-two"
               }
-              onClick={handleDeleteUnit}
+              onClick={handleDeleteTheme}
             />
           </div>
         </div>
@@ -192,10 +253,10 @@ function EditUnit() {
 
       <Modal show={show} onHide={handleCloseLeave}>
         <Modal.Header closeButton>
-          <Modal.Title>Раздел обновлен</Modal.Title>
+          <Modal.Title>Тема обновлена</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Название раздела успешно обновлено</p>
+          <p>Название темы успешно обновлено</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseLeave}>
@@ -206,10 +267,10 @@ function EditUnit() {
 
       <Modal show={showTwo} onHide={handleCloseLeave}>
         <Modal.Header closeButton>
-          <Modal.Title>Раздел удален</Modal.Title>
+          <Modal.Title>Тема удалена</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Раздел успешно удален</p>
+          <p>Тема успешно удалена</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseLeave}>
@@ -224,8 +285,8 @@ function EditUnit() {
         </Modal.Header>
         <Modal.Body>
           <p>
-            Вы уверены, что хотите удалить этот раздел, а также все темы и
-            подтемы, соответствующие ему?
+            Вы уверены, что хотите удалить эту тему, а также все подтемы,
+            соответствующие ей?
           </p>
         </Modal.Body>
         <Modal.Footer>
@@ -241,4 +302,4 @@ function EditUnit() {
   );
 }
 
-export default EditUnit;
+export default EditTheme;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { useLocation, useParams, useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
 
 import { THEME_LIST } from "../apollo/queries";
@@ -10,6 +10,7 @@ import ButtonCustom from "../components/button";
 import Loader from "./loading";
 
 import EditIcon from "../assets/edit_icon.svg";
+import "../css/units.css";
 
 function Units() {
   const [dataQuery, setData] = useState([]);
@@ -19,6 +20,14 @@ function Units() {
 
   const goToAddUnit = () => {
     navigate("/add-unit");
+  };
+
+  const goToThemes = () => {
+    navigate("/themes");
+  };
+
+  const goToSubthemes = () => {
+    navigate("/subthemes");
   };
 
   useEffect(() => {
@@ -71,7 +80,19 @@ function Units() {
           ))}
         </tbody>
       </Table>
-      <ButtonCustom title="Добавить раздел" onClick={goToAddUnit} />
+      <div className="units__btn-row">
+        <ButtonCustom title="Добавить раздел" onClick={goToAddUnit} />
+        <ButtonCustom
+          title="Перейти к темам"
+          className={"add-curator__btn units__btn alltickets__button-two"}
+          onClick={goToThemes}
+        />
+        <ButtonCustom
+          title="Перейти к подтемамам"
+          className={"add-curator__btn units__btn alltickets__button-two"}
+          onClick={goToSubthemes}
+        />
+      </div>
     </>
   );
 }

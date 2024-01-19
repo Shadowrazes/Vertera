@@ -44,33 +44,11 @@ function FormComponent() {
 
   const [isCopy, setIsCopy] = useState(false);
 
-  const handleClose = () => {
-    setShow(false);
-    window.location.reload();
-  };
-  const handleCopy = () => {
-    navigator.clipboard.writeText(newTicketLink);
-    setIsCopy(true);
-  };
-
   //const [popupTicketID, setPopupTicketID] = useState(null);
   //const [popupUserID, setPopupUserID] = useState(null);
 
   let popupTicketID = null;
   let popupUserID = null;
-
-  const handleShow = () => {
-    setNewTicketLink(
-      "http://" +
-        window.location.hostname +
-        "/dialog/" +
-        popupUserID +
-        "/" +
-        popupTicketID +
-        "/"
-    );
-    setShow(true);
-  };
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -398,6 +376,29 @@ function FormComponent() {
 
     setIsFilesLimitExceeded(false);
     setIsVisible(false);
+  };
+
+  const handleShow = () => {
+    setNewTicketLink(
+      "http://" +
+        window.location.hostname +
+        "/dialog/" +
+        popupUserID +
+        "/" +
+        popupTicketID +
+        "/"
+    );
+    setShow(true);
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    window.location.reload();
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(newTicketLink);
+    setIsCopy(true);
   };
 
   return (

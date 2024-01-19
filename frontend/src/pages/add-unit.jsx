@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Row, Col, Modal, Button } from "react-bootstrap";
 
-import {} from "../apollo/queries";
 import { ADD_UNIT } from "../apollo/mutations";
 
-import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
 
@@ -94,6 +84,7 @@ function addUnit() {
     setShow(false);
     goToAllUnits();
   };
+
   return (
     <>
       <BackTitle title="Добавить раздел" linkPrev={linkPrev} />

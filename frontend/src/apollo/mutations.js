@@ -167,3 +167,26 @@ export const DELETE_UNIT = gql`
     deleteUnit(id: $id)
   }
 `;
+
+export const ADD_THEME = gql`
+  mutation ($unitId: Int!, $stroke: String!, $lang: String!) {
+    addTheme(fields: { unitId: $unitId, stroke: $stroke, lang: $lang })
+  }
+`;
+
+export const EDIT_THEME = gql`
+  mutation ($id: Int!, $unitId: Int!, $stroke: String!, $lang: String!) {
+    updateTheme(
+      id: $id
+      fields: { unitId: $unitId, stroke: $stroke, lang: $lang }
+    ) {
+      changed
+    }
+  }
+`;
+
+export const DELETE_THEME = gql`
+  mutation ($id: Int!) {
+    deleteTheme(id: $id)
+  }
+`;

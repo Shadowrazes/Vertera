@@ -11,6 +11,10 @@ import EditCurator from "./pages/edit-curator";
 import Units from "./pages/units";
 import AddUnit from "./pages/add-unit";
 import EditUnit from "./pages/edit-unit";
+import Themes from "./pages/themes";
+import AddTheme from "./pages/add-theme";
+import EditTheme from "./pages/edit-theme";
+import SubThemes from "./pages/subthemes";
 
 import "./App.css";
 
@@ -36,13 +40,21 @@ function App() {
             Component={EditCurator}
             element={<EditCurator />}
           />
-          <Route path="/Units" element={<Units />} />
+          <Route path="/units" element={<Units />} />
           <Route path="/add-unit" element={<AddUnit />} />
           <Route
             path="/edit-unit/:unitId"
             Component={EditUnit}
             element={<EditUnit />}
           />
+          <Route path="/themes" element={<Themes />} />
+          <Route path="/add-theme" element={<AddTheme />} />
+          <Route
+            path="/edit-theme/:themeId"
+            Component={EditTheme}
+            element={<EditTheme />}
+          />
+          <Route path="/subthemes" element={<SubThemes />} />
         </Routes>
       </Router>
     </div>

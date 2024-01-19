@@ -10,33 +10,33 @@ import ButtonCustom from "../components/button";
 import Loader from "./loading";
 
 import EditIcon from "../assets/edit_icon.svg";
-import "../css/themes.css";
 
-function Theme() {
+function Subthemes() {
   const [dataQuery, setData] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
 
   const { loading, error, data, refetch } = useQuery(THEME_LIST);
 
   const navigate = useNavigate();
 
-  const goToAddTheme = () => {
-    navigate("/add-theme");
+  const goToAddSubtheme = () => {
+    navigate("/add-subtheme");
   };
 
   const goToUnits = () => {
     navigate("/units");
   };
 
-  const goToSubthemes = () => {
-    navigate("/subthemes");
+  const goToThemes = () => {
+    navigate("/themes");
   };
 
   useEffect(() => {
     if (data && data.allThemeTree) {
       setData(data.allThemeTree);
-      // console.log(data.allThemeTree.map((unit) => unit.id));
     }
 
     refetch();
@@ -54,12 +54,42 @@ function Theme() {
     setSelectedItem(unit);
     setSelectedUnit(unit);
 
-    // console.log(unitId);
+    setSelectedTheme(null);
+  };
+
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+    // console.log(themeId);
+
+    // switch ((selectedUnitId, themeId)) {
+    //   case (1, 14):
+    //     setSelectedSubThemeId(73);
+    //     setSubThemeDropdownVisible(false);
+    //     break;
+    //   case (2, 15):
+    //     setSelectedSubThemeId(74);
+    //     setSubThemeDropdownVisible(false);
+    //     break;
+    //   case (2, 16):
+    //     setSelectedSubThemeId(75);
+    //     setSubThemeDropdownVisible(false);
+    //     break;
+    //   case (2, 22):
+    //     setSelectedSubThemeId(102);
+    //     setSubThemeDropdownVisible(false);
+    //     break;
+    //   case (2, 23):
+    //     setSelectedSubThemeId(103);
+    //     setSubThemeDropdownVisible(false);
+    //     break;
+    //   default:
+    // }
   };
 
   return (
     <>
-      <TitleH2 title="Темы" className="title__heading" />
+      <TitleH2 title="Подтемы" className="title__heading" />
       <DropdownButton
         id="dropdown-custom-1"
         title={selectedItem || "Выберите подразделение"}
@@ -75,25 +105,46 @@ function Theme() {
           </Dropdown.Item>
         ))}
       </DropdownButton>
+
+      {selectedUnit && (
+        <DropdownButton
+          id="dropdown-custom-1"
+          title={selectedTheme || "Тип обращения"}
+          className="themes__dropdown"
+        >
+          {dataQuery
+            .find((unit) => unit.name.stroke === selectedUnit)
+            ?.themes.map((theme) => (
+              <Dropdown.Item
+                key={theme.id}
+                onClick={() => handleThemeClick(theme.name.stroke, theme.id)}
+                href="#"
+              >
+                {theme.name.stroke}
+              </Dropdown.Item>
+            ))}
+        </DropdownButton>
+      )}
       <Table className="table__table" hover>
         <thead>
           <tr>
-            <td>Тема ID</td>
-            <td>Название темы</td>
+            <td>Подтема ID</td>
+            <td>Название подтемы</td>
             <td>Редактировать</td>
           </tr>
         </thead>
         <tbody>
           {dataQuery
             .find((unit) => unit.name.stroke === selectedUnit)
-            ?.themes.map((theme) => (
-              <tr key={theme.id}>
-                <td>{theme.id}</td>
-                <td>{theme.name.stroke}</td>
+            ?.themes.find((theme) => theme.name.stroke === selectedTheme)
+            ?.subThemes.map((subTheme) => (
+              <tr key={subTheme.id}>
+                <td>{subTheme.id}</td>
+                <td>{subTheme.name.stroke}</td>
 
                 <td>
                   <Link
-                    to={`/edit-theme/${theme.id}`}
+                    to={`/edit-theme/${subTheme.id}`}
                     state={{
                       linkPrev: window.location.href,
                     }}
@@ -107,20 +158,20 @@ function Theme() {
         </tbody>
       </Table>
       <div className="units__btn-row">
-        <ButtonCustom title="Добавить тему" onClick={goToAddTheme} />
+        <ButtonCustom title="Добавить подтему" onClick={goToAddSubtheme} />
         <ButtonCustom
           title="Перейти к разделам"
           className={"add-curator__btn units__btn alltickets__button-two"}
           onClick={goToUnits}
         />
         <ButtonCustom
-          title="Перейти к подтемам"
+          title="Перейти к темам"
           className={"add-curator__btn units__btn alltickets__button-two"}
-          onClick={goToSubthemes}
+          onClick={goToThemes}
         />
       </div>
     </>
   );
 }
 
-export default Theme;
+export default Subthemes;

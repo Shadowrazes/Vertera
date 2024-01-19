@@ -276,3 +276,19 @@ export const UNIT = gql`
     }
   }
 `;
+
+export const THEME = gql`
+  query ($id: Int!) {
+    theme(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+      unit {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;

@@ -45,7 +45,7 @@ function EditCurator() {
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
   const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCountryId, setSelectedCountryId] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
@@ -150,10 +150,12 @@ function EditCurator() {
 
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handleOnChangeSurname = (e) => {
     setSurnameValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handleOnChangePatronymic = (e) => {
@@ -163,6 +165,7 @@ function EditCurator() {
   const handleCountryClick = (country, countryId) => {
     setSelectedCountry(country);
     setSelectedCountryId(countryId);
+    setIsErrorVisible(false);
   };
 
   const handlePeriodClick = (originalDate) => {
@@ -179,19 +182,31 @@ function EditCurator() {
     setSelectedDepartments(departments);
     setSelectedDepartmentsId(departments.map((department) => department.id));
     // console.log(departments);
+    setIsErrorVisible(false);
   };
 
   const handleJobTitleClick = (jobTitle, jobTitleId) => {
     // setSelectedItemJobTitle(jobTitle);
     setSelectedJobTitle(jobTitle);
     setSelectedJobTitleId(jobTitleId);
+    setIsErrorVisible(false);
   };
 
   const errorMsg = () => {
     let error = "";
 
-    if (selectedDepartmentsId.length == 0) {
+    if (nameValue.trim() == "") {
+      error = "Укажите имя";
+    } else if (surnameValue.trim() == "") {
+      error = "Укажите фамилию";
+    } else if (birthdayValue == null) {
+      error = "Укажите дату рождения";
+    } else if (selectedCountry == null) {
+      error = "Укажите страну";
+    } else if (selectedDepartments.length == 0) {
       error = "Выберите департамент";
+    } else if (selectedJobTitle == null) {
+      error = "Выберите должность";
     } else {
       error = "Ошибка при обработке куратора";
     }
@@ -202,12 +217,11 @@ function EditCurator() {
   const handleEditCurator = async (e) => {
     e.preventDefault();
 
-    const formattedDate = handlePeriodClick(birthdayValue);
-
     // console.log(idValue);
     // console.log(nameValue);
     // console.log(surnameValue);
     // console.log(patronymicValue);
+    // console.log(birthdayValue);
     // console.log(formattedDate);
     // console.log(selectedCountry);
     // console.log(selectedCountryId);
@@ -216,11 +230,21 @@ function EditCurator() {
     // console.log(selectedJobTitle);
     // console.log(selectedJobTitleId);
 
-    if (selectedDepartmentsId.length == 0) {
+    if (
+      nameValue.trim() == "" ||
+      surnameValue.trim() == "" ||
+      birthdayValue == null ||
+      selectedCountry == null ||
+      selectedDepartments.length == 0 ||
+      selectedJobTitle == null
+    ) {
       setIsErrorVisible(true);
       return;
     }
+
     setIsErrorVisible(false);
+
+    const formattedDate = handlePeriodClick(birthdayValue);
 
     try {
       let result;
@@ -439,22 +463,25 @@ function EditCurator() {
               ))}
             </DropdownButton>
           </Form.Group>
-          <div className="edit-curator__btn-row">
+
+          <div className="edit-curator__column">
             {isErrorVisible && (
               <span className="form__error">{errorMsg()}</span>
             )}
-            <ButtonCustom
-              title="Применить"
-              className={"add-curator__btn edit-curator__btn"}
-              onClick={handleEditCurator}
-            />
-            <ButtonCustom
-              title="Удалить куратора"
-              className={
-                "add-curator__btn edit-curator__btn alltickets__button-two"
-              }
-              onClick={handleDeleteCurator}
-            />
+            <div className="edit-curator__btn-row">
+              <ButtonCustom
+                title="Применить"
+                className={"add-curator__btn edit-curator__btn"}
+                onClick={handleEditCurator}
+              />
+              <ButtonCustom
+                title="Удалить куратора"
+                className={
+                  "add-curator__btn edit-curator__btn alltickets__button-two"
+                }
+                onClick={handleDeleteCurator}
+              />
+            </div>
           </div>
         </Col>
       </Row>
