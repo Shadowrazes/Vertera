@@ -89,6 +89,15 @@ export const resolvers = {
         allThemeTree: async (_, args) => {
             return await Unit.GetList();
         },
+        unit: async (_, { id }) => {
+            return await Unit.GetById(id);
+        },
+        theme: async (_, { id }) => {
+            return await Theme.GetById(id);
+        },
+        subTheme: async (_, { id }) => {
+            return await SubTheme.GetById(id);
+        },
         departmentList: async (_, args) => {
             //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
             return await Department.GetList();
