@@ -320,3 +320,24 @@ export const SUBTHEME = gql`
     }
   }
 `;
+
+export const STATS = gql`
+  query{
+    helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
+      helper {
+        id
+      }
+      stats {
+        totalTickets
+        newTickets
+        inProgressTickets
+        closedTickets
+        avgReplyTime
+        likes
+        dislikes
+        notRated
+        fantasy
+      }
+    }
+  }
+`;

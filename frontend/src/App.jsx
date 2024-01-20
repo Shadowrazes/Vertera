@@ -17,6 +17,7 @@ import EditTheme from "./pages/edit-theme";
 import SubThemes from "./pages/subthemes";
 import AddSubtheme from "./pages/add-subtheme";
 import EditSubtheme from "./pages/edit-subtheme";
+import Stats from "./pages/stats";
 
 import "./App.css";
 
@@ -63,6 +64,7 @@ function App() {
             Component={EditSubtheme}
             element={<EditSubtheme />}
           />
+          <Route path="/stats" element={<Stats />} />
         </Routes>
       </Router>
     </div>
