@@ -29,7 +29,7 @@ function ChatMessage({ message, sender, time, attachs }) {
     <>
       <div className="chat-message-sender__container">
         <div className="chat-message-sender__box">
-          <h3>{getFullName(sender)}</h3>
+          <h3 className="chat-message-sender__name">{getFullName(sender)}</h3>
           <div className="chat-message-sender__text">{message}</div>
           {!isVisible && (
             <>
