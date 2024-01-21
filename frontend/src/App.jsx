@@ -8,7 +8,7 @@ import CreateTicket from "./pages/create-ticket";
 import Curators from "./pages/curators";
 import AddCurator from "./pages/add-curator";
 import EditCurator from "./pages/edit-curator";
-import Units from "./pages/Units";
+import Units from "./pages/units";
 import AddUnit from "./pages/add-unit";
 import EditUnit from "./pages/edit-unit";
 import Themes from "./pages/themes";
@@ -17,6 +17,7 @@ import EditTheme from "./pages/edit-theme";
 import SubThemes from "./pages/subthemes";
 import AddSubtheme from "./pages/add-subtheme";
 import EditSubtheme from "./pages/edit-subtheme";
+import EditTicket from "./pages/edit-ticket";
 import Stats from "./pages/stats";
 
 import "./App.css";
@@ -63,6 +64,11 @@ function App() {
             path="/edit-subtheme/:subthemeId"
             Component={EditSubtheme}
             element={<EditSubtheme />}
+          />
+          <Route
+            path="/edit-ticket/:itemId"
+            Component={EditTicket}
+            element={<EditTicket />}
           />
           <Route path="/stats" element={<Stats />} />
         </Routes>

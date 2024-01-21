@@ -1,6 +1,6 @@
 import "../css/chat-message-recipient.css";
 
-function ChatMessage({ message, time, attachs }) {
+function ChatMessage({ message, sender, time, attachs }) {
   let isVisible;
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -9,10 +9,27 @@ function ChatMessage({ message, time, attachs }) {
   } else {
     isVisible = false;
   }
+
+  const getFullName = (userData) => {
+    let result = "";
+    console.log(userData);
+    if(userData?.name) {
+        result += userData?.name + " ";
+    }
+    if(userData?.surname) {
+        result += userData?.surname + " ";
+    }
+    if(userData?.patronymic) {
+        result += userData?.patronymic;
+    }
+    return result;
+  }
+
   return (
     <>
       <div className="chat-message-recipient__container">
         <div className="chat-message-recipient__box">
+          <h4>{getFullName(sender)}</h4>
           <div className="chat-message-recipient__text">{message}</div>
           {!isVisible && (
             <>
@@ -23,6 +40,7 @@ function ChatMessage({ message, time, attachs }) {
                 {attachs &&
                   attachs.map((attach) => (
                     <div key={attach.id}>
+                      
                       <a
                         className="chat-message-recipient__attach-link"
                         download
@@ -35,6 +53,7 @@ function ChatMessage({ message, time, attachs }) {
                             : "http://localhost:4444" + attach.path
                         }
                       >
+                        <img src="/file.svg" className="chat-message-recipient__attach-icon" alt="" />
                         <span className="chat-message-recipient__attach">
                           {attach.name}
                         </span>

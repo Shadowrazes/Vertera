@@ -1,6 +1,6 @@
 import "../css/chat-message-sender.css";
 
-function ChatMessage({ message, time, attachs }) {
+function ChatMessage({ message, sender, time, attachs }) {
   let isVisible;
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -10,10 +10,26 @@ function ChatMessage({ message, time, attachs }) {
     isVisible = false;
   }
 
+  const getFullName = (userData) => {
+    let result = "";
+    console.log(userData);
+    if(userData?.name) {
+        result += userData?.name + " ";
+    }
+    if(userData?.surname) {
+        result += userData?.surname + " ";
+    }
+    if(userData?.patronymic) {
+        result += userData?.patronymic;
+    }
+    return result;
+  }
+
   return (
     <>
       <div className="chat-message-sender__container">
         <div className="chat-message-sender__box">
+          <h3>{getFullName(sender)}</h3>
           <div className="chat-message-sender__text">{message}</div>
           {!isVisible && (
             <>
