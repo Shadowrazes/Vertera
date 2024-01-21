@@ -6,7 +6,7 @@ const Pool = MySQL.createPool({
     connectionLimit: 100,
     host: 'localhost',
     user: !isBuild ? 'root' : 'mysqladmin',
-    password: !isBuild ? 'cdbyjhsk' : 'uoyoi9Uroi7v',
+    password: !isBuild ? 'cdbyjhsk' : 'H2Zx8xhQOYlsCjjv',
     database: 'vertera',
     namedPlaceholders: true
 }).promise();

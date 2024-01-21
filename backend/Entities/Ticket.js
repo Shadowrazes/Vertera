@@ -12,7 +12,7 @@ import MySQL  from 'mysql2';
 import Client from "./Client.js";
 
 const isBuild = process.argv[2] === 'build';
-const baseUrl = isBuild ? 'https://vertera-ticket.yasanyabeats.ru' : 'http://localhost:5173';
+const baseUrl = isBuild ? 'https://vticket.yasanyabeats.ru' : 'http://localhost:5173';
 
 class Ticket extends Entity{
     static TableName = 'tickets';
