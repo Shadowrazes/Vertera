@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 
 import { MESSAGES_CHAT, THEME_LIST, CURATORS_LIST } from "../apollo/queries";
-import { EDIT_SUBTHEME, DELETE_SUBTHEME } from "../apollo/mutations";
+import { EDIT_TICKET } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "./loading";
@@ -36,6 +36,7 @@ function EditTicket() {
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorId, setSelectedCuratorId] = useState(null);
+  const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [selectedItem, setSelectedItem] = useState("");
 
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
@@ -62,6 +63,8 @@ function EditTicket() {
     data: dataCurators,
   } = useQuery(CURATORS_LIST);
 
+  const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
+
   useEffect(() => {
     if (data && data.ticket) {
       setSelectedItem(data.ticket.subTheme.theme.unit.name.stroke);
@@ -79,6 +82,10 @@ function EditTicket() {
         }`
       );
       setSelectedCuratorId(data.ticket.helper.id);
+      setSelectedDepartmentsId(
+        data.ticket.subTheme.departments.map((department) => department.id)
+      );
+      // console.log(selectedDepartmentsId);
 
       if (location.state && location.state.linkPrev) {
         setLinkPrev(location.state.linkPrev);
@@ -110,6 +117,18 @@ function EditTicket() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  if (loadingCurators) {
+    return <Loader />;
+  }
+
+  if (errorCurators) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingEditTicket) {
+    return <Loader />;
+  }
+
   const handleUnitClick = (unit, unitId) => {
     setSelectedItem(unit);
     setSelectedUnit(unit);
@@ -119,6 +138,11 @@ function EditTicket() {
       setSelectedTheme(null);
       setSelectedSubTheme(null);
       setSubThemeDropdownVisible(true);
+
+      setSelectedCurator(null);
+      setSelectedCuratorId(null);
+
+      setIsErrorVisible(false);
     }
 
     // console.log(unitId);
@@ -128,38 +152,53 @@ function EditTicket() {
     setSelectedTheme(theme);
     setSelectedThemeId(themeId);
 
-    setSelectedSubTheme(null);
-    setSubThemeDropdownVisible(true);
+    if (theme !== selectedTheme) {
+      setSelectedSubTheme(null);
+      setSubThemeDropdownVisible(true);
 
-    switch ((selectedUnitId, themeId)) {
-      case (1, 14):
-        setSelectedSubThemeId(73);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 15):
-        setSelectedSubThemeId(74);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 16):
-        setSelectedSubThemeId(75);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 22):
-        setSelectedSubThemeId(102);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 23):
-        setSelectedSubThemeId(103);
-        setSubThemeDropdownVisible(false);
-        break;
-      default:
+      setSelectedCurator(null);
+      setSelectedCuratorId(null);
+
+      setIsErrorVisible(false);
+
+      switch ((selectedUnitId, themeId)) {
+        case (1, 14):
+          setSelectedSubThemeId(73);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 15):
+          setSelectedSubThemeId(74);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 16):
+          setSelectedSubThemeId(75);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 22):
+          setSelectedSubThemeId(102);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 23):
+          setSelectedSubThemeId(103);
+          setSubThemeDropdownVisible(false);
+          break;
+        default:
+      }
     }
+
     // console.log(unitId);
   };
 
-  const handleSubThemeClick = (subTheme, subThemeId) => {
+  const handleSubThemeClick = (subTheme, subThemeId, departmentsId) => {
     setSelectedSubTheme(subTheme);
     setSelectedSubThemeId(subThemeId);
+
+    setSelectedDepartmentsId(departmentsId);
+
+    setSelectedCurator(null);
+    setSelectedCuratorId(null);
+
+    setIsErrorVisible(false);
     // console.log(subThemeId);
   };
 
@@ -174,20 +213,24 @@ function EditTicket() {
     }`;
     setSelectedCurator(fullName);
     setSelectedCuratorId(curatorId);
+
+    setIsErrorVisible(false);
   };
 
   const errorMsg = () => {
     let error = "";
 
-    // if (selectedUnit == null) {
-    //   error = "Выберите раздел";
-    // } else if (selectedTheme == null) {
-    //   error = "Выберите тему";
-    // } else if (nameValue.trim() == "") {
-    //   error = "Укажите название подтемы";
-    // } else {
-    //   error = "Ошибка при обработке подтемы";
-    // }
+    if (selectedUnit == null) {
+      error = "Выберите раздел";
+    } else if (selectedTheme == null) {
+      error = "Выберите тему";
+    } else if (selectedSubThemeId == null) {
+      error = "Выберите подтему";
+    } else if (selectedCurator == null) {
+      error = "Выберите куратора";
+    } else {
+      error = "Ошибка изменение данных тикета";
+    }
 
     return error;
   };
@@ -195,42 +238,45 @@ function EditTicket() {
   const handleEditTicket = async (e) => {
     e.preventDefault();
 
-    console.log(selectedUnit);
-    console.log(selectedUnitId);
-    console.log(selectedTheme);
-    console.log(selectedThemeId);
-    console.log(selectedSubTheme);
-    console.log(selectedSubThemeId);
-    console.log(selectedCurator);
-    console.log(selectedCuratorId);
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
+    // console.log(selectedTheme);
+    // console.log(selectedThemeId);
+    // console.log(selectedSubTheme);
+    // console.log(selectedSubThemeId);
+    // console.log(selectedCurator);
+    // console.log(selectedCuratorId);
+    // console.log(selectedDepartmentsId);
 
-    // if (
-    //   nameValue.trim() == "" ||
-    //   selectedUnit == null ||
-    //   selectedTheme == null
-    // ) {
-    //   setIsErrorVisible(true);
-    //   return;
-    // }
-    // setIsErrorVisible(false);
+    if (
+      selectedUnit == null ||
+      selectedTheme == null ||
+      selectedSubThemeId == null ||
+      selectedCurator == null
+    ) {
+      setIsErrorVisible(true);
+      return;
+    }
+    setIsErrorVisible(false);
 
-    // try {
-    //   const result = await editSubtheme({
-    //     variables: {
-    //       id: parseInt(subthemeId),
-    //       themeId: selectedThemeId,
-    //       stroke: nameValue.trim(),
-    //       lang: "ru",
-    //       departmentIds: selectedDepartmentsId,
-    //     },
-    //   });
+    try {
+      const result = await editTicket({
+        variables: {
+          id: parseInt(itemId),
+          helperId: selectedCuratorId,
+          unitId: selectedUnitId,
+          themeId: selectedThemeId,
+          subThemeId: selectedSubThemeId,
+          departmentId: selectedDepartmentsId[0],
+        },
+      });
 
-    //   console.log("Подтема успешно обновлена:", result);
-    //   handleShow();
-    // } catch (error) {
-    //   console.error("Ошибка при обновлении подтемы:", error);
-    //   setIsErrorVisible(true);
-    // }
+      console.log("Подтема успешно обновлена:", result);
+      // handleShow();
+    } catch (error) {
+      console.error("Ошибка при обновлении подтемы:", error);
+      setIsErrorVisible(true);
+    }
   };
 
   return (
@@ -310,7 +356,13 @@ function EditTicket() {
                     <Dropdown.Item
                       key={subTheme.id}
                       onClick={() =>
-                        handleSubThemeClick(subTheme.name.stroke, subTheme.id)
+                        handleSubThemeClick(
+                          subTheme.name.stroke,
+                          subTheme.id,
+                          subTheme.departments.map(
+                            (department) => department.id
+                          )
+                        )
                       }
                       href="#"
                     >
@@ -331,24 +383,32 @@ function EditTicket() {
               title={selectedCurator || "Куратор"}
               className="themes__dropdown"
             >
-              {dataQueryCurators.map((curator, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() =>
-                    handleCuratorClick(
-                      curator.user.name,
-                      curator.user.surname,
-                      curator.user.patronymic,
-                      curator.id
-                    )
-                  }
-                  href="#"
-                >
-                  {`${curator.user.surname} ${curator.user.name} ${
-                    curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-                  }`}
-                </Dropdown.Item>
-              ))}
+              {dataQueryCurators
+                .filter((curator) =>
+                  curator.departments.some((department) =>
+                    selectedDepartmentsId.includes(department.id)
+                  )
+                )
+                .map((curator, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleCuratorClick(
+                        curator.user.name,
+                        curator.user.surname,
+                        curator.user.patronymic,
+                        curator.id
+                      )
+                    }
+                    href="#"
+                  >
+                    {`${curator.user.surname} ${curator.user.name} ${
+                      curator.user.patronymic
+                        ? ` ${curator.user.patronymic}`
+                        : ""
+                    }`}
+                  </Dropdown.Item>
+                ))}
             </DropdownButton>
           </div>
         </Tab>

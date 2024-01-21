@@ -236,3 +236,27 @@ export const DELETE_SUBTHEME = gql`
     deleteSubTheme(id: $id)
   }
 `;
+
+export const EDIT_TICKET = gql`
+  mutation (
+    $id: Int!
+    $helperId: Int
+    $unitId: Int
+    $themeId: Int
+    $subThtmeId: Int
+    $departmentId: Int
+  ) {
+    updateTicket(
+      id: $id
+      fields: {
+        helperId: $helperId
+        unitId: $unitId
+        themeId: $themeId
+        subThemeId: $subThtmeId
+      }
+      departmentId: $departmentId
+    ) {
+      changed
+    }
+  }
+`;
