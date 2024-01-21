@@ -104,6 +104,14 @@ export const MESSAGES_CHAT = gql`
   query ($id: Int!) {
     ticket(id: $id) {
       id
+      helper {
+        id
+        user {
+          name
+          surname
+          patronymic
+        }
+      }
       reaction
       messages {
         id
@@ -123,6 +131,30 @@ export const MESSAGES_CHAT = gql`
         id
         name(lang: "ru") {
           stroke
+        }
+      }
+      subTheme {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+        departments {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+        theme {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+          unit {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+          }
         }
       }
     }
@@ -322,7 +354,7 @@ export const SUBTHEME = gql`
 `;
 
 export const STATS = gql`
-  query{
+  query {
     helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
       helper {
         id
