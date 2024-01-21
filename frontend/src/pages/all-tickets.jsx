@@ -243,7 +243,7 @@ function allTickets() {
     let userCurRole = null;
 
     if (userRole === null) {
-      userCurRole = "client";
+      userCurRole = "helper";
     } else {
       userCurRole = userRole;
     }
