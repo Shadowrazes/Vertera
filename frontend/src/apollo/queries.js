@@ -114,14 +114,14 @@ export const MESSAGES_CHAT = gql`
       }
       reaction
       client {
-				user {
+        user {
           name
           surname
           patronymic
         }
         email
       }
-    	helper {
+      helper {
         user {
           name
           surname
@@ -213,6 +213,12 @@ export const THEME_LIST = gql`
           name(lang: "ru") {
             stroke
           }
+          departments {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+          }
         }
       }
     }
@@ -256,6 +262,12 @@ export const CURATORS_LIST = gql`
         name
         surname
         patronymic
+      }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
       }
     }
   }

@@ -152,32 +152,34 @@ function FormComponent() {
     setSelectedThemeId(themeId);
     // console.log(themeId);
 
-    setSelectedSubTheme(null);
-    setSubThemeDropdownVisible(true);
-    setIsVisible(false);
+    if (theme !== selectedTheme) {
+      setSelectedSubTheme(null);
+      setSubThemeDropdownVisible(true);
+      setIsVisible(false);
 
-    switch ((selectedUnitId, themeId)) {
-      case (1, 14):
-        setSelectedSubThemeId(73);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 15):
-        setSelectedSubThemeId(74);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 16):
-        setSelectedSubThemeId(75);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 22):
-        setSelectedSubThemeId(102);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 23):
-        setSelectedSubThemeId(103);
-        setSubThemeDropdownVisible(false);
-        break;
-      default:
+      switch ((selectedUnitId, themeId)) {
+        case (1, 14):
+          setSelectedSubThemeId(73);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 15):
+          setSelectedSubThemeId(74);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 16):
+          setSelectedSubThemeId(75);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 22):
+          setSelectedSubThemeId(102);
+          setSubThemeDropdownVisible(false);
+          break;
+        case (2, 23):
+          setSelectedSubThemeId(103);
+          setSubThemeDropdownVisible(false);
+          break;
+        default:
+      }
     }
   };
 

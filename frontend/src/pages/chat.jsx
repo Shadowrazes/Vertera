@@ -470,17 +470,17 @@ function Chat() {
   const getFullName = (userData) => {
     let result = "";
     console.log(userData);
-    if(userData?.name) {
-        result += userData?.name + " ";
+    if (userData?.name) {
+      result += userData?.name + " ";
     }
-    if(userData?.surname) {
-        result += userData?.surname + " ";
+    if (userData?.surname) {
+      result += userData?.surname + " ";
     }
-    if(userData?.patronymic) {
-        result += userData?.patronymic;
+    if (userData?.patronymic) {
+      result += userData?.patronymic;
     }
     return result;
-  }
+  };
 
   return (
     <>
@@ -504,18 +504,27 @@ function Chat() {
 
         <Row>
           <Col md={6}>
-              <Table striped bordered hover>
-                  <tbody>
-                    <tr>
-                      <td><b>Создатель обращения:</b></td>
-                      <td>{getFullName(data?.ticket?.client?.user)} | <a href={"mailto:" + data?.ticket?.client?.email}>{data?.ticket?.client?.email}</a></td>
-                    </tr>
-                    <tr>
-                      <td><b>Текущий куратор:</b></td>
-                      <td>{getFullName(data?.ticket?.helper?.user)}</td>
-                    </tr>
-                  </tbody>
-              </Table>
+            <Table striped bordered hover>
+              <tbody>
+                <tr>
+                  <td>
+                    <b>Создатель обращения:</b>
+                  </td>
+                  <td>
+                    {getFullName(data?.ticket?.client?.user)} |{" "}
+                    <a href={"mailto:" + data?.ticket?.client?.email}>
+                      {data?.ticket?.client?.email}
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Текущий куратор:</b>
+                  </td>
+                  <td>{getFullName(data?.ticket?.helper?.user)}</td>
+                </tr>
+              </tbody>
+            </Table>
           </Col>
         </Row>
 
@@ -658,7 +667,7 @@ function Chat() {
                 )}
               </div>
               <Link
-                to={`/edit-ticket/dialog/${itemId}`}
+                to={`/edit-ticket/${itemId}`}
                 state={{
                   linkPrev: window.location.href,
                 }}
@@ -711,7 +720,7 @@ function Chat() {
                   {reaction === "like" && (
                     <a href="#" className="disabled">
                       <span className="chat-message-recepient__rate-icon-like">
-                      <img src="/like.svg" alt="" />
+                        <img src="/like.svg" alt="" />
                       </span>
                     </a>
                   )}
