@@ -361,6 +361,7 @@ function Stats() {
             </Table>
         </Col>
       </Row>
+      <span>123</span>
     </>
   );
 }
