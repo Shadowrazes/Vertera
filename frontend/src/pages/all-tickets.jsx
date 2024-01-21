@@ -4,8 +4,11 @@ import {
   Row,
   Col,
   Table,
+  Button,
   DropdownButton,
   Dropdown,
+  Container,
+  ButtonGroup
 } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import { Link, useNavigate } from "react-router-dom";
@@ -77,6 +80,10 @@ function allTickets() {
     userCurRole = userRole;
   }
 
+  let fastFilterHelperId = userId;
+  let fastFilterStatus = null;
+  const [fastFilterStr, setFastFilterStr] = useState('my');
+
   const pageNumbers = [];
   const itemsPerPage = 8;
 
@@ -127,7 +134,7 @@ function allTickets() {
     return useQuery(TABLE_TICKETS, {
       variables: {
         filters: {
-          helperIds: userId,
+          helperIds: fastFilterHelperId,
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
@@ -168,7 +175,7 @@ function allTickets() {
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: userId,
+          helperIds: fastFilterHelperId,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -179,6 +186,7 @@ function allTickets() {
           offset: _offset,
           orderBy: orderBy,
           orderDir: orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -196,6 +204,7 @@ function allTickets() {
           offset: _offset,
           orderBy: orderBy,
           orderDir: orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -318,7 +327,7 @@ function allTickets() {
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: userId,
+          helperIds: fastFilterHelperId,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -329,6 +338,7 @@ function allTickets() {
           offset: offset,
           orderBy: _orderBy,
           orderDir: _orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -346,6 +356,7 @@ function allTickets() {
           offset: offset,
           orderBy: _orderBy,
           orderDir: _orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -456,7 +467,7 @@ function allTickets() {
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: userId,
+          helperIds: fastFilterHelperId,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -467,6 +478,7 @@ function allTickets() {
           offset: offset,
           orderBy: orderBy,
           orderDir: orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -484,12 +496,56 @@ function allTickets() {
           offset: offset,
           orderBy: orderBy,
           orderDir: orderDir,
+          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
       await refetch(variables);
     }
   };
+
+  const handleFastFilter = async (filterStr, event) => {
+
+    setFastFilterStr(filterStr);
+
+    let currentFastFilterHelperId;
+    let currentFastFilterStatus;
+    
+    if(filterStr === 'my') {
+      fastFilterHelperId = userId;
+      fastFilterStatus = null;
+    }
+    else if(filterStr === 'all') {
+      fastFilterHelperId = null;
+      fastFilterStatus = null;
+    }
+    else if(filterStr === 'in-process') {
+      fastFilterHelperId = null;
+      fastFilterStatus = 3;
+    }
+
+    const variables = {
+      filters: {
+        helperIds: fastFilterHelperId,
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+        reaction: queryReaction,
+        limit: itemsPerPage,
+        offset: offset,
+        orderBy: orderBy,
+        orderDir: orderDir,
+        statusIds: fastFilterStatus,
+        lang: "ru",
+      },
+    };
+
+    console.log(variables);
+
+    await refetch(variables);
+  }
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -638,7 +694,15 @@ function allTickets() {
               </Form>
             </div>
           )}
+
+          <ButtonGroup className="mb-3">
+            <Button onClick={handleFastFilter.bind(null, 'my')} variant={fastFilterStr === "my" ? "primary" : "outline-primary"}>Мои тикеты</Button>
+            <Button onClick={handleFastFilter.bind(null, 'all')} variant={fastFilterStr === "all" ? "primary" : "outline-primary"}>Все тикеты</Button>
+            <Button onClick={handleFastFilter.bind(null, 'in-process')} variant={fastFilterStr === "in-process" ? "primary" : "outline-primary"}>В процессе рассмотрения</Button>
+          </ButtonGroup>
+
           <div className="table__sorts">
+              
             <span className="table__sorts-label">Сортировать по:</span>
             {columns.map((column, index) => (
               <span
