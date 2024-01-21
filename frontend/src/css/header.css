@@ -18,6 +18,18 @@
     text-decoration: none;
 }
 
+.header-menu {
+    padding: 5px 0 !important;
+}
+
+.nav-link.active {
+    background-color: aliceblue;
+}
+
+.nav-link {
+    padding-right: 60px !important;
+}
+
 @media screen and (max-width: 768px) {
     .header__logo {
         width: 100px;

@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@apollo/client";
-import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
+import { Modal, Button, Form, Row, Col, Spinner, Alert, Overlay, Popover, OverlayTrigger, Nav } from "react-bootstrap";
 
 import { LOGIN, USER } from "../apollo/queries";
 
@@ -13,8 +11,11 @@ import "../css/header.css";
 function Header({ user }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [menuTarget, setMenuTarget] = useState(null);
   const [isLoad, setIsLoad] = useState(false);
   const [isError, setIsError] = useState(false);
+  const ref = useRef(null);
 
   const [loginVariables, setLoginVariables] = useState({
     login: "",
@@ -35,6 +36,11 @@ function Header({ user }) {
       setShowLoginModal(true);
     }
   };
+
+  const handleShowMenu = (event) => {
+    setShowMenu(!showMenu);
+    setMenuTarget(event.target);
+  }
 
   const handleInput = (event) => {
     setLoginVariables({
@@ -87,7 +93,6 @@ function Header({ user }) {
 
     useEffect(() => {
       if (data) {
-        // console.log(data);
         localStorage.setItem(
           "user",
           JSON.stringify({
@@ -130,16 +135,36 @@ function Header({ user }) {
           <a href="/">
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
-          <div className="header__btn-group">
-            <a className="header__exit" href="#" onClick={handleShow}>
+          <div className="header__btn-group" ref={ref}>
+            <a className="header__exit" href="#" onClick={user ? handleShowMenu : handleShow}>
               {user ? user.login : "Войти"}
             </a>
-            <a href="#" className="header__button" onClick={handleShow}>
+            <a href="#" className="header__button" onClick={user ? handleShowMenu : handleShow}>
               <img src={headerBtn} alt="" className="header__button-svg" />
             </a>
           </div>
         </div>
       </section>
+
+      <Overlay
+        show={showMenu}
+        target={menuTarget}
+        placement="bottom-end"
+        container={ref}
+        containerPadding={20}
+      >
+        <Popover id="popover-contained">
+          <Popover.Body className="header-menu">
+            <Nav defaultActiveKey={window.location.pathname} className="flex-column">
+              <Nav.Link href="/all-tickets">Тикеты</Nav.Link>
+              <Nav.Link href="/stats">Статистика</Nav.Link>
+              <Nav.Link href="/curators">Кураторы</Nav.Link>
+              <Nav.Link href="/themes">Темы</Nav.Link>
+              <Nav.Link><Button variant="danger" size="sm" onClick={handleShow}>Выйти</Button></Nav.Link>
+            </Nav>
+          </Popover.Body>
+        </Popover>
+      </Overlay>
 
       {/* Попап авторизации */}
       <Modal show={showLoginModal} onHide={handleClose}>

@@ -518,44 +518,7 @@ function Chat() {
               </Table>
           </Col>
         </Row>
-
-        {isHideMessages &&
-          messagesQuery.map(
-            (msg, index) =>
-              index === 0 &&
-              msg.text !== "" && (
-                <pre key={msg.id}>
-                  {console.log(msg)}
-                  {msg.sender.id === userId ? (
-                    <ChatMessageSender
-                      message={msg.text}
-                      sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
-                      attachs={msg.attachs}
-                    />
-                  ) : msg.sender.role === "system" ? (
-                    <ChatMessageSystem
-                      message={msg.text}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
-                    />
-                  ) : (
-                    <ChatMessageRecepient
-                      message={msg.text}
-                      sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
-                      attachs={msg.attachs}
-                    />
-                  )}
-                </pre>
-              )
-          )}
-
+        
         {/* {isHideMessages && (
           <div className="chat-input__more">
             <span className="chat-input__more-text">
@@ -578,6 +541,7 @@ function Chat() {
                   {msg.sender.id === userId ? (
                     <ChatMessageSender
                       message={msg.text}
+                      sender={msg.sender}
                       time={msg.date.replace(/T|-/g, (match) =>
                         match === "T" ? " " : "."
                       )}
@@ -593,6 +557,7 @@ function Chat() {
                   ) : (
                     <ChatMessageRecepient
                       message={msg.text}
+                      sender={msg.sender}
                       time={msg.date.replace(/T|-/g, (match) =>
                         match === "T" ? " " : "."
                       )}
