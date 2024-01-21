@@ -176,59 +176,6 @@ function Chat() {
   //   setIsHideMessages(false);
   // };
 
-  const handleUnitClick = (unit, unitId) => {
-    setSelectedItem(unit);
-    setSelectedUnit(unit);
-    setSelectedUnitId(unitId);
-
-    if (unit !== selectedUnit) {
-      setSelectedTheme(null);
-      setSelectedSubTheme(null);
-      setSubThemeDropdownVisible(true);
-    }
-
-    // console.log(unitId);
-  };
-
-  const handleThemeClick = (theme, themeId) => {
-    setSelectedTheme(theme);
-    setSelectedThemeId(themeId);
-
-    setSelectedSubTheme(null);
-    setSubThemeDropdownVisible(true);
-
-    switch ((selectedUnitId, themeId)) {
-      case (1, 14):
-        setSelectedSubThemeId(73);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 15):
-        setSelectedSubThemeId(74);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 16):
-        setSelectedSubThemeId(75);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 22):
-        setSelectedSubThemeId(102);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 23):
-        setSelectedSubThemeId(103);
-        setSubThemeDropdownVisible(false);
-        break;
-      default:
-    }
-    // console.log(unitId);
-  };
-
-  const handleSubThemeClick = (subTheme, subThemeId) => {
-    setSelectedSubTheme(subTheme);
-    setSelectedSubThemeId(subThemeId);
-    // console.log(subThemeId);
-  };
-
   const errorMsg = () => {
     let error = "";
 
@@ -316,14 +263,12 @@ function Chat() {
         setMessageDate(new Date());
         addMessage({
           variables: {
-            fields: {
-              senderId: userId,
-              recieverId: 46,
-              ticketId: ticketId,
-              type: "message",
-              text: message,
-              attachPaths: filePaths,
-            },
+            senderId: userId,
+            recieverId: 1,
+            ticketId: ticketId,
+            type: "message",
+            text: message,
+            attachPaths: filePaths,
           },
         });
       })
@@ -433,7 +378,7 @@ function Chat() {
     setIsVisibleError(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
     if (message.trim() == "") {
       setIsVisibleError(true);
     }
@@ -527,7 +472,7 @@ function Chat() {
             </Table>
           </Col>
         </Row>
-        
+
         {/* {isHideMessages && (
           <div className="chat-input__more">
             <span className="chat-input__more-text">

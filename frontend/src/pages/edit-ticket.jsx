@@ -271,12 +271,21 @@ function EditTicket() {
         },
       });
 
-      console.log("Подтема успешно обновлена:", result);
-      // handleShow();
+      console.log("Тикет успешно обновлен:", result);
+      handleShow();
     } catch (error) {
-      console.error("Ошибка при обновлении подтемы:", error);
+      console.error("Ошибка при обновлении тикета:", error);
       setIsErrorVisible(true);
     }
+  };
+
+  const handleShow = () => {
+    setShow(true);
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    window.location.href = linkPrev;
   };
 
   return (
@@ -422,6 +431,20 @@ function EditTicket() {
           onClick={handleEditTicket}
         />
       </div>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Тикет обновлен</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Данные тикета успешно обновлены</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

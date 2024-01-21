@@ -8,7 +8,7 @@ import {
   DropdownButton,
   Dropdown,
   Container,
-  ButtonGroup
+  ButtonGroup,
 } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import { Link, useNavigate } from "react-router-dom";
@@ -82,7 +82,7 @@ function allTickets() {
 
   let fastFilterHelperId = userId;
   let fastFilterStatus = null;
-  const [fastFilterStr, setFastFilterStr] = useState('my');
+  const [fastFilterStr, setFastFilterStr] = useState("my");
 
   const pageNumbers = [];
   const itemsPerPage = 8;
@@ -204,7 +204,6 @@ function allTickets() {
           offset: _offset,
           orderBy: orderBy,
           orderDir: orderDir,
-          statusIds: fastFilterStatus,
           lang: "ru",
         },
       };
@@ -505,21 +504,18 @@ function allTickets() {
   };
 
   const handleFastFilter = async (filterStr, event) => {
-
     setFastFilterStr(filterStr);
 
     let currentFastFilterHelperId;
     let currentFastFilterStatus;
-    
-    if(filterStr === 'my') {
+
+    if (filterStr === "my") {
       fastFilterHelperId = userId;
       fastFilterStatus = null;
-    }
-    else if(filterStr === 'all') {
+    } else if (filterStr === "all") {
       fastFilterHelperId = null;
       fastFilterStatus = null;
-    }
-    else if(filterStr === 'in-process') {
+    } else if (filterStr === "in-process") {
       fastFilterHelperId = null;
       fastFilterStatus = 3;
     }
@@ -545,7 +541,7 @@ function allTickets() {
     console.log(variables);
 
     await refetch(variables);
-  }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -695,14 +691,34 @@ function allTickets() {
             </div>
           )}
 
-          <ButtonGroup className="mb-3">
-            <Button onClick={handleFastFilter.bind(null, 'my')} variant={fastFilterStr === "my" ? "primary" : "outline-primary"}>Мои тикеты</Button>
-            <Button onClick={handleFastFilter.bind(null, 'all')} variant={fastFilterStr === "all" ? "primary" : "outline-primary"}>Все тикеты</Button>
-            <Button onClick={handleFastFilter.bind(null, 'in-process')} variant={fastFilterStr === "in-process" ? "primary" : "outline-primary"}>В процессе рассмотрения</Button>
-          </ButtonGroup>
+          {isAdmin() && (
+            <ButtonGroup className="mb-3">
+              <Button
+                onClick={handleFastFilter.bind(null, "my")}
+                variant={fastFilterStr === "my" ? "primary" : "outline-primary"}
+              >
+                Мои тикеты
+              </Button>
+              <Button
+                onClick={handleFastFilter.bind(null, "all")}
+                variant={
+                  fastFilterStr === "all" ? "primary" : "outline-primary"
+                }
+              >
+                Все тикеты
+              </Button>
+              <Button
+                onClick={handleFastFilter.bind(null, "in-process")}
+                variant={
+                  fastFilterStr === "in-process" ? "primary" : "outline-primary"
+                }
+              >
+                В процессе рассмотрения
+              </Button>
+            </ButtonGroup>
+          )}
 
           <div className="table__sorts">
-              
             <span className="table__sorts-label">Сортировать по:</span>
             {columns.map((column, index) => (
               <span

@@ -43,8 +43,24 @@ export const ADD_TICKET = gql`
 `;
 
 export const ADD_MESSAGE = gql`
-  mutation ($fields: MessageInsert!) {
-    addMessage(fields: $fields)
+  mutation (
+    $senderId: Int!
+    $recieverId: Int!
+    $ticketId: Int!
+    $type: String!
+    $text: String!
+    $attachPaths: [String]
+  ) {
+    addMessage(
+      fields: {
+        senderId: $senderId
+        recieverId: $recieverId
+        ticketId: $ticketId
+        type: $type
+        text: $text
+        attachPaths: $attachPaths
+      }
+    )
   }
 `;
 

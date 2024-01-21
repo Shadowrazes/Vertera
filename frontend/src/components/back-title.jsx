@@ -4,7 +4,7 @@ function BackTitle({ title, className, linkPrev }) {
   const handleGoBack = () => {
     // console.log(linkPrev);
     if (linkPrev == null) {
-      window.location.href = "/curators";
+      window.location.href = "/all-tickets";
     } else {
       window.location.href = linkPrev;
     }

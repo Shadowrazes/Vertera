@@ -1,6 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@apollo/client";
-import { Modal, Button, Form, Row, Col, Spinner, Alert, Overlay, Popover, OverlayTrigger, Nav } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+  Overlay,
+  Popover,
+  OverlayTrigger,
+  Nav,
+} from "react-bootstrap";
 
 import { LOGIN, USER } from "../apollo/queries";
 
@@ -40,7 +52,7 @@ function Header({ user }) {
   const handleShowMenu = (event) => {
     setShowMenu(!showMenu);
     setMenuTarget(event.target);
-  }
+  };
 
   const handleInput = (event) => {
     setLoginVariables({
@@ -113,6 +125,7 @@ function Header({ user }) {
         );
       }
       //console.log(JSON.parse(localStorage.getItem("userRole")).role);
+      refetch();
     }, [data, dataUser, loginVariables]);
   }
 
@@ -136,10 +149,18 @@ function Header({ user }) {
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
           <div className="header__btn-group" ref={ref}>
-            <a className="header__exit" href="#" onClick={user ? handleShowMenu : handleShow}>
+            <a
+              className="header__exit"
+              href="#"
+              onClick={user ? handleShowMenu : handleShow}
+            >
               {user ? user.login : "Войти"}
             </a>
-            <a href="#" className="header__button" onClick={user ? handleShowMenu : handleShow}>
+            <a
+              href="#"
+              className="header__button"
+              onClick={user ? handleShowMenu : handleShow}
+            >
               <img src={headerBtn} alt="" className="header__button-svg" />
             </a>
           </div>
@@ -155,12 +176,19 @@ function Header({ user }) {
       >
         <Popover id="popover-contained">
           <Popover.Body className="header-menu">
-            <Nav defaultActiveKey={window.location.pathname} className="flex-column">
+            <Nav
+              defaultActiveKey={window.location.pathname}
+              className="flex-column"
+            >
               <Nav.Link href="/all-tickets">Тикеты</Nav.Link>
               <Nav.Link href="/stats">Статистика</Nav.Link>
               <Nav.Link href="/curators">Кураторы</Nav.Link>
               <Nav.Link href="/themes">Темы</Nav.Link>
-              <Nav.Link><Button variant="danger" size="sm" onClick={handleShow}>Выйти</Button></Nav.Link>
+              <Nav.Link>
+                <Button variant="danger" size="sm" onClick={handleShow}>
+                  Выйти
+                </Button>
+              </Nav.Link>
             </Nav>
           </Popover.Body>
         </Popover>
