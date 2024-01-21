@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
-
+ 
 import { THEME_LIST } from "../apollo/queries";
 
 import TitleH2 from "../components/title";
