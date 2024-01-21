@@ -8,7 +8,7 @@ import CreateTicket from "./pages/create-ticket";
 import Curators from "./pages/curators";
 import AddCurator from "./pages/add-curator";
 import EditCurator from "./pages/edit-curator";
-import Units from "./pages/Units";
+import Units from "./pages/units";
 import AddUnit from "./pages/add-unit";
 import EditUnit from "./pages/edit-unit";
 import Themes from "./pages/themes";
