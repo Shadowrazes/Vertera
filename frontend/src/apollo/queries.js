@@ -105,6 +105,21 @@ export const MESSAGES_CHAT = gql`
     ticket(id: $id) {
       id
       reaction
+      client {
+				user {
+          name
+          surname
+          patronymic
+        }
+        email
+      }
+    	helper {
+        user {
+          name
+          surname
+          patronymic
+        }
+      }
       messages {
         id
         text
@@ -115,6 +130,9 @@ export const MESSAGES_CHAT = gql`
         }
         sender {
           id
+          name
+          surname
+          patronymic
           role
         }
         date

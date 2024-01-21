@@ -43,4 +43,26 @@
   font-size: 16px;
   color: rgb(33, 37, 41);
   text-decoration: none;
+  position: relative;
+}
+
+.chat-message-sender__attach {
+  position: relative;
+}
+
+.chat-message-sender__attach::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  width: 100%;
+  border-bottom: 1px dashed red;
+}
+
+.chat-message-sender__attach-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  margin-right: 5px;
 }
