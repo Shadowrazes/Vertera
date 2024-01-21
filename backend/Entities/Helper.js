@@ -31,6 +31,7 @@ class Helper extends Entity{
                 IFNULL(SUM(statusId = 1), 0) AS newTickets,
                 IFNULL(SUM(statusId = 2), 0) AS closedTickets,
                 IFNULL(SUM(statusId = 3), 0) AS inProgressTickets,
+                IFNULL(SUM(statusId = 4), 0) AS onCorrectionTickets,
                 IFNULL(SUM(reaction = 'like'), 0) AS likes,
                 IFNULL(SUM(reaction = 'dislike'), 0) AS dislikes,
                 COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
@@ -70,9 +71,9 @@ class Helper extends Entity{
         }
 
         const avgTimeMilli = dateDiffs.reduce((sum, current) => sum + current, 0) / dateDiffs.length;
-        const avgTimeHours = +((avgTimeMilli / 60000 / 60).toFixed(2));
-        stats.avgReplyTime = isNaN(avgTimeHours) ? 1 : avgTimeHours;
-        stats.fantasy = +((1 / stats.avgReplyTime + 0.2 * stats.likes - 0.15 * stats.dislikes).toFixed(3));
+        const avgTimeSecs= +((avgTimeMilli / 1000).toFixed(2));
+        stats.avgReplyTime = isNaN(avgTimeSecs) ? 60 * 60 : avgTimeSecs;
+        stats.fantasy = +((60 * 60 / stats.avgReplyTime + 0.5 * stats.likes + stats.totalTickets * 0.2).toFixed(3));
 
         return stats;
     }

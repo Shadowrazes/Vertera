@@ -121,6 +121,7 @@ export const typeDefs = `
         totalTickets: Int!
         newTickets: Int!
         inProgressTickets: Int!
+        onCorrectionTickets: Int!
         closedTickets: Int!
         avgReplyTime: Float!
         likes: Int!
