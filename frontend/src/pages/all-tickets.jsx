@@ -839,7 +839,7 @@ function allTickets() {
           </ul>
         </>
       )}
-      {dataAmount == 0 && (
+      {dataAmount == 0 && !isAdmin() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">
             У вас нет тикетов, чтобы создать обращение нажмите на кнопку
@@ -848,6 +848,12 @@ function allTickets() {
             title="Создать новое обращение"
             onClick={goToCreateTicket}
           />
+        </div>
+      )}
+
+      {dataAmount == 0 && isAdmin() && (
+        <div className="alltickets__empty-table">
+          <span className="alltickets__text">У вас нет тикетов</span>
         </div>
       )}
     </>

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { MESSAGES_CHAT } from "../apollo/queries";
+import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
@@ -26,6 +26,7 @@ import {
 import "../css/chat-input.css";
 
 function Chat() {
+  const [dataQuery, setData] = useState([]);
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
@@ -33,11 +34,22 @@ function Chat() {
   const [linkPrev, setLinkPrev] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
 
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState("");
+
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
+
   const [reaction, setReaction] = useState(null);
 
   const [isLoadingClose, setIsLoadingClose] = useState(false);
 
-  const [isHideMessages, setIsHideMessages] = useState(true);
+  const [isHideMessages, setIsHideMessages] = useState(false);
 
   const [ticketId, setTicketId] = useState(null);
   const [messagesQuery, setMessagesQuery] = useState([]);
@@ -82,22 +94,29 @@ function Chat() {
     },
   });
 
+  const {
+    loading: loadingTheme,
+    error: errorTheme,
+    data: dataTheme,
+  } = useQuery(THEME_LIST);
+
   useEffect(() => {
     if (data && data.ticket) {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
+      setSelectedItem(data.ticket.subTheme.theme.unit.name.stroke);
+      setSelectedUnit(data.ticket.subTheme.theme.unit.name.stroke);
+      setSelectedTheme(data.ticket.subTheme.theme.name.stroke);
+      setSelectedSubTheme(data.ticket.subTheme.name.stroke);
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
+      //console.log(data.ticket.subTheme.theme.unit.name.stroke);
 
       if (data.ticket.status.name.stroke !== "Закрыт") {
         setIsVisible(true);
       } else {
         setIsVisible(false);
-      }
-
-      if (data.ticket.messages.length == 1) {
-        setIsHideMessages(false);
       }
 
       if (location.state && location.state.linkPrev) {
@@ -112,7 +131,11 @@ function Chat() {
         setReaction(null);
       }
     }
-  }, [data, location.state]);
+
+    if (dataTheme && dataTheme.allThemeTree) {
+      setData(dataTheme.allThemeTree);
+    }
+  }, [data, dataTheme, location.state]);
 
   const navigate = useNavigate();
 
@@ -140,9 +163,70 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  const handleMoreMessages = (e) => {
-    e.preventDefault();
-    setIsHideMessages(false);
+  if (loadingTheme) {
+    return <Loader />;
+  }
+
+  if (errorTheme) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  // const handleMoreMessages = (e) => {
+  //   e.preventDefault();
+  //   setIsHideMessages(false);
+  // };
+
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedItem(unit);
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+
+    if (unit !== selectedUnit) {
+      setSelectedTheme(null);
+      setSelectedSubTheme(null);
+      setSubThemeDropdownVisible(true);
+    }
+
+    // console.log(unitId);
+  };
+
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+
+    setSelectedSubTheme(null);
+    setSubThemeDropdownVisible(true);
+
+    switch ((selectedUnitId, themeId)) {
+      case (1, 14):
+        setSelectedSubThemeId(73);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 15):
+        setSelectedSubThemeId(74);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 16):
+        setSelectedSubThemeId(75);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 22):
+        setSelectedSubThemeId(102);
+        setSubThemeDropdownVisible(false);
+        break;
+      case (2, 23):
+        setSelectedSubThemeId(103);
+        setSubThemeDropdownVisible(false);
+        break;
+      default:
+    }
+    // console.log(unitId);
+  };
+
+  const handleSubThemeClick = (subTheme, subThemeId) => {
+    setSelectedSubTheme(subTheme);
+    setSelectedSubThemeId(subThemeId);
+    // console.log(subThemeId);
   };
 
   const errorMsg = () => {
@@ -472,7 +556,7 @@ function Chat() {
               )
           )}
 
-        {isHideMessages && (
+        {/* {isHideMessages && (
           <div className="chat-input__more">
             <span className="chat-input__more-text">
               <a
@@ -484,7 +568,7 @@ function Chat() {
               </a>
             </span>
           </div>
-        )}
+        )} */}
 
         {!isHideMessages &&
           messagesQuery.map(
@@ -573,10 +657,23 @@ function Chat() {
                   <></>
                 )}
               </div>
+              <Link
+                to={`/edit-ticket/dialog/${itemId}`}
+                state={{
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                <ButtonCustom
+                  title="Изменить тикет"
+                  className="chat-input__button-close single"
+                />
+              </Link>
             </Row>
           </Form>
         </div>
       )}
+
       {!isVisible && (
         <div className="chat-input__close-container">
           <div className="chat-input__close-box">

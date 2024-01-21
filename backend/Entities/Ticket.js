@@ -5,6 +5,7 @@ import User from "./User.js";
 import Unit from "./Unit.js";
 import Theme from "./Theme.js";
 import SubTheme from "./SubTheme.js";
+import ThemeDepartment from "./ThemeDepartment.js";
 import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
@@ -230,22 +231,34 @@ class Ticket extends Entity{
         return await super.Transaction(async (conn) => {
             if(super.IsArgsEmpty(fields) && !departmentId) throw new Error('Empty fields');
 
-            // обновить хелпера при subTheme?
+            if(departmentId) {
+                const curTicket = await this.GetById(id);
+                const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
-            if(fields.helperId || departmentId) {
-                const clientResult = await this.GetById(id);
-                const clientId = clientResult.clientId;
+                let needNewHelper = true;
+                for(department of curDepartments){
+                    if(departmentId == department.id){
+                        needNewHelper = false;
+                        break;
+                    }
+                }
 
-                if(departmentId) {
+                if(needNewHelper){
                     fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
                 }
+            }
+
+            if(fields.helperId){
+                const clientResult = await this.GetById(id);
+                const clientId = clientResult.clientId;
 
                 const helperResult = await User.GetById(fields.helperId);
                 const helperName = helperResult.name ? helperResult.name : 'Anonymous';
     
-                const msgFields = { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
-                                    ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
-                const msgResult = await Message.TransInsert(msgFields, conn);
+                const msgHelperEventFields = 
+                    { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
+                    ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
+                const msgHelperEventResult = await Message.TransInsert(msgHelperEventFields, conn);
             }
     
             let result = super.EmptyUpdateInfo;

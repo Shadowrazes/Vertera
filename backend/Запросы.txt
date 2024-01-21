@@ -3,6 +3,10 @@ mutation{
 }
 
 mutation{
+  addTicketStatus(fields:{lang:"ru", stroke:"На уточнении"})
+}
+
+mutation{
   addTicket( ticketFields: {clientId: 1, unitId: 1, themeId: 6, subThemeId: 31}, messageFields: {senderId: 1, recieverId: 2, ticketId: 1, type: "message", text: "test", attachPaths: ["test/a", "test/321"]})
 }
 

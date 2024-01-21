@@ -139,10 +139,12 @@ function FormComponent() {
     setSelectedUnitId(unitId);
     // console.log(unitId);
 
-    setSelectedTheme(null);
-    setSelectedSubTheme(null);
-    setSubThemeDropdownVisible(true);
-    setIsVisible(false);
+    if (unit !== selectedUnit) {
+      setSelectedTheme(null);
+      setSelectedSubTheme(null);
+      setSubThemeDropdownVisible(true);
+      setIsVisible(false);
+    }
   };
 
   const handleThemeClick = (theme, themeId) => {
@@ -205,19 +207,6 @@ function FormComponent() {
 
   const handleEmailChange = (e) => {
     setEmailValue(e.target.value);
-  };
-
-  const resetState = (e) => {
-    setSelectedUnit(null);
-    setSelectedTheme(null);
-    setSelectedSubTheme(null);
-    setSelectedItem(null);
-    setTextareaValue("");
-    setNameValue("");
-    setEmailValue("");
-    setSelectedUnitId(null);
-    setSelectedThemeId(null);
-    setSelectedSubThemeId(null);
   };
 
   const errorMsg = () => {
