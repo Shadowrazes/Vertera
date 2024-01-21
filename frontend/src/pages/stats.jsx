@@ -43,7 +43,7 @@ ChartJS.register(
     Tooltip,
     Legend,
     ArcElement
-  );
+);
 
 function Stats() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -51,6 +51,8 @@ function Stats() {
   const [likeData, setLikeData] = useState({});
   const [tableInfo, setTableInfo] = useState({});
   const [fantasy, setFantasy] = useState({});
+  const [rateAvgTime, setRateAvgTime] = useState([]);
+  const [rateLike, setRateLike] = useState([]);
 
   const { loading, error, data, refetch } = useQuery(STATS);
   const getCurrentUserStats = () => {
@@ -65,6 +67,20 @@ function Stats() {
         avg += elem.stats.avgReplyTime;
     })
     return avg / data?.helperStatList.length;
+  }
+
+  const getFullName = (userData) => {
+    let result = "";
+    if(userData?.helper?.user?.name) {
+        result += userData?.helper?.user?.name + " ";
+    }
+    if(userData?.helper?.user?.surname) {
+        result += userData?.helper?.user?.surname + " ";
+    }
+    if(userData?.helper?.user?.patronymic) {
+        result += userData?.helper?.user?.patronymic;
+    }
+    return result;
   }
 
   const getStatCoefs = (stat) => {
@@ -87,6 +103,44 @@ function Stats() {
     result.effTicketsCoef = Math.max(result.effTicketsCoef, 10);
 
     return result;
+  }
+
+  const getRateLike = (allUserData) => {
+    if(!allUserData || !allUserData?.helperStatList) {
+        return [];
+    }
+    
+    allUserData = [...allUserData?.helperStatList];
+    allUserData = allUserData?.sort((userData1, userData2) => {
+        return -(userData1.stats.likes - userData2.stats.likes)
+    }).map((userData) => {
+        return {
+            name: getFullName(userData),
+            value: userData?.stats?.likes
+        }
+    })
+
+    
+
+    return allUserData;
+  }
+
+  const getRateAvgTime = (allUserData) => {
+    if(!allUserData || !allUserData?.helperStatList) {
+        return [];
+    }
+    allUserData = [...allUserData?.helperStatList];
+    allUserData = allUserData?.sort((userData1, userData2) => {
+        console.log(userData1.stats.avgReplyTime, userData2.stats.avgReplyTime);
+        return userData1.stats.avgReplyTime - userData2.stats.avgReplyTime
+    }).map((userData) => {
+        return {
+            name: userData?.helper?.user?.name + " " + userData?.helper?.user?.surname +  " " + userData?.helper?.user?.patronymic,
+            value: getTimeStr(userData?.stats?.avgReplyTime)
+        }
+    })
+
+    return allUserData;
   }
 
   const getAvgStatCoefs = (allUserData) => {
@@ -115,14 +169,29 @@ function Stats() {
   }
 
   const getTime = (sourceHource) => {
-    let hours = Math.round(sourceHource);
-    let minutes = Math.round(sourceHource * 60) % 60;
-    let seconds = Math.round(sourceHource * 60 * 60) % 60;
+    let hours = Math.round(sourceHource / 60 / 60);
+    let minutes = Math.round(sourceHource / 60) % 60;
+    let seconds = Math.round(sourceHource) % 60;
     return {
         hours: hours,
         minutes: minutes,
         seconds: seconds
     }
+  }
+
+  const getTimeStr = (sourceHource) => {
+    let time = getTime(sourceHource);
+    let result = "";
+    if(time.hours > 0) {
+        result += time.hours + ' ч. ';
+    }
+    if(time.minutes > 0) {
+        result += time.minutes + " мин. ";
+    }
+    if(time.seconds > 0) {
+        result += time.seconds + " сек.";
+    }
+    return result !== '' ? result : "0 сек.";
   }
 
   useEffect(() => {
@@ -144,9 +213,6 @@ function Stats() {
         ]
     })
     
-
-    
-
     let coefs = getStatCoefs(currentStats);
     let avgCoefs = getAvgStatCoefs(data);
 
@@ -167,7 +233,6 @@ function Stats() {
         ]
     })
 
-    let time = getTime(currentStats?.avgReplyTime);
     setTableInfo([
         {
             name: "Всего тикетов",
@@ -191,11 +256,14 @@ function Stats() {
         },
         {
             name: "Среднее время ответа",
-            value: time.hours + 'ч. ' + time.minutes + "мин. " + time.seconds + "сек.",
+            value: getTimeStr(currentStats?.avgReplyTime)
         },
     ])
 
     setFantasy(currentStats?.fantasy);
+
+    setRateLike(getRateLike(data));
+    setRateAvgTime(getRateAvgTime(data));
 
   }, [data])
 
@@ -229,13 +297,16 @@ function Stats() {
             </Table>
         </Col>
       </Row>
-      <Row>
-        <Col>
+      <Row className="mt-5">
+        <h3 className="stats-title stats-title_left">Уровень куратора VERTERA</h3>
+        <Col md={6} className="mt-2">
+            
             <Level fantasy={fantasy}/>
         </Col>
       </Row>
-      <Row>
-        <Col>
+      <Row className="mt-5">
+        <Col md={7}>
+            <h3 className="stats-title">Статистика моя/средняя</h3>
             <Radar data={totalData} options={{ 
                     responsive: true ,
                     scales: {
@@ -246,8 +317,48 @@ function Stats() {
                 }
             />
         </Col>
-        <Col>
+        <Col md={5}>
+            <h3 className="stats-title">Статистика лайки/дизлайки</h3>
             <Doughnut data={likeData} options={{ responsive: true }} />
+        </Col>
+      </Row>
+      <Row className="mt-5">
+        <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
+        <Col md={6} className="mt-2">
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                    <th colSpan={3}>По времени ответа</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rateAvgTime.map((elem, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{elem.name}</td>
+                            <td>{elem.value}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+        </Col>
+        <Col md={6} className="mt-2">
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                    <th colSpan={3}>По кол-ву положительных отзывов</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rateLike.map((elem, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{elem.name}</td>
+                            <td>{elem.value} отзыв(-ов)</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
         </Col>
       </Row>
     </>

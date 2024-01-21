@@ -326,6 +326,11 @@ export const STATS = gql`
     helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
       helper {
         id
+        user {
+          name
+          surname
+          patronymic
+        }
       }
       stats {
         totalTickets
