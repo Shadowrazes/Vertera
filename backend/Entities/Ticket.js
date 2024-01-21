@@ -236,7 +236,7 @@ class Ticket extends Entity{
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
                 let needNewHelper = true;
-                for(department of curDepartments){
+                for(const department of curDepartments){
                     if(departmentId == department.id){
                         needNewHelper = false;
                         break;
