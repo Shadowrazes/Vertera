@@ -1,0 +1,44 @@
+.level {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.level__circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 44px;
+    border: #00AB97 solid 5px;
+    border-radius: 50%;
+    flex: 0 0 80px;
+    height: 80px;
+    padding-bottom: 5px;
+}
+
+@media screen and (max-width: 768px) {
+    .level__circle {
+        flex: 0 0 60px;
+        height: 60px;
+        font-size: 30px;
+    }
+}
+
+.level__progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.level__progress-bar {
+    width: 100%;
+    background-color: #00000020;
+    height: 40px;
+}
+
+.level__progress-bar-active {
+    width: 60%;
+    background-color: #00AB97;
+    height: 40px;
+}

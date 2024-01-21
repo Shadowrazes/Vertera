@@ -266,3 +266,78 @@ export const COUNTRY_LIST = gql`
     }
   }
 `;
+
+export const UNIT = gql`
+  query ($id: Int!) {
+    unit(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+    }
+  }
+`;
+
+export const THEME = gql`
+  query ($id: Int!) {
+    theme(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+      unit {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;
+
+export const SUBTHEME = gql`
+  query ($id: Int!) {
+    subTheme(id: $id) {
+      name(lang: "ru") {
+        stroke
+      }
+      theme {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+        unit {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+      }
+      departments {
+        id
+        name(lang: "ru") {
+          stroke
+        }
+      }
+    }
+  }
+`;
+
+export const STATS = gql`
+  query{
+    helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
+      helper {
+        id
+      }
+      stats {
+        totalTickets
+        newTickets
+        inProgressTickets
+        closedTickets
+        avgReplyTime
+        likes
+        dislikes
+        notRated
+        fantasy
+      }
+    }
+  }
+`;

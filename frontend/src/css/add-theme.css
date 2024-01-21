@@ -1,0 +1,8 @@
+.add-theme__dropdown {
+  margin-bottom: 25px;
+}
+
+.edit-subtheme__field {
+  display: flex;
+  flex-direction: column;
+}

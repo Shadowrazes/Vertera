@@ -9,6 +9,15 @@ import Curators from "./pages/curators";
 import AddCurator from "./pages/add-curator";
 import EditCurator from "./pages/edit-curator";
 import Units from "./pages/Units";
+import AddUnit from "./pages/add-unit";
+import EditUnit from "./pages/edit-unit";
+import Themes from "./pages/themes";
+import AddTheme from "./pages/add-theme";
+import EditTheme from "./pages/edit-theme";
+import SubThemes from "./pages/subthemes";
+import AddSubtheme from "./pages/add-subtheme";
+import EditSubtheme from "./pages/edit-subtheme";
+import Stats from "./pages/stats";
 
 import "./App.css";
 
@@ -34,7 +43,28 @@ function App() {
             Component={EditCurator}
             element={<EditCurator />}
           />
-          <Route path="/Units" element={<Units />} />
+          <Route path="/units" element={<Units />} />
+          <Route path="/add-unit" element={<AddUnit />} />
+          <Route
+            path="/edit-unit/:unitId"
+            Component={EditUnit}
+            element={<EditUnit />}
+          />
+          <Route path="/themes" element={<Themes />} />
+          <Route path="/add-theme" element={<AddTheme />} />
+          <Route
+            path="/edit-theme/:themeId"
+            Component={EditTheme}
+            element={<EditTheme />}
+          />
+          <Route path="/subthemes" element={<SubThemes />} />
+          <Route path="/add-subtheme" element={<AddSubtheme />} />
+          <Route
+            path="/edit-subtheme/:subthemeId"
+            Component={EditSubtheme}
+            element={<EditSubtheme />}
+          />
+          <Route path="/stats" element={<Stats />} />
         </Routes>
       </Router>
     </div>

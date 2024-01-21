@@ -1,0 +1,8 @@
+.units__btn-row {
+    display: flex;
+    gap: 20px;
+}
+
+.units__btn {
+    width: 250px !important;
+}

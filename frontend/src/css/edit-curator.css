@@ -18,6 +18,17 @@
     flex-direction: column;
 }
 
+.edit-curator__column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.edit-curator__btn-row {
+    display: flex;
+    gap: 20px;
+}
+
 .edit-curator__btn {
-    width: 250px !important;
+    width: 200px !important;
 }
