@@ -8,16 +8,16 @@ class ThemeDepartment extends Entity{
     static DepartmentIdField = 'departmentId';
 
     static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]); 
         return result[0];
     }
 
     static async GetListBySubThemeId(subThemeId) {
         const sql = `
-        SELECT * from ${Department.TableName} 
+        SELECT * FROM ${Department.TableName} 
         WHERE ${Department.PrimaryField} IN (
-            SELECT ${this.DepartmentIdField} from ${this.TableName} 
+            SELECT ${this.DepartmentIdField} FROM ${this.TableName} 
             WHERE ${this.SubThemeIdField} = ?
         )`;
 
