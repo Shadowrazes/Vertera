@@ -56,8 +56,8 @@ if(!isBuild) {
 }
 else {
     const options = {
-        cert: fs.readFileSync('/etc/letsencrypt/live/vertera-ticket.yasanyabeats.ru/fullchain.pem'),
-        key: fs.readFileSync('/etc/letsencrypt/live/vertera-ticket.yasanyabeats.ru/privkey.pem')
+        cert: fs.readFileSync('/etc/letsencrypt/live/vticket.yasanyabeats.ru/fullchain.pem'),
+        key: fs.readFileSync('/etc/letsencrypt/live/vticket.yasanyabeats.ru/privkey.pem')
     };
     //express.listen(port);
     https.createServer(options, app).listen(port);
