@@ -44,6 +44,10 @@
   width: 100% !important;
 }
 
+.chat-input__button-row-gap {
+  gap: 20px;
+}
+
 .chat-input__button-row .chat-input__button-close {
   padding: 15px;
   background: #fff !important;
@@ -58,6 +62,11 @@
   border: 1px solid #00ab97 !important;
   font-family: "TT Norms Pro", sans-serif;
   color: #00ab97 !important;
+}
+
+.chat-input__row .chat-input__button-send {
+  padding: 15px;
+  font-family: "TT Norms Pro", sans-serif;
 }
 
 .chat-input__row .chat-input__button-close {

@@ -12,38 +12,17 @@ import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
 
-import {
-  Form,
-  Row,
-  Col,
-  Button,
-  DropdownButton,
-  Dropdown,
-  Modal,
-  Table,
-} from "react-bootstrap";
+import { Form, Row, Col, Table } from "react-bootstrap";
 
 import "../css/chat-input.css";
 
 function Chat() {
-  const [dataQuery, setData] = useState([]);
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
-
-  const [selectedUnit, setSelectedUnit] = useState(null);
-  const [selectedUnitId, setSelectedUnitId] = useState(null);
-  const [selectedTheme, setSelectedTheme] = useState(null);
-  const [selectedThemeId, setSelectedThemeId] = useState(null);
-  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
-  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("");
-
-  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
-    useState(true);
 
   const [reaction, setReaction] = useState(null);
 
@@ -105,10 +84,7 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
-      setSelectedItem(data.ticket.subTheme.theme.unit.name.stroke);
-      setSelectedUnit(data.ticket.subTheme.theme.unit.name.stroke);
-      setSelectedTheme(data.ticket.subTheme.theme.name.stroke);
-      setSelectedSubTheme(data.ticket.subTheme.name.stroke);
+
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
       //console.log(data.ticket.subTheme.theme.unit.name.stroke);
@@ -131,11 +107,7 @@ function Chat() {
         setReaction(null);
       }
     }
-
-    if (dataTheme && dataTheme.allThemeTree) {
-      setData(dataTheme.allThemeTree);
-    }
-  }, [data, dataTheme, location.state]);
+  }, [data, location.state]);
 
   const navigate = useNavigate();
 
@@ -522,9 +494,8 @@ function Chat() {
               )
           )}
       </div>
-
-      {isVisible && (
-        <div className="chat-input__container">
+      <div className="chat-input__container">
+        {isVisible && (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
@@ -549,24 +520,24 @@ function Chat() {
               {isVisibleError && (
                 <span className="form__error">{errorMsg()}</span>
               )}
-              <div className="chat-input__button-row">
+              <div
+                className={
+                  currentStatus == "В процессе"
+                    ? "chat-input__button-row chat-input__button-row-gap"
+                    : "chat-input__button-row"
+                }
+              >
                 <ButtonCustom
                   title="Отправить"
                   className={
                     isAdmin()
-                      ? "chat-input__button-send"
+                      ? "chat-input__button-send single"
                       : "chat-input__button-send single"
                   }
                   type="submit"
                   onClick={handleSubmit}
                 />
-                {isAdmin() && currentStatus == "Новый" ? (
-                  <ButtonCustom
-                    title="Начать работу"
-                    className="chat-input__button-close"
-                    onClick={handleInProgress}
-                  />
-                ) : isAdmin() ? (
+                {isAdmin() && currentStatus == "В процессе" ? (
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"
@@ -576,6 +547,17 @@ function Chat() {
                   <></>
                 )}
               </div>
+              {isAdmin() && currentStatus == "Новый" ? (
+                <div className="chat-input__button-row">
+                  <ButtonCustom
+                    title="Начать работу"
+                    className="chat-input__button-send single"
+                    onClick={handleInProgress}
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
               <Link
                 to={`/edit-ticket/${itemId}`}
                 state={{
@@ -590,8 +572,8 @@ function Chat() {
               </Link>
             </Row>
           </Form>
-        </div>
-      )}
+        )}
+      </div>
 
       {!isVisible && (
         <div className="chat-input__close-container">
