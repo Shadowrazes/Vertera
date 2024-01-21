@@ -66,18 +66,11 @@ function allTickets() {
   const [dateRange, setDateRange] = useState([]);
 
   let userId = null;
-  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
   } else {
     userId = user.id;
-  }
-
-  if (userRole === null) {
-    userCurRole = "client";
-  } else {
-    userCurRole = userRole;
   }
 
   let fastFilterHelperId = userId;
@@ -246,6 +239,17 @@ function allTickets() {
 
     setIsVisible(pageNumbers.length > 1);
     // console.log(pageNumbers.length);
+
+    let userCurRole = null;
+
+    if (userRole === null) {
+      userCurRole = "client";
+    } else {
+      userCurRole = userRole;
+    }
+
+    console.log(userRole);
+    console.log(user.id);
   }, [
     data,
     themeData,

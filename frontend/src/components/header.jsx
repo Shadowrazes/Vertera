@@ -81,6 +81,12 @@ function Header({ user }) {
             token: loginData.login.token,
           })
         );
+        localStorage.setItem(
+          "userRole",
+          JSON.stringify({
+            role: { role: "helper" },
+          })
+        );
         document.location.href = "/all-tickets";
       }
     } catch (error) {
