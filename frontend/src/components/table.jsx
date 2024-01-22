@@ -218,7 +218,7 @@ function TableTickets() {
 
   return (
     <>
-      {!loading && dataAmount > 0 && (
+      {!loading && (
         <>
           <TitleH2 title="Мои обращения" className="title__heading" />
           <div className="table__sorts">

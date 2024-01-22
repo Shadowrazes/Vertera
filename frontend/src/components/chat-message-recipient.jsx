@@ -13,23 +13,28 @@ function ChatMessage({ message, sender, time, attachs }) {
   const getFullName = (userData) => {
     let result = "";
     console.log(userData);
-    if(userData?.name) {
-        result += userData?.name + " ";
+    if (userData?.surname) {
+      result += userData?.surname + " ";
     }
-    if(userData?.surname) {
-        result += userData?.surname + " ";
+
+    if (userData?.name) {
+      result += userData?.name + " ";
     }
-    if(userData?.patronymic) {
-        result += userData?.patronymic;
+
+    if (userData?.patronymic) {
+      result += userData?.patronymic;
     }
+
     return result;
-  }
+  };
 
   return (
     <>
       <div className="chat-message-recipient__container">
         <div className="chat-message-recipient__box">
-          <h3 className="chat-message-recipient__name">{getFullName(sender)}</h3>
+          <h3 className="chat-message-recipient__name">
+            {getFullName(sender)}
+          </h3>
           <div className="chat-message-recipient__text">{message}</div>
           {!isVisible && (
             <>
@@ -40,7 +45,6 @@ function ChatMessage({ message, sender, time, attachs }) {
                 {attachs &&
                   attachs.map((attach) => (
                     <div key={attach.id}>
-                      
                       <a
                         className="chat-message-recipient__attach-link"
                         download
@@ -53,7 +57,11 @@ function ChatMessage({ message, sender, time, attachs }) {
                             : "http://localhost:4444" + attach.path
                         }
                       >
-                        <img src="/file.svg" className="chat-message-recipient__attach-icon" alt="" />
+                        <img
+                          src="/file.svg"
+                          className="chat-message-recipient__attach-icon"
+                          alt=""
+                        />
                         <span className="chat-message-recipient__attach">
                           {attach.name}
                         </span>

@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
 
 import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
-import { ADD_MESSAGE, UPDATE_STATUS } from "../apollo/mutations";
+import { ADD_MESSAGE, UPDATE_STATUS, EDIT_TICKET } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
@@ -127,6 +127,8 @@ function Chat() {
     { loading: loaderUpdateStatus, error: errorUpdateStatus },
   ] = useMutation(UPDATE_STATUS);
 
+  const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
+
   if (loading) {
     return <Loader />;
   }
@@ -141,6 +143,10 @@ function Chat() {
 
   if (errorTheme) {
     return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingEditTicket) {
+    return <Loader />;
   }
 
   // const handleMoreMessages = (e) => {
@@ -297,23 +303,34 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    try {
-      setIsLoadingClose(true);
+    // try {
+    //   setIsLoadingClose(true);
 
-      await updateStatus({
+    //   await updateStatus({
+    //     variables: {
+    //       id: ticketId,
+    //       fields: {
+    //         statusId: 3,
+    //       },
+    //     },
+    //   });
+    //   setCurrentStatus("В процессе");
+    //   setIsLoadingClose(false);
+    // } catch (error) {
+    //   console.error("Ошибка при смене статуса:", error);
+
+    //   setIsLoadingClose(false);
+    // }
+    try {
+      await editTicket({
         variables: {
-          id: ticketId,
-          fields: {
-            statusId: 3,
-          },
+          id: parseInt(itemId),
+          helperId: userId,
         },
       });
-      setCurrentStatus("В процессе");
-      setIsLoadingClose(false);
+      window.location.reload();
     } catch (error) {
-      console.error("Ошибка при смене статуса:", error);
-
-      setIsLoadingClose(false);
+      console.error("Ошибка при смене куратора:", error);
     }
   };
 
@@ -387,11 +404,11 @@ function Chat() {
   const getFullName = (userData) => {
     let result = "";
     console.log(userData);
-    if (userData?.name) {
-      result += userData?.name + " ";
-    }
     if (userData?.surname) {
       result += userData?.surname + " ";
+    }
+    if (userData?.name) {
+      result += userData?.name + " ";
     }
     if (userData?.patronymic) {
       result += userData?.patronymic;
