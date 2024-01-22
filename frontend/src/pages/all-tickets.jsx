@@ -7,7 +7,6 @@ import {
   Button,
   DropdownButton,
   Dropdown,
-  Container,
   ButtonGroup,
 } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
@@ -566,7 +565,7 @@ function allTickets() {
     <>
       <div className="alltickets__container">
         <TitleH2 title="Все обращения" className="title__heading-nomargin" />
-        {!loading && dataAmount > 0 && (
+        {!loading && isAdmin() && (
           <ButtonCustom
             title={
               isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
@@ -575,7 +574,7 @@ function allTickets() {
           />
         )}
       </div>
-      {!loading && dataAmount > 0 && (
+      {!loading && isAdmin() && (
         <>
           {isVisibleFilters && (
             <div className="alltickets__filters-container">
@@ -935,11 +934,11 @@ function allTickets() {
         </div>
       )}
 
-      {dataAmount == 0 && isAdmin() && (
+      {/* {dataAmount == 0 && isAdmin() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">У вас нет тикетов</span>
         </div>
-      )}
+      )} */}
     </>
   );
 }

@@ -463,7 +463,7 @@ function Chat() {
           messagesQuery.map(
             (msg) =>
               msg.text !== "" && (
-                <pre key={msg.id}>
+                <div key={msg.id}>
                   {msg.sender.id === userId ? (
                     <ChatMessageSender
                       message={msg.text}
@@ -490,12 +490,12 @@ function Chat() {
                       attachs={msg.attachs}
                     />
                   )}
-                </pre>
+                </div>
               )
           )}
       </div>
       <div className="chat-input__container">
-        {isVisible && (
+        {isVisible && currentStatus !== "Новый" ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
@@ -558,18 +558,67 @@ function Chat() {
               ) : (
                 <></>
               )}
-              <Link
-                to={`/edit-ticket/${itemId}`}
-                state={{
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
+              {isAdmin() && (
+                <Link
+                  to={`/edit-ticket/${itemId}`}
+                  state={{
+                    linkPrev: window.location.href,
+                  }}
+                  className="alltickets__link"
+                >
+                  <ButtonCustom
+                    title="Изменить тикет"
+                    className="chat-input__button-close single"
+                  />
+                </Link>
+              )}
+            </Row>
+          </Form>
+        ) : (
+          <Form className="chat-input__form" onSubmit={sendMsg}>
+            <Row className="chat-input__row">
+              <div
+                className={
+                  currentStatus == "В процессе"
+                    ? "chat-input__button-row chat-input__button-row-gap"
+                    : "chat-input__button-row"
+                }
               >
-                <ButtonCustom
-                  title="Изменить тикет"
-                  className="chat-input__button-close single"
-                />
-              </Link>
+                {isAdmin() && currentStatus == "В процессе" ? (
+                  <ButtonCustom
+                    title="Закрыть заявку"
+                    className="chat-input__button-close"
+                    onClick={handleClose}
+                  />
+                ) : (
+                  <></>
+                )}
+              </div>
+              {isAdmin() && currentStatus == "Новый" ? (
+                <div className="chat-input__button-row">
+                  <ButtonCustom
+                    title="Начать работу"
+                    className="chat-input__button-send single"
+                    onClick={handleInProgress}
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
+              {isAdmin() && (
+                <Link
+                  to={`/edit-ticket/${itemId}`}
+                  state={{
+                    linkPrev: window.location.href,
+                  }}
+                  className="alltickets__link"
+                >
+                  <ButtonCustom
+                    title="Изменить тикет"
+                    className="chat-input__button-close single"
+                  />
+                </Link>
+              )}
             </Row>
           </Form>
         )}

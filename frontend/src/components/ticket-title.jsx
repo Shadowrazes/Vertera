@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import "../css/ticket-title.css";
 
 const getStatusColor = (status) => {
@@ -12,9 +14,12 @@ const getStatusColor = (status) => {
 };
 
 function TicketTitle({ title, className, state, linkPrev }) {
+  const navigate = useNavigate();
+
   const handleGoBack = () => {
     // console.log(linkPrev);
-    window.location.href = linkPrev;
+    // window.location.href = linkPrev;
+    navigate("/all-tickets");
   };
 
   return (
