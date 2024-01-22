@@ -191,6 +191,9 @@ export const LOGIN = gql`
 export const USER = gql`
   query ($id: Int!) {
     user(id: $id) {
+      name
+      surname
+      patronymic
       role
     }
   }

@@ -246,9 +246,6 @@ function allTickets() {
     } else {
       userCurRole = userRole;
     }
-
-    console.log(userRole);
-    console.log(user.id);
   }, [
     data,
     themeData,
