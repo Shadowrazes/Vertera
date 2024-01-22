@@ -337,7 +337,9 @@ function TableTickets() {
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                      {`${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
+                      {ticket.lastMessage.sender.surname === "system"
+                        ? "Системное сообщение"
+                        : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
                     </Link>
                   </td>
                   <td>

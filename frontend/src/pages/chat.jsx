@@ -575,7 +575,7 @@ function Chat() {
               ) : (
                 <></>
               )}
-              {isAdmin() && (
+              {isAdmin() && currentStatus !== "Закрыт" && (
                 <Link
                   to={`/edit-ticket/${itemId}`}
                   state={{
@@ -622,7 +622,7 @@ function Chat() {
               ) : (
                 <></>
               )}
-              {isAdmin() && (
+              {isAdmin() && currentStatus !== "Закрыт" && (
                 <Link
                   to={`/edit-ticket/${itemId}`}
                   state={{

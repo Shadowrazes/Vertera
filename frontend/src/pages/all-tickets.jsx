@@ -565,7 +565,7 @@ function allTickets() {
     <>
       <div className="alltickets__container">
         <TitleH2 title="Все обращения" className="title__heading-nomargin" />
-        {!loading && isAdmin() && (
+        {!loading && (
           <ButtonCustom
             title={
               isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
@@ -574,7 +574,7 @@ function allTickets() {
           />
         )}
       </div>
-      {!loading && isAdmin() && (
+      {!loading && (
         <>
           {isVisibleFilters && (
             <div className="alltickets__filters-container">
@@ -668,7 +668,11 @@ function allTickets() {
                     />
                     <DropdownButton
                       id="dropdown-custom-1"
-                      title={selectedReaction || "Мои реакции"}
+                      title={
+                        selectedReaction || isAdmin()
+                          ? "Реакции"
+                          : "Мои реакции"
+                      }
                     >
                       {reactions.map((reaction, index) => (
                         <Dropdown.Item
@@ -837,7 +841,9 @@ function allTickets() {
                       className="alltickets__link"
                     >
                       {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                      {`${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
+                      {ticket.lastMessage.sender.surname === "system"
+                        ? "Системное сообщение"
+                        : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
                     </Link>
                   </td>
                   <td>
