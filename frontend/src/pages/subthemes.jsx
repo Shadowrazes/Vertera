@@ -125,38 +125,41 @@ function Subthemes() {
         </DropdownButton>
       )}
 
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <td>Подтема ID</td>
-            <td>Название подтемы</td>
-            <td>Редактировать</td>
-          </tr>
-        </thead>
-        <tbody>
-          {dataQuery
-            .find((unit) => unit.name.stroke === selectedUnit)
-            ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-            ?.subThemes.map((subTheme) => (
-              <tr key={subTheme.id}>
-                <td>{subTheme.id}</td>
-                <td>{subTheme.name.stroke}</td>
+      <div className="table__wrapper">
+        <Table className="table__table" hover>
+          <thead>
+            <tr>
+              <td>Подтема ID</td>
+              <td>Название подтемы</td>
+              <td>Редактировать</td>
+            </tr>
+          </thead>
+          <tbody>
+            {dataQuery
+              .find((unit) => unit.name.stroke === selectedUnit)
+              ?.themes.find((theme) => theme.name.stroke === selectedTheme)
+              ?.subThemes.map((subTheme) => (
+                <tr key={subTheme.id}>
+                  <td>{subTheme.id}</td>
+                  <td>{subTheme.name.stroke}</td>
 
-                <td>
-                  <Link
-                    to={`/edit-subtheme/${subTheme.id}`}
-                    state={{
-                      linkPrev: window.location.href,
-                    }}
-                    className="alltickets__link"
-                  >
-                    <img src={EditIcon} alt="" />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </Table>
+                  <td>
+                    <Link
+                      to={`/edit-subtheme/${subTheme.id}`}
+                      state={{
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      <img src={EditIcon} alt="" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </Table>
+      </div>
+
       <div className="units__btn-row">
         <ButtonCustom title="Добавить подтему" onClick={goToAddSubtheme} />
         <ButtonCustom

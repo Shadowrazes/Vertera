@@ -75,37 +75,41 @@ function Theme() {
           </Dropdown.Item>
         ))}
       </DropdownButton>
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <td>Тема ID</td>
-            <td>Название темы</td>
-            <td>Редактировать</td>
-          </tr>
-        </thead>
-        <tbody>
-          {dataQuery
-            .find((unit) => unit.name.stroke === selectedUnit)
-            ?.themes.map((theme) => (
-              <tr key={theme.id}>
-                <td>{theme.id}</td>
-                <td>{theme.name.stroke}</td>
 
-                <td>
-                  <Link
-                    to={`/edit-theme/${theme.id}`}
-                    state={{
-                      linkPrev: window.location.href,
-                    }}
-                    className="alltickets__link"
-                  >
-                    <img src={EditIcon} alt="" />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </Table>
+      <div className="table__wrapper">
+        <Table className="table__table" hover>
+          <thead>
+            <tr>
+              <td>Тема ID</td>
+              <td>Название темы</td>
+              <td>Редактировать</td>
+            </tr>
+          </thead>
+          <tbody>
+            {dataQuery
+              .find((unit) => unit.name.stroke === selectedUnit)
+              ?.themes.map((theme) => (
+                <tr key={theme.id}>
+                  <td>{theme.id}</td>
+                  <td>{theme.name.stroke}</td>
+
+                  <td>
+                    <Link
+                      to={`/edit-theme/${theme.id}`}
+                      state={{
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      <img src={EditIcon} alt="" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </Table>
+      </div>
+
       <div className="units__btn-row">
         <ButtonCustom title="Добавить тему" onClick={goToAddTheme} />
         <ButtonCustom

@@ -67,53 +67,59 @@ function Curators() {
   return (
     <>
       <TitleH2 title="Все кураторы" className="title__heading" />
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <th>ФИО</th>
-            <th>Дата рождения</th>
-            <th>Куратор ID</th>
-            <th>Вступил в должность</th>
-            <th>Редактировать</th>
-          </tr>
-        </thead>
-        <tbody>
-          {curators.map((curator) => (
-            <tr key={curator.id}>
-              <td>
-                {`${curator.user.surname} ${curator.user.name} ${
-                  curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-                }`}
-              </td>
-              <td>
-                {curator.birthday.replace(
-                  /^(\d{4})-(\d{2})-(\d{2}).*/,
-                  "$3.$2.$1"
-                )}
-              </td>
-              <td>{curator.id}</td>
-              <td>
-                {curator.startWorkDate.replace(
-                  /^(\d{4})-(\d{2})-(\d{2}).*/,
-                  "$3.$2.$1"
-                )}
-              </td>
-              <td>
-                <Link
-                  to={`/edit-curator/${curator.id}`}
-                  state={{
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  <img src={EditIcon} alt="" />
-                </Link>
-              </td>
+      <div className="table__wrapper">
+        <Table className="table__table" hover>
+          <thead>
+            <tr>
+              <th>ФИО</th>
+              <th>Дата рождения</th>
+              <th>Куратор ID</th>
+              <th>Вступил в должность</th>
+              <th>Редактировать</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
-      <ButtonCustom title="Добавить куратора" onClick={goToAddCurator} />
+          </thead>
+          <tbody>
+            {curators.map((curator) => (
+              <tr key={curator.id}>
+                <td>
+                  {`${curator.user.surname} ${curator.user.name} ${
+                    curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+                  }`}
+                </td>
+                <td>
+                  {curator.birthday.replace(
+                    /^(\d{4})-(\d{2})-(\d{2}).*/,
+                    "$3.$2.$1"
+                  )}
+                </td>
+                <td>{curator.id}</td>
+                <td>
+                  {curator.startWorkDate.replace(
+                    /^(\d{4})-(\d{2})-(\d{2}).*/,
+                    "$3.$2.$1"
+                  )}
+                </td>
+                <td>
+                  <Link
+                    to={`/edit-curator/${curator.id}`}
+                    state={{
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    <img src={EditIcon} alt="" />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+      <ButtonCustom
+        title="Добавить куратора"
+        onClick={goToAddCurator}
+        className={"table__btn"}
+      />
     </>
   );
 }

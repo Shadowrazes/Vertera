@@ -6,3 +6,16 @@
 .units__btn {
     width: 250px !important;
 }
+
+@media screen and (max-width: 768px) {
+    .units__btn-row {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .units__btn-row button {
+        width: 100% !important;
+    }
+}

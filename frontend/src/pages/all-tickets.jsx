@@ -566,6 +566,7 @@ function allTickets() {
               isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
             }
             onClick={handleHideComponent}
+            className={"alltickets__btn"}
           />
         )}
       </div>
@@ -761,122 +762,131 @@ function allTickets() {
               </span>
             ))}
           </div>
-          <Table className="table__table" hover>
-            <thead>
-              <tr>
-                <th>ID тикет</th>
-                <th>Раздел</th>
-                <th>Дата создания</th>
-                <th>Тема</th>
-                <th>Последнее сообщение</th>
-                <th>Сообщений</th>
-                <th>Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.id}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.subTheme.theme.unit.name.stroke}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.subTheme.theme.name.stroke}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                      {ticket.lastMessage.sender.surname === "system"
-                        ? "Системное сообщение"
-                        : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      {ticket.messages.length}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/dialog/${userId}/${ticket.id}`}
-                      state={{
-                        status: ticket.status.name.stroke,
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      <span
-                        className="table__status"
-                        style={{
-                          background: getStatusColor(ticket.status.name.stroke),
-                          minWidth: "115px",
-                        }}
-                      >
-                        {ticket.status.name.stroke}
-                      </span>
-                    </Link>
-                  </td>
+
+          <div className="table__wrapper">
+            <Table className="table__table" hover>
+              <thead>
+                <tr>
+                  <th>ID тикет</th>
+                  <th>Раздел</th>
+                  <th>Дата создания</th>
+                  <th>Тема</th>
+                  <th>Последнее сообщение</th>
+                  <th>Сообщений</th>
+                  <th>Статус</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {tickets.map((ticket) => (
+                  <tr key={ticket.id}>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.id}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.subTheme.theme.unit.name.stroke}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.date.replace(/T|-/g, (match) =>
+                          match === "T" ? " " : "."
+                        )}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.subTheme.theme.name.stroke}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.lastMessage.date
+                          .slice(0, 10)
+                          .replace(/-/g, ".")}
+                        |{" "}
+                        {ticket.lastMessage.sender.surname === "system"
+                          ? "Системное сообщение"
+                          : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        {ticket.messages.length}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/dialog/${userId}/${ticket.id}`}
+                        state={{
+                          status: ticket.status.name.stroke,
+                          linkPrev: window.location.href,
+                        }}
+                        className="alltickets__link"
+                      >
+                        <span
+                          className="table__status"
+                          style={{
+                            background: getStatusColor(
+                              ticket.status.name.stroke
+                            ),
+                            minWidth: "115px",
+                          }}
+                        >
+                          {ticket.status.name.stroke}
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+
           <ul className="alltickets__pagination">
             {isVisible && (
               <button

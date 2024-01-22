@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
- 
+
 import { THEME_LIST } from "../apollo/queries";
 
 import TitleH2 from "../components/title";
@@ -52,34 +52,36 @@ function Units() {
   return (
     <>
       <TitleH2 title="Разделения" className="title__heading" />
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <td>Раздел ID</td>
-            <td>Название разделения</td>
-            <td>Редактировать</td>
-          </tr>
-        </thead>
-        <tbody>
-          {units.map((unit) => (
-            <tr key={unit.id}>
-              <td>{unit.id}</td>
-              <td>{unit.name.stroke}</td>
-              <td>
-                <Link
-                  to={`/edit-unit/${unit.id}`}
-                  state={{
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  <img src={EditIcon} alt="" />
-                </Link>
-              </td>
+      <div className="table__wrapper">
+        <Table className="table__table" hover>
+          <thead>
+            <tr>
+              <td>Раздел ID</td>
+              <td>Название разделения</td>
+              <td>Редактировать</td>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {units.map((unit) => (
+              <tr key={unit.id}>
+                <td>{unit.id}</td>
+                <td>{unit.name.stroke}</td>
+                <td>
+                  <Link
+                    to={`/edit-unit/${unit.id}`}
+                    state={{
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    <img src={EditIcon} alt="" />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
       <div className="units__btn-row">
         <ButtonCustom title="Добавить раздел" onClick={goToAddUnit} />
         <ButtonCustom
