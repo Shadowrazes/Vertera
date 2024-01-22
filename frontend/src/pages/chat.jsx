@@ -12,7 +12,14 @@ import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
 
-import { Form, Row, Col, Table } from "react-bootstrap";
+import {
+  Form,
+  Row,
+  Col,
+  Table,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-bootstrap";
 
 import "../css/chat-input.css";
 
@@ -23,6 +30,9 @@ function Chat() {
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
+
+  const [helperId, setHelperId] = useState(null);
+  const [selectedValue, setSelectedValue] = useState(1);
 
   const [reaction, setReaction] = useState(null);
 
@@ -84,6 +94,7 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
+      setHelperId(data.ticket.helper.id);
 
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
@@ -222,7 +233,7 @@ function Chat() {
     return filePaths;
   }
 
-  const sendMsg = (e) => {
+  const sendMsg = async (e) => {
     e.preventDefault();
 
     if (loaderAddMsg) {
@@ -234,6 +245,38 @@ function Chat() {
 
     if (message.trim() == "") {
       return;
+    }
+
+    if (isAdmin() && selectedValue == 1) {
+      try {
+        await updateStatus({
+          variables: {
+            id: ticketId,
+            fields: {
+              statusId: 3,
+            },
+          },
+        });
+
+        console.log("Статус успешно обновлен:", result);
+      } catch (error) {
+        console.error("Ошибка при обновлении статуса:", error);
+      }
+    } else if (isAdmin() && selectedValue == 2) {
+      try {
+        await updateStatus({
+          variables: {
+            id: ticketId,
+            fields: {
+              statusId: 4,
+            },
+          },
+        });
+
+        console.log("Статус успешно обновлен:", result);
+      } catch (error) {
+        console.error("Ошибка при обновлении статуса:", error);
+      }
     }
 
     uploadFiles()
@@ -322,13 +365,15 @@ function Chat() {
       setIsLoadingClose(false);
     }
     try {
-      await editTicket({
-        variables: {
-          id: parseInt(itemId),
-          helperId: userId,
-        },
-      });
-      window.location.reload();
+      if (userId !== helperId) {
+        await editTicket({
+          variables: {
+            id: parseInt(itemId),
+            helperId: userId,
+          },
+        });
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Ошибка при смене куратора:", error);
     }
@@ -414,6 +459,10 @@ function Chat() {
       result += userData?.patronymic;
     }
     return result;
+  };
+
+  const handleToggleChange = (value) => {
+    setSelectedValue(value);
   };
 
   return (
@@ -512,7 +561,7 @@ function Chat() {
           )}
       </div>
       <div className="chat-input__container">
-        {isVisible && currentStatus !== "Новый" ? (
+        {isVisible && isAdmin() && currentStatus !== "Новый" ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
@@ -537,6 +586,20 @@ function Chat() {
               {isVisibleError && (
                 <span className="form__error">{errorMsg()}</span>
               )}
+              <ToggleButtonGroup
+                type="radio"
+                name="options"
+                defaultValue={1}
+                value={selectedValue}
+                onChange={handleToggleChange}
+              >
+                <ToggleButton id="tbg-radio-1" value={1}>
+                  Запретить писать клиенту
+                </ToggleButton>
+                <ToggleButton id="tbg-radio-2" value={2}>
+                  Разрешить писать клиенту
+                </ToggleButton>
+              </ToggleButtonGroup>
               <div
                 className={
                   currentStatus == "В процессе"
@@ -638,6 +701,44 @@ function Chat() {
               )}
             </Row>
           </Form>
+        )}
+      </div>
+
+      <div className="chat-input__container">
+        {isVisible &&
+        !isAdmin() &&
+        (currentStatus === "Новый" || currentStatus === "На уточнении") ? (
+          <Form className="chat-input__form" onSubmit={sendMsg}>
+            <Row className="chat-input__row">
+              <Form.Group controlId="TextareaForm">
+                <Form.Control
+                  as="textarea"
+                  placeholder="Текст сообщения"
+                  rows={3}
+                  value={message}
+                  onChange={handleChange}
+                  className="chat-input__textarea"
+                />
+              </Form.Group>
+              <Form.Group controlId="FileInputForm">
+                <Form.Control
+                  type="file"
+                  multiple
+                  accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                  onChange={handleFileChange}
+                  ref={inputRef}
+                />
+              </Form.Group>
+              <ButtonCustom
+                title="Отправить"
+                className="chat-input__button-send single"
+                type="submit"
+                onClick={handleSubmit}
+              />
+            </Row>
+          </Form>
+        ) : (
+          <></>
         )}
       </div>
 

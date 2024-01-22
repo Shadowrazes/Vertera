@@ -207,7 +207,7 @@ function TableTickets() {
         return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
       case "В процессе":
         return "#E6E3F6";
-      case "В ожидании":
+      case "На уточнении":
         return "rgba(171, 144, 0, 0.11)";
       case "Закрыт":
         return "rgba(171, 0, 0, 0.11)";
