@@ -303,24 +303,24 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    // try {
-    //   setIsLoadingClose(true);
+    try {
+      setIsLoadingClose(true);
 
-    //   await updateStatus({
-    //     variables: {
-    //       id: ticketId,
-    //       fields: {
-    //         statusId: 3,
-    //       },
-    //     },
-    //   });
-    //   setCurrentStatus("В процессе");
-    //   setIsLoadingClose(false);
-    // } catch (error) {
-    //   console.error("Ошибка при смене статуса:", error);
+      await updateStatus({
+        variables: {
+          id: ticketId,
+          fields: {
+            statusId: 3,
+          },
+        },
+      });
+      setCurrentStatus("В процессе");
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при смене статуса:", error);
 
-    //   setIsLoadingClose(false);
-    // }
+      setIsLoadingClose(false);
+    }
     try {
       await editTicket({
         variables: {
