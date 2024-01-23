@@ -12,12 +12,17 @@ import {
 import { DateRangePicker } from "rsuite";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
+import { DateTime } from "luxon";
 
 import {
   TABLE_TICKETS,
   TABLE_TICKETS_USER,
   THEME_LIST,
+  CURATORS_LIST,
+  COUNTRY_LIST,
 } from "../apollo/queries";
+
+import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -29,21 +34,28 @@ function allTickets() {
   const [dataTableTickets, setDataTableTickets] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
   const [dataTheme, setDataTheme] = useState([]);
+  const [dataQueryCurators, setDataQueryCurators] = useState([]);
+  const [countryList, setCountryList] = useState([]);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
+  const [selectedCurator, setSelectedCurator] = useState(null);
+  const [selectedCuratorId, setSelectedCuratorId] = useState(null);
+  const [selectedCuratorCountry, setSelectedCuratorCountry] = useState(null);
+  const [selectedCuratorCountryId, setSelectedCuratorCountryId] =
+    useState(null);
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [queryReaction, setQueryReaction] = useState(null);
+  const [dateRange, setDateRange] = useState(null);
   const [selectedDateBefore, setSelectedDateBefore] = useState(null);
   const [selectedDateAfter, setSelectedDateAfter] = useState(null);
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
-
-  const [selectedUnitId, setSelectedUnitId] = useState(null);
-  const [selectedThemeId, setSelectedThemeId] = useState(null);
-  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
@@ -52,7 +64,10 @@ function allTickets() {
   const [orderDir, setOrderDir] = useState("ASC");
   const [offset, setOffset] = useState(0);
 
+  const [fastFilterStr, setFastFilterStr] = useState("my");
+
   const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
@@ -62,8 +77,6 @@ function allTickets() {
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
 
-  const [dateRange, setDateRange] = useState([]);
-
   let userId = null;
 
   if (user === null) {
@@ -72,9 +85,18 @@ function allTickets() {
     userId = user.id;
   }
 
+  const [helperIdsFilter, setHelperIdsFilter] = useState(userId);
+
+  let userCurRole = null;
+
+  if (userRole === null) {
+    userCurRole = "helper";
+  } else {
+    userCurRole = userRole;
+  }
+
   let fastFilterHelperId = userId;
   let fastFilterStatus = null;
-  const [fastFilterStr, setFastFilterStr] = useState("my");
 
   const pageNumbers = [];
   const itemsPerPage = 8;
@@ -89,8 +111,6 @@ function allTickets() {
     navigate("/");
   };
 
-  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
-
   const handleHideComponent = () => {
     setIsVisibleFilters((prevVisibility) => !prevVisibility);
     // console.log(dataTheme);
@@ -98,10 +118,9 @@ function allTickets() {
 
   let reactions = ["Понравилось", "Не понравилось", "Все реакции"];
 
-  const handleResetFilters = (e) => {
+  const handleResetFilters = async (e) => {
     e.preventDefault();
-    // const resetState = initialSelectedFilterState.map(() => -1);
-    // setSelectedFilter(resetState);
+
     setSelectedUnit(null);
     setSelectedUnitId(null);
     setSelectedItem(null);
@@ -109,24 +128,60 @@ function allTickets() {
     setSelectedThemeId(null);
     setSelectedSubTheme(null);
     setSelectedSubThemeId(null);
-    setDateRange([]);
+    setDateRange(null);
     setSelectedDateAfter(null);
     setSelectedDateBefore(null);
     setSelectedReaction(null);
     setQueryReaction(null);
+
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: helperIdsFilter,
+          unitIds: null,
+          themeIds: null,
+          subThemeIds: null,
+          dateBefore: null,
+          dateAfter: null,
+          reaction: null,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          statusIds: null,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    }
   };
 
-  const {
-    loading: themeLoading,
-    error: themeError,
-    data: themeData,
-  } = useQuery(THEME_LIST);
+  const { data: themeData } = useQuery(THEME_LIST);
+  const { data: dataCurators } = useQuery(CURATORS_LIST);
+  const { data: dataCountryList } = useQuery(COUNTRY_LIST);
 
   const adminRequest = () => {
     return useQuery(TABLE_TICKETS, {
       variables: {
         filters: {
-          helperIds: fastFilterHelperId,
+          helperIds: helperIdsFilter,
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
@@ -164,10 +219,23 @@ function allTickets() {
 
     setOffset(_offset);
 
+    // console.log("fast id ", helperIdsFilter);
+    // console.log("unit id ", selectedUnitId);
+    // console.log("theme id ", selectedThemeId);
+    // console.log("subtheme id ", selectedSubThemeId);
+    // console.log("datebefore ", selectedDateBefore);
+    // console.log("dateafter ", selectedDateAfter);
+    // console.log("reactions ", queryReaction);
+    // console.log("items/page ", itemsPerPage);
+    // console.log("offset ", _offset);
+    // console.log("orderby ", orderBy);
+    // console.log("orderdir ", orderDir);
+    // console.log("fastfilter status ", fastFilterStatus);
+
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: fastFilterHelperId,
+          helperIds: helperIdsFilter,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -212,6 +280,14 @@ function allTickets() {
       if (data && data.ticketList.count) {
         setDataAmount(data.ticketList.count);
       }
+
+      if (dataCurators && dataCurators.helperList) {
+        setDataQueryCurators(dataCurators.helperList);
+      }
+
+      if (dataCountryList && dataCountryList.countryList) {
+        setCountryList(dataCountryList.countryList);
+      }
     } else {
       if (data && data.ticketListByClient.array) {
         setDataTableTickets(data.ticketListByClient.array);
@@ -238,17 +314,11 @@ function allTickets() {
 
     setIsVisible(pageNumbers.length > 1);
     // console.log(pageNumbers.length);
-
-    let userCurRole = null;
-
-    if (userRole === null) {
-      userCurRole = "helper";
-    } else {
-      userCurRole = userRole;
-    }
   }, [
     data,
     themeData,
+    dataCurators,
+    dataCountryList,
     selectedSort,
     prevSelectedSort,
     currentPage,
@@ -326,7 +396,7 @@ function allTickets() {
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: fastFilterHelperId,
+          helperIds: helperIdsFilter,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -424,6 +494,24 @@ function allTickets() {
     // console.log(subThemeId);
   };
 
+  const handleCuratorClick = (
+    curatorName,
+    curatorSurname,
+    curatorPatronymic,
+    curatorId
+  ) => {
+    let fullName = `${curatorSurname} ${curatorName} ${
+      curatorPatronymic ? ` ${curatorPatronymic}` : ""
+    }`;
+    setSelectedCurator(fullName);
+    setSelectedCuratorId(curatorId);
+  };
+
+  const handleCountryClick = (country, countryId) => {
+    setSelectedCuratorCountry(country);
+    setSelectedCuratorCountryId(countryId);
+  };
+
   const handlePeriodClick = (period) => {
     const formattedDate = period.map((originalDate) => {
       const year = originalDate.getFullYear();
@@ -465,7 +553,7 @@ function allTickets() {
     if (isAdmin()) {
       const variables = {
         filters: {
-          helperIds: fastFilterHelperId,
+          helperIds: helperIdsFilter,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
@@ -504,41 +592,58 @@ function allTickets() {
   const handleFastFilter = async (filterStr, event) => {
     setFastFilterStr(filterStr);
 
-    let currentFastFilterHelperId;
-    let currentFastFilterStatus;
-
     if (filterStr === "my") {
       fastFilterHelperId = userId;
       fastFilterStatus = null;
+      setHelperIdsFilter(fastFilterHelperId);
     } else if (filterStr === "all") {
       fastFilterHelperId = null;
       fastFilterStatus = null;
     } else if (filterStr === "in-process") {
       fastFilterHelperId = null;
       fastFilterStatus = 3;
+    } else if (filterStr === "clarification") {
+      fastFilterHelperId = null;
+      fastFilterStatus = 4;
     }
 
-    const variables = {
-      filters: {
-        helperIds: fastFilterHelperId,
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
-        reaction: queryReaction,
-        limit: itemsPerPage,
-        offset: offset,
-        orderBy: orderBy,
-        orderDir: orderDir,
-        statusIds: fastFilterStatus,
-        lang: "ru",
-      },
-    };
-
-    console.log(variables);
-
-    await refetch(variables);
+    if (isAdmin()) {
+      const variables = {
+        filters: {
+          helperIds: fastFilterHelperId,
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          statusIds: fastFilterStatus,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    } else {
+      const variables = {
+        filters: {
+          unitIds: selectedUnitId,
+          themeIds: selectedThemeId,
+          subThemeIds: selectedSubThemeId,
+          dateBefore: selectedDateBefore,
+          dateAfter: selectedDateAfter,
+          reaction: queryReaction,
+          limit: itemsPerPage,
+          offset: offset,
+          orderBy: orderBy,
+          orderDir: orderDir,
+          lang: "ru",
+        },
+      };
+      await refetch(variables);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -573,125 +678,255 @@ function allTickets() {
       {!loading && (
         <>
           {isVisibleFilters && (
-            <div className="alltickets__filters-container">
-              <Form>
-                <Row>
-                  <Col className="alltickets__column">
-                    <DropdownButton
-                      id="dropdown-custom-1"
-                      title={selectedItem || "Выберите подразделение"}
-                    >
-                      {dataTheme.map((unit, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() =>
-                            handleUnitClick(unit.name.stroke, unit.id)
+            <>
+              {isAdmin() ? (
+                <div className="alltickets__filters-container">
+                  <Form>
+                    <Row>
+                      <Col className="alltickets__column">
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={selectedItem || "Выберите подразделение"}
+                        >
+                          {dataTheme.map((unit, index) => (
+                            <Dropdown.Item
+                              key={index}
+                              onClick={() =>
+                                handleUnitClick(unit.name.stroke, unit.id)
+                              }
+                              href="#"
+                            >
+                              {unit.name.stroke}
+                            </Dropdown.Item>
+                          ))}
+                        </DropdownButton>
+
+                        {selectedUnit && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={selectedTheme || "Тип обращения"}
+                          >
+                            {dataTheme
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.map((theme) => (
+                                <Dropdown.Item
+                                  key={theme.id}
+                                  onClick={() =>
+                                    handleThemeClick(
+                                      theme.name.stroke,
+                                      theme.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {theme.name.stroke}
+                                </Dropdown.Item>
+                              ))}
+                          </DropdownButton>
+                        )}
+
+                        {isSubThemeDropdownVisible && selectedTheme && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={selectedSubTheme || "Подтема"}
+                          >
+                            {dataTheme
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.find(
+                                (theme) => theme.name.stroke === selectedTheme
+                              )
+                              ?.subThemes.map((subTheme) => (
+                                <Dropdown.Item
+                                  key={subTheme.id}
+                                  onClick={() =>
+                                    handleSubThemeClick(
+                                      subTheme.name.stroke,
+                                      subTheme.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {subTheme.name.stroke}
+                                </Dropdown.Item>
+                              ))}
+                          </DropdownButton>
+                        )}
+                      </Col>
+                      <Col className="alltickets__column">
+                        <DateRangePicker
+                          className="alltickets__date-range-picker"
+                          placeholder="Задать период"
+                          locale={{
+                            sunday: "Вс",
+                            monday: "Пн",
+                            tuesday: "Вт",
+                            wednesday: "Ср",
+                            thursday: "Чт",
+                            friday: "Пт",
+                            saturday: "Сб",
+                            ok: "ОК",
+                            today: "Сегодня",
+                            yesterday: "Вчера",
+                            last7Days: "Последние 7 дней",
+                          }}
+                          onChange={handlePeriodClick}
+                          value={dateRange}
+                        />
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={
+                            selectedReaction || isAdmin()
+                              ? "Реакции"
+                              : "Мои реакции"
                           }
-                          href="#"
                         >
-                          {unit.name.stroke}
-                        </Dropdown.Item>
-                      ))}
-                    </DropdownButton>
-
-                    {selectedUnit && (
-                      <DropdownButton
-                        id="dropdown-custom-1"
-                        title={selectedTheme || "Тип обращения"}
-                      >
-                        {dataTheme
-                          .find((unit) => unit.name.stroke === selectedUnit)
-                          ?.themes.map((theme) => (
+                          {reactions.map((reaction, index) => (
                             <Dropdown.Item
-                              key={theme.id}
+                              key={index}
+                              onClick={() => handleReactionClick(reaction)}
+                              href="#"
+                            >
+                              {reaction}
+                            </Dropdown.Item>
+                          ))}
+                        </DropdownButton>
+                      </Col>
+                    </Row>
+                    <Row className="alltickets__button-row">
+                      <ButtonCustom title="Применить" onClick={handleSubmit} />
+                      <ButtonCustom
+                        title="Сбросить"
+                        className="alltickets__button-two"
+                        onClick={handleResetFilters}
+                      />
+                    </Row>
+                  </Form>
+                </div>
+              ) : (
+                <div className="alltickets__filters-container">
+                  <Form>
+                    <Row>
+                      <Col className="alltickets__column">
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={selectedItem || "Выберите подразделение"}
+                        >
+                          {dataTheme.map((unit, index) => (
+                            <Dropdown.Item
+                              key={index}
                               onClick={() =>
-                                handleThemeClick(theme.name.stroke, theme.id)
+                                handleUnitClick(unit.name.stroke, unit.id)
                               }
                               href="#"
                             >
-                              {theme.name.stroke}
+                              {unit.name.stroke}
                             </Dropdown.Item>
                           ))}
-                      </DropdownButton>
-                    )}
+                        </DropdownButton>
 
-                    {isSubThemeDropdownVisible && selectedTheme && (
-                      <DropdownButton
-                        id="dropdown-custom-1"
-                        title={selectedSubTheme || "Подтема"}
-                      >
-                        {dataTheme
-                          .find((unit) => unit.name.stroke === selectedUnit)
-                          ?.themes.find(
-                            (theme) => theme.name.stroke === selectedTheme
-                          )
-                          ?.subThemes.map((subTheme) => (
+                        {selectedUnit && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={selectedTheme || "Тип обращения"}
+                          >
+                            {dataTheme
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.map((theme) => (
+                                <Dropdown.Item
+                                  key={theme.id}
+                                  onClick={() =>
+                                    handleThemeClick(
+                                      theme.name.stroke,
+                                      theme.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {theme.name.stroke}
+                                </Dropdown.Item>
+                              ))}
+                          </DropdownButton>
+                        )}
+
+                        {isSubThemeDropdownVisible && selectedTheme && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={selectedSubTheme || "Подтема"}
+                          >
+                            {dataTheme
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.find(
+                                (theme) => theme.name.stroke === selectedTheme
+                              )
+                              ?.subThemes.map((subTheme) => (
+                                <Dropdown.Item
+                                  key={subTheme.id}
+                                  onClick={() =>
+                                    handleSubThemeClick(
+                                      subTheme.name.stroke,
+                                      subTheme.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {subTheme.name.stroke}
+                                </Dropdown.Item>
+                              ))}
+                          </DropdownButton>
+                        )}
+                      </Col>
+                      <Col className="alltickets__column">
+                        <DateRangePicker
+                          className="alltickets__date-range-picker"
+                          placeholder="Задать период"
+                          locale={{
+                            sunday: "Вс",
+                            monday: "Пн",
+                            tuesday: "Вт",
+                            wednesday: "Ср",
+                            thursday: "Чт",
+                            friday: "Пт",
+                            saturday: "Сб",
+                            ok: "ОК",
+                            today: "Сегодня",
+                            yesterday: "Вчера",
+                            last7Days: "Последние 7 дней",
+                          }}
+                          onChange={handlePeriodClick}
+                          value={dateRange}
+                        />
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={
+                            selectedReaction || isAdmin()
+                              ? "Реакции"
+                              : "Мои реакции"
+                          }
+                        >
+                          {reactions.map((reaction, index) => (
                             <Dropdown.Item
-                              key={subTheme.id}
-                              onClick={() =>
-                                handleSubThemeClick(
-                                  subTheme.name.stroke,
-                                  subTheme.id
-                                )
-                              }
+                              key={index}
+                              onClick={() => handleReactionClick(reaction)}
                               href="#"
                             >
-                              {subTheme.name.stroke}
+                              {reaction}
                             </Dropdown.Item>
                           ))}
-                      </DropdownButton>
-                    )}
-                  </Col>
-                  <Col className="alltickets__column">
-                    <DateRangePicker
-                      className="alltickets__date-range-picker"
-                      placeholder="Задать период"
-                      locale={{
-                        sunday: "Вс",
-                        monday: "Пн",
-                        tuesday: "Вт",
-                        wednesday: "Ср",
-                        thursday: "Чт",
-                        friday: "Пт",
-                        saturday: "Сб",
-                        ok: "ОК",
-                        today: "Сегодня",
-                        yesterday: "Вчера",
-                        last7Days: "Последние 7 дней",
-                      }}
-                      onChange={handlePeriodClick}
-                      // value={dateRange}
-                    />
-                    <DropdownButton
-                      id="dropdown-custom-1"
-                      title={
-                        selectedReaction || isAdmin()
-                          ? "Реакции"
-                          : "Мои реакции"
-                      }
-                    >
-                      {reactions.map((reaction, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() => handleReactionClick(reaction)}
-                          href="#"
-                        >
-                          {reaction}
-                        </Dropdown.Item>
-                      ))}
-                    </DropdownButton>
-                  </Col>
-                </Row>
-                <Row className="alltickets__button-row">
-                  <ButtonCustom title="Применить" onClick={handleSubmit} />
-                  <ButtonCustom
-                    title="Сбросить"
-                    className="alltickets__button-two"
-                    onClick={handleResetFilters}
-                  />
-                </Row>
-              </Form>
-            </div>
+                        </DropdownButton>
+                      </Col>
+                    </Row>
+                    <Row className="alltickets__button-row">
+                      <ButtonCustom title="Применить" onClick={handleSubmit} />
+                      <ButtonCustom
+                        title="Сбросить"
+                        className="alltickets__button-two"
+                        onClick={handleResetFilters}
+                      />
+                    </Row>
+                  </Form>
+                </div>
+              )}
+            </>
           )}
 
           {isAdmin() && (
@@ -717,6 +952,16 @@ function allTickets() {
                 }
               >
                 В процессе рассмотрения
+              </Button>
+              <Button
+                onClick={handleFastFilter.bind(null, "clarification")}
+                variant={
+                  fastFilterStr === "clarification"
+                    ? "primary"
+                    : "outline-primary"
+                }
+              >
+                На уточнении
               </Button>
             </ButtonGroup>
           )}
@@ -812,9 +1057,11 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.date.replace(/T|-/g, (match) =>
-                          match === "T" ? " " : "."
-                        )}
+                        {DateTime.fromISO(ticket.date, {
+                          zone: "utc",
+                        })
+                          .toLocal()
+                          .toFormat("yyyy.MM.dd HH:mm:ss")}
                       </Link>
                     </td>
                     <td>

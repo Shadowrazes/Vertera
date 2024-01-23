@@ -3,6 +3,7 @@ import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
+import { DateTime } from "luxon";
 
 import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../apollo/queries";
 
@@ -311,9 +312,11 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.date.replace(/T|-/g, (match) =>
-                          match === "T" ? " " : "."
-                        )}
+                        {DateTime.fromISO(ticket.date, {
+                          zone: "utc",
+                        })
+                          .toLocal()
+                          .toFormat("yyyy.MM.dd HH:mm:ss")}
                       </Link>
                     </td>
                     <td>

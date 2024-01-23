@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
+import { DateTime } from "luxon";
+import {
+  Form,
+  Row,
+  Col,
+  Table,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-bootstrap";
 
 import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS, EDIT_TICKET } from "../apollo/mutations";
@@ -11,15 +20,6 @@ import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
-
-import {
-  Form,
-  Row,
-  Col,
-  Table,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "react-bootstrap";
 
 import "../css/chat-input.css";
 
@@ -32,6 +32,7 @@ function Chat() {
   const [currentStatus, setCurrentStatus] = useState(null);
 
   const [helperId, setHelperId] = useState(null);
+  const [clientId, setClientId] = useState(null);
   const [selectedValue, setSelectedValue] = useState(1);
 
   const [reaction, setReaction] = useState(null);
@@ -95,6 +96,7 @@ function Chat() {
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
       setHelperId(data.ticket.helper.id);
+      setClientId(data.ticket.client.id);
 
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
@@ -249,7 +251,7 @@ function Chat() {
 
     if (isAdmin() && selectedValue == 1) {
       try {
-        await updateStatus({
+        const result = await updateStatus({
           variables: {
             id: ticketId,
             fields: {
@@ -264,7 +266,7 @@ function Chat() {
       }
     } else if (isAdmin() && selectedValue == 2) {
       try {
-        await updateStatus({
+        const result = await updateStatus({
           variables: {
             id: ticketId,
             fields: {
@@ -279,13 +281,23 @@ function Chat() {
       }
     }
 
+    let senderId;
+
+    if (userId == clientId) {
+      senderId = helperId;
+    } else {
+      senderId = clientId;
+    }
+
+    // console.log(senderId);
+
     uploadFiles()
       .then((filePaths) => {
         setMessageDate(new Date());
         addMessage({
           variables: {
             senderId: userId,
-            recieverId: 1,
+            recieverId: senderId,
             ticketId: ticketId,
             type: "message",
             text: message,
@@ -296,6 +308,7 @@ function Chat() {
       .catch((error) => {
         console.error("Ошибка при загрузке файлов:", error);
       });
+
     setMessage("");
     if (inputRef.current) {
       inputRef.current.value = null;
@@ -448,7 +461,7 @@ function Chat() {
 
   const getFullName = (userData) => {
     let result = "";
-    console.log(userData);
+    // console.log(userData);
     if (userData?.surname) {
       result += userData?.surname + " ";
     }
@@ -473,13 +486,13 @@ function Chat() {
       >
         {currentStatus !== null && currentStatus !== "Закрыт" ? (
           <TicketTitle
-            title={`Обращение #${itemId}`}
+            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
             state="Открыта"
             linkPrev={linkPrev}
           />
         ) : (
           <TicketTitle
-            title={`Обращение #${itemId}`}
+            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
             state="Закрыта"
             linkPrev={linkPrev}
           />
@@ -534,25 +547,31 @@ function Chat() {
                     <ChatMessageSender
                       message={msg.text}
                       sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
+                      time={DateTime.fromISO(msg.date, { zone: "utc" })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
                       attachs={msg.attachs}
                     />
                   ) : msg.sender.role === "system" ? (
-                    <ChatMessageSystem
-                      message={msg.text}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
+                    <>
+                      {isAdmin() ? (
+                        <ChatMessageSystem
+                          message={msg.text}
+                          time={DateTime.fromISO(msg.date, { zone: "utc" })
+                            .toLocal()
+                            .toFormat("yyyy.MM.dd HH:mm:ss")}
+                        />
+                      ) : (
+                        <></>
                       )}
-                    />
+                    </>
                   ) : (
                     <ChatMessageRecepient
                       message={msg.text}
                       sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
+                      time={DateTime.fromISO(msg.date, { zone: "utc" })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
                       attachs={msg.attachs}
                     />
                   )}
@@ -749,9 +768,16 @@ function Chat() {
             <div className="chat-message-recepient__separator"></div>
             {!isAdmin() && (
               <div className="chat-message-recepient__rate-container">
-                <span className="chat-message-recepient__rate-title">
-                  Оцените ответ
-                </span>
+                {!reaction ? (
+                  <span className="chat-message-recepient__rate-title">
+                    Оцените ответ
+                  </span>
+                ) : (
+                  <span className="chat-message-recepient__rate-title">
+                    Ответ оценен
+                  </span>
+                )}
+
                 <div className="chat-message-recepient__rate">
                   {!reaction && (
                     <>

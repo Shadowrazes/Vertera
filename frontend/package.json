@@ -16,6 +16,7 @@
     "graphql-request": "^6.1.0",
     "history": "^5.3.0",
     "json-graphql-server": "^2.3.2",
+    "luxon": "^3.4.4",
     "mdb-react-ui-kit": "^7.1.0",
     "multiselect-react-dropdown": "^2.0.25",
     "primereact": "^10.3.1",
@@ -29,6 +30,7 @@
     "rsuite": "^5.45.0"
   },
   "devDependencies": {
+    "@types/luxon": "^3.4.2",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",

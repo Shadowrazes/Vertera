@@ -114,19 +114,13 @@ export const MESSAGES_CHAT = gql`
       }
       reaction
       client {
+        id
         user {
           name
           surname
           patronymic
         }
         email
-      }
-      helper {
-        user {
-          name
-          surname
-          patronymic
-        }
       }
       messages {
         id
