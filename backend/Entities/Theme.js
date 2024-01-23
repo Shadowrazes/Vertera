@@ -6,6 +6,7 @@ class Theme extends Entity{
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
     static UnitIdField = 'unitId';
+    static OrderField = 'orderNum';
     static TranslationType = 'theme'
 
     static async GetById(id) {
@@ -21,7 +22,11 @@ class Theme extends Entity{
     }
 
     static async GetListByUnit(unitId) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.UnitIdField} = ?`;
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.UnitIdField} = ?
+            ORDER BY ${this.OrderField} ASC
+        `;
         const result = await super.Request(sql, [unitId]);
         return result;
     }
@@ -48,7 +53,8 @@ class Theme extends Entity{
 
             const updateFields = {};
             if(fields.unitId) updateFields.unitId = fields.unitId;
-            else return super.EmptyUpdateInfo;
+            if(fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if(super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);
             return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };

@@ -24,46 +24,53 @@ const clientRole = 'client';
 const helperRole = 'helper';
 const adminRole = 'system';
 
+async function Access(role, token){
+    if(!(await User.AccessAllow(role, token))) throw new Error('Forbidden');
+}
+
 export const resolvers = {
     Query:{
+        clientQuery: async (_, args) => {
+            await Access(clientRole, args.token);
+            return {status: 200};
+        },
         login: async (_, { login, password }) => {
             return await User.Login(login, password);
         },
         user: async (_, { id }) => {
-            //if(!(await User.AccessAllow(clientRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await User.GetById(id);
         },
         userList: async (_, args) => {
-            if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            await Access(helperRole, args.token);
             return await User.GetList();
         },
         helper: async (_, { id }) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Helper.GetById(id);
         },
         helperList: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Helper.GetList();
         },
         helperStatList: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
         },
         client: async (_, { id }) => {
-            //if(!(await User.AccessAllow(clientRole, args.token))) throw new Error('Forbidden');
+            //await Access(clientRole, args.token);
             return await Client.GetById(id);
         },
         clientList: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Client.GetList();
         },
         //если есть токен, валидируем, если нет, то проверяем клиента тикета, если аноним, то пускаем
-        // если нет, то пошел нахуй
         ticket: async (_, { id }) => {
             return await Ticket.GetById(id);
         },
         ticketList: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Ticket.GetList(args.filters);
         },
         ticketListByClient: async (_, args) => {
@@ -76,11 +83,11 @@ export const resolvers = {
             return await Message.GetListByTicket(ticketId);
         },
         attachment: async (_, { id }) => {
-            //if(!(await User.AccessAllow(clientRole, args.token))) throw new Error('Forbidden');
+            //await Access(clientRole, args.token);
             return await Attachment.GetById(id);
         },
         attachmentList: async (_, { messageId }) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Attachment.GetListByMsg(messageId);
         },
         subThemeList: async (_, args) => {
@@ -99,26 +106,26 @@ export const resolvers = {
             return await SubTheme.GetById(id);
         },
         departmentList: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Department.GetList();
         },
         jobTitleList: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await HelperJobTitle.GetList();
         },
         countryList: async (_, args) => {
             return await Country.GetList();
         },
         ticketStatusList: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await TicketStatus.GetList();
         },
         translationList: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Translation.GetList(args.lang);
         },
         translationListByType: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Translation.GetListByType(args.lang, args.type);
         },
     },
@@ -127,7 +134,7 @@ export const resolvers = {
             return await Client.TransInsert(args.userFields, args.clientFields);
         },
         addHelperUser: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         addTicket: async (_, args) => {
@@ -137,111 +144,116 @@ export const resolvers = {
             return await Message.TransInsert(args.fields);
         },
         addTicketStatus: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await TicketStatus.TransInsert(args.fields);
         },
         addCountry: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Country.TransInsert(args.fields);
         },
         addJobTitle: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await HelperJobTitle.TransInsert(args.fields);
         },
         addSubTheme: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await SubTheme.TransInsert(args.fields);
         },
         addTheme: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Theme.TransInsert(args.fields);
         },
         addUnit: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Unit.TransInsert(args.fields);
         },
         addDepartment: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Department.TransInsert(args.fields);
         },
         addTranslation: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Translation.Insert(args.fields);
         },
         updateTicket: async (_, args) => {
             return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
         },
         updateClientUser: async (_, args) => {
-            //if(!(await User.AccessAllow(clientRole, args.token))) throw new Error('Forbidden');
+            //await Access(clientRole, args.token);
             return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateHelperUser: async (_, args) => {
-            //if(!(await User.AccessAllow(helperRole, args.token))) throw new Error('Forbidden');
+            //await Access(helperRole, args.token);
             return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         updateSubTheme: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await SubTheme.TransUpdate(args.id, args.fields);
         },
         updateTheme: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Theme.TransUpdate(args.id, args.fields);
         },
         updateUnit: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Unit.TransUpdate(args.id, args.fields);
         },
         updateDepartment: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Department.TransUpdate(args.id, args.fields);
         },
         updateCountry: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Country.TransUpdate(args.id, args.fields);
         },
         updateTicketStatus: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await TicketStatus.TransUpdate(args.id, args.fields);
         },
         updateHelperJobTitle: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await HelperJobTitle.TransUpdate(args.id, args.fields);
         },
         updateTranslation: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Translation.Update(args.fields);
         },
         updateMessage: async (_, args) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Message.TransUpdate(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Ticket.DeleteCascade(id);
         },
         deleteUser: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await User.DeleteCascade(id);
         },
         deleteUnit: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Unit.DeleteCascade(id);
         },
         deleteTheme: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Theme.DeleteCascade(id);
         },
         deleteSubTheme: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await SubTheme.DeleteCascade(id);
         },
         deleteThemeDepartment: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await ThemeDepartment.DeleteCascade(id);
         },
         deleteDepartment: async (_, { id }) => {
-            //if(!(await User.AccessAllow(adminRole, args.token))) throw new Error('Forbidden');
+            //await Access(adminRole, args.token);
             return await Department.DeleteCascade(id);
+        },
+    },
+    ClientQuery: {
+        userList: async (_, args) => {
+            return await User.GetList();
         },
     },
     User: {

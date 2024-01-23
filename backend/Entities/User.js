@@ -13,6 +13,7 @@ class User extends Entity{
     static LoginField = 'login';
     static PasswordField = 'password';
     static TokenField = 'token';
+    static IsActiveField = 'isActive';
 
     static userAccess = ['system', 'helper', 'client'];
     static helperAccess = ['system', 'helper'];
@@ -23,6 +24,8 @@ class User extends Entity{
         const userResult = await super.Request(sql, [login]);
 
         if(userResult.length == 0) throw new Error('Auth error');
+        
+        if(!userResult[0].isActive) throw new Error('User not found');
 
         const passwordHash = userResult[0].password;
         const userId = userResult[0].id;
@@ -58,7 +61,10 @@ class User extends Entity{
     }
 
     static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} <> 0`;
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.PrimaryField} <> 0 AND ${this.IsActiveField} <> 0
+        `;
         const result = await super.Request(sql);
         return result;
     }
@@ -77,6 +83,7 @@ class User extends Entity{
 
             fields.password = await Account.GenerateHash(fields.password);
         }
+        fields.isActive = true;
         const result = await super.TransRequest(conn, sql, [fields]);
         return result.insertId;
     }

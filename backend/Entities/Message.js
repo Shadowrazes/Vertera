@@ -2,6 +2,7 @@ import Attachment from "./Attachment.js";
 import Entity from "./Entity.js";
 import Client from "./Client.js";
 import User from "./User.js";
+import Ticket from "./Ticket.js";
 import EmailSender from "../Utils/EmailSender.js";
 
 class Message extends Entity{
@@ -42,10 +43,14 @@ class Message extends Entity{
             const userResult = await User.GetById(args.senderId);
 
             if(userResult.role && userResult.role == 'helper'){
-                const clientResult = await Client.GetById(args.recieverId);
+                const curTicket = await Ticket.GetById(args.ticketId);
+                const curClient = await Client.GetById(args.recieverId);
+
+                if(curTicket.clientId != curClient.id) throw new Error('Incorrect msg reciever');
+
                 const dialogLink = `https://vticket.yasanyabeats.ru/dialog/${args.recieverId}/${args.ticketId}/`
-                const emailText = `На ваше обрашение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
-                EmailSender.Notify(clientResult.email, emailText);
+                const emailText = `На ваше обращение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
+                EmailSender.Notify(curClient.email, emailText);
             }
 
             return result.insertId;

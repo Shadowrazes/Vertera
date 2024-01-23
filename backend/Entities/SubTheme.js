@@ -7,6 +7,7 @@ class SubTheme extends Entity{
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
     static ThemeIdField = 'themeId';
+    static OrderField = 'orderNum';
     static TranslationType = 'subTheme'
 
     static async GetById(id) {
@@ -22,7 +23,11 @@ class SubTheme extends Entity{
     }
 
     static async GetListByTheme(themeId) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.ThemeIdField} = ?`;
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.ThemeIdField} = ?
+            ORDER BY ${this.OrderField} ASC
+        `;
         const result = await super.Request(sql, [themeId]);
         return result;
     }
@@ -57,7 +62,8 @@ class SubTheme extends Entity{
 
             const updateFields = {};
             if(fields.themeId) updateFields.themeId = fields.themeId;
-            else return super.EmptyUpdateInfo;
+            if(fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if(super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);
             return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };

@@ -2,6 +2,8 @@ export const typeDefs = `
     scalar DateTime
 
     type Query {
+        clientQuery(token: String!): ClientQuery
+
         login(login: String!, password: String!): LoginInfo!
 
         user(id: Int!): User
@@ -41,6 +43,11 @@ export const typeDefs = `
 
         translationList(lang: String!): [Translation]
         translationListByType(lang: String!, type: String!): [Translation]
+    }
+
+    type ClientQuery {
+        status: Int!
+        userList: [User]
     }
 
     type Mutation {
@@ -93,6 +100,7 @@ export const typeDefs = `
         patronymic: String
         role: String!
         country: Country!
+        isActive: Boolean!
         phone: String
     }
 
@@ -173,6 +181,7 @@ export const typeDefs = `
         id: Int!
         name(lang: String!): Translation!
         themes: [Theme]!
+        orderNum: Int!
     }
 
     type Theme {
@@ -180,12 +189,14 @@ export const typeDefs = `
         name(lang: String!): Translation!
         subThemes: [SubTheme]!
         unit: Unit!
+        orderNum: Int!
     }
 
     type SubTheme {
         id: Int!
         name(lang: String!): Translation!
         theme: Theme!
+        orderNum: Int!
         departments: [Department]!
     }
 
@@ -302,6 +313,7 @@ export const typeDefs = `
 
     input SubThemeInsert {
         themeId: Int!
+        orderNum: Int!
         stroke: String!
         lang: String!
         departmentIds: [Int]!
@@ -309,11 +321,13 @@ export const typeDefs = `
 
     input ThemeInsert {
         unitId: Int!
+        orderNum: Int!
         stroke: String!
         lang: String!
     }
 
     input UnitInsert {
+        orderNum: Int!
         stroke: String!
         lang: String!
     }
@@ -364,6 +378,7 @@ export const typeDefs = `
         patronymic: String
         countryId: Int
         password: String
+        isActive: Boolean
         phone: String
     }
 
@@ -400,6 +415,7 @@ export const typeDefs = `
 
     input SubThemeUpdate {
         themeId: Int
+        orderNum: Int
         stroke: String
         departmentIds: [Int]
         lang: String!
@@ -407,12 +423,14 @@ export const typeDefs = `
 
     input ThemeUpdate {
         unitId: Int
+        orderNum: Int
         stroke: String
         lang: String!
     }
 
     input UnitUpdate {
-        stroke: String!
+        orderNum: Int
+        stroke: String
         lang: String!
     }
 
