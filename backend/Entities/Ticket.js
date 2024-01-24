@@ -117,7 +117,7 @@ class Ticket extends Entity{
                 ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusIdField}, 
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
-                ${this.TableName}.${this.ReactionField}, 
+                ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
                 ${filter.orderBy == unitTranslationAS ? unitColSql : ``}
                 ${filter.orderBy == themeTranslationAS ? themeColSql : ``}
                 ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientColSql : ``}
