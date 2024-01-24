@@ -36,7 +36,7 @@ class Theme extends Entity{
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {unitId: fields.unitId, nameCode};
+            const insertFields = {unitId: fields.unitId, nameCode, orderNum: fields.orderNum};
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });

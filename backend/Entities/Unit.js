@@ -25,7 +25,7 @@ class Unit extends Entity{
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {nameCode};
+            const insertFields = {nameCode, orderNum: fields.orderNum};
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });

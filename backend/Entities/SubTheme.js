@@ -37,7 +37,7 @@ class SubTheme extends Entity{
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {themeId: fields.themeId, nameCode};
+            const insertFields = {themeId: fields.themeId, nameCode, orderNum: fields.orderNum};
             const result = await super.TransRequest(conn, sql, [insertFields]);
 
             const themeDepartmentResult = await ThemeDepartment.TransInsert(conn, result.insertId, fields.departmentIds);
