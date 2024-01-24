@@ -34,8 +34,8 @@ function Theme() {
   };
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
       // console.log(data.allThemeTree.map((unit) => unit.id));
     }
 
@@ -80,6 +80,7 @@ function Theme() {
         <Table className="table__table" hover>
           <thead>
             <tr>
+              <td>Порядок</td>
               <td>Тема ID</td>
               <td>Название темы</td>
               <td>Редактировать</td>
@@ -90,9 +91,9 @@ function Theme() {
               .find((unit) => unit.name.stroke === selectedUnit)
               ?.themes.map((theme) => (
                 <tr key={theme.id}>
+                  <td>{theme.orderNum}</td>
                   <td>{theme.id}</td>
                   <td>{theme.name.stroke}</td>
-
                   <td>
                     <Link
                       to={`/edit-theme/${theme.id}`}

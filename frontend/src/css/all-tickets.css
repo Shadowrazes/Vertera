@@ -129,6 +129,23 @@
   text-align: center;
 }
 
+.alltickets__amount {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alltickets__amount #dropdown-custom-1 {
+  width: 100px !important;
+}
+
+.alltickets__amount .dropdown-menu {
+  width: 50px !important;
+}
+
+.alltickets__amount .dropdown-item {
+  width: 100% !important;
+}
+
 @media screen and (max-width: 768px) {
   .alltickets__container {
     display: flex;

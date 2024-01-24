@@ -31,8 +31,8 @@ function Units() {
   };
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
       // console.log(data.allThemeTree.map((unit) => unit.id));
     }
 
@@ -56,6 +56,7 @@ function Units() {
         <Table className="table__table" hover>
           <thead>
             <tr>
+              <td>Порядок</td>
               <td>Раздел ID</td>
               <td>Название разделения</td>
               <td>Редактировать</td>
@@ -64,6 +65,7 @@ function Units() {
           <tbody>
             {units.map((unit) => (
               <tr key={unit.id}>
+                <td>{unit.orderNum}</td>
                 <td>{unit.id}</td>
                 <td>{unit.name.stroke}</td>
                 <td>

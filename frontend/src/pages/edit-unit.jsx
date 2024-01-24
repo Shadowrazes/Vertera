@@ -16,6 +16,7 @@ function EditUnit() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [nameValue, setNameValue] = useState("");
+  const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -38,9 +39,10 @@ function EditUnit() {
   };
 
   useEffect(() => {
-    if (data && data.unit) {
-      setNameValue(data.unit.name.stroke);
-      console.log(data.unit.name.stroke);
+    if (data && data.helperQuery.unit) {
+      setNameValue(data.helperQuery.unit.name.stroke);
+      setOrderNum(data.helperQuery.unit.orderNum);
+      // console.log(data.helperQuery.unit.name.stroke);
     }
 
     if (location.state && location.state.linkPrev) {
@@ -68,6 +70,12 @@ function EditUnit() {
 
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
+    setIsErrorVisible(false);
+  };
+
+  const handleOnChangeOrderNum = (e) => {
+    setOrderNum(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const errorMsg = () => {
@@ -75,6 +83,8 @@ function EditUnit() {
 
     if (nameValue.trim() == "") {
       error = "Укажите название раздела";
+    } else if (orderNum < 0) {
+      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при обработке раздела";
     }
@@ -85,7 +95,7 @@ function EditUnit() {
   const handleEditUnit = async (e) => {
     e.preventDefault();
 
-    if (nameValue.trim() == "") {
+    if (nameValue.trim() == "" || orderNum < 0) {
       setIsErrorVisible(true);
       return;
     }
@@ -97,6 +107,7 @@ function EditUnit() {
           id: parseInt(unitId),
           stroke: nameValue.trim(),
           lang: "ru",
+          orderNum: orderNum,
         },
       });
 
@@ -165,9 +176,17 @@ function EditUnit() {
           </Form.Label>
           <Form.Control
             type="text"
-            className="add-currator__input"
+            className="add-currator__input add-theme__dropdown"
             value={nameValue}
             onChange={handleOnChangeName}
+          />
+          <Form.Label className="edit-curator__field-label">Порядок</Form.Label>
+          <Form.Control
+            type="number"
+            className="add-currator__input"
+            value={orderNum}
+            onChange={handleOnChangeOrderNum}
+            min={0}
           />
         </Form.Group>
 

@@ -16,6 +16,7 @@ function addUnit() {
   const [show, setShow] = useState(false);
 
   const [nameValue, setNameValue] = useState("");
+  const [orderNum, setOrderNum] = useState(0);
 
   const navigate = useNavigate();
 
@@ -36,11 +37,18 @@ function addUnit() {
     setIsErrorVisible(false);
   };
 
+  const handleOrderNumChange = (e) => {
+    setOrderNum(e.target.value);
+    setIsErrorVisible(false);
+  };
+
   const errorMsg = () => {
     let error = "";
 
     if (nameValue.trim() == "") {
       error = "Укажите название раздела";
+    } else if (orderNum < 0) {
+      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -53,7 +61,7 @@ function addUnit() {
 
     // console.log(nameValue);
 
-    if (nameValue.trim() == "") {
+    if (nameValue.trim() == "" || orderNum < 0) {
       setIsErrorVisible(true);
       return;
     }
@@ -65,6 +73,7 @@ function addUnit() {
         variables: {
           stroke: nameValue.trim(),
           lang: "ru",
+          orderNum: parseInt(orderNum),
         },
       });
 
@@ -95,8 +104,19 @@ function addUnit() {
               type="text"
               placeholder="Название раздела"
               value={nameValue}
-              className="add-currator__input"
+              className="add-currator__input add-theme__dropdown"
               onChange={handleNameChange}
+            />
+            <Form.Label className="edit-curator__field-label">
+              Порядок
+            </Form.Label>
+            <Form.Control
+              type="number"
+              className="add-currator__input"
+              placeholder="Порядок"
+              value={orderNum}
+              onChange={handleOrderNumChange}
+              min={0}
             />
           </Form.Group>
           {isErrorVisible && <span className="form__error">{errorMsg()}</span>}

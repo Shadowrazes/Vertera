@@ -32,11 +32,7 @@ function App() {
         <Routes>
           <Route path="/" element={<CreateTicket />} />
           <Route path="/all-tickets" element={<AllTickets />} />
-          <Route
-            path="/dialog/:userId/:itemId"
-            Component={Chat}
-            element={<Chat />}
-          />
+          <Route path="/dialog/:itemId" Component={Chat} element={<Chat />} />
           <Route path="/curators" element={<Curators />} />
           <Route path="/add-curator" element={<AddCurator />} />
           <Route

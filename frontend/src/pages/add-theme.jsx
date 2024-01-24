@@ -32,6 +32,7 @@ function AddTheme() {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [nameValue, setNameValue] = useState("");
+  const [orderNum, setOrderNum] = useState(0);
 
   const { loading, error, data } = useQuery(THEME_LIST);
 
@@ -42,8 +43,8 @@ function AddTheme() {
   };
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
     }
 
     if (location.state && location.state.linkPrev) {
@@ -75,6 +76,11 @@ function AddTheme() {
     setIsErrorVisible(false);
   };
 
+  const handleOrderNumChange = (e) => {
+    setOrderNum(e.target.value);
+    setIsErrorVisible(false);
+  };
+
   const errorMsg = () => {
     let error = "";
 
@@ -82,6 +88,8 @@ function AddTheme() {
       error = "Выберите название раздела";
     } else if (nameValue.trim() == "") {
       error = "Укажите название темы";
+    } else if (orderNum < 0) {
+      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -92,11 +100,11 @@ function AddTheme() {
   const handleAddTheme = async (e) => {
     e.preventDefault();
 
-    console.log(selectedUnit);
-    console.log(selectedUnitId);
-    console.log(nameValue);
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
+    // console.log(nameValue);
 
-    if (nameValue.trim() == "" || selectedUnit == null) {
+    if (nameValue.trim() == "" || selectedUnit == null || orderNum < 0) {
       setIsErrorVisible(true);
       return;
     }
@@ -109,6 +117,7 @@ function AddTheme() {
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
+          orderNum: orderNum,
         },
       });
 
@@ -156,8 +165,19 @@ function AddTheme() {
               type="text"
               placeholder="Название темы"
               value={nameValue}
-              className="add-currator__input"
+              className="add-currator__input add-theme__dropdown"
               onChange={handleNameChange}
+            />
+            <Form.Label className="edit-curator__field-label">
+              Порядок
+            </Form.Label>
+            <Form.Control
+              type="number"
+              className="add-currator__input"
+              placeholder="Порядок"
+              value={orderNum}
+              onChange={handleOrderNumChange}
+              min={0}
             />
           </Form.Group>
           {isErrorVisible && <span className="form__error">{errorMsg()}</span>}

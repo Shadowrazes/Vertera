@@ -27,6 +27,7 @@ function EditTheme() {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
+  const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -55,16 +56,16 @@ function EditTheme() {
   };
 
   useEffect(() => {
-    if (dataTheme && dataTheme.allThemeTree) {
-      setData(dataTheme.allThemeTree);
+    if (dataTheme && dataTheme.clientQuery.allThemeTree) {
+      setData(dataTheme.clientQuery.allThemeTree);
       // console.log(data.allThemeTree.map((unit) => unit.id));
     }
 
-    if (data && data.theme) {
-      setNameValue(data.theme.name.stroke);
-      setSelectedUnit(data.theme.unit.name.stroke);
-      setSelectedUnitId(data.theme.unit.id);
-      setSelectedItem(data.theme.unit.name.stroke);
+    if (data && data.helperQuery.theme) {
+      setNameValue(data.helperQuery.theme.name.stroke);
+      setSelectedUnit(data.helperQuery.theme.unit.name.stroke);
+      setSelectedUnitId(data.helperQuery.theme.unit.id);
+      setSelectedItem(data.helperQuery.theme.unit.name.stroke);
       // console.log(data.theme.unit.id);
     }
 
@@ -110,7 +111,11 @@ function EditTheme() {
 
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
+    setIsErrorVisible(false);
+  };
 
+  const handleOnChangeOrderNum = (e) => {
+    setOrderNum(e.target.value);
     setIsErrorVisible(false);
   };
 
@@ -121,6 +126,8 @@ function EditTheme() {
       error = "Выберите раздел";
     } else if (nameValue.trim() == "") {
       error = "Укажите название темы";
+    } else if (orderNum < 0) {
+      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при обработке темы";
     }
@@ -135,7 +142,7 @@ function EditTheme() {
     // console.log(selectedUnitId);
     // console.log(nameValue);
 
-    if (nameValue.trim() == "" || selectedUnit == null) {
+    if (nameValue.trim() == "" || selectedUnit == null || orderNum < 0) {
       setIsErrorVisible(true);
       return;
     }
@@ -148,6 +155,7 @@ function EditTheme() {
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
+          orderNum: orderNum,
         },
       });
 
@@ -228,9 +236,17 @@ function EditTheme() {
           </Form.Label>
           <Form.Control
             type="text"
-            className="add-currator__input"
+            className="add-currator__input add-theme__dropdown"
             value={nameValue}
             onChange={handleOnChangeName}
+          />
+          <Form.Label className="edit-curator__field-label">Порядок</Form.Label>
+          <Form.Control
+            type="number"
+            className="add-currator__input"
+            value={orderNum}
+            onChange={handleOnChangeOrderNum}
+            min={0}
           />
         </Form.Group>
 

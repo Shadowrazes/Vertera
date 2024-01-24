@@ -55,12 +55,12 @@ function AddCurator() {
   };
 
   useEffect(() => {
-    if (data && data.departmentList) {
-      setDepartmentList(data.departmentList);
+    if (data && data.adminQuery.departmentList) {
+      setDepartmentList(data.adminQuery.departmentList);
     }
 
-    if (dataJobTitle && dataJobTitle.jobTitleList) {
-      setJobTitleList(dataJobTitle.jobTitleList);
+    if (dataJobTitle && dataJobTitle.adminQuery.jobTitleList) {
+      setJobTitleList(dataJobTitle.adminQuery.jobTitleList);
     }
 
     if (location.state && location.state.linkPrev) {

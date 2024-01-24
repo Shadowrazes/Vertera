@@ -68,8 +68,8 @@ function FormComponent() {
   let userId = user ? user.id : 999;
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
     }
   }, [data]);
 

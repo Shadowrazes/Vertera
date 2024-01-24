@@ -34,8 +34,8 @@ function Subthemes() {
   };
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
     }
 
     refetch();
@@ -129,6 +129,7 @@ function Subthemes() {
         <Table className="table__table" hover>
           <thead>
             <tr>
+              <td>Порядок</td>
               <td>Подтема ID</td>
               <td>Название подтемы</td>
               <td>Редактировать</td>
@@ -140,6 +141,7 @@ function Subthemes() {
               ?.themes.find((theme) => theme.name.stroke === selectedTheme)
               ?.subThemes.map((subTheme) => (
                 <tr key={subTheme.id}>
+                  <td>{subTheme.orderNum}</td>
                   <td>{subTheme.id}</td>
                   <td>{subTheme.name.stroke}</td>
 

@@ -61,7 +61,7 @@ function allTickets() {
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
 
   const [orderBy, setOrderBy] = useState("id");
-  const [orderDir, setOrderDir] = useState("ASC");
+  const [orderDir, setOrderDir] = useState("DESC");
   const [offset, setOffset] = useState(0);
 
   const [fastFilterStr, setFastFilterStr] = useState("my");
@@ -71,6 +71,8 @@ function allTickets() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
+
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userRole, setUserRole] = useState(
@@ -86,6 +88,7 @@ function allTickets() {
   }
 
   const [helperIdsFilter, setHelperIdsFilter] = useState(userId);
+  const [helperStatusFilter, setHelperStatusFilter] = useState(null);
 
   let userCurRole = null;
 
@@ -99,7 +102,10 @@ function allTickets() {
   let fastFilterStatus = null;
 
   const pageNumbers = [];
-  const itemsPerPage = 8;
+  // const itemsPerPage = 8;
+
+  const reactions = ["Понравилось", "Не понравилось", "Все реакции"];
+  const itemsPerPageArray = [25, 50, 100];
 
   const isAdmin = () => {
     return userRole === "helper";
@@ -115,8 +121,6 @@ function allTickets() {
     setIsVisibleFilters((prevVisibility) => !prevVisibility);
     // console.log(dataTheme);
   };
-
-  let reactions = ["Понравилось", "Не понравилось", "Все реакции"];
 
   const handleResetFilters = async (e) => {
     e.preventDefault();
@@ -135,6 +139,7 @@ function allTickets() {
     setQueryReaction(null);
 
     if (isAdmin()) {
+      console.log(1);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -178,6 +183,7 @@ function allTickets() {
   const { data: dataCountryList } = useQuery(COUNTRY_LIST);
 
   const adminRequest = () => {
+    console.log(2);
     return useQuery(TABLE_TICKETS, {
       variables: {
         filters: {
@@ -185,7 +191,7 @@ function allTickets() {
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
-          orderDir: "ASC",
+          orderDir: "DESC",
           lang: "ru",
         },
       },
@@ -200,7 +206,7 @@ function allTickets() {
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
-          orderDir: "ASC",
+          orderDir: "DESC",
           lang: "ru",
         },
       },
@@ -233,6 +239,7 @@ function allTickets() {
     // console.log("fastfilter status ", fastFilterStatus);
 
     if (isAdmin()) {
+      console.log(3);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -246,7 +253,7 @@ function allTickets() {
           offset: _offset,
           orderBy: orderBy,
           orderDir: orderDir,
-          statusIds: fastFilterStatus,
+          statusIds: helperStatusFilter,
           lang: "ru",
         },
       };
@@ -273,33 +280,33 @@ function allTickets() {
 
   useEffect(() => {
     if (isAdmin()) {
-      if (data && data.ticketList.array) {
-        setDataTableTickets(data.ticketList.array);
+      if (data && data.helperQuery.ticketList.array) {
+        setDataTableTickets(data.helperQuery.ticketList.array);
       }
 
-      if (data && data.ticketList.count) {
-        setDataAmount(data.ticketList.count);
+      if (data && data.helperQuery.ticketList.count) {
+        setDataAmount(data.helperQuery.ticketList.count);
       }
 
-      if (dataCurators && dataCurators.helperList) {
-        setDataQueryCurators(dataCurators.helperList);
+      if (dataCurators && dataCurators.helperQuery.helperList) {
+        setDataQueryCurators(dataCurators.helperQuery.helperList);
       }
 
-      if (dataCountryList && dataCountryList.countryList) {
-        setCountryList(dataCountryList.countryList);
+      if (dataCountryList && dataCountryList.adminQuery.countryList) {
+        setCountryList(dataCountryList.adminQuery.countryList);
       }
     } else {
-      if (data && data.ticketListByClient.array) {
-        setDataTableTickets(data.ticketListByClient.array);
+      if (data && data.clientQuery.ticketListByClient.array) {
+        setDataTableTickets(data.clientQuery.ticketListByClient.array);
       }
 
-      if (data && data.ticketListByClient.count) {
-        setDataAmount(data.ticketListByClient.count);
+      if (data && data.clientQuery.ticketListByClient.count) {
+        setDataAmount(data.clientQuery.ticketListByClient.count);
       }
     }
 
-    if (themeData && themeData.allThemeTree) {
-      setDataTheme(themeData.allThemeTree);
+    if (themeData && themeData.clientQuery.allThemeTree) {
+      setDataTheme(themeData.clientQuery.allThemeTree);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -384,16 +391,17 @@ function allTickets() {
         break;
     }
 
-    if (orderDir == "DESC") {
+    if (prevSelectedSort !== -1 && orderDir == "DESC") {
       setSelectedSort(-1);
       _orderBy = "id";
-      _orderDir = "ASC";
+      _orderDir = "DESC";
     }
 
     setOrderBy(_orderBy);
     setOrderDir(_orderDir);
 
     if (isAdmin()) {
+      console.log(4);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -407,7 +415,7 @@ function allTickets() {
           offset: offset,
           orderBy: _orderBy,
           orderDir: _orderDir,
-          statusIds: fastFilterStatus,
+          statusIds: helperStatusFilter,
           lang: "ru",
         },
       };
@@ -551,6 +559,7 @@ function allTickets() {
     // console.log(queryReaction);
 
     if (isAdmin()) {
+      console.log(5);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -564,7 +573,7 @@ function allTickets() {
           offset: offset,
           orderBy: orderBy,
           orderDir: orderDir,
-          statusIds: fastFilterStatus,
+          statusIds: helperStatusFilter,
           lang: "ru",
         },
       };
@@ -596,18 +605,27 @@ function allTickets() {
       fastFilterHelperId = userId;
       fastFilterStatus = null;
       setHelperIdsFilter(fastFilterHelperId);
+      setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "all") {
       fastFilterHelperId = null;
       fastFilterStatus = null;
+      setHelperIdsFilter(fastFilterHelperId);
+      setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "in-process") {
       fastFilterHelperId = null;
       fastFilterStatus = 3;
+      setHelperIdsFilter(null);
+      setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "clarification") {
       fastFilterHelperId = null;
       fastFilterStatus = 4;
+      setHelperIdsFilter(null);
+      setHelperStatusFilter(fastFilterStatus);
     }
 
     if (isAdmin()) {
+      console.log(6);
+      console.log("helperID ", helperIdsFilter);
       const variables = {
         filters: {
           helperIds: fastFilterHelperId,
@@ -1132,6 +1150,22 @@ function allTickets() {
                 ))}
               </tbody>
             </Table>
+
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={itemsPerPage || "Количество строк"}
+              className="alltickets__amount"
+            >
+              {itemsPerPageArray.map((amount, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => setItemsPerPage(amount)}
+                  href="#"
+                >
+                  {amount}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
           </div>
 
           <ul className="alltickets__pagination">
