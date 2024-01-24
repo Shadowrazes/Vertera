@@ -10,6 +10,7 @@ import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
 import Client from "./Client.js";
+import md5 from "md5";
 
 const isBuild = process.argv[2] === 'build';
 const baseUrl = isBuild ? 'https://vticket.yasanyabeats.ru' : 'http://localhost:5173';
