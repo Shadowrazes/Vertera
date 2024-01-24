@@ -163,19 +163,24 @@ class Helper extends Entity{
             if(super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error('Empty fields');
 
             let helperResult = super.EmptyUpdateInfo;
-            if(super.ArgsSize(helperArgs) != 1 && helperArgs.departmentIds){
-                const helperFields = { jobTitleId: helperArgs.jobTitleId, birthday: helperArgs.birthday };
-                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-                helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
-            }
-
-            if(!super.IsArgsEmpty(userFields)){
-                const userResult = await User.TransUpdate(conn, id, userFields);
-            }
 
             if(helperArgs.departmentIds && helperArgs.departmentIds.length > 0){
                 const helperDepartmentDelResult = await HelperDepartment.TransDeleteByHelper(conn, id);
                 const helperDepartmentInsertResult = await HelperDepartment.TransInsert(conn, id, helperArgs.departmentIds);
+            }
+
+            if(!super.IsArgsEmpty(userFields)){
+                const userResult = await User.TransUpdate(conn, id, userFields);
+                helperResult = userResult;
+            }
+
+            const helperFields = {};
+            if(helperArgs.jobTitleId) helperFields.jobTitleId = helperArgs.jobTitleId;
+            if(helperArgs.birthday) helperFields.birthday = helperArgs.birthday;
+
+            if(!super.IsArgsEmpty(helperFields)){
+                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+                helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
             }
 
             return {affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus};
