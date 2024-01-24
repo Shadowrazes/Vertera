@@ -128,3 +128,36 @@
   font-family: "TT Norms Pro", sans-serif;
   font-size: 20px;
 }
+
+@media screen and (max-width: 768px) {
+  .chat-input__container {
+    width: 100%;
+  }
+
+  .chat-input__form {
+    width: 100%;
+  }
+
+  .chat-input__row {
+    width: 100%;
+  }
+
+  .chat-input__button-send {
+    min-width: unset !important;
+  }
+
+  .chat-input__button-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .chat-input__button-row button {
+    width: 100% !important;
+  }
+
+  .chat-input__close-box {
+    width: 100% !important;
+    padding: 20px;
+  }
+}

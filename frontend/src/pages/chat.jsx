@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
+import { DateTime } from "luxon";
+import {
+  Form,
+  Row,
+  Col,
+  Table,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-bootstrap";
 
 import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS, EDIT_TICKET } from "../apollo/mutations";
@@ -12,8 +21,6 @@ import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
 
-import { Form, Row, Col, Table } from "react-bootstrap";
-
 import "../css/chat-input.css";
 
 function Chat() {
@@ -23,6 +30,10 @@ function Chat() {
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
+
+  const [helperId, setHelperId] = useState(null);
+  const [clientId, setClientId] = useState(null);
+  const [selectedValue, setSelectedValue] = useState(1);
 
   const [reaction, setReaction] = useState(null);
 
@@ -84,6 +95,8 @@ function Chat() {
       setTicketId(data.ticket.id);
       setMessagesQuery(data.ticket.messages);
       setCurrentStatus(data.ticket.status.name.stroke);
+      setHelperId(data.ticket.helper.id);
+      setClientId(data.ticket.client.id);
 
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
@@ -222,7 +235,7 @@ function Chat() {
     return filePaths;
   }
 
-  const sendMsg = (e) => {
+  const sendMsg = async (e) => {
     e.preventDefault();
 
     if (loaderAddMsg) {
@@ -236,13 +249,55 @@ function Chat() {
       return;
     }
 
+    if (isAdmin() && selectedValue == 1) {
+      try {
+        const result = await updateStatus({
+          variables: {
+            id: ticketId,
+            fields: {
+              statusId: 3,
+            },
+          },
+        });
+
+        console.log("Статус успешно обновлен:", result);
+      } catch (error) {
+        console.error("Ошибка при обновлении статуса:", error);
+      }
+    } else if (isAdmin() && selectedValue == 2) {
+      try {
+        const result = await updateStatus({
+          variables: {
+            id: ticketId,
+            fields: {
+              statusId: 4,
+            },
+          },
+        });
+
+        console.log("Статус успешно обновлен:", result);
+      } catch (error) {
+        console.error("Ошибка при обновлении статуса:", error);
+      }
+    }
+
+    let senderId;
+
+    if (userId == clientId) {
+      senderId = helperId;
+    } else {
+      senderId = clientId;
+    }
+
+    // console.log(senderId);
+
     uploadFiles()
       .then((filePaths) => {
         setMessageDate(new Date());
         addMessage({
           variables: {
             senderId: userId,
-            recieverId: 1,
+            recieverId: senderId,
             ticketId: ticketId,
             type: "message",
             text: message,
@@ -253,6 +308,7 @@ function Chat() {
       .catch((error) => {
         console.error("Ошибка при загрузке файлов:", error);
       });
+
     setMessage("");
     if (inputRef.current) {
       inputRef.current.value = null;
@@ -322,13 +378,15 @@ function Chat() {
       setIsLoadingClose(false);
     }
     try {
-      await editTicket({
-        variables: {
-          id: parseInt(itemId),
-          helperId: userId,
-        },
-      });
-      window.location.reload();
+      if (userId !== helperId) {
+        await editTicket({
+          variables: {
+            id: parseInt(itemId),
+            helperId: userId,
+          },
+        });
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Ошибка при смене куратора:", error);
     }
@@ -403,7 +461,7 @@ function Chat() {
 
   const getFullName = (userData) => {
     let result = "";
-    console.log(userData);
+    // console.log(userData);
     if (userData?.surname) {
       result += userData?.surname + " ";
     }
@@ -416,6 +474,10 @@ function Chat() {
     return result;
   };
 
+  const handleToggleChange = (value) => {
+    setSelectedValue(value);
+  };
+
   return (
     <>
       {isLoadingClose && <Loader />}
@@ -424,13 +486,13 @@ function Chat() {
       >
         {currentStatus !== null && currentStatus !== "Закрыт" ? (
           <TicketTitle
-            title={`Обращение #${itemId}`}
+            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
             state="Открыта"
             linkPrev={linkPrev}
           />
         ) : (
           <TicketTitle
-            title={`Обращение #${itemId}`}
+            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
             state="Закрыта"
             linkPrev={linkPrev}
           />
@@ -485,25 +547,31 @@ function Chat() {
                     <ChatMessageSender
                       message={msg.text}
                       sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
+                      time={DateTime.fromISO(msg.date, { zone: "utc" })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
                       attachs={msg.attachs}
                     />
                   ) : msg.sender.role === "system" ? (
-                    <ChatMessageSystem
-                      message={msg.text}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
+                    <>
+                      {isAdmin() ? (
+                        <ChatMessageSystem
+                          message={msg.text}
+                          time={DateTime.fromISO(msg.date, { zone: "utc" })
+                            .toLocal()
+                            .toFormat("yyyy.MM.dd HH:mm:ss")}
+                        />
+                      ) : (
+                        <></>
                       )}
-                    />
+                    </>
                   ) : (
                     <ChatMessageRecepient
                       message={msg.text}
                       sender={msg.sender}
-                      time={msg.date.replace(/T|-/g, (match) =>
-                        match === "T" ? " " : "."
-                      )}
+                      time={DateTime.fromISO(msg.date, { zone: "utc" })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
                       attachs={msg.attachs}
                     />
                   )}
@@ -512,7 +580,7 @@ function Chat() {
           )}
       </div>
       <div className="chat-input__container">
-        {isVisible && currentStatus !== "Новый" ? (
+        {isVisible && isAdmin() && currentStatus !== "Новый" ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
@@ -537,6 +605,20 @@ function Chat() {
               {isVisibleError && (
                 <span className="form__error">{errorMsg()}</span>
               )}
+              <ToggleButtonGroup
+                type="radio"
+                name="options"
+                defaultValue={1}
+                value={selectedValue}
+                onChange={handleToggleChange}
+              >
+                <ToggleButton id="tbg-radio-1" value={1}>
+                  Запретить писать клиенту
+                </ToggleButton>
+                <ToggleButton id="tbg-radio-2" value={2}>
+                  Разрешить писать клиенту
+                </ToggleButton>
+              </ToggleButtonGroup>
               <div
                 className={
                   currentStatus == "В процессе"
@@ -575,7 +657,7 @@ function Chat() {
               ) : (
                 <></>
               )}
-              {isAdmin() && (
+              {isAdmin() && currentStatus !== "Закрыт" && (
                 <Link
                   to={`/edit-ticket/${itemId}`}
                   state={{
@@ -622,7 +704,7 @@ function Chat() {
               ) : (
                 <></>
               )}
-              {isAdmin() && (
+              {isAdmin() && currentStatus !== "Закрыт" && (
                 <Link
                   to={`/edit-ticket/${itemId}`}
                   state={{
@@ -641,6 +723,44 @@ function Chat() {
         )}
       </div>
 
+      <div className="chat-input__container">
+        {isVisible &&
+        !isAdmin() &&
+        (currentStatus === "Новый" || currentStatus === "На уточнении") ? (
+          <Form className="chat-input__form" onSubmit={sendMsg}>
+            <Row className="chat-input__row">
+              <Form.Group controlId="TextareaForm">
+                <Form.Control
+                  as="textarea"
+                  placeholder="Текст сообщения"
+                  rows={3}
+                  value={message}
+                  onChange={handleChange}
+                  className="chat-input__textarea"
+                />
+              </Form.Group>
+              <Form.Group controlId="FileInputForm">
+                <Form.Control
+                  type="file"
+                  multiple
+                  accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                  onChange={handleFileChange}
+                  ref={inputRef}
+                />
+              </Form.Group>
+              <ButtonCustom
+                title="Отправить"
+                className="chat-input__button-send single"
+                type="submit"
+                onClick={handleSubmit}
+              />
+            </Row>
+          </Form>
+        ) : (
+          <></>
+        )}
+      </div>
+
       {!isVisible && (
         <div className="chat-input__close-container">
           <div className="chat-input__close-box">
@@ -648,9 +768,16 @@ function Chat() {
             <div className="chat-message-recepient__separator"></div>
             {!isAdmin() && (
               <div className="chat-message-recepient__rate-container">
-                <span className="chat-message-recepient__rate-title">
-                  Оцените ответ
-                </span>
+                {!reaction ? (
+                  <span className="chat-message-recepient__rate-title">
+                    Оцените ответ
+                  </span>
+                ) : (
+                  <span className="chat-message-recepient__rate-title">
+                    Ответ оценен
+                  </span>
+                )}
+
                 <div className="chat-message-recepient__rate">
                   {!reaction && (
                     <>

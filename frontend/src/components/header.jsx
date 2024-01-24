@@ -34,6 +34,9 @@ function Header({ user }) {
     password: "",
   });
 
+  const [userName, setUserName] = useState(null);
+  const [userSurname, setUserSurname] = useState(null);
+
   const { data, refetch } = useQuery(LOGIN);
 
   const handleClose = () => {
@@ -129,6 +132,8 @@ function Header({ user }) {
             role: dataUser.user,
           })
         );
+        setUserName(dataUser.user.name);
+        setUserSurname(dataUser.user.surname);
       }
       //console.log(JSON.parse(localStorage.getItem("userRole")).role);
       refetch();
@@ -160,7 +165,7 @@ function Header({ user }) {
               href="#"
               onClick={user ? handleShowMenu : handleShow}
             >
-              {user ? user.login : "Войти"}
+              {user ? `${userSurname} ${userName}` : "Войти"}
             </a>
             <a
               href="#"

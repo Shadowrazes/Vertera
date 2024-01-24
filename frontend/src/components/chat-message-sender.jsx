@@ -12,7 +12,7 @@ function ChatMessage({ message, sender, time, attachs }) {
 
   const getFullName = (userData) => {
     let result = "";
-    console.log(userData);
+    // console.log(userData);
 
     if (userData?.surname) {
       result += userData?.surname + " ";

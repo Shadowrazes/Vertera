@@ -126,4 +126,37 @@
 .alltickets__text {
   font-family: "TT Norms Pro", sans-serif;
   font-size: 20px;
+  text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+  .alltickets__container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .alltickets__btn {
+    margin: 30px auto 0 auto;
+  }
+
+  .alltickets__column {
+    margin-top: 20px;
+  }
+
+  .rs-date-range-input {
+    font-size: 16px;
+  }
+
+  .table__wrapper {
+    overflow-x: auto;
+  }
+
+  .alltickets__button-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+  
 }

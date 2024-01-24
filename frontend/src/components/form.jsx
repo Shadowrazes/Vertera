@@ -225,7 +225,7 @@ function FormComponent() {
     } else if (selectedSubThemeId == null) {
       error = "Выберите подтему";
     } else if (textareaValue.trim() == "") {
-      error = "Опишите Вашу проблему";
+      error = "Опишите ситуацию";
     } else if (nameValue?.trim() == "") {
       error = "Укажите ваше имя";
     } else if (surnameValue?.trim() == "") {
@@ -503,7 +503,7 @@ function FormComponent() {
             <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"
-                placeholder="Текст сообщения"
+                placeholder="Текст обращения"
                 rows={3}
                 value={textareaValue}
                 onChange={handleTextareaChange}
@@ -530,7 +530,7 @@ function FormComponent() {
         </Row>
       </Form>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show}>
         <Modal.Header closeButton>
           <Modal.Title>Ваше обращение создано</Modal.Title>
         </Modal.Header>

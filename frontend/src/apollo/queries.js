@@ -114,19 +114,13 @@ export const MESSAGES_CHAT = gql`
       }
       reaction
       client {
+        id
         user {
           name
           surname
           patronymic
         }
         email
-      }
-      helper {
-        user {
-          name
-          surname
-          patronymic
-        }
       }
       messages {
         id
@@ -191,6 +185,9 @@ export const LOGIN = gql`
 export const USER = gql`
   query ($id: Int!) {
     user(id: $id) {
+      name
+      surname
+      patronymic
       role
     }
   }

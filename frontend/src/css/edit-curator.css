@@ -32,3 +32,16 @@
 .edit-curator__btn {
     width: 200px !important;
 }
+
+@media screen and (max-width: 768px) {
+    .edit-curator__btn-row {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .add-curator__btn {
+        width: 100% !important;
+    }
+}

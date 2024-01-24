@@ -128,3 +128,22 @@
   font-family: 'TT Norms Pro', sans-serif;
   font-weight: 400;
 }
+
+@media screen and (max-width: 768px) {
+  .chat-message-recipient__container {
+    width: 100%;
+  }
+
+  .chat-message-recipient__box {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .chat-message-recepient__separator {
+    width: 100%;
+  }
+
+  .chat-message-recepient__rate-title {
+    font-size: 30px;
+  }
+}

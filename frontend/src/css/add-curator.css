@@ -136,3 +136,37 @@
 .add-curator__btn {
   width: 416px !important;
 }
+
+@media screen and (max-width: 768px) {
+  .add-curator__btn {
+    width: 100% !important;
+  }
+
+  .add-currator__input {
+    width: 100% !important;
+  }
+
+  .add-curator__date-picker {
+    width: 100% !important;
+  }
+
+  .rs-input {
+    font-size: 16px !important;
+  }
+
+  .add-curator__multiselect {
+    width: 100% !important;
+  }
+
+  .p-multiselect-label {
+    font-size: 16px;
+  }
+
+  .edit-curator__column:nth-child(2) {
+    margin-top: 20px !important;
+  }
+
+  .add-currator__input {
+    font-size: 16px !important;
+  }
+}

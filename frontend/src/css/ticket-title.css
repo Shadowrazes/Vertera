@@ -8,3 +8,9 @@
 .ticket-title__state {
     font-size: 24px;
 }
+
+@media screen and (max-width: 768px) {
+    .ticket-title__container {
+        margin: 50px 0;
+    }
+}

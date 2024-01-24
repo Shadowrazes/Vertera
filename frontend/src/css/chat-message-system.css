@@ -31,3 +31,13 @@
   font-size: 15px;
   color: #5c5c5c;
 }
+
+@media screen and (max-width: 768px) {
+  .chat-message-system__container {
+    width: 100%;
+  }
+
+  .chat-message-system__box {
+    width: 100%;
+  }
+}
