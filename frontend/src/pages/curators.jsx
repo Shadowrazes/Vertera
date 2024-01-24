@@ -47,8 +47,8 @@ function Curators() {
   };
 
   useEffect(() => {
-    if (data && data.helperList) {
-      setData(data.helperList);
+    if (data && data.helperQuery.helperList) {
+      setData(data.helperQuery.helperList);
     }
 
     refetch();

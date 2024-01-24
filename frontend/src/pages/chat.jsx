@@ -91,18 +91,18 @@ function Chat() {
   } = useQuery(THEME_LIST);
 
   useEffect(() => {
-    if (data && data.ticket) {
-      setTicketId(data.ticket.id);
-      setMessagesQuery(data.ticket.messages);
-      setCurrentStatus(data.ticket.status.name.stroke);
-      setHelperId(data.ticket.helper.id);
-      setClientId(data.ticket.client.id);
+    if (data && data.clientQuery.ticket) {
+      setTicketId(data.clientQuery.ticket.id);
+      setMessagesQuery(data.clientQuery.ticket.messages);
+      setCurrentStatus(data.clientQuery.ticket.status.name.stroke);
+      setHelperId(data.clientQuery.ticket.helper.id);
+      setClientId(data.clientQuery.ticket.client.id);
 
       //console.log(data.ticket.status.name.stroke);
       //console.log(data.ticket.id);
       //console.log(data.ticket.subTheme.theme.unit.name.stroke);
 
-      if (data.ticket.status.name.stroke !== "Закрыт") {
+      if (data.clientQuery.ticket.status.name.stroke !== "Закрыт") {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -112,9 +112,9 @@ function Chat() {
         setLinkPrev(location.state.linkPrev);
       }
 
-      if (data.ticket.reaction == "like") {
+      if (data.clientQuery.ticket.reaction == "like") {
         setReaction("like");
-      } else if (data.ticket.reaction == "dislike") {
+      } else if (data.clientQuery.ticket.reaction == "dislike") {
         setReaction("dislike");
       } else {
         setReaction(null);

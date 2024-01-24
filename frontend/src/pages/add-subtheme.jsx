@@ -36,6 +36,7 @@ function AddSubtheme() {
   const [nameValue, setNameValue] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
+  const [orderNum, setOrderNum] = useState(0);
 
   const { loading, error, data } = useQuery(THEME_LIST);
   const {
@@ -51,12 +52,12 @@ function AddSubtheme() {
   };
 
   useEffect(() => {
-    if (data && data.allThemeTree) {
-      setData(data.allThemeTree);
+    if (data && data.clientQuery.allThemeTree) {
+      setData(data.clientQuery.allThemeTree);
     }
 
-    if (dataDepartmentList && dataDepartmentList.departmentList) {
-      setDepartmentList(dataDepartmentList.departmentList);
+    if (dataDepartmentList && dataDepartmentList.adminQuery.departmentList) {
+      setDepartmentList(dataDepartmentList.adminQuery.departmentList);
     }
 
     if (location.state && location.state.linkPrev) {
@@ -96,6 +97,11 @@ function AddSubtheme() {
     setIsErrorVisible(false);
   };
 
+  const handleOrderNumChange = (e) => {
+    setOrderNum(e.target.value);
+    setIsErrorVisible(false);
+  };
+
   const errorMsg = () => {
     let error = "";
 
@@ -105,6 +111,8 @@ function AddSubtheme() {
       error = "Выберите подтему";
     } else if (nameValue.trim() == "") {
       error = "Укажите название подтемы";
+    } else if (orderNum < 0) {
+      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -132,7 +140,8 @@ function AddSubtheme() {
     if (
       nameValue.trim() == "" ||
       selectedUnit == null ||
-      selectedTheme == null
+      selectedTheme == null ||
+      orderNum < 0
     ) {
       setIsErrorVisible(true);
       return;
@@ -147,6 +156,7 @@ function AddSubtheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           departmentIds: selectedDepartmentsId,
+          orderNum: orderNum,
         },
       });
 
@@ -232,6 +242,20 @@ function AddSubtheme() {
             placeholder="Выбрать департамент"
             className="add-curator__multiselect"
           />
+
+          <div>
+            <Form.Label className="edit-curator__field-label">
+              Порядок
+            </Form.Label>
+            <Form.Control
+              type="number"
+              className="add-currator__input"
+              placeholder="Порядок"
+              value={orderNum}
+              onChange={handleOrderNumChange}
+              min={0}
+            />
+          </div>
 
           {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
 

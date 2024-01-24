@@ -165,14 +165,17 @@ export const DELETE_USER = gql`
 `;
 
 export const ADD_UNIT = gql`
-  mutation ($stroke: String!, $lang: String!) {
-    addUnit(fields: { stroke: $stroke, lang: $lang })
+  mutation ($stroke: String!, $lang: String!, $orderNum: Int!) {
+    addUnit(fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum })
   }
 `;
 
 export const EDIT_UNIT = gql`
-  mutation ($id: Int!, $stroke: String!, $lang: String!) {
-    updateUnit(id: $id, fields: { stroke: $stroke, lang: $lang }) {
+  mutation ($id: Int!, $stroke: String!, $lang: String!, $orderNum: Int) {
+    updateUnit(
+      id: $id
+      fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum }
+    ) {
       changed
     }
   }
@@ -185,16 +188,34 @@ export const DELETE_UNIT = gql`
 `;
 
 export const ADD_THEME = gql`
-  mutation ($unitId: Int!, $stroke: String!, $lang: String!) {
-    addTheme(fields: { unitId: $unitId, stroke: $stroke, lang: $lang })
+  mutation ($unitId: Int!, $stroke: String!, $lang: String!, $orderNum: Int!) {
+    addTheme(
+      fields: {
+        unitId: $unitId
+        stroke: $stroke
+        lang: $lang
+        orderNum: $orderNum
+      }
+    )
   }
 `;
 
 export const EDIT_THEME = gql`
-  mutation ($id: Int!, $unitId: Int, $stroke: String, $lang: String!) {
+  mutation (
+    $id: Int!
+    $unitId: Int
+    $stroke: String
+    $lang: String!
+    $orderNum: Int
+  ) {
     updateTheme(
       id: $id
-      fields: { unitId: $unitId, stroke: $stroke, lang: $lang }
+      fields: {
+        unitId: $unitId
+        stroke: $stroke
+        lang: $lang
+        orderNum: $orderNum
+      }
     ) {
       changed
     }
@@ -213,6 +234,7 @@ export const ADD_SUBTHEME = gql`
     $stroke: String!
     $lang: String!
     $departmentIds: [Int]!
+    $orderNum: Int!
   ) {
     addSubTheme(
       fields: {
@@ -220,6 +242,7 @@ export const ADD_SUBTHEME = gql`
         stroke: $stroke
         lang: $lang
         departmentIds: $departmentIds
+        orderNum: $orderNum
       }
     )
   }
@@ -232,6 +255,7 @@ export const EDIT_SUBTHEME = gql`
     $stroke: String
     $lang: String!
     $departmentIds: [Int]
+    $orderNum: Int
   ) {
     updateSubTheme(
       id: $id
@@ -240,6 +264,7 @@ export const EDIT_SUBTHEME = gql`
         stroke: $stroke
         lang: $lang
         departmentIds: $departmentIds
+        orderNum: $orderNum
       }
     ) {
       changed

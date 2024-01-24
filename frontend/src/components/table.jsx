@@ -21,7 +21,7 @@ function TableTickets() {
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
 
-  const [orderDir, setOrderDir] = useState("ASC");
+  const [orderDir, setOrderDir] = useState("DESC");
 
   const columns = [
     "subTheme.theme.unit.name.stroke",
@@ -66,7 +66,7 @@ function TableTickets() {
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
-          orderDir: "ASC",
+          orderDir: "DESC",
           lang: "ru",
         },
       },
@@ -81,7 +81,7 @@ function TableTickets() {
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
-          orderDir: "ASC",
+          orderDir: "DESC",
           lang: "ru",
         },
       },
@@ -100,20 +100,20 @@ function TableTickets() {
 
   useEffect(() => {
     if (isAdmin()) {
-      if (data && data.ticketList.array) {
-        setData(data.ticketList.array);
+      if (data && data.helperQuery.ticketList.array) {
+        setData(data.helperQuery.ticketList.array);
       }
 
-      if (data && data.ticketList.count) {
-        setDataAmount(data.ticketList.count);
+      if (data && data.helperQuery.ticketList.count) {
+        setDataAmount(data.helperQuery.ticketList.count);
       }
     } else {
-      if (data && data.ticketListByClient.array) {
-        setData(data.ticketListByClient.array);
+      if (data && data.clientQuery.ticketListByClient.array) {
+        setData(data.clientQuery.ticketListByClient.array);
       }
 
-      if (data && data.ticketListByClient.count) {
-        setDataAmount(data.ticketListByClient.count);
+      if (data && data.clientQuery.ticketListByClient.count) {
+        setDataAmount(data.clientQuery.ticketListByClient.count);
       }
     }
 
@@ -130,6 +130,8 @@ function TableTickets() {
 
     let _orderBy;
     let _orderDir;
+
+    console.log(index);
 
     if (prevSelectedSort === index) {
       _orderDir = "DESC";
@@ -159,10 +161,10 @@ function TableTickets() {
         break;
     }
 
-    if (orderDir == "DESC") {
+    if (prevSelectedSort !== -1 && orderDir == "DESC") {
       setSelectedSort(-1);
       _orderBy = "id";
-      _orderDir = "ASC";
+      _orderDir = "DESC";
     }
 
     setOrderDir(_orderDir);

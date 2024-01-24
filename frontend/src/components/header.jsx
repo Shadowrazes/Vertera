@@ -125,15 +125,15 @@ function Header({ user }) {
         document.location.href = "/all-tickets";
       }
 
-      if (dataUser && dataUser.user) {
+      if (dataUser && dataUser.helperQuery.user) {
         localStorage.setItem(
           "userRole",
           JSON.stringify({
-            role: dataUser.user,
+            role: dataUser.helperQuery.user,
           })
         );
-        setUserName(dataUser.user.name);
-        setUserSurname(dataUser.user.surname);
+        setUserName(dataUser.helperQuery.user.name);
+        setUserSurname(dataUser.helperQuery.user.surname);
       }
       //console.log(JSON.parse(localStorage.getItem("userRole")).role);
       refetch();

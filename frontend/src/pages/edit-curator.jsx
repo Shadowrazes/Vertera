@@ -75,50 +75,50 @@ function EditCurator() {
   };
 
   useEffect(() => {
-    if (data && data.helper) {
+    if (data && data.helperQuery.helper) {
       // console.log(data.helper.birthday);
-      setBirthdayValue(new Date(data.helper.birthday));
+      setBirthdayValue(new Date(data.helperQuery.helper.birthday));
     }
 
-    if (data && data.helper.user) {
+    if (data && data.helperQuery.helper.user) {
       // console.log(data.helper.user);
-      setNameValue(data.helper.user.name);
-      setSurnameValue(data.helper.user.surname);
-      setPatronymicValue(data.helper.user.patronymic);
-      setSelectedCountry(data.helper.user.country.name.stroke);
-      setSelectedCountryId(data.helper.user.country.id);
+      setNameValue(data.helperQuery.helper.user.name);
+      setSurnameValue(data.helperQuery.helper.user.surname);
+      setPatronymicValue(data.helperQuery.helper.user.patronymic);
+      setSelectedCountry(data.helperQuery.helper.user.country.name.stroke);
+      setSelectedCountryId(data.helperQuery.helper.user.country.id);
     }
 
-    if (data && data.helper.departments) {
+    if (data && data.helperQuery.helper.departments) {
       setSelectedDepartments(
-        data.helper.departments.map((department) => ({
+        data.helperQuery.helper.departments.map((department) => ({
           name: department.name.stroke,
           id: department.id,
         }))
       );
       setSelectedDepartmentsId(
-        data.helper.departments.map((department) => department.id)
+        data.helperQuery.helper.departments.map((department) => department.id)
       );
       // console.log(data.helper.departments);
     }
 
-    if (data && data.helper.jobTitle) {
+    if (data && data.helperQuery.helper.jobTitle) {
       // console.log(data.helper.jobTitle.name.stroke);
-      setSelectedJobTitle(data.helper.jobTitle.name.stroke);
-      setSelectedJobTitleId(data.helper.jobTitle.id);
+      setSelectedJobTitle(data.helperQuery.helper.jobTitle.name.stroke);
+      setSelectedJobTitleId(data.helperQuery.helper.jobTitle.id);
     }
 
-    if (dataDepartmentsList && dataDepartmentsList.departmentList) {
-      setDepartmentList(dataDepartmentsList.departmentList);
+    if (dataDepartmentsList && dataDepartmentsList.adminQuery.departmentList) {
+      setDepartmentList(dataDepartmentsList.adminQuery.departmentList);
     }
 
-    if (dataJobTitleList && dataJobTitleList.jobTitleList) {
+    if (dataJobTitleList && dataJobTitleList.adminQuery.jobTitleList) {
       // console.log(dataJobTitleList.jobTitleList);
-      setJobTitleList(dataJobTitleList.jobTitleList);
+      setJobTitleList(dataJobTitleList.adminQuery.jobTitleList);
     }
 
-    if (dataCountryList && dataCountryList.countryList) {
-      setCountryList(dataCountryList.countryList);
+    if (dataCountryList && dataCountryList.adminQuery.countryList) {
+      setCountryList(dataCountryList.adminQuery.countryList);
     }
 
     if (location.state && location.state.linkPrev) {

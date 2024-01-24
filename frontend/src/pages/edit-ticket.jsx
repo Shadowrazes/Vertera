@@ -66,24 +66,28 @@ function EditTicket() {
   const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
 
   useEffect(() => {
-    if (data && data.ticket) {
-      setSelectedItem(data.ticket.subTheme.theme.unit.name.stroke);
-      setSelectedUnit(data.ticket.subTheme.theme.unit.name.stroke);
-      setSelectedUnitId(data.ticket.subTheme.theme.unit.id);
-      setSelectedTheme(data.ticket.subTheme.theme.name.stroke);
-      setSelectedThemeId(data.ticket.subTheme.theme.id);
-      setSelectedSubTheme(data.ticket.subTheme.name.stroke);
-      setSelectedSubThemeId(data.ticket.subTheme.id);
+    if (data && data.clientQuery.ticket) {
+      setSelectedItem(data.clientQuery.ticket.subTheme.theme.unit.name.stroke);
+      setSelectedUnit(data.clientQuery.ticket.subTheme.theme.unit.name.stroke);
+      setSelectedUnitId(data.clientQuery.ticket.subTheme.theme.unit.id);
+      setSelectedTheme(data.clientQuery.ticket.subTheme.theme.name.stroke);
+      setSelectedThemeId(data.clientQuery.ticket.subTheme.theme.id);
+      setSelectedSubTheme(data.clientQuery.ticket.subTheme.name.stroke);
+      setSelectedSubThemeId(data.clientQuery.ticket.subTheme.id);
       setSelectedCurator(
-        `${data.ticket.helper.user.surname} ${data.ticket.helper.user.name} ${
-          data.ticket.helper.user.patronymic
-            ? ` ${data.ticket.helper.user.patronymic}`
+        `${data.clientQuery.ticket.helper.user.surname} ${
+          data.clientQuery.ticket.helper.user.name
+        } ${
+          data.clientQuery.ticket.helper.user.patronymic
+            ? ` ${data.clientQuery.ticket.helper.user.patronymic}`
             : ""
         }`
       );
-      setSelectedCuratorId(data.ticket.helper.id);
+      setSelectedCuratorId(data.clientQuery.ticket.helper.id);
       setSelectedDepartmentsId(
-        data.ticket.subTheme.departments.map((department) => department.id)
+        data.clientQuery.ticket.subTheme.departments.map(
+          (department) => department.id
+        )
       );
       // console.log(selectedDepartmentsId);
 
@@ -92,12 +96,12 @@ function EditTicket() {
       }
     }
 
-    if (dataTheme && dataTheme.allThemeTree) {
-      setData(dataTheme.allThemeTree);
+    if (dataTheme && dataTheme.clientQuery.allThemeTree) {
+      setData(dataTheme.clientQuery.allThemeTree);
     }
 
-    if (dataCurators && dataCurators.helperList) {
-      setDataQueryCurators(dataCurators.helperList);
+    if (dataCurators && dataCurators.helperQuery.helperList) {
+      setDataQueryCurators(dataCurators.helperQuery.helperList);
     }
   }, [data, dataTheme, dataCurators, location.state]);
 
