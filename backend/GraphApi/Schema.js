@@ -14,7 +14,7 @@ export const typeDefs = `
 
         client(id: Int!): Client
 
-        ticket(id: Int!): Ticket
+        ticket(link: String!): Ticket
         ticketListByClient(clientId: Int!, filters: TicketClientFilter!): TicketList!
 
         message(id: Int!): Message

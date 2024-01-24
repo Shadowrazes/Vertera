@@ -52,15 +52,15 @@ export const resolvers = {
         client: async (_, { id }) => {
             return await Client.GetById(id);
         },
-        ticket: async (_, { id }, context) => {
+        ticket: async (_, { link }, context) => {
             // const userId = await Token.Validation(context.token);
             // const isHelper = await User.AccessAllow(helperRole, context.token);
-            // const reqTicket = await Ticket.GetById(id);
+            // const reqTicket = await Ticket.GetByLink(link);
             // const isOwner = reqTicket.clientId == userId;
 
             // if(!isHelper && !isOwner) throw new Error('Forbidden');
 
-            return await Ticket.GetById(id);
+            return await Ticket.GetByLink(link);
         },
         ticketListByClient: async (_, args) => {
             return await Ticket.GetList(args.filters, args.clientId);

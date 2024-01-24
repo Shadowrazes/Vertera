@@ -25,6 +25,7 @@ class Ticket extends Entity{
     static ThemeField = 'themeId';
     static SubThemeField = 'subThemeId';
     static ReactionField = 'reaction';
+    static LinkField = 'link';
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -32,11 +33,17 @@ class Ticket extends Entity{
         return result[0];
     }
 
+    static async GetByLink(link) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LinkField} = ?`;
+        const result = await super.Request(sql, [link]);
+        return result[0];
+    }
+
     static async GetLastMsg(ticketId) {
         const sql = `
-        SELECT * FROM ${Message.TableName} 
-        WHERE ${Message.TicketIdField} = ? 
-        ORDER BY ${Message.DateField} DESC LIMIT 1
+            SELECT * FROM ${Message.TableName} 
+            WHERE ${Message.TicketIdField} = ? 
+            ORDER BY ${Message.DateField} DESC LIMIT 1
         `;
         const result = await super.Request(sql, [ticketId]);   
         return result[0];
@@ -221,7 +228,7 @@ class Ticket extends Entity{
 
             const userResult = await User.GetById(ticketFields.clientId);
             const clientResult = await Client.GetById(ticketFields.clientId);
-            const dialogLink = baseUrl + `/dialog/${ticketFields.clientId}/${result.insertId}/`
+            const dialogLink = baseUrl + `/dialog/${ticketLink}/`
             const emailText = `Здравствуйте, ${userResult.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
             EmailSender.Notify(clientResult.email, emailText);
  

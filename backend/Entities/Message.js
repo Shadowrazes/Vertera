@@ -48,7 +48,7 @@ class Message extends Entity{
 
                 if(curTicket.clientId != curClient.id) throw new Error('Incorrect msg reciever');
 
-                const dialogLink = `https://vticket.yasanyabeats.ru/dialog/${args.recieverId}/${args.ticketId}/`
+                const dialogLink = `https://vticket.yasanyabeats.ru/dialog/${curTicket.link}/`
                 const emailText = `На ваше обращение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
                 EmailSender.Notify(curClient.email, emailText);
             }
