@@ -40,11 +40,11 @@ export const resolvers = {
             return {class: 'client'};
         },
         helperQuery: async (_, args) => {
-            await Access(helperRole, args.token);
+            //await Access(helperRole, args.token);
             return {class: 'helper'};
         },
         adminQuery: async (_, args) => {
-            await Access(adminRole, args.token);
+            //await Access(adminRole, args.token);
             return {class: 'admin'};
         },
     },
@@ -53,12 +53,12 @@ export const resolvers = {
             return await Client.GetById(id);
         },
         ticket: async (_, { id }, context) => {
-            const userId = await Token.Validation(context.token);
-            const isHelper = await User.AccessAllow(helperRole, context.token);
-            const reqTicket = await Ticket.GetById(id);
-            const isOwner = reqTicket.clientId == userId;
+            // const userId = await Token.Validation(context.token);
+            // const isHelper = await User.AccessAllow(helperRole, context.token);
+            // const reqTicket = await Ticket.GetById(id);
+            // const isOwner = reqTicket.clientId == userId;
 
-            if(!isHelper && !isOwner) throw new Error('Forbidden');
+            // if(!isHelper && !isOwner) throw new Error('Forbidden');
 
             return await Ticket.GetById(id);
         },
