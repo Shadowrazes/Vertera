@@ -10,7 +10,7 @@ class Token {
             },
             this.Secret,
             {
-                expiresIn: '8h',
+                expiresIn: '48h',
             },
         );
         return token;

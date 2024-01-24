@@ -201,21 +201,23 @@ class Ticket extends Entity{
             const messageFields = args.messageFields;
 
             const helperId = await Helper.GetMostFreeHelper(ticketFields.subThemeId);
+            const ticketLink = md5(new Date().toISOString() + ticketFields.clientId);
+
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
-                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: 1};
+                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: 1, link: ticketLink};
             const result = await super.TransRequest(conn, sql, [fields]);
             
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
             const messageResult = await Message.TransInsert(messageFields, conn);
 
-            const helperResult = await User.GetById(helperId);
-            const helperName = helperResult.name ? helperResult.name : 'Anonymous';
+            // const helperResult = await User.GetById(helperId);
+            // const helperName = helperResult.name ? helperResult.name : 'Anonymous';
 
-            const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
-                                   ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
-            const msgSysResult = await Message.TransInsert(msgSysFields, conn);
+            // const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
+            //                        ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
+            // const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
             const userResult = await User.GetById(ticketFields.clientId);
             const clientResult = await Client.GetById(ticketFields.clientId);

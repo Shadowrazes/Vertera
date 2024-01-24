@@ -3,7 +3,7 @@ export const typeDefs = `
 
     type Query {
         login(login: String!, password: String!): LoginInfo!
-        
+
         clientQuery(token: String!): ClientQuery!
         helperQuery(token: String!): HelperQuery!
         adminQuery(token: String!): AdminQuery!
@@ -171,6 +171,7 @@ export const typeDefs = `
         messages: [Message]
         lastMessage: Message!
         msgStats: TicketMsgStats!
+        link: String!
     }
 
     type TicketList {

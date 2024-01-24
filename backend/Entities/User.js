@@ -47,11 +47,16 @@ class User extends Entity{
         else if(level == 'system') return this.adminAccess.includes(userRole);
     }
 
-    static async GetRoleByToken(token) {
+    static async GetByToken(token) {
         const userId = await Token.Validation(token);
         const result = await this.GetById(userId);
-        if(result.length == 0) throw new Error('Invalid token');
-        return result.role;
+        return result;
+    }
+
+    static async GetRoleByToken(token) {
+        const user = await this.GetByToken(token);
+        if(user.length == 0) throw new Error('Invalid token');
+        return user.role;
     }
 
     static async GetById(id) {

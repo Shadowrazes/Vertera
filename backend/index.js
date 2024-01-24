@@ -63,3 +63,18 @@ else {
     https.createServer(options, app).listen(port);
     console.log('Server HTTPS started');
 }
+
+import Entity from './Entities/Entity.js';
+import Ticket from './Entities/Ticket.js';
+import md5 from 'md5';
+
+// const sql = `UPDATE tickets SET ? WHERE id = ?`;
+
+// const tickssq = `select * from tickets`;
+// let ticks = await Entity.Request(tickssq);
+
+// for(const ti of ticks){
+//     const fields = {link: md5(new Date().toISOString() + ti.clientId)}
+//     let res = await Entity.Request(sql, [fields, ti.id]);
+//     console.log(res);
+// }

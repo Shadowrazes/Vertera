@@ -18,6 +18,7 @@ import HelperDepartment from "../Entities/HelperDepartment.js";
 import TicketStatus from '../Entities/TicketStatus.js'; 
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translation from "../Entities/Translation.js";
+import Token from '../Utils/Token.js';
 
 Entity.Pool = Pool;
 const clientRole = 'client';
@@ -33,8 +34,9 @@ export const resolvers = {
         login: async (_, { login, password }) => {
             return await User.Login(login, password);
         },
-        clientQuery: async (_, args) => {
-            await Access(clientRole, args.token);
+        clientQuery: async (_, args, context) => {
+            //await Access(clientRole, args.token);
+            context.token = args.token;
             return {class: 'client'};
         },
         helperQuery: async (_, args) => {
@@ -48,11 +50,16 @@ export const resolvers = {
     },
     ClientQuery: {
         client: async (_, { id }) => {
-            //await Access(clientRole, args.token);
             return await Client.GetById(id);
         },
-        //если есть токен, валидируем, если нет, то проверяем клиента тикета, если аноним, то пускаем
-        ticket: async (_, { id }) => {
+        ticket: async (_, { id }, context) => {
+            const userId = await Token.Validation(context.token);
+            const isHelper = await User.AccessAllow(helperRole, context.token);
+            const reqTicket = await Ticket.GetById(id);
+            const isOwner = reqTicket.clientId == userId;
+
+            if(!isHelper && !isOwner) throw new Error('Forbidden');
+
             return await Ticket.GetById(id);
         },
         ticketListByClient: async (_, args) => {
@@ -65,11 +72,9 @@ export const resolvers = {
             return await Message.GetListByTicket(ticketId);
         },
         attachment: async (_, { id }) => {
-            //await Access(clientRole, args.token);
             return await Attachment.GetById(id);
         },
         attachmentList: async (_, { messageId }) => {
-            //await Access(helperRole, args.token);
             return await Attachment.GetListByMsg(messageId);
         },
         allThemeTree: async (_, args) => {
@@ -78,30 +83,24 @@ export const resolvers = {
     },
     HelperQuery: {
         user: async (_, { id }) => {
-            //await Access(helperRole, args.token);
             return await User.GetById(id);
         },
         userList: async (_, args) => {
             return await User.GetList();
         },
         helper: async (_, { id }) => {
-            //await Access(helperRole, args.token);
             return await Helper.GetById(id);
         },
         helperList: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await Helper.GetList();
         },
         helperStatList: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
         },
         clientList: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await Client.GetList();
         },
         ticketList: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await Ticket.GetList(args.filters);
         },
         subThemeList: async (_, args) => {
@@ -117,28 +116,23 @@ export const resolvers = {
             return await SubTheme.GetById(id);
         },
         ticketStatusList: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await TicketStatus.GetList();
         },
     },
     AdminQuery: {
         departmentList: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Department.GetList();
         },
         jobTitleList: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await HelperJobTitle.GetList();
         },
         countryList: async (_, args) => {
             return await Country.GetList();
         },
         translationList: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Translation.GetList(args.lang);
         },
         translationListByType: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Translation.GetListByType(args.lang, args.type);
         },
     },
