@@ -30,48 +30,30 @@ async function Access(role, token){
 
 export const resolvers = {
     Query:{
-        clientQuery: async (_, args) => {
-            await Access(clientRole, args.token);
-            return {status: 200};
-        },
         login: async (_, { login, password }) => {
             return await User.Login(login, password);
         },
-        user: async (_, { id }) => {
-            //await Access(helperRole, args.token);
-            return await User.GetById(id);
+        clientQuery: async (_, args) => {
+            await Access(clientRole, args.token);
+            return {class: 'client'};
         },
-        userList: async (_, args) => {
+        helperQuery: async (_, args) => {
             await Access(helperRole, args.token);
-            return await User.GetList();
+            return {class: 'helper'};
         },
-        helper: async (_, { id }) => {
-            //await Access(helperRole, args.token);
-            return await Helper.GetById(id);
+        adminQuery: async (_, args) => {
+            await Access(adminRole, args.token);
+            return {class: 'admin'};
         },
-        helperList: async (_, args) => {
-            //await Access(helperRole, args.token);
-            return await Helper.GetList();
-        },
-        helperStatList: async (_, args) => {
-            //await Access(helperRole, args.token);
-            return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
-        },
+    },
+    ClientQuery: {
         client: async (_, { id }) => {
             //await Access(clientRole, args.token);
             return await Client.GetById(id);
         },
-        clientList: async (_, args) => {
-            //await Access(helperRole, args.token);
-            return await Client.GetList();
-        },
         //если есть токен, валидируем, если нет, то проверяем клиента тикета, если аноним, то пускаем
         ticket: async (_, { id }) => {
             return await Ticket.GetById(id);
-        },
-        ticketList: async (_, args) => {
-            //await Access(helperRole, args.token);
-            return await Ticket.GetList(args.filters);
         },
         ticketListByClient: async (_, args) => {
             return await Ticket.GetList(args.filters, args.clientId);
@@ -90,11 +72,40 @@ export const resolvers = {
             //await Access(helperRole, args.token);
             return await Attachment.GetListByMsg(messageId);
         },
-        subThemeList: async (_, args) => {
-            return await SubTheme.GetList();
-        },
         allThemeTree: async (_, args) => {
             return await Unit.GetList();
+        },
+    },
+    HelperQuery: {
+        user: async (_, { id }) => {
+            //await Access(helperRole, args.token);
+            return await User.GetById(id);
+        },
+        userList: async (_, args) => {
+            return await User.GetList();
+        },
+        helper: async (_, { id }) => {
+            //await Access(helperRole, args.token);
+            return await Helper.GetById(id);
+        },
+        helperList: async (_, args) => {
+            //await Access(helperRole, args.token);
+            return await Helper.GetList();
+        },
+        helperStatList: async (_, args) => {
+            //await Access(helperRole, args.token);
+            return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
+        },
+        clientList: async (_, args) => {
+            //await Access(helperRole, args.token);
+            return await Client.GetList();
+        },
+        ticketList: async (_, args) => {
+            //await Access(helperRole, args.token);
+            return await Ticket.GetList(args.filters);
+        },
+        subThemeList: async (_, args) => {
+            return await SubTheme.GetList();
         },
         unit: async (_, { id }) => {
             return await Unit.GetById(id);
@@ -105,6 +116,12 @@ export const resolvers = {
         subTheme: async (_, { id }) => {
             return await SubTheme.GetById(id);
         },
+        ticketStatusList: async (_, args) => {
+            //await Access(helperRole, args.token);
+            return await TicketStatus.GetList();
+        },
+    },
+    AdminQuery: {
         departmentList: async (_, args) => {
             //await Access(adminRole, args.token);
             return await Department.GetList();
@@ -115,10 +132,6 @@ export const resolvers = {
         },
         countryList: async (_, args) => {
             return await Country.GetList();
-        },
-        ticketStatusList: async (_, args) => {
-            //await Access(helperRole, args.token);
-            return await TicketStatus.GetList();
         },
         translationList: async (_, args) => {
             //await Access(adminRole, args.token);
@@ -249,11 +262,6 @@ export const resolvers = {
         deleteDepartment: async (_, { id }) => {
             //await Access(adminRole, args.token);
             return await Department.DeleteCascade(id);
-        },
-    },
-    ClientQuery: {
-        userList: async (_, args) => {
-            return await User.GetList();
         },
     },
     User: {

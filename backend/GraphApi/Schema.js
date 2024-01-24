@@ -2,22 +2,19 @@ export const typeDefs = `
     scalar DateTime
 
     type Query {
-        clientQuery(token: String!): ClientQuery
-
         login(login: String!, password: String!): LoginInfo!
+        
+        clientQuery(token: String!): ClientQuery!
+        helperQuery(token: String!): HelperQuery!
+        adminQuery(token: String!): AdminQuery!
+    }
 
-        user(id: Int!): User
-        userList(token: String!): [User]
+    type ClientQuery {
+        class: String!
 
         client(id: Int!): Client
-        clientList: [Client]
-
-        helper(id: Int!): Helper
-        helperList: [Helper]
-        helperStatList(orderBy: String!, orderDir: String!, limit: Int!, offset: Int!): [HelperStatListItem]
 
         ticket(id: Int!): Ticket
-        ticketList(filters: TicketFilter!): TicketList!
         ticketListByClient(clientId: Int!, filters: TicketClientFilter!): TicketList!
 
         message(id: Int!): Message
@@ -26,12 +23,34 @@ export const typeDefs = `
         attachment(id: Int!): Attachment
         attachmentList(messageId: Int!): [Attachment]
 
-        subThemeList: [SubTheme]
         allThemeTree: [Unit]
+    }
+
+    type HelperQuery {
+        class: String!
+
+        user(id: Int!): User
+        userList(token: String!): [User]
+
+        clientList: [Client]
+
+        ticketList(filters: TicketFilter!): TicketList!
+
+        helper(id: Int!): Helper
+        helperList: [Helper]
+        helperStatList(orderBy: String!, orderDir: String!, limit: Int!, offset: Int!): [HelperStatListItem]
+
+        subThemeList: [SubTheme]
 
         unit(id: Int!): Unit
         theme(id: Int!): Theme
         subTheme(id: Int!): SubTheme
+
+        ticketStatusList: [TicketStatus]
+    }
+
+    type AdminQuery {
+        class: String!
 
         departmentList: [Department]
 
@@ -39,15 +58,8 @@ export const typeDefs = `
 
         countryList: [Country]
 
-        ticketStatusList: [TicketStatus]
-
         translationList(lang: String!): [Translation]
         translationListByType(lang: String!, type: String!): [Translation]
-    }
-
-    type ClientQuery {
-        status: Int!
-        userList: [User]
     }
 
     type Mutation {

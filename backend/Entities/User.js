@@ -25,7 +25,7 @@ class User extends Entity{
 
         if(userResult.length == 0) throw new Error('Auth error');
         
-        if(!userResult[0].isActive) throw new Error('User not found');
+        if(!userResult[0].isActive) throw new Error('Auth error');
 
         const passwordHash = userResult[0].password;
         const userId = userResult[0].id;
@@ -81,7 +81,7 @@ class User extends Entity{
                 throw new Error('Bad password');
             }
 
-            fields.password = await Account.GenerateHash(fields.password);
+            fields.password = await Account.GeneratePassHash(fields.password);
         }
         fields.isActive = true;
         const result = await super.TransRequest(conn, sql, [fields]);
@@ -94,7 +94,7 @@ class User extends Entity{
                 throw new Error('Bad password');
             }
 
-            fields.password = await Account.GenerateHash(fields.password);
+            fields.password = await Account.GeneratePassHash(fields.password);
         }
 
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
