@@ -10,6 +10,7 @@ import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
 import Client from "./Client.js";
+import md5 from "md5";
 
 const isBuild = process.argv[2] === 'build';
 const baseUrl = isBuild ? 'https://vticket.yasanyabeats.ru' : 'http://localhost:5173';
@@ -117,7 +118,7 @@ class Ticket extends Entity{
                 ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusIdField}, 
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
-                ${this.TableName}.${this.ReactionField}, 
+                ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
                 ${filter.orderBy == unitTranslationAS ? unitColSql : ``}
                 ${filter.orderBy == themeTranslationAS ? themeColSql : ``}
                 ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientColSql : ``}

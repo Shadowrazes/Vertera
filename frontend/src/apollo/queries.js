@@ -7,6 +7,7 @@ export const TABLE_TICKETS = gql`
         count
         array {
           id
+          link
           client {
             id
           }
@@ -59,6 +60,7 @@ export const TABLE_TICKETS_USER = gql`
         count
         array {
           id
+          link
           client {
             id
           }
@@ -105,9 +107,9 @@ export const TABLE_TICKETS_USER = gql`
 `;
 
 export const MESSAGES_CHAT = gql`
-  query ($id: Int!) {
+  query ($link: String!) {
     clientQuery(token: "123") {
-      ticket(id: $id) {
+      ticket(link: $link) {
         id
         helper {
           id

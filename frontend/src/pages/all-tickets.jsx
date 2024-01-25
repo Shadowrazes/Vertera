@@ -1176,7 +1176,7 @@ function allTickets() {
                   <tr key={ticket.id}>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1188,7 +1188,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1200,7 +1200,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1216,7 +1216,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1228,7 +1228,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1246,7 +1246,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1258,7 +1258,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,

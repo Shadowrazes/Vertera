@@ -80,7 +80,7 @@ function Chat() {
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
-      id: parseInt(itemId),
+      link: itemId,
     },
   });
 
@@ -130,9 +130,7 @@ function Chat() {
 
   const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
     useMutation(ADD_MESSAGE, {
-      refetchQueries: [
-        { query: MESSAGES_CHAT, variables: { id: parseInt(itemId) } },
-      ],
+      refetchQueries: [{ query: MESSAGES_CHAT, variables: { link: itemId } }],
     });
 
   const [
@@ -486,14 +484,22 @@ function Chat() {
       >
         {currentStatus !== null && currentStatus !== "Закрыт" ? (
           <TicketTitle
-            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
-            state="Открыта"
+            title={
+              isAdmin()
+                ? `Обращение #${data.clientQuery.ticket.id}`
+                : `Обращение`
+            }
+            state="Открыто"
             linkPrev={linkPrev}
           />
         ) : (
           <TicketTitle
-            title={isAdmin() ? `Обращение #${itemId}` : `Обращение`}
-            state="Закрыта"
+            title={
+              isAdmin()
+                ? `Обращение #${data.clientQuery.ticket.id}`
+                : `Обращение`
+            }
+            state="Закрыто"
             linkPrev={linkPrev}
           />
         )}
@@ -507,9 +513,11 @@ function Chat() {
                     <b>Создатель обращения:</b>
                   </td>
                   <td>
-                    {getFullName(data?.ticket?.client?.user)} |{" "}
-                    <a href={"mailto:" + data?.ticket?.client?.email}>
-                      {data?.ticket?.client?.email}
+                    {getFullName(data?.clientQuery.ticket?.client?.user)} |{" "}
+                    <a
+                      href={"mailto:" + data?.clientQuery.ticket?.client?.email}
+                    >
+                      {data?.clientQuery.ticket?.client?.email}
                     </a>
                   </td>
                 </tr>
@@ -517,7 +525,7 @@ function Chat() {
                   <td>
                     <b>Текущий куратор:</b>
                   </td>
-                  <td>{getFullName(data?.ticket?.helper?.user)}</td>
+                  <td>{getFullName(data?.clientQuery.ticket?.helper?.user)}</td>
                 </tr>
               </tbody>
             </Table>

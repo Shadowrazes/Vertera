@@ -28,9 +28,9 @@ function FormComponent() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
 
-  const [nameValue, setNameValue] = useState(null);
-  const [surnameValue, setSurnameValue] = useState(null);
-  const [patronymicValue, setPatronymicValue] = useState(null);
+  const [nameValue, setNameValue] = useState("");
+  const [surnameValue, setSurnameValue] = useState("");
+  const [patronymicValue, setPatronymicValue] = useState("");
   const [emailValue, setEmailValue] = useState(null);
 
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -46,10 +46,10 @@ function FormComponent() {
 
   const [isCopy, setIsCopy] = useState(false);
 
-  //const [popupTicketID, setPopupTicketID] = useState(null);
+  //const [popupTicketLink, setpopupTicketLink] = useState(null);
   //const [popupUserID, setPopupUserID] = useState(null);
 
-  let popupTicketID = null;
+  let popupTicketLink = null;
   let popupUserID = null;
 
   const [isVisible, setIsVisible] = useState(false);
@@ -259,9 +259,9 @@ function FormComponent() {
           },
         }).then((data) => {
           console.log(data.data.addTicket);
-          popupTicketID = data.data.addTicket.id;
+          popupTicketLink = data.data.addTicket.link;
           popupUserID = data.data.addTicket.clientId;
-          //setPopupTicketID(data.data.addTicket.id);
+          //setpopupTicketLink(data.data.addTicket.id);
           //setPopupUserID(data.data.addTicket.clientId);
           setIsVisible(false);
           handleShow();
@@ -372,15 +372,7 @@ function FormComponent() {
   };
 
   const handleShow = () => {
-    setNewTicketLink(
-      "http://" +
-        window.location.hostname +
-        "/dialog/" +
-        popupUserID +
-        "/" +
-        popupTicketID +
-        "/"
-    );
+    setNewTicketLink(popupTicketLink);
     setShow(true);
   };
 
