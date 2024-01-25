@@ -63,11 +63,32 @@ export const typeDefs = `
     }
 
     type Mutation {
+        clientMutation(token: String!): ClientMutation!
+        helperMutation(token: String!): HelperMutation!
+        adminMutation(token: String!): AdminMutation!
+    }
+
+    type ClientMutation {
+        class: String!
+
         addClientUser(userFields: UserInsert!, clientFields: ClientInsert!): Int!
-        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): TicketInsertInfo!
         addMessage(fields: MessageInsert!): Int!
 
+        updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
+        updateMessage(id: Int!, fields: MessageUpdate!): UpdateInfo!
+    }
+
+    type HelperMutation {
+        class: String!
+
+        updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
+    }
+
+    type AdminMutation {
+        class: String!
+        
+        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTranslation(fields: TranslationInsert!): String!
         addTicketStatus(fields: TicketStatusInsert!): String!
         addCountry(fields: CountryInsert!): String!
@@ -77,11 +98,7 @@ export const typeDefs = `
         addUnit(fields: UnitInsert!): String!
         addDepartment(fields: DepartmentInsert!): String!
 
-        updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
-        updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
-        updateMessage(id: Int!, fields: MessageUpdate!): UpdateInfo!
-
         updateTranslation(fields: TranslationUpdate!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
         updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!

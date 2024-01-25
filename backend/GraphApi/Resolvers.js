@@ -138,17 +138,46 @@ export const resolvers = {
         },
     },
     Mutation: {
+        clientMutation: async (_, args, context) => {
+            //await Access(clientRole, args.token);
+            context.token = args.token;
+            return {class: 'client'};
+        },
+        helperMutation: async (_, args, context) => {
+            //await Access(helperRole, args.token);
+            context.token = args.token;
+            return {class: 'helper'};
+        },
+        adminMutation: async (_, args) => {
+            //await Access(adminRole, args.token);
+            return {class: 'admin'};
+        },
+    },
+    ClientMutation: {
         addClientUser: async (_, args) => {
             return await Client.TransInsert(args.userFields, args.clientFields);
-        },
-        addHelperUser: async (_, args) => {
-            return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         addTicket: async (_, args) => {
             return await Ticket.TransInsert(args);
         },
         addMessage: async (_, args) => {
             return await Message.TransInsert(args.fields);
+        },
+        updateMessage: async (_, args) => {
+            return await Message.TransUpdate(args.id, args.fields);
+        },
+        updateClientUser: async (_, args) => {
+            return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
+        },
+    },
+    HelperMutation: {
+        updateTicket: async (_, args) => {
+            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
+        },
+    },
+    AdminMutation: {
+        addHelperUser: async (_, args) => {
+            return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         addTicketStatus: async (_, args) => {
             return await TicketStatus.TransInsert(args.fields);
@@ -173,12 +202,6 @@ export const resolvers = {
         },
         addTranslation: async (_, args) => {
             return await Translation.Insert(args.fields);
-        },
-        updateTicket: async (_, args) => {
-            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
-        },
-        updateClientUser: async (_, args) => {
-            return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateHelperUser: async (_, args) => {
             return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
@@ -206,9 +229,6 @@ export const resolvers = {
         },
         updateTranslation: async (_, args) => {
             return await Translation.Update(args.fields);
-        },
-        updateMessage: async (_, args) => {
-            return await Message.TransUpdate(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
