@@ -10,6 +10,7 @@ export const InputsInsert = `
     }
 
     input ClientInsert {
+        outerId: Int!
         email: String!
     }
 

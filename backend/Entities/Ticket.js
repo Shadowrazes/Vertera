@@ -62,10 +62,6 @@ class Ticket extends Entity{
 
     // ORDER BY lastMsgDate, themeStroke, unitStroke, date, и другие (по необходимости)
     static async GetList(filter, clientId) {
-        const usersClientAS = 'clies';
-        const usersHelperAS = 'helps';
-        const clientCountryAS = 'clientCountry';
-        const helperCountryAS = 'helperCountry';
         const lastMsgDateAS = 'lastMsgDate';
         const totalMsgAS = 'totalMsg';
 
@@ -77,62 +73,55 @@ class Ticket extends Entity{
         const unitTranslationAS = 'unitStroke';
         const unitJoinTableName = 'unitSubReq';
 
-        const unitColSql = `${unitJoinTableName}.${unitTranslationAS} AS ${unitTranslationAS},`;
-        const unitJoinSql = `
-            JOIN (
-                SELECT  ${Unit.TableName}.${Unit.PrimaryField} AS ${unitIdAS}, 
-                        ${Translation.TableName}.${filter.lang} AS ${unitTranslationAS} 
-                FROM ${Unit.TableName}
-                JOIN ${Translation.TableName} 
-                ON ${Unit.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
-            ) ${unitJoinTableName}
-            ON ${this.TableName}.${this.UnitField} = ${unitJoinTableName}.${unitIdAS}
-        `;
+        let unitColSql = ``;
+        let unitJoinSql = ``;
 
-        const themeColSql = `${themeJoinTableName}.${themeTranslationAS} AS ${themeTranslationAS},`;
-        const themeJoinSql = `
-            JOIN (
-                SELECT  ${Theme.TableName}.${Theme.PrimaryField} AS ${themeIdAS}, 
-                        ${Translation.TableName}.${filter.lang} AS ${themeTranslationAS} 
-                FROM ${Theme.TableName}
-                JOIN ${Translation.TableName} 
-                ON ${Theme.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
-            ) ${themeJoinTableName}
-            ON ${this.TableName}.${this.ThemeField} = ${themeJoinTableName}.${themeIdAS}
-        `;
+        let themeColSql = ``;
+        let themeJoinSql = ``;
 
-        const clientColSql = `${usersClientAS}.${User.CountryIdField} AS ${clientCountryAS},`;
-        const clientJoinSql = `
-            JOIN    ${User.TableName} AS ${usersClientAS} 
-            ON ${this.TableName}.${this.ClientIdField} = ${usersClientAS}.${User.PrimaryField}
-        `;
+        if(filter.orderBy == unitTranslationAS){
+            unitColSql = `${unitJoinTableName}.${unitTranslationAS} AS ${unitTranslationAS},`;
+            unitJoinSql = `
+                JOIN (
+                    SELECT  ${Unit.TableName}.${Unit.PrimaryField} AS ${unitIdAS}, 
+                            ${Translation.TableName}.${filter.lang} AS ${unitTranslationAS} 
+                    FROM ${Unit.TableName}
+                    JOIN ${Translation.TableName} 
+                    ON ${Unit.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
+                ) ${unitJoinTableName}
+                ON ${this.TableName}.${this.UnitField} = ${unitJoinTableName}.${unitIdAS}
+            `;
+        }
 
-        const helperColSql = `${usersHelperAS}.${User.CountryIdField} AS ${helperCountryAS},`;
-        const helperJoinSql = `
-            JOIN    ${User.TableName} AS ${usersHelperAS} 
-            ON ${this.TableName}.${this.HelperIdField} = ${usersHelperAS}.${User.PrimaryField}
-        `;
+        if(filter.orderBy == themeTranslationAS){
+            themeColSql = `${themeJoinTableName}.${themeTranslationAS} AS ${themeTranslationAS},`;
+            themeJoinSql = `
+                JOIN (
+                    SELECT  ${Theme.TableName}.${Theme.PrimaryField} AS ${themeIdAS}, 
+                            ${Translation.TableName}.${filter.lang} AS ${themeTranslationAS} 
+                    FROM ${Theme.TableName}
+                    JOIN ${Translation.TableName} 
+                    ON ${Theme.NameCodeField} = ${Translation.TableName}.${Translation.CodeField}
+                ) ${themeJoinTableName}
+                ON ${this.TableName}.${this.ThemeField} = ${themeJoinTableName}.${themeIdAS}
+            `;
+        }
 
-        // SUM(IF(messages.readed = 0, 1, 0)) AS unreadMsg
         let sql = `
         SELECT  ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.ClientIdField}, 
                 ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusIdField}, 
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
-                ${filter.orderBy == unitTranslationAS ? unitColSql : ``}
-                ${filter.orderBy == themeTranslationAS ? themeColSql : ``}
-                ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientColSql : ``}
-                ${filter.helperCountryIds && filter.helperCountryIds.length > 0 ? helperColSql : ``}
+                ${unitColSql}
+                ${themeColSql}
                 MAX(${Message.TableName}.${Message.DateField}) AS ${lastMsgDateAS}, 
                 COUNT(${Message.TableName}.${Message.PrimaryField}) AS ${totalMsgAS}
 
         FROM    ${this.TableName} 
 
-        ${filter.orderBy == unitTranslationAS ? unitJoinSql : ``}
-        ${filter.orderBy == themeTranslationAS ? themeJoinSql : ``}
-        ${filter.clientCountryIds && filter.clientCountryIds.length > 0 ? clientJoinSql : ``}
-        ${filter.helperCountryIds && filter.helperCountryIds.length > 0 ? helperJoinSql : ``}
+        ${unitJoinSql}
+        ${themeJoinSql}
 
         JOIN    ${Message.TableName} 
                 ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
@@ -141,6 +130,17 @@ class Ticket extends Entity{
         `;
 
         let fields = [];
+
+        if(filter.words && filter.words.length > 0){
+            sql += ` 
+                AND ${this.PrimaryField} IN (
+                    SELECT DISTINCT ${Message.TicketIdField} 
+                    FROM ${Message.TableName} 
+                    WHERE MATCH (${Message.TextField}) AGAINST ('?' IN BOOLEAN MODE)
+                )
+            `;
+            fields.push(filter.words);
+        }
         if (filter.unitIds && filter.unitIds.length > 0) {
             sql += ` AND ${this.UnitField} IN (?)`;
             fields.push(filter.unitIds);
@@ -158,11 +158,23 @@ class Ticket extends Entity{
             fields.push(filter.helperIds);
         }
         if (filter.helperCountryIds && filter.helperCountryIds.length > 0) {
-            sql += ` AND ${usersHelperAS}.${User.CountryIdField} IN (?)`;
+            sql += ` 
+                AND ${this.HelperIdField} IN (
+                    SELECT ${User.PrimaryField} 
+                    FROM ${User.TableName} 
+                    WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'helper'
+                )
+            `;
             fields.push(filter.helperCountryIds);
         }
         if (filter.clientCountryIds && filter.clientCountryIds.length > 0) {
-            sql += ` AND ${usersClientAS}.${User.CountryIdField} IN (?)`;
+            sql += ` 
+                AND ${this.ClientIdField} IN (
+                    SELECT ${User.PrimaryField} 
+                    FROM ${User.TableName} 
+                    WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'client'
+                )
+            `;
             fields.push(filter.clientCountryIds);
         }
         if (filter.replyed != undefined) {
@@ -190,10 +202,20 @@ class Ticket extends Entity{
             sql += ` AND ${this.ReactionField} = ?`;
             fields.push(filter.reaction);
         }
+        if (filter.outerId) {
+            sql += ` 
+                AND ${this.ClientIdField} IN (
+                    SELECT ${Client.PrimaryField} 
+                    FROM ${Client.TableName} 
+                    WHERE ${Client.OuterIdField} IN (?)
+                )
+            `;
+            fields.push(filter.outerId);
+        }
   
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
 
-        const countSql = `SELECT COUNT(*) as total FROM ( ${sql} ) as subquery`;
+        const countSql = `SELECT COUNT(*) AS total FROM ( ${sql} ) AS subquery`;
         const countRes = await super.Request(countSql, fields);
 
         sql += ` ORDER BY ${MySQL.escapeId(filter.orderBy)} ${filter.orderDir === 'ASC' ? 'ASC' : 'DESC'}`;

@@ -140,12 +140,12 @@ export const resolvers = {
     Mutation: {
         clientMutation: async (_, args, context) => {
             //await Access(clientRole, args.token);
-            context.token = args.token;
+            context.user = await User.GetByToken(args.token);
             return {class: 'client'};
         },
         helperMutation: async (_, args, context) => {
             //await Access(helperRole, args.token);
-            context.token = args.token;
+            context.user = await User.GetByToken(args.token);
             return {class: 'helper'};
         },
         adminMutation: async (_, args) => {
@@ -171,8 +171,8 @@ export const resolvers = {
         },
     },
     HelperMutation: {
-        updateTicket: async (_, args) => {
-            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
+        updateTicket: async (_, args, context) => {
+            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId, context.user.id);
         },
     },
     AdminMutation: {

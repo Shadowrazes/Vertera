@@ -22,6 +22,7 @@ export const ObjectTypes = `
 
     type Client {
         id: Int!
+        outerId: Int!
         email: String!
         user: User!
     }

@@ -9,6 +9,8 @@ export const InputsSpecific = `
         dateAfter: DateTime
         dateBefore: DateTime
         reaction: String
+        words: String
+        outerId: Int
         statusIds: [Int]
         replyed: Boolean
         orderBy: String!
