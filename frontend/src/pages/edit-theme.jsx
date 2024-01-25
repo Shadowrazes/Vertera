@@ -66,6 +66,7 @@ function EditTheme() {
       setSelectedUnit(data.helperQuery.theme.unit.name.stroke);
       setSelectedUnitId(data.helperQuery.theme.unit.id);
       setSelectedItem(data.helperQuery.theme.unit.name.stroke);
+      setOrderNum(data.helperQuery.theme.orderNum);
       // console.log(data.theme.unit.id);
     }
 

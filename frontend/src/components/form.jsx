@@ -14,10 +14,12 @@ import { THEME_LIST } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
 import { ADD_CLIENT_USER } from "../apollo/mutations";
 
+import { Editor } from "react-draft-wysiwyg";
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
 
 import "../css/form.css";
+import "/node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 function FormComponent() {
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -509,6 +511,7 @@ function FormComponent() {
                 onChange={handleTextareaChange}
               />
             </Form.Group>
+            {/* <Editor /> */}
             <Form.Group className="mb-3" controlId="FileInputForm">
               <Form.Control
                 type="file"

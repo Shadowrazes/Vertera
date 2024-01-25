@@ -142,8 +142,22 @@
   width: 50px !important;
 }
 
+.p-multiselect-filter {
+  width: 80%;
+  margin: 0 20px;
+}
+
 .alltickets__amount .dropdown-item {
   width: 100% !important;
+}
+
+.alltickets__days-ago {
+  display: flex;
+}
+
+.alltickets__days-ago-label {
+  border-radius: 6px 0px 0px 6px;
+background: #F8F9FA;
 }
 
 @media screen and (max-width: 768px) {

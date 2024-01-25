@@ -371,6 +371,7 @@ export const THEME = gql`
         name(lang: "ru") {
           stroke
         }
+        orderNum
         unit {
           id
           name(lang: "ru") {
@@ -389,6 +390,7 @@ export const SUBTHEME = gql`
         name(lang: "ru") {
           stroke
         }
+        orderNum
         theme {
           id
           name(lang: "ru") {
@@ -434,6 +436,19 @@ export const STATS = gql`
           dislikes
           notRated
           fantasy
+        }
+      }
+    }
+  }
+`;
+
+export const STATUS_LIST = gql`
+  query {
+    helperQuery(token: "123") {
+      ticketStatusList {
+        id
+        name(lang: "ru") {
+          stroke
         }
       }
     }
