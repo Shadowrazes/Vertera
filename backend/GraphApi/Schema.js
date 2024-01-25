@@ -172,6 +172,14 @@ export const typeDefs = `
         lastMessage: Message!
         msgStats: TicketMsgStats!
         link: String!
+        log: [TicketLog]
+    }
+
+    type TicketLog {
+        date: DateTime!
+        type: String!
+        initiator: User!
+        info: String!
     }
 
     type TicketList {

@@ -18,6 +18,7 @@ import HelperDepartment from "../Entities/HelperDepartment.js";
 import TicketStatus from '../Entities/TicketStatus.js'; 
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translation from "../Entities/Translation.js";
+import TicketLog from '../Entities/TicketLog.js';
 import Token from '../Utils/Token.js';
 
 Entity.Pool = Pool;
@@ -141,7 +142,6 @@ export const resolvers = {
             return await Client.TransInsert(args.userFields, args.clientFields);
         },
         addHelperUser: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         addTicket: async (_, args) => {
@@ -151,110 +151,84 @@ export const resolvers = {
             return await Message.TransInsert(args.fields);
         },
         addTicketStatus: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await TicketStatus.TransInsert(args.fields);
         },
         addCountry: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Country.TransInsert(args.fields);
         },
         addJobTitle: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await HelperJobTitle.TransInsert(args.fields);
         },
         addSubTheme: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await SubTheme.TransInsert(args.fields);
         },
         addTheme: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Theme.TransInsert(args.fields);
         },
         addUnit: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Unit.TransInsert(args.fields);
         },
         addDepartment: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Department.TransInsert(args.fields);
         },
         addTranslation: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Translation.Insert(args.fields);
         },
         updateTicket: async (_, args) => {
             return await Ticket.TransUpdate(args.id, args.fields, args.departmentId);
         },
         updateClientUser: async (_, args) => {
-            //await Access(clientRole, args.token);
             return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateHelperUser: async (_, args) => {
-            //await Access(helperRole, args.token);
             return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         updateSubTheme: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await SubTheme.TransUpdate(args.id, args.fields);
         },
         updateTheme: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Theme.TransUpdate(args.id, args.fields);
         },
         updateUnit: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Unit.TransUpdate(args.id, args.fields);
         },
         updateDepartment: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Department.TransUpdate(args.id, args.fields);
         },
         updateCountry: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Country.TransUpdate(args.id, args.fields);
         },
         updateTicketStatus: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await TicketStatus.TransUpdate(args.id, args.fields);
         },
         updateHelperJobTitle: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await HelperJobTitle.TransUpdate(args.id, args.fields);
         },
         updateTranslation: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Translation.Update(args.fields);
         },
         updateMessage: async (_, args) => {
-            //await Access(adminRole, args.token);
             return await Message.TransUpdate(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await Ticket.DeleteCascade(id);
         },
         deleteUser: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await User.DeleteCascade(id);
         },
         deleteUnit: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await Unit.DeleteCascade(id);
         },
         deleteTheme: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await Theme.DeleteCascade(id);
         },
         deleteSubTheme: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await SubTheme.DeleteCascade(id);
         },
         deleteThemeDepartment: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await ThemeDepartment.DeleteCascade(id);
         },
         deleteDepartment: async (_, { id }) => {
-            //await Access(adminRole, args.token);
             return await Department.DeleteCascade(id);
         },
     },
@@ -308,6 +282,14 @@ export const resolvers = {
         },
         status: async (parent, args) => {
             return await TicketStatus.GetById(parent.statusId);
+        },
+        log: async (parent, args) => {
+            return await TicketLog.GetListByTicket(parent.id);
+        },
+    },
+    TicketLog: {
+        initiator: async (parent, args) => {
+            return await User.GetById(parent.initiatorId);
         },
     },
     Message: {

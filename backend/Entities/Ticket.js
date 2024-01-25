@@ -10,6 +10,7 @@ import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
 import Client from "./Client.js";
+import TicketLog from "./TicketLog.js";
 import md5 from "md5";
 
 const isBuild = process.argv[2] === 'build';
@@ -215,6 +216,14 @@ class Ticket extends Entity{
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
                             themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: 1, link: ticketLink};
             const result = await super.TransRequest(conn, sql, [fields]);
+
+            //
+            const createTicketLogFields = { type: 'create', ticketId: result.insertId, info: 'Создал', initiatorId: ticketFields.clientId};
+            const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
+
+            const helperAssignLogFields = { type: 'helperAssign', ticketId: result.insertId, info: `Назначен куратор`, initiatorId: 0};
+            const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
+            //  //
             
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
@@ -222,7 +231,6 @@ class Ticket extends Entity{
 
             // const helperResult = await User.GetById(helperId);
             // const helperName = helperResult.name ? helperResult.name : 'Anonymous';
-
             // const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
             //                        ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
             // const msgSysResult = await Message.TransInsert(msgSysFields, conn);
@@ -237,13 +245,40 @@ class Ticket extends Entity{
         });
     }
 
-    static async TransUpdate(id, fields, departmentId) {
+    static async TransUpdate(id, fields, departmentId, initiator) {
         return await super.Transaction(async (conn) => {
             if(super.IsArgsEmpty(fields) && !departmentId) throw new Error('Empty fields');
 
-            if(departmentId) {
+            if(fields.statusId){
+                const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id};
+                if(fields.statusId == 2) statusChangeLogFields.info = 'Закрыл';
+                if(fields.statusId == 3) statusChangeLogFields.info = 'В работе';
+                if(fields.statusId == 4) statusChangeLogFields.info = 'Запросил уточнение';
+                if(fields.statusId == 5) statusChangeLogFields.info = 'Требует дополнения';
+
+                const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
+            }
+
+            if(fields.reaction){
+                const reactionLogFields = { type: 'clientReaction', ticketId: id, info: `Поставил оценку`, initiatorId: initiator.id};
+                const reactionLogRes = await TicketLog.TransInsert(conn, reactionLogFields);
+            }
+
+            if(fields.subThemeId){
+                const themeChangeLogFields = { type: 'themeChange', ticketId: id, info: `Изменил тему`, initiatorId: initiator.id};
+                const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
+            }
+
+            if(fields.helperId){
+                const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменил куратора`, initiatorId: initiator.id};
+                const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
+            }
+            else if(departmentId) {
                 const curTicket = await this.GetById(id);
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
+
+                const changeDepLogFields = { type: 'depChange', ticketId: id, info: `Изменил деп.`, initiatorId: initiator.id};
+                const changeDepLogRes = await TicketLog.TransInsert(conn, changeDepLogFields);
 
                 let needNewHelper = true;
                 for(const department of curDepartments){
@@ -255,21 +290,28 @@ class Ticket extends Entity{
 
                 if(needNewHelper){
                     fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
+
+                    const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменен куратор (деп.)`, initiatorId: 0};
+                    const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
+                }
+                else{
+                    const helperNoAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Куратор не изменен (деп.)`, initiatorId: 0};
+                    const helperNoAssignLogRes = await TicketLog.TransInsert(conn, helperNoAssignLogFields);
                 }
             }
 
-            if(fields.helperId){
-                const clientResult = await this.GetById(id);
-                const clientId = clientResult.clientId;
+            // if(fields.helperId){
+            //     const clientResult = await this.GetById(id);
+            //     const clientId = clientResult.clientId;
 
-                const helperResult = await User.GetById(fields.helperId);
-                const helperName = helperResult.name ? helperResult.name : 'Anonymous';
+            //     const helperResult = await User.GetById(fields.helperId);
+            //     const helperName = helperResult.name ? helperResult.name : 'Anonymous';
     
-                const msgHelperEventFields = 
-                    { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
-                    ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
-                const msgHelperEventResult = await Message.TransInsert(msgHelperEventFields, conn);
-            }
+            //     const msgHelperEventFields = 
+            //         { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
+            //         ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
+            //     const msgHelperEventResult = await Message.TransInsert(msgHelperEventFields, conn);
+            // }
     
             let result = super.EmptyUpdateInfo;
 

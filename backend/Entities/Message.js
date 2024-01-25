@@ -4,6 +4,7 @@ import Client from "./Client.js";
 import User from "./User.js";
 import Ticket from "./Ticket.js";
 import EmailSender from "../Utils/EmailSender.js";
+import TicketLog from "./TicketLog.js";
 
 class Message extends Entity{
     static TableName = 'messages';
@@ -40,9 +41,13 @@ class Message extends Entity{
                 const attachResult = await Attachment.TransInsert(conn, result.insertId, args.attachPaths);
             }
 
-            const userResult = await User.GetById(args.senderId);
+            const sender = await User.GetById(args.senderId);
+            const reciever = await User.GetById(args.recieverId);
 
-            if(userResult.role && userResult.role == 'helper'){
+            const msgLogFields = { type: 'msgSend', ticketId: args.ticketId, info: `Отправил сообщение`, initiatorId: args.senderId};
+            const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
+
+            if(sender.role == 'helper' && reciever.role != 'helper'){
                 const curTicket = await Ticket.GetById(args.ticketId);
                 const curClient = await Client.GetById(args.recieverId);
 
