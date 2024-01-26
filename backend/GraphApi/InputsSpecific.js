@@ -8,7 +8,7 @@ export const InputsSpecific = `
         clientCountryIds: [Int]
         dateAfter: DateTime
         dateBefore: DateTime
-        reaction: String
+        reaction: Int
         words: String
         outerId: Int
         statusIds: [Int]
@@ -26,7 +26,7 @@ export const InputsSpecific = `
         subThemeIds: [Int]
         dateAfter: DateTime
         dateBefore: DateTime
-        reaction: String
+        reaction: Int
         orderBy: String!
         orderDir: String!
         limit: Int!

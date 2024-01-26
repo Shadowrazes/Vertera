@@ -8,11 +8,12 @@ export const Mutations = `
 
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateMessage(id: Int!, fields: MessageUpdate!): UpdateInfo!
+        updateTicketByClient(id: Int!, fields: TicketClientUpdate!): UpdateInfo!
     }
 
     type HelperMutation {
         class: String!
-
+        
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
     }

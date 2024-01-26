@@ -41,7 +41,8 @@ export const ObjectTypes = `
         totalTickets: Int!
         newTickets: Int!
         inProgressTickets: Int!
-        onCorrectionTickets: Int!
+        onRevisionTickets: Int!
+        onExtensionTickets: Int!
         closedTickets: Int!
         avgReplyTime: Float!
         likes: Int!
@@ -67,7 +68,7 @@ export const ObjectTypes = `
         status: TicketStatus!
         date: DateTime!
         subTheme: SubTheme!
-        reaction: String
+        reaction: Int
         messages: [Message]
         lastMessage: Message!
         msgStats: TicketMsgStats!

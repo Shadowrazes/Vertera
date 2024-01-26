@@ -5,7 +5,11 @@ export const InputsUpdate = `
         unitId: Int
         themeId: Int
         subThemeId: Int
-        reaction: String
+        reaction: Int
+    }
+
+    input TicketClientUpdate {
+        reaction: Int
     }
 
     input MessageUpdate {

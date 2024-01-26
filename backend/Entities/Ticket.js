@@ -29,6 +29,15 @@ class Ticket extends Entity{
     static ReactionField = 'reaction';
     static LinkField = 'link';
 
+    static StatusIdOpened = 1;
+    static StatusIdClosed = 2;
+    static StatusIdInProgress = 3;
+    static StatusIdOnRevision = 4;
+    static StatusIdOnExtension = 5;
+
+    static ReactionMarkLike = 1;
+    static ReactionMarkDislike = 0;
+
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
@@ -245,7 +254,7 @@ class Ticket extends Entity{
             }
 
             const systemInitiator = await User.GetById(0);
-            const closeTicketUpd = await this.TransUpdate(parentId, {statusId: 2}, undefined, systemInitiator, conn);
+            const closeTicketUpd = await this.TransUpdate(parentId, {statusId: StatusIdClosed}, undefined, systemInitiator, conn);
             
             return 0;
         });
@@ -261,7 +270,7 @@ class Ticket extends Entity{
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
-                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: 1, link: ticketLink};
+                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: StatusIdOpened, link: ticketLink};
             const result = await super.TransRequest(conn, sql, [fields]);
 
             //
@@ -310,10 +319,10 @@ class Ticket extends Entity{
 
             if(fields.statusId){
                 const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id};
-                if(fields.statusId == 2) statusChangeLogFields.info = 'Закрыл';
-                if(fields.statusId == 3) statusChangeLogFields.info = 'В работе';
-                if(fields.statusId == 4) statusChangeLogFields.info = 'Запросил уточнение';
-                if(fields.statusId == 5) statusChangeLogFields.info = 'Требует дополнения';
+                if(fields.statusId == StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
+                if(fields.statusId == StatusIdInProgress) statusChangeLogFields.info = 'В работе';
+                if(fields.statusId == StatusIdOnRevision) statusChangeLogFields.info = 'Запросил уточнение';
+                if(fields.statusId == StatusIdOnExtension) statusChangeLogFields.info = 'Требует дополнения';
 
                 const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
             }
@@ -358,19 +367,6 @@ class Ticket extends Entity{
                     const helperNoAssignLogRes = await TicketLog.TransInsert(conn, helperNoAssignLogFields);
                 }
             }
-
-            // if(fields.helperId){
-            //     const clientResult = await this.GetById(id);
-            //     const clientId = clientResult.clientId;
-
-            //     const helperResult = await User.GetById(fields.helperId);
-            //     const helperName = helperResult.name ? helperResult.name : 'Anonymous';
-    
-            //     const msgHelperEventFields = 
-            //         { senderId: 0, recieverId: clientId, type: 'helperChange', readed: 0,
-            //         ticketId: id, text: `Вашим вопросом занимается ${helperName}` };
-            //     const msgHelperEventResult = await Message.TransInsert(msgHelperEventFields, conn);
-            // }
     
             let result = super.EmptyUpdateInfo;
 

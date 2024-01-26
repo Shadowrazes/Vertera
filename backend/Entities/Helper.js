@@ -28,12 +28,13 @@ class Helper extends Entity{
         const sql = `
             SELECT 
                 COUNT(*) AS totalTickets,
-                IFNULL(SUM(statusId = 1), 0) AS newTickets,
-                IFNULL(SUM(statusId = 2), 0) AS closedTickets,
-                IFNULL(SUM(statusId = 3), 0) AS inProgressTickets,
-                IFNULL(SUM(statusId = 4), 0) AS onCorrectionTickets,
-                IFNULL(SUM(reaction = 'like'), 0) AS likes,
-                IFNULL(SUM(reaction = 'dislike'), 0) AS dislikes,
+                IFNULL(SUM(statusId = ${Ticket.StatusIdOpened}), 0) AS newTickets,
+                IFNULL(SUM(statusId = ${Ticket.StatusIdClosed}), 0) AS closedTickets,
+                IFNULL(SUM(statusId = ${Ticket.StatusIdInProgress}), 0) AS inProgressTickets,
+                IFNULL(SUM(statusId = ${Ticket.StatusIdOnRevision}), 0) AS onRevisionTickets,
+                IFNULL(SUM(statusId = ${Ticket.StatusIdOnExtension}), 0) AS onExtensionTickets,
+                IFNULL(SUM(reaction = ${Ticket.ReactionMarkLike}), 0) AS likes,
+                IFNULL(SUM(reaction = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
                 COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
             WHERE ${Ticket.HelperIdField} = ?;
