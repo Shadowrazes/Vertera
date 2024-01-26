@@ -32,11 +32,15 @@ class Message extends Entity{
 
     static async TransInsert(args, conn) {
         const transFunc = async (conn) => {
+            const curTicket = await Ticket.GetById(args.ticketId);
+            if(curTicket.statusId == Ticket.StatusIdClosed) throw new Error('Ticket closed');
+
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
                             ticketId: args.ticketId, text: args.text, date: new Date(), };
 
             const result = await super.TransRequest(conn, sql, [fields]);
+
             if(args.attachPaths){
                 const attachResult = await Attachment.TransInsert(conn, result.insertId, args.attachPaths);
             }
@@ -48,7 +52,6 @@ class Message extends Entity{
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
             if(sender.role == 'helper' && reciever.role != 'helper'){
-                const curTicket = await Ticket.GetById(args.ticketId);
                 const curClient = await Client.GetById(args.recieverId);
 
                 if(curTicket.clientId != curClient.id) throw new Error('Incorrect msg reciever');

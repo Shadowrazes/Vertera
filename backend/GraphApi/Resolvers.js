@@ -19,7 +19,6 @@ import TicketStatus from '../Entities/TicketStatus.js';
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translation from "../Entities/Translation.js";
 import TicketLog from '../Entities/TicketLog.js';
-import Token from '../Utils/Token.js';
 
 Entity.Pool = Pool;
 const clientRole = 'client';
