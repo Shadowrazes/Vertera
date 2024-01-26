@@ -156,6 +156,7 @@ export const resolvers = {
             return await Ticket.TransInsert(args);
         },
         addMessage: async (_, args) => {
+            args.fields.type = Message.TypeDefault;
             return await Message.TransInsert(args.fields);
         },
         updateMessage: async (_, args) => {

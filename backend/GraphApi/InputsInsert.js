@@ -32,7 +32,6 @@ export const InputsInsert = `
         senderId: Int!
         recieverId: Int!
         ticketId: Int!
-        type: String!
         text: String!
         attachPaths: [String]
     }

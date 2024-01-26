@@ -240,8 +240,8 @@ class Ticket extends Entity {
             const curTicket = await this.GetById(parentId);
 
             const msgSysFields = {
-                senderId: User.AdminId, recieverId: curTicket.clientId, type: 'system', readed: 0,
-                ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`
+                senderId: User.AdminId, recieverId: curTicket.clientId, type: Message.TypeSystem,
+                readed: 0, ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`
             };
             const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
@@ -291,8 +291,8 @@ class Ticket extends Entity {
                 createTicketLogFields.initiatorId = args.initiator.id;
 
                 const msgSysFields = {
-                    senderId: User.AdminId, recieverId: ticketFields.clientId, type: 'system', readed: 0,
-                    ticketId: result.insertId, text: `Обращение создано разделением`
+                    senderId: User.AdminId, recieverId: ticketFields.clientId, type: Message.TypeSystem,
+                    readed: 0, ticketId: result.insertId, text: `Обращение создано разделением`
                 };
                 const msgSysResult = await Message.TransInsert(msgSysFields, conn);
             }
@@ -300,13 +300,14 @@ class Ticket extends Entity {
 
             const helperAssignLogFields = {
                 type: TicketLog.TypeHelperAssign, ticketId: result.insertId,
-                info: `Назначен куратор`, initiatorId: 0
+                info: `Назначен куратор`, initiatorId: User.AdminId
             };
             const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             //  //
 
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
+            messageFields.type = Message.TypeDefault;
             const messageResult = await Message.TransInsert(messageFields, conn);
 
             const userResult = await User.GetById(ticketFields.clientId);
@@ -391,14 +392,14 @@ class Ticket extends Entity {
 
                     const helperAssignLogFields = {
                         type: TicketLog.TypeHelperAssign, ticketId: id,
-                        info: `Изменен куратор (деп.)`, initiatorId: 0
+                        info: `Изменен куратор (деп.)`, initiatorId: User.AdminId
                     };
                     const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
                 }
                 else {
                     const helperNoAssignLogFields = {
                         type: TicketLog.TypeHelperAssign, ticketId: id,
-                        info: `Куратор не изменен (деп.)`, initiatorId: 0
+                        info: `Куратор не изменен (деп.)`, initiatorId: User.AdminId
                     };
                     const helperNoAssignLogRes = await TicketLog.TransInsert(conn, helperNoAssignLogFields);
                 }

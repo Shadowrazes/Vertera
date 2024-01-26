@@ -19,6 +19,9 @@ class Message extends Entity {
     static TextField = 'text';
     static DateField = 'date';
 
+    static TypeDefault = 'common';
+    static TypeSystem = 'system';
+
     static ClientAllowedStatusIds = [1, 5];
 
     static async GetById(id) {
