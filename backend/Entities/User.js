@@ -39,24 +39,24 @@ class User extends Entity{
         return { token, userId };
     }
 
-    static async AccessAllow(level, token) {
-        const userRole = await this.GetRoleByToken(token);
-
+    static ValidateRoleAccess(level, userRole) {
         if(level == 'client') return this.userAccess.includes(userRole);
         else if(level == 'helper') return this.helperAccess.includes(userRole);
         else if(level == 'system') return this.adminAccess.includes(userRole);
+        return false;
+    }
+
+    static async AccessAllow(level, token) {
+        const user = await this.GetByToken(token);
+        const isAllowed = this.ValidateRoleAccess(level, user.role);
+        return { user, isAllowed };
     }
 
     static async GetByToken(token) {
         const userId = await Token.Validation(token);
-        const result = await this.GetById(userId);
-        return result;
-    }
-
-    static async GetRoleByToken(token) {
-        const user = await this.GetByToken(token);
+        const user = await this.GetById(userId);
         if(user.length == 0) throw new Error('Invalid token');
-        return user.role;
+        return user;
     }
 
     static async GetById(id) {

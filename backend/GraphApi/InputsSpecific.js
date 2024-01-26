@@ -33,4 +33,9 @@ export const InputsSpecific = `
         offset: Int!
         lang: String!
     }
+
+    input TicketSplitArgItem {
+        ticketFields: TicketInsert!
+        messageFields: MessageInsert!
+    }
 `;

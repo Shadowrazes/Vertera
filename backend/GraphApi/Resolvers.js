@@ -27,7 +27,9 @@ const helperRole = 'helper';
 const adminRole = 'system';
 
 async function Access(role, token){
-    if(!(await User.AccessAllow(role, token))) throw new Error('Forbidden');
+    const access = await User.AccessAllow(role, token);
+    if(!access.isAllowed) throw new Error('Forbidden');
+    return access.user;
 }
 
 export const resolvers = {
@@ -36,16 +38,15 @@ export const resolvers = {
             return await User.Login(login, password);
         },
         clientQuery: async (_, args, context) => {
-            //await Access(clientRole, args.token);
-            context.token = args.token;
+            context.user = await Access(clientRole, args.token);
             return {class: 'client'};
         },
-        helperQuery: async (_, args) => {
-            //await Access(helperRole, args.token);
+        helperQuery: async (_, args, context) => {
+            //context.user = await Access(helperRole, args.token);
             return {class: 'helper'};
         },
-        adminQuery: async (_, args) => {
-            //await Access(adminRole, args.token);
+        adminQuery: async (_, args, context) => {
+            //context.user = await Access(adminRole, args.token);
             return {class: 'admin'};
         },
     },
@@ -54,12 +55,11 @@ export const resolvers = {
             return await Client.GetById(id);
         },
         ticket: async (_, { link }, context) => {
-            // const userId = await Token.Validation(context.token);
-            // const isHelper = await User.AccessAllow(helperRole, context.token);
-            // const reqTicket = await Ticket.GetByLink(link);
-            // const isOwner = reqTicket.clientId == userId;
+            const isHelper = context.user.role == helperRole;
+            const reqTicket = await Ticket.GetByLink(link);
+            const isOwner = reqTicket.clientId == context.user.id;
 
-            // if(!isHelper && !isOwner) throw new Error('Forbidden');
+            if(!isHelper && !isOwner) throw new Error('Forbidden');
 
             return await Ticket.GetByLink(link);
         },
@@ -139,17 +139,15 @@ export const resolvers = {
     },
     Mutation: {
         clientMutation: async (_, args, context) => {
-            //await Access(clientRole, args.token);
-            context.user = await User.GetByToken(args.token);
+            //context.user = await Access(clientRole, args.token);
             return {class: 'client'};
         },
         helperMutation: async (_, args, context) => {
-            //await Access(helperRole, args.token);
-            context.user = await User.GetByToken(args.token);
+            context.user = await Access(helperRole, args.token);
             return {class: 'helper'};
         },
         adminMutation: async (_, args) => {
-            //await Access(adminRole, args.token);
+            //context.user = await Access(adminRole, args.token);
             return {class: 'admin'};
         },
     },
@@ -172,7 +170,10 @@ export const resolvers = {
     },
     HelperMutation: {
         updateTicket: async (_, args, context) => {
-            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId, context.user.id);
+            return await Ticket.TransUpdate(args.id, args.fields, args.departmentId, context.user);
+        },
+        splitTicket: async (_, args, context) => {
+            return await Ticket.Split(args.id, args.argsList, context.user);
         },
     },
     AdminMutation: {

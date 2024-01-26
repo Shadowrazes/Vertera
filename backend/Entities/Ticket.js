@@ -133,10 +133,10 @@ class Ticket extends Entity{
 
         if(filter.words && filter.words.length > 0){
             sql += ` 
-                AND ${this.PrimaryField} IN (
+                AND ${this.TableName}.${this.PrimaryField} IN (
                     SELECT DISTINCT ${Message.TicketIdField} 
                     FROM ${Message.TableName} 
-                    WHERE MATCH (${Message.TextField}) AGAINST ('?' IN BOOLEAN MODE)
+                    WHERE MATCH (${Message.TextField}) AGAINST (? IN BOOLEAN MODE)
                 )
             `;
             fields.push(filter.words);
@@ -226,8 +226,33 @@ class Ticket extends Entity{
         return {count: countRes[0].total, array: res};
     }
 
-    static async TransInsert(args) {
+    static async Split(parentId, argsList, initiator){
         return await super.Transaction(async (conn) => {
+            const curTicket = await this.GetById(parentId);
+
+            const msgSysFields = { senderId: 0, recieverId: curTicket.clientId, type: 'system', readed: 0,
+                                   ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`};
+            const msgSysResult = await Message.TransInsert(msgSysFields, conn);
+
+            const splitLogFields = { type: 'split', ticketId: parentId, info: `Разделил`, initiatorId: initiator.id};
+            const splitLogRes = await TicketLog.TransInsert(conn, splitLogFields);
+
+            for(let arg of argsList){
+                arg.split = true;
+                arg.initiator = initiator;
+
+                const insertRes = await this.TransInsert(arg, conn);
+            }
+
+            const systemInitiator = await User.GetById(0);
+            const closeTicketUpd = await this.TransUpdate(parentId, {statusId: 2}, undefined, systemInitiator, conn);
+            
+            return 0;
+        });
+    }
+
+    static async TransInsert(args, conn) {
+        const transFunc = async (conn) => {
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
@@ -241,6 +266,15 @@ class Ticket extends Entity{
 
             //
             const createTicketLogFields = { type: 'create', ticketId: result.insertId, info: 'Создал', initiatorId: ticketFields.clientId};
+            if(args.split){
+                createTicketLogFields.type = 'splitCreate';
+                createTicketLogFields.info = 'Создал (сплит)';
+                createTicketLogFields.initiatorId = args.initiator.id;
+
+                const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
+                                   ticketId: result.insertId, text: `Обращение создано разделением`};
+                const msgSysResult = await Message.TransInsert(msgSysFields, conn);
+            }
             const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
 
             const helperAssignLogFields = { type: 'helperAssign', ticketId: result.insertId, info: `Назначен куратор`, initiatorId: 0};
@@ -251,12 +285,6 @@ class Ticket extends Entity{
             messageFields.ticketId = result.insertId;
             const messageResult = await Message.TransInsert(messageFields, conn);
 
-            // const helperResult = await User.GetById(helperId);
-            // const helperName = helperResult.name ? helperResult.name : 'Anonymous';
-            // const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
-            //                        ticketId: result.insertId, text: `Вашим вопросом занимается ${helperName}`};
-            // const msgSysResult = await Message.TransInsert(msgSysFields, conn);
-
             const userResult = await User.GetById(ticketFields.clientId);
             const clientResult = await Client.GetById(ticketFields.clientId);
             const dialogLink = baseUrl + `/dialog/${ticketLink}/`
@@ -264,11 +292,20 @@ class Ticket extends Entity{
             EmailSender.Notify(clientResult.email, emailText);
  
             return {id: result.insertId, clientId: ticketFields.clientId, link: dialogLink};
-        });
+        };
+
+        if(!conn){
+            return await super.Transaction(async (conn) => {
+                return await transFunc(conn);
+            });
+        }
+        else{
+            return await transFunc(conn);
+        }
     }
 
-    static async TransUpdate(id, fields, departmentId, initiator) {
-        return await super.Transaction(async (conn) => {
+    static async TransUpdate(id, fields, departmentId, initiator, conn) {
+        const transFunc = async (conn) => {
             if(super.IsArgsEmpty(fields) && !departmentId) throw new Error('Empty fields');
 
             if(fields.statusId){
@@ -343,7 +380,16 @@ class Ticket extends Entity{
             }
 
             return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
-        });
+        };
+
+        if(!conn){
+            return await super.Transaction(async (conn) => {
+                return await transFunc(conn);
+            });
+        }
+        else{
+            return await transFunc(conn);
+        }
     }
 
     // Cascade deleting Ticket & Ticket Messages & Messages attachs

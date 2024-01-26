@@ -14,6 +14,7 @@ export const Mutations = `
         class: String!
 
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
+        splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
     }
 
     type AdminMutation {

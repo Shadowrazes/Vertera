@@ -31,7 +31,7 @@ class Message extends Entity{
     }
 
     static async TransInsert(args, conn) {
-        const transFunc = async (conn, args) => {
+        const transFunc = async (conn) => {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
                             ticketId: args.ticketId, text: args.text, date: new Date(), };
@@ -63,11 +63,11 @@ class Message extends Entity{
 
         if(!conn){
             return await super.Transaction(async (conn) => {
-                return await transFunc(conn, args);
+                return await transFunc(conn);
             });
         }
         else{
-            return await transFunc(conn, args);
+            return await transFunc(conn);
         }
     }
 
