@@ -67,6 +67,7 @@ export const ObjectTypes = `
         helper: Helper!
         status: TicketStatus!
         date: DateTime!
+        title: String!
         subTheme: SubTheme!
         reaction: Int
         messages: [Message]

@@ -7,7 +7,7 @@ import Theme from "./Theme.js";
 import ThemeDepartment from "./ThemeDepartment.js";
 import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
-import MySQL  from 'mysql2';
+import MySQL from 'mysql2';
 import Client from "./Client.js";
 import TicketLog from "./TicketLog.js";
 import Errors from "../Utils/Errors.js";
@@ -16,7 +16,7 @@ import md5 from "md5";
 const isBuild = process.argv[2] === 'build';
 const baseUrl = isBuild ? 'https://vticket.yasanyabeats.ru' : 'http://localhost:5173';
 
-class Ticket extends Entity{
+class Ticket extends Entity {
     static TableName = 'tickets';
     static PrimaryField = 'id';
     static ClientIdField = 'clientId';
@@ -56,7 +56,7 @@ class Ticket extends Entity{
             WHERE ${Message.TicketIdField} = ? 
             ORDER BY ${Message.DateField} DESC LIMIT 1
         `;
-        const result = await super.Request(sql, [ticketId]);   
+        const result = await super.Request(sql, [ticketId]);
         return result[0];
     }
 
@@ -65,7 +65,7 @@ class Ticket extends Entity{
         SELECT COUNT(*) AS total, SUM(IF(${Message.TableName}.${Message.ReadField} = 0, 1, 0)) AS unread
         FROM ${Message.TableName} WHERE ${Message.TicketIdField} = ?;
         `;
-        const result = await super.Request(sql, [ticketId]);   
+        const result = await super.Request(sql, [ticketId]);
         return result[0];
     }
 
@@ -88,7 +88,7 @@ class Ticket extends Entity{
         let themeColSql = ``;
         let themeJoinSql = ``;
 
-        if(filter.orderBy == unitTranslationAS){
+        if (filter.orderBy == unitTranslationAS) {
             unitColSql = `${unitJoinTableName}.${unitTranslationAS} AS ${unitTranslationAS},`;
             unitJoinSql = `
                 JOIN (
@@ -102,7 +102,7 @@ class Ticket extends Entity{
             `;
         }
 
-        if(filter.orderBy == themeTranslationAS){
+        if (filter.orderBy == themeTranslationAS) {
             themeColSql = `${themeJoinTableName}.${themeTranslationAS} AS ${themeTranslationAS},`;
             themeJoinSql = `
                 JOIN (
@@ -140,7 +140,7 @@ class Ticket extends Entity{
 
         let fields = [];
 
-        if(filter.words && filter.words.length > 0){
+        if (filter.words && filter.words.length > 0) {
             sql += ` 
                 AND ${this.TableName}.${this.PrimaryField} IN (
                     SELECT DISTINCT ${Message.TicketIdField} 
@@ -221,7 +221,7 @@ class Ticket extends Entity{
             `;
             fields.push(filter.outerId);
         }
-  
+
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
 
         const countSql = `SELECT COUNT(*) AS total FROM ( ${sql} ) AS subquery`;
@@ -232,21 +232,23 @@ class Ticket extends Entity{
 
         fields.push(filter.limit, filter.offset);
         const res = await super.Request(sql, fields);
-        return {count: countRes[0].total, array: res};
+        return { count: countRes[0].total, array: res };
     }
 
-    static async Split(parentId, argsList, initiator){
+    static async Split(parentId, argsList, initiator) {
         return await super.Transaction(async (conn) => {
             const curTicket = await this.GetById(parentId);
 
-            const msgSysFields = { senderId: 0, recieverId: curTicket.clientId, type: 'system', readed: 0,
-                                   ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`};
+            const msgSysFields = {
+                senderId: 0, recieverId: curTicket.clientId, type: 'system', readed: 0,
+                ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`
+            };
             const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
-            const splitLogFields = { type: 'split', ticketId: parentId, info: `Разделил`, initiatorId: initiator.id};
+            const splitLogFields = { type: 'split', ticketId: parentId, info: `Разделил`, initiatorId: initiator.id };
             const splitLogRes = await TicketLog.TransInsert(conn, splitLogFields);
 
-            for(let arg of argsList){
+            for (let arg of argsList) {
                 arg.split = true;
                 arg.initiator = initiator;
 
@@ -254,8 +256,8 @@ class Ticket extends Entity{
             }
 
             const systemInitiator = await User.GetById(0);
-            const closeTicketUpd = await this.TransUpdate(parentId, {statusId: StatusIdClosed}, undefined, systemInitiator, conn);
-            
+            const closeTicketUpd = await this.TransUpdate(parentId, { statusId: this.StatusIdClosed }, undefined, systemInitiator, conn);
+
             return 0;
         });
     }
@@ -269,27 +271,31 @@ class Ticket extends Entity{
             const ticketLink = md5(new Date().toISOString() + ticketFields.clientId);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {clientId: ticketFields.clientId, helperId, date: new Date(), unitId: ticketFields.unitId, 
-                            themeId: ticketFields.themeId, subThemeId: ticketFields.subThemeId, statusId: StatusIdOpened, link: ticketLink};
-            const result = await super.TransRequest(conn, sql, [fields]);
+            ticketFields.helperId = helperId;
+            ticketFields.link = ticketLink;
+            ticketFields.date = new Date();
+            ticketFields.statusId = this.StatusIdOpened;
+            const result = await super.TransRequest(conn, sql, [ticketFields]);
 
             //
-            const createTicketLogFields = { type: 'create', ticketId: result.insertId, info: 'Создал', initiatorId: ticketFields.clientId};
-            if(args.split){
+            const createTicketLogFields = { type: 'create', ticketId: result.insertId, info: 'Создал', initiatorId: ticketFields.clientId };
+            if (args.split) {
                 createTicketLogFields.type = 'splitCreate';
                 createTicketLogFields.info = 'Создал (сплит)';
                 createTicketLogFields.initiatorId = args.initiator.id;
 
-                const msgSysFields = { senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
-                                   ticketId: result.insertId, text: `Обращение создано разделением`};
+                const msgSysFields = {
+                    senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
+                    ticketId: result.insertId, text: `Обращение создано разделением`
+                };
                 const msgSysResult = await Message.TransInsert(msgSysFields, conn);
             }
             const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
 
-            const helperAssignLogFields = { type: 'helperAssign', ticketId: result.insertId, info: `Назначен куратор`, initiatorId: 0};
+            const helperAssignLogFields = { type: 'helperAssign', ticketId: result.insertId, info: `Назначен куратор`, initiatorId: 0 };
             const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             //  //
-            
+
             messageFields.recieverId = helperId;
             messageFields.ticketId = result.insertId;
             const messageResult = await Message.TransInsert(messageFields, conn);
@@ -299,91 +305,91 @@ class Ticket extends Entity{
             const dialogLink = baseUrl + `/dialog/${ticketLink}/`
             const emailText = `Здравствуйте, ${userResult.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
             EmailSender.Notify(clientResult.email, emailText);
- 
-            return {id: result.insertId, clientId: ticketFields.clientId, link: dialogLink};
+
+            return { id: result.insertId, clientId: ticketFields.clientId, link: dialogLink };
         };
 
-        if(!conn){
+        if (!conn) {
             return await super.Transaction(async (conn) => {
                 return await transFunc(conn);
             });
         }
-        else{
+        else {
             return await transFunc(conn);
         }
     }
 
     static async TransUpdate(id, fields, departmentId, initiator, conn) {
         const transFunc = async (conn) => {
-            if(super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
+            if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
 
-            if(fields.statusId){
-                const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id};
-                if(fields.statusId == StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
-                if(fields.statusId == StatusIdInProgress) statusChangeLogFields.info = 'В работе';
-                if(fields.statusId == StatusIdOnRevision) statusChangeLogFields.info = 'Запросил уточнение';
-                if(fields.statusId == StatusIdOnExtension) statusChangeLogFields.info = 'Требует дополнения';
+            if (fields.statusId) {
+                const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id };
+                if (fields.statusId == this.StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
+                if (fields.statusId == this.StatusIdInProgress) statusChangeLogFields.info = 'В работе';
+                if (fields.statusId == this.StatusIdOnRevision) statusChangeLogFields.info = 'Запросил уточнение';
+                if (fields.statusId == this.StatusIdOnExtension) statusChangeLogFields.info = 'Требует дополнения';
 
                 const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
             }
 
-            if(fields.reaction){
-                const reactionLogFields = { type: 'clientReaction', ticketId: id, info: `Поставил оценку`, initiatorId: initiator.id};
+            if (fields.reaction) {
+                const reactionLogFields = { type: 'clientReaction', ticketId: id, info: `Поставил оценку`, initiatorId: initiator.id };
                 const reactionLogRes = await TicketLog.TransInsert(conn, reactionLogFields);
             }
 
-            if(fields.subThemeId){
-                const themeChangeLogFields = { type: 'themeChange', ticketId: id, info: `Изменил тему`, initiatorId: initiator.id};
+            if (fields.subThemeId) {
+                const themeChangeLogFields = { type: 'themeChange', ticketId: id, info: `Изменил тему`, initiatorId: initiator.id };
                 const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
             }
 
-            if(fields.helperId){
-                const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменил куратора`, initiatorId: initiator.id};
+            if (fields.helperId) {
+                const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменил куратора`, initiatorId: initiator.id };
                 const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             }
-            else if(departmentId) {
+            else if (departmentId) {
                 const curTicket = await this.GetById(id);
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
-                const changeDepLogFields = { type: 'depChange', ticketId: id, info: `Изменил деп.`, initiatorId: initiator.id};
+                const changeDepLogFields = { type: 'depChange', ticketId: id, info: `Изменил деп.`, initiatorId: initiator.id };
                 const changeDepLogRes = await TicketLog.TransInsert(conn, changeDepLogFields);
 
                 let needNewHelper = true;
-                for(const department of curDepartments){
-                    if(departmentId == department.id){
+                for (const department of curDepartments) {
+                    if (departmentId == department.id) {
                         needNewHelper = false;
                         break;
                     }
                 }
 
-                if(needNewHelper){
+                if (needNewHelper) {
                     fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
 
-                    const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменен куратор (деп.)`, initiatorId: 0};
+                    const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменен куратор (деп.)`, initiatorId: 0 };
                     const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
                 }
-                else{
-                    const helperNoAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Куратор не изменен (деп.)`, initiatorId: 0};
+                else {
+                    const helperNoAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Куратор не изменен (деп.)`, initiatorId: 0 };
                     const helperNoAssignLogRes = await TicketLog.TransInsert(conn, helperNoAssignLogFields);
                 }
             }
-    
+
             let result = super.EmptyUpdateInfo;
 
-            if(!super.IsArgsEmpty(fields)){
+            if (!super.IsArgsEmpty(fields)) {
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 result = await super.TransRequest(conn, sql, [fields, id]);
             }
 
-            return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+            return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
         };
 
-        if(!conn){
+        if (!conn) {
             return await super.Transaction(async (conn) => {
                 return await transFunc(conn);
             });
         }
-        else{
+        else {
             return await transFunc(conn);
         }
     }
