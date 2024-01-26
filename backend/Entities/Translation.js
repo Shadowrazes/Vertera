@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import Translitter from "../Utils/Translitter.js";
+import Errors from "../Utils/Errors.js";
 import md5 from 'md5';
 
 class Translation extends Entity{
@@ -43,7 +44,7 @@ class Translation extends Entity{
 
     static async Insert(fields) {
         // одинаковые переводы элементов интерфейса в разных частях сайта?
-        if(!this.OuterTypes.includes(fields.type)) throw new Error('This type of translation is forbidden');
+        if(!this.OuterTypes.includes(fields.type)) throw new Error(Errors.ForbiddenTranslationType);
 
         const code = Translitter.Transform(fields.type + ' ' + md5(new Date().toISOString()));
         const sql = `
@@ -57,7 +58,7 @@ class Translation extends Entity{
 
     // Types come from other entities, only internal
     static async TransInsert(conn, fields, type) {
-        if(fields.lang != this.MainLang) throw new Error('Insert is possible only by ru lang');
+        if(fields.lang != this.MainLang) throw new Error(Errors.TranslationInsertLangNoRu);
 
         const code = Translitter.Transform(type + ' ' + md5(new Date().toISOString()));
         const sql = `
@@ -85,7 +86,7 @@ class Translation extends Entity{
     // Code come from other entities, only internal
     // Cascade updating translation & dependent tables by other entities
     static async TransUpdate(conn, fields, code) {
-        //if(fields.lang != this.MainLang) throw new Error('Renaming is possible only by ru lang');
+        if(fields.lang != this.MainLang) throw new Error(Errors.TranslationRenamingLangNoRu);
 
         const sql = `
             UPDATE ${this.TableName} 

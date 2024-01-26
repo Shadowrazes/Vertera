@@ -4,6 +4,7 @@ import Ticket from "./Ticket.js";
 import Message from "./Message.js";
 import HelperDepartment from "./HelperDepartment.js";
 import ThemeDepartment from "./ThemeDepartment.js";
+import Errors from "../Utils/Errors.js";
 
 class Helper extends Entity{
     static TableName = 'helpers';
@@ -146,7 +147,7 @@ class Helper extends Entity{
 
     static async TransInsert(userFields, helperFields) {
         return await super.Transaction(async (conn) => {
-            userFields.role = 'helper';
+            userFields.role = User.RoleHelper;
             const id = await User.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {id, jobTitleId: helperFields.jobTitleId, birthday: helperFields.birthday, 
@@ -161,7 +162,7 @@ class Helper extends Entity{
 
     static async TransUpdate(id, userFields, helperArgs) {
         return await super.Transaction(async (conn) => {
-            if(super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error('Empty fields');
+            if(super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error(Errors.EmptyArgsFields);
 
             let helperResult = super.EmptyUpdateInfo;
 

@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import Errors from './Errors.js';
 
 class Account {
     static async GeneratePassHash(password) {
@@ -9,7 +10,7 @@ class Account {
         }
         catch (err) {
             console.log(err);
-            throw new Error('Registration error');
+            throw new Error(Errors.RegistrationFailed);
         }
     }
 
@@ -20,7 +21,7 @@ class Account {
         }
         catch (err) {
             console.log(err);
-            throw new Error('Auth error');
+            throw new Error(Errors.PassValidationFailed);
         }
     }
 }

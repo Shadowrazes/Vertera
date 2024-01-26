@@ -36,7 +36,7 @@ class Client extends Entity{
 
     static async TransInsert(userFields, clientFields) {
         return await super.Transaction(async (conn) => {
-            userFields.role = 'client';
+            userFields.role = User.RoleClient;
             const id = await User.TransInsert(conn, userFields);
             clientFields.id = id;
             const sql = `INSERT INTO ${this.TableName} SET ?`;

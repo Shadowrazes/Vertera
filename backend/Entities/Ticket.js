@@ -4,13 +4,13 @@ import Message from "./Message.js";
 import User from "./User.js";
 import Unit from "./Unit.js";
 import Theme from "./Theme.js";
-import SubTheme from "./SubTheme.js";
 import ThemeDepartment from "./ThemeDepartment.js";
 import Translation from "./Translation.js";
 import EmailSender from "../Utils/EmailSender.js";
 import MySQL  from 'mysql2';
 import Client from "./Client.js";
 import TicketLog from "./TicketLog.js";
+import Errors from "../Utils/Errors.js";
 import md5 from "md5";
 
 const isBuild = process.argv[2] === 'build';
@@ -315,7 +315,7 @@ class Ticket extends Entity{
 
     static async TransUpdate(id, fields, departmentId, initiator, conn) {
         const transFunc = async (conn) => {
-            if(super.IsArgsEmpty(fields) && !departmentId) throw new Error('Empty fields');
+            if(super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
 
             if(fields.statusId){
                 const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id};

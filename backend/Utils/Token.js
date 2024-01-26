@@ -1,4 +1,5 @@
 import JWT from 'jsonwebtoken';
+import Errors from './Errors.js';
 
 class Token {
     static Secret = 'f7496d8eb4536a8fb2ed68ad6bce4eaf';
@@ -23,7 +24,7 @@ class Token {
         }
         catch(err) {
             console.log(err);
-            throw new Error('Invalid token');
+            throw new Error(Errors.InvalidToken);
         }
     }
 }

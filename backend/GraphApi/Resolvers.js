@@ -19,15 +19,13 @@ import TicketStatus from '../Entities/TicketStatus.js';
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translation from "../Entities/Translation.js";
 import TicketLog from '../Entities/TicketLog.js';
+import Errors from '../Utils/Errors.js';
 
 Entity.Pool = Pool;
-const clientRole = 'client';
-const helperRole = 'helper';
-const adminRole = 'system';
 
 async function Access(role, token){
     const access = await User.AccessAllow(role, token);
-    if(!access.isAllowed) throw new Error('Forbidden');
+    if(!access.isAllowed) throw new Error(Errors.AccessForbidden);
     return access.user;
 }
 
@@ -37,15 +35,15 @@ export const resolvers = {
             return await User.Login(login, password);
         },
         clientQuery: async (_, args, context) => {
-            context.user = await Access(clientRole, args.token);
+            context.user = await Access(User.RoleClient, args.token);
             return {class: 'client'};
         },
         helperQuery: async (_, args, context) => {
-            //context.user = await Access(helperRole, args.token);
+            //context.user = await Access(User.RoleHelper, args.token);
             return {class: 'helper'};
         },
         adminQuery: async (_, args, context) => {
-            //context.user = await Access(adminRole, args.token);
+            //context.user = await Access(User.RoleAdmin, args.token);
             return {class: 'admin'};
         },
     },
@@ -54,11 +52,11 @@ export const resolvers = {
             return await Client.GetById(id);
         },
         ticket: async (_, { link }, context) => {
-            const isHelper = context.user.role == helperRole;
+            const isHelper = context.user.role == User.RoleHelper;
             const reqTicket = await Ticket.GetByLink(link);
             const isOwner = reqTicket.clientId == context.user.id;
 
-            if(!isHelper && !isOwner) throw new Error('Forbidden');
+            if(!isHelper && !isOwner) throw new Error(Errors.AccessForbidden);
 
             return await Ticket.GetByLink(link);
         },
@@ -138,15 +136,15 @@ export const resolvers = {
     },
     Mutation: {
         clientMutation: async (_, args, context) => {
-            //context.user = await Access(clientRole, args.token);
+            //context.user = await Access(User.RoleClient, args.token);
             return {class: 'client'};
         },
         helperMutation: async (_, args, context) => {
-            context.user = await Access(helperRole, args.token);
+            context.user = await Access(User.RoleHelper, args.token);
             return {class: 'helper'};
         },
         adminMutation: async (_, args) => {
-            //context.user = await Access(adminRole, args.token);
+            //context.user = await Access(User.RoleAdmin, args.token);
             return {class: 'admin'};
         },
     },

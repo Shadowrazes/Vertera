@@ -1,6 +1,7 @@
 import Entity from "./Entity.js";
 import Account from "../Utils/Account.js"
 import Token from "../Utils/Token.js"
+import Errors from "../Utils/Errors.js";
 
 class User extends Entity{
     static TableName = 'users';
@@ -15,23 +16,27 @@ class User extends Entity{
     static TokenField = 'token';
     static IsActiveField = 'isActive';
 
-    static userAccess = ['system', 'helper', 'client'];
-    static helperAccess = ['system', 'helper'];
-    static adminAccess = ['system'];
+    static RoleClient = 'client';
+    static RoleHelper = 'helper';
+    static RoleAdmin = 'system';
+
+    static userAccess = [this.RoleAdmin, this.RoleHelper, this.RoleClient];
+    static helperAccess = [this.RoleAdmin, this.RoleHelper];
+    static adminAccess = [this.RoleAdmin];
 
     static async Login(login, password) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
 
-        if(userResult.length == 0) throw new Error('Auth error');
+        if(userResult.length == 0) throw new Error(Errors.IncorrectLogin);
         
-        if(!userResult[0].isActive) throw new Error('Auth error');
+        if(!userResult[0].isActive) throw new Error(Errors.UserDeactivated);
 
         const passwordHash = userResult[0].password;
         const userId = userResult[0].id;
         const isPassValid = await Account.CheckPassword(password, passwordHash);
 
-        if(!isPassValid) throw new Error('Auth error');
+        if(!isPassValid) throw new Error(Errors.IncorrectPass);
 
         const token = await Token.Generate({ userId });
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
@@ -40,9 +45,9 @@ class User extends Entity{
     }
 
     static ValidateRoleAccess(level, userRole) {
-        if(level == 'client') return this.userAccess.includes(userRole);
-        else if(level == 'helper') return this.helperAccess.includes(userRole);
-        else if(level == 'system') return this.adminAccess.includes(userRole);
+        if(level == this.RoleClient) return this.userAccess.includes(userRole);
+        else if(level == this.RoleHelper) return this.helperAccess.includes(userRole);
+        else if(level == this.RoleAdmin) return this.adminAccess.includes(userRole);
         return false;
     }
 
@@ -55,7 +60,7 @@ class User extends Entity{
     static async GetByToken(token) {
         const userId = await Token.Validation(token);
         const user = await this.GetById(userId);
-        if(user.length == 0) throw new Error('Invalid token');
+        if(user.length == 0) throw new Error(Errors.InvalidToken);
         return user;
     }
 
@@ -78,12 +83,12 @@ class User extends Entity{
         const sql = `INSERT INTO ${this.TableName} SET ?`;
 
         if(fields.password && !fields.login || !fields.password && fields.login){
-            throw new Error('No password or login');
+            throw new Error(Errors.RegisterNoPassOrLogin);
         }
 
         if(fields.password){
             if(fields.password.length < 6){
-                throw new Error('Bad password');
+                throw new Error(Errors.InvalidRegisterPass);
             }
 
             fields.password = await Account.GeneratePassHash(fields.password);
@@ -96,7 +101,7 @@ class User extends Entity{
     static async TransUpdate(conn, id, fields) {
         if(fields.password){
             if(fields.password.length < 6){
-                throw new Error('Bad password');
+                throw new Error(Errors.InvalidRegisterPass);
             }
 
             fields.password = await Account.GeneratePassHash(fields.password);
