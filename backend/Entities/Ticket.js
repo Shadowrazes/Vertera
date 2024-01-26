@@ -240,12 +240,15 @@ class Ticket extends Entity {
             const curTicket = await this.GetById(parentId);
 
             const msgSysFields = {
-                senderId: 0, recieverId: curTicket.clientId, type: 'system', readed: 0,
+                senderId: User.AdminId, recieverId: curTicket.clientId, type: 'system', readed: 0,
                 ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`
             };
             const msgSysResult = await Message.TransInsert(msgSysFields, conn);
 
-            const splitLogFields = { type: 'split', ticketId: parentId, info: `Разделил`, initiatorId: initiator.id };
+            const splitLogFields = {
+                type: TicketLog.TypeSplit, ticketId: parentId,
+                info: `Разделил`, initiatorId: initiator.id
+            };
             const splitLogRes = await TicketLog.TransInsert(conn, splitLogFields);
 
             for (let arg of argsList) {
@@ -278,21 +281,27 @@ class Ticket extends Entity {
             const result = await super.TransRequest(conn, sql, [ticketFields]);
 
             //
-            const createTicketLogFields = { type: 'create', ticketId: result.insertId, info: 'Создал', initiatorId: ticketFields.clientId };
+            const createTicketLogFields = {
+                type: TicketLog.TypeCreate, ticketId: result.insertId,
+                info: 'Создал', initiatorId: ticketFields.clientId
+            };
             if (args.split) {
                 createTicketLogFields.type = 'splitCreate';
                 createTicketLogFields.info = 'Создал (сплит)';
                 createTicketLogFields.initiatorId = args.initiator.id;
 
                 const msgSysFields = {
-                    senderId: 0, recieverId: ticketFields.clientId, type: 'system', readed: 0,
+                    senderId: User.AdminId, recieverId: ticketFields.clientId, type: 'system', readed: 0,
                     ticketId: result.insertId, text: `Обращение создано разделением`
                 };
                 const msgSysResult = await Message.TransInsert(msgSysFields, conn);
             }
             const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
 
-            const helperAssignLogFields = { type: 'helperAssign', ticketId: result.insertId, info: `Назначен куратор`, initiatorId: 0 };
+            const helperAssignLogFields = {
+                type: TicketLog.TypeHelperAssign, ticketId: result.insertId,
+                info: `Назначен куратор`, initiatorId: 0
+            };
             const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             //  //
 
@@ -324,7 +333,10 @@ class Ticket extends Entity {
             if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
 
             if (fields.statusId) {
-                const statusChangeLogFields = { type: 'statusChange', ticketId: id, info: 'Статус', initiatorId: initiator.id };
+                const statusChangeLogFields = {
+                    type: TicketLog.TypeStatusChange, ticketId: id,
+                    info: 'Статус', initiatorId: initiator.id
+                };
                 if (fields.statusId == this.StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
                 if (fields.statusId == this.StatusIdInProgress) statusChangeLogFields.info = 'В работе';
                 if (fields.statusId == this.StatusIdOnRevision) statusChangeLogFields.info = 'Запросил уточнение';
@@ -334,24 +346,36 @@ class Ticket extends Entity {
             }
 
             if (fields.reaction) {
-                const reactionLogFields = { type: 'clientReaction', ticketId: id, info: `Поставил оценку`, initiatorId: initiator.id };
+                const reactionLogFields = {
+                    type: TicketLog.TypeClientReaction, ticketId: id,
+                    info: `Поставил оценку`, initiatorId: initiator.id
+                };
                 const reactionLogRes = await TicketLog.TransInsert(conn, reactionLogFields);
             }
 
             if (fields.subThemeId) {
-                const themeChangeLogFields = { type: 'themeChange', ticketId: id, info: `Изменил тему`, initiatorId: initiator.id };
+                const themeChangeLogFields = {
+                    type: TicketLog.TypeThemeChange, ticketId: id,
+                    info: `Изменил тему`, initiatorId: initiator.id
+                };
                 const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
             }
 
             if (fields.helperId) {
-                const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменил куратора`, initiatorId: initiator.id };
+                const helperAssignLogFields = {
+                    type: TicketLog.TypeHelperAssign, ticketId: id,
+                    info: `Изменил куратора`, initiatorId: initiator.id
+                };
                 const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             }
             else if (departmentId) {
                 const curTicket = await this.GetById(id);
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
-                const changeDepLogFields = { type: 'depChange', ticketId: id, info: `Изменил деп.`, initiatorId: initiator.id };
+                const changeDepLogFields = {
+                    type: TicketLog.TypeDepChange, ticketId: id,
+                    info: `Изменил деп.`, initiatorId: initiator.id
+                };
                 const changeDepLogRes = await TicketLog.TransInsert(conn, changeDepLogFields);
 
                 let needNewHelper = true;
@@ -365,11 +389,17 @@ class Ticket extends Entity {
                 if (needNewHelper) {
                     fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
 
-                    const helperAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Изменен куратор (деп.)`, initiatorId: 0 };
+                    const helperAssignLogFields = {
+                        type: TicketLog.TypeHelperAssign, ticketId: id,
+                        info: `Изменен куратор (деп.)`, initiatorId: 0
+                    };
                     const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
                 }
                 else {
-                    const helperNoAssignLogFields = { type: 'helperAssign', ticketId: id, info: `Куратор не изменен (деп.)`, initiatorId: 0 };
+                    const helperNoAssignLogFields = {
+                        type: TicketLog.TypeHelperAssign, ticketId: id,
+                        info: `Куратор не изменен (деп.)`, initiatorId: 0
+                    };
                     const helperNoAssignLogRes = await TicketLog.TransInsert(conn, helperNoAssignLogFields);
                 }
             }

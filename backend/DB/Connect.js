@@ -1,4 +1,4 @@
-import MySQL  from 'mysql2';
+import MySQL from 'mysql2';
 
 const isBuild = process.argv[2] === 'build';
 

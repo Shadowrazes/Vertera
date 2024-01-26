@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
 
-class Country extends Entity{
+class Country extends Entity {
     static TableName = 'countries';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
@@ -24,7 +24,7 @@ class Country extends Entity{
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {nameCode};
+            const insertFields = { nameCode };
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });

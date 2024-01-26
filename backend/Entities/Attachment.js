@@ -7,7 +7,7 @@ class Attachment extends Entity {
     static PathField = 'path';
 
     static AddMd5Name(res) {
-        for(const attach of res){
+        for (const attach of res) {
             const path = attach.path;
             attach.name = path.substring(path.lastIndexOf('/') + 1);
         }
@@ -29,9 +29,9 @@ class Attachment extends Entity {
 
     static async TransInsert(conn, messageId, attachs) {
         let insertIds = [];
-        for(const path of attachs){
+        for (const path of attachs) {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {messageId, path};
+            const fields = { messageId, path };
             const result = await super.TransRequest(conn, sql, [fields]);
             insertIds.push(result.insertId);
         }

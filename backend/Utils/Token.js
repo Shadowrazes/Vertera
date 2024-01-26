@@ -22,7 +22,7 @@ class Token {
             const decodedToken = JWT.verify(token, this.Secret);
             return decodedToken.id;
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             throw new Error(Errors.InvalidToken);
         }

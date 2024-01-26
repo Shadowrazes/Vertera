@@ -9,6 +9,16 @@ class TicketLog extends Entity{
     static InitiatorIdField = 'initiatorId';
     static InfoField = 'info';
 
+    static TypeCreate = 'create';
+    static TypeMsgSend = 'msgSend';
+    static TypeSplit = 'split';
+    static TypeDepChange = 'depChange';
+    static TypeHelperAssign = 'helperAssign';
+    static TypeStatusChange = 'statusChange';
+    static TypeSplitCreate = 'splitCreate';
+    static TypeClientReaction = 'clientReaction';
+    static TypeThemeChange = 'themeChange';
+
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);

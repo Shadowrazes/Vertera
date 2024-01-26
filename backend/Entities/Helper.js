@@ -6,7 +6,7 @@ import HelperDepartment from "./HelperDepartment.js";
 import ThemeDepartment from "./ThemeDepartment.js";
 import Errors from "../Utils/Errors.js";
 
-class Helper extends Entity{
+class Helper extends Entity {
     static TableName = 'helpers';
     static PrimaryField = 'id';
     static JobTitleIdField = 'jobTitleId';
@@ -57,23 +57,23 @@ class Helper extends Entity{
         let dateDiffs = [];
         let skipToNextClient = false;
 
-        for(const curMsg of msgResult){
-            if(skipToNextClient){
-                if(curMsg.senderId != helperId){
+        for (const curMsg of msgResult) {
+            if (skipToNextClient) {
+                if (curMsg.senderId != helperId) {
                     clientMsg = curMsg;
                     skipToNextClient = false;
                 }
                 continue;
             }
 
-            if(curMsg.senderId == helperId){
+            if (curMsg.senderId == helperId) {
                 dateDiffs.push(curMsg.date - clientMsg.date);
                 skipToNextClient = true;
             }
         }
 
         const avgTimeMilli = dateDiffs.reduce((sum, current) => sum + current, 0) / dateDiffs.length;
-        const avgTimeSecs= +((avgTimeMilli / 1000).toFixed(2));
+        const avgTimeSecs = +((avgTimeMilli / 1000).toFixed(2));
         stats.avgReplyTime = isNaN(avgTimeSecs) ? 60 * 60 : avgTimeSecs;
         stats.fantasy = +((60 * 60 / stats.avgReplyTime + 0.5 * stats.likes + stats.totalTickets * 0.2).toFixed(3));
 
@@ -84,7 +84,7 @@ class Helper extends Entity{
         let result = [];
         const helpers = await this.GetList();
 
-        for(const helper of helpers) {
+        for (const helper of helpers) {
             let helperStatData = {};
             helperStatData.helper = helper;
             helperStatData.stats = await this.GetStatsById(helper.id);
@@ -114,7 +114,7 @@ class Helper extends Entity{
         const statusFilter = [2];
         let fields = [statusFilter];
 
-        if(!departmentId){
+        if (!departmentId) {
             fields.push(subThemeId)
         }
 
@@ -150,8 +150,10 @@ class Helper extends Entity{
             userFields.role = User.RoleHelper;
             const id = await User.TransInsert(conn, userFields);
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {id, jobTitleId: helperFields.jobTitleId, birthday: helperFields.birthday, 
-                            startWorkDate: new Date()};
+            const fields = {
+                id, jobTitleId: helperFields.jobTitleId, birthday: helperFields.birthday,
+                startWorkDate: new Date()
+            };
             const result = await super.TransRequest(conn, sql, [fields]);
 
             const helperDepartmentResult = await HelperDepartment.TransInsert(conn, id, helperFields.departmentIds);
@@ -162,30 +164,30 @@ class Helper extends Entity{
 
     static async TransUpdate(id, userFields, helperArgs) {
         return await super.Transaction(async (conn) => {
-            if(super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error(Errors.EmptyArgsFields);
+            if (super.IsArgsEmpty(userFields) && super.IsArgsEmpty(helperArgs)) throw new Error(Errors.EmptyArgsFields);
 
             let helperResult = super.EmptyUpdateInfo;
 
-            if(helperArgs.departmentIds && helperArgs.departmentIds.length > 0){
+            if (helperArgs.departmentIds && helperArgs.departmentIds.length > 0) {
                 const helperDepartmentDelResult = await HelperDepartment.TransDeleteByHelper(conn, id);
                 const helperDepartmentInsertResult = await HelperDepartment.TransInsert(conn, id, helperArgs.departmentIds);
             }
 
-            if(!super.IsArgsEmpty(userFields)){
+            if (!super.IsArgsEmpty(userFields)) {
                 const userResult = await User.TransUpdate(conn, id, userFields);
                 helperResult = userResult;
             }
 
             const helperFields = {};
-            if(helperArgs.jobTitleId) helperFields.jobTitleId = helperArgs.jobTitleId;
-            if(helperArgs.birthday) helperFields.birthday = helperArgs.birthday;
+            if (helperArgs.jobTitleId) helperFields.jobTitleId = helperArgs.jobTitleId;
+            if (helperArgs.birthday) helperFields.birthday = helperArgs.birthday;
 
-            if(!super.IsArgsEmpty(helperFields)){
+            if (!super.IsArgsEmpty(helperFields)) {
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
             }
 
-            return {affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus};
+            return { affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus };
         });
     }
 }

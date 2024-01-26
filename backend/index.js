@@ -1,6 +1,6 @@
 import Express from 'express';
 
-import { graphqlHTTP }  from 'express-graphql';
+import { graphqlHTTP } from 'express-graphql';
 
 import { typeDefs } from './GraphApi/Schema.js';
 import { resolvers } from './GraphApi/Resolvers.js';
@@ -33,24 +33,24 @@ app.use(fileUpload({
 }));
 
 app.use(cors());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(Express.json());
 app.use('/files', Express.static(__dirname + '/uploads'));
 app.use('/graphql', graphqlHTTP({
     schema: schema,
-    graphiql: true 
+    graphiql: true
 }));
 
 app.post('/upload', async (req, res) => {
     FilelUpload(req, res);
 });
 
-if(!isBuild) {
+if (!isBuild) {
     app.listen(port, (err) => {
-        if(err){
+        if (err) {
             return console.log(err);
         }
-    
+
         console.log('Server started');
     });
 }
@@ -63,18 +63,3 @@ else {
     https.createServer(options, app).listen(port);
     console.log('Server HTTPS started');
 }
-
-import Entity from './Entities/Entity.js';
-import Ticket from './Entities/Ticket.js';
-import md5 from 'md5';
-
-// const sql = `UPDATE tickets SET ? WHERE id = ?`;
-
-// const tickssq = `select * from tickets`;
-// let ticks = await Entity.Request(tickssq);
-
-// for(const ti of ticks){
-//     const fields = {link: md5(new Date().toISOString() + ti.clientId)}
-//     let res = await Entity.Request(sql, [fields, ti.id]);
-//     console.log(res);
-// }

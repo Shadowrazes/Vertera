@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
 import User from "./User.js";
 
-class Client extends Entity{
+class Client extends Entity {
     static TableName = 'clients';
     static PrimaryField = 'id';
     static PhoneField = 'phone';
@@ -44,22 +44,24 @@ class Client extends Entity{
             return id;
         });
     }
-    
+
     static async TransUpdate(id, userFields, clientFields) {
         return await super.Transaction(async (conn) => {
             let clientResult = super.EmptyUpdateInfo;
 
-            if(!super.IsArgsEmpty(clientFields)){
+            if (!super.IsArgsEmpty(clientFields)) {
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 clientResult = await super.TransRequest(conn, sql, [clientFields, id]);
             }
 
-            if(!super.IsArgsEmpty(userFields)){
+            if (!super.IsArgsEmpty(userFields)) {
                 const userResult = await User.TransUpdate(conn, id, userFields);
             }
 
-            return {affected: clientResult.affectedRows, changed: clientResult.changedRows, 
-                    warning: clientResult.warningStatus};
+            return {
+                affected: clientResult.affectedRows, changed: clientResult.changedRows,
+                warning: clientResult.warningStatus
+            };
         });
     }
 }

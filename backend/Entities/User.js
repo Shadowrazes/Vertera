@@ -3,7 +3,7 @@ import Account from "../Utils/Account.js"
 import Token from "../Utils/Token.js"
 import Errors from "../Utils/Errors.js";
 
-class User extends Entity{
+class User extends Entity {
     static TableName = 'users';
     static PrimaryField = 'id';
     static NameField = 'name';
@@ -15,6 +15,8 @@ class User extends Entity{
     static PasswordField = 'password';
     static TokenField = 'token';
     static IsActiveField = 'isActive';
+
+    static AdminId = 0;
 
     static RoleClient = 'client';
     static RoleHelper = 'helper';
@@ -28,15 +30,15 @@ class User extends Entity{
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
 
-        if(userResult.length == 0) throw new Error(Errors.IncorrectLogin);
-        
-        if(!userResult[0].isActive) throw new Error(Errors.UserDeactivated);
+        if (userResult.length == 0) throw new Error(Errors.IncorrectLogin);
+
+        if (!userResult[0].isActive) throw new Error(Errors.UserDeactivated);
 
         const passwordHash = userResult[0].password;
         const userId = userResult[0].id;
         const isPassValid = await Account.CheckPassword(password, passwordHash);
 
-        if(!isPassValid) throw new Error(Errors.IncorrectPass);
+        if (!isPassValid) throw new Error(Errors.IncorrectPass);
 
         const token = await Token.Generate({ userId });
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
@@ -45,9 +47,9 @@ class User extends Entity{
     }
 
     static ValidateRoleAccess(level, userRole) {
-        if(level == this.RoleClient) return this.userAccess.includes(userRole);
-        else if(level == this.RoleHelper) return this.helperAccess.includes(userRole);
-        else if(level == this.RoleAdmin) return this.adminAccess.includes(userRole);
+        if (level == this.RoleClient) return this.userAccess.includes(userRole);
+        else if (level == this.RoleHelper) return this.helperAccess.includes(userRole);
+        else if (level == this.RoleAdmin) return this.adminAccess.includes(userRole);
         return false;
     }
 
@@ -60,13 +62,13 @@ class User extends Entity{
     static async GetByToken(token) {
         const userId = await Token.Validation(token);
         const user = await this.GetById(userId);
-        if(user.length == 0) throw new Error(Errors.InvalidToken);
+        if (user.length == 0) throw new Error(Errors.InvalidToken);
         return user;
     }
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]); 
+        const result = await super.Request(sql, [id]);
         return result[0];
     }
 
@@ -82,12 +84,12 @@ class User extends Entity{
     static async TransInsert(conn, fields) {
         const sql = `INSERT INTO ${this.TableName} SET ?`;
 
-        if(fields.password && !fields.login || !fields.password && fields.login){
+        if (fields.password && !fields.login || !fields.password && fields.login) {
             throw new Error(Errors.RegisterNoPassOrLogin);
         }
 
-        if(fields.password){
-            if(fields.password.length < 6){
+        if (fields.password) {
+            if (fields.password.length < 6) {
                 throw new Error(Errors.InvalidRegisterPass);
             }
 
@@ -99,8 +101,8 @@ class User extends Entity{
     }
 
     static async TransUpdate(conn, id, fields) {
-        if(fields.password){
-            if(fields.password.length < 6){
+        if (fields.password) {
+            if (fields.password.length < 6) {
                 throw new Error(Errors.InvalidRegisterPass);
             }
 
@@ -109,13 +111,13 @@ class User extends Entity{
 
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.TransRequest(conn, sql, [fields, id]);
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 
     static async UpdateToken(id, token) {
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [token, id]);
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 
     // Cascade deleting User & (Client || Helper) 

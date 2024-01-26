@@ -3,7 +3,7 @@ import Translitter from "../Utils/Translitter.js";
 import Errors from "../Utils/Errors.js";
 import md5 from 'md5';
 
-class Translation extends Entity{
+class Translation extends Entity {
     static TableName = 'translations';
     static PrimaryField = 'id';
     static TypeField = 'type';
@@ -44,7 +44,7 @@ class Translation extends Entity{
 
     static async Insert(fields) {
         // одинаковые переводы элементов интерфейса в разных частях сайта?
-        if(!this.OuterTypes.includes(fields.type)) throw new Error(Errors.ForbiddenTranslationType);
+        if (!this.OuterTypes.includes(fields.type)) throw new Error(Errors.ForbiddenTranslationType);
 
         const code = Translitter.Transform(fields.type + ' ' + md5(new Date().toISOString()));
         const sql = `
@@ -58,7 +58,7 @@ class Translation extends Entity{
 
     // Types come from other entities, only internal
     static async TransInsert(conn, fields, type) {
-        if(fields.lang != this.MainLang) throw new Error(Errors.TranslationInsertLangNoRu);
+        if (fields.lang != this.MainLang) throw new Error(Errors.TranslationInsertLangNoRu);
 
         const code = Translitter.Transform(type + ' ' + md5(new Date().toISOString()));
         const sql = `
@@ -77,26 +77,26 @@ class Translation extends Entity{
             SET ${fields.lang} = ?
             WHERE ${this.CodeField} = ?
         `;
-   
+
         const result = await super.Request(sql, [fields.stroke, fields.code]);
 
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 
     // Code come from other entities, only internal
     // Cascade updating translation & dependent tables by other entities
     static async TransUpdate(conn, fields, code) {
-        if(fields.lang != this.MainLang) throw new Error(Errors.TranslationRenamingLangNoRu);
+        if (fields.lang != this.MainLang) throw new Error(Errors.TranslationRenamingLangNoRu);
 
         const sql = `
             UPDATE ${this.TableName} 
             SET ${fields.lang} = ?
             WHERE ${this.CodeField} = ?
         `;
-   
+
         const result = await super.TransRequest(conn, sql, [fields.stroke, code]);
 
-        return {affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus};
+        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 
     static async Delete(code) {

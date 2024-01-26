@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
-import Department from "./Department.js"; 
+import Department from "./Department.js";
 
-class ThemeDepartment extends Entity{
+class ThemeDepartment extends Entity {
     static TableName = 'theme_departments';
     static PrimaryField = 'id';
     static SubThemeIdField = 'subThemeId';
@@ -9,7 +9,7 @@ class ThemeDepartment extends Entity{
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]); 
+        const result = await super.Request(sql, [id]);
         return result[0];
     }
 
@@ -27,9 +27,9 @@ class ThemeDepartment extends Entity{
 
     static async TransInsert(conn, subThemeId, departmentIds) {
         let insertedIds = [];
-        for(const departmentId of departmentIds){
+        for (const departmentId of departmentIds) {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const fields = {subThemeId, departmentId};
+            const fields = { subThemeId, departmentId };
             const result = await super.TransRequest(conn, sql, [fields]);
             insertedIds.push(result.insertId);
         }

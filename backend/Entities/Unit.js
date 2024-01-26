@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
 
-class Unit extends Entity{
+class Unit extends Entity {
     static TableName = 'units';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
@@ -10,7 +10,7 @@ class Unit extends Entity{
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]); 
+        const result = await super.Request(sql, [id]);
         return result[0];
     }
 
@@ -25,7 +25,7 @@ class Unit extends Entity{
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = {nameCode, orderNum: fields.orderNum};
+            const insertFields = { nameCode, orderNum: fields.orderNum };
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });
@@ -33,7 +33,7 @@ class Unit extends Entity{
 
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
-            if(fields.stroke){
+            if (fields.stroke) {
                 const row = await this.GetById(id);
                 const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
             }
@@ -41,8 +41,8 @@ class Unit extends Entity{
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
 
             const updateFields = {};
-            if(fields.orderNum) updateFields.orderNum = fields.orderNum;
-            if(super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
+            if (fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if (super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);
             return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
