@@ -65,6 +65,7 @@ export const ObjectTypes = `
         id: Int!
         client: Client!
         helper: Helper!
+        assistant: Helper
         status: TicketStatus!
         date: DateTime!
         title: String!
@@ -139,8 +140,6 @@ export const ObjectTypes = `
         sender: User!
         reciever: User!
         attachs: [Attachment]
-        ticket: Ticket!
-        ticketId: Int!
         type: String!
         text: String!
         date: DateTime!

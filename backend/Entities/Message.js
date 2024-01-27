@@ -56,6 +56,17 @@ class Message extends Entity {
                 throw new Error(Errors.MsgSendForbidden);
             }
 
+            const allowedSenderIds = [
+                curTicket.clientId,
+                curTicket.helperId,
+                curTicket.assistantId,
+                User.AdminId
+            ];
+            if (!allowedSenderIds.includes(sender.id)) 
+            {
+                throw new Error(Errors.MsgSendForbidden);
+            }
+
             let visibility = this.VisibleByAll;
             if (curTicket.statusId == Ticket.StatusIdOnRevision){
                 visibility = this.VisibleByHelpers;

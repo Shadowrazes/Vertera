@@ -21,6 +21,7 @@ class Ticket extends Entity {
     static PrimaryField = 'id';
     static ClientIdField = 'clientId';
     static HelperIdField = 'helperId';
+    static AssistantIdField = 'assistantId';
     static StatusIdField = 'statusId';
     static DateField = 'date';
     static UnitField = 'unitId';
@@ -122,6 +123,7 @@ class Ticket extends Entity {
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
+                ${this.TableName}.${this.AssistantIdField},
                 ${unitColSql}
                 ${themeColSql}
                 MAX(${Message.TableName}.${Message.DateField}) AS ${lastMsgDateAS}, 
@@ -163,7 +165,8 @@ class Ticket extends Entity {
             fields.push(filter.subThemeIds);
         }
         if (filter.helperIds && filter.helperIds.length > 0) {
-            sql += ` AND ${this.HelperIdField} IN (?)`;
+            sql += ` AND (${this.HelperIdField} IN (?) OR ${this.AssistantIdField} IN (?))`;
+            fields.push(filter.helperIds);
             fields.push(filter.helperIds);
         }
         if (filter.helperCountryIds && filter.helperCountryIds.length > 0) {
@@ -344,10 +347,32 @@ class Ticket extends Entity {
                 };
                 if (fields.statusId == this.StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
                 if (fields.statusId == this.StatusIdInProgress) statusChangeLogFields.info = 'В работе';
-                if (fields.statusId == this.StatusIdOnRevision) statusChangeLogFields.info = 'Запросил уточнение';
+                if (fields.statusId == this.StatusIdOnRevision) statusChangeLogFields.info = 'На уточнении';
                 if (fields.statusId == this.StatusIdOnExtension) statusChangeLogFields.info = 'Требует дополнения';
 
                 const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
+            }
+
+            const curTicket = await this.GetById(id);
+            if(fields.assistantId){
+                const assistantConnLogFields = {
+                    type: TicketLog.TypeAssistantConn, ticketId: id,
+                    info: 'Подключен к диалогу', initiatorId: fields.assistantId
+                };
+                if(fields.assistantId > 0){
+                    const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
+                }
+                else {
+                    assistantConnLogFields.info = 'Отключен от диалога';
+                    assistantConnLogFields.initiatorId = curTicket.assistantId;
+                    const sql = `
+                        UPDATE ${this.TableName} 
+                        SET ${this.AssistantIdField} = NULL
+                        WHERE ${this.PrimaryField} = ?`
+                    ;
+                    const res = await super.TransRequest(conn, sql, [id]);
+                    const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
+                }
             }
 
             if (fields.reaction) {
@@ -374,7 +399,6 @@ class Ticket extends Entity {
                 const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
             }
             else if (departmentId) {
-                const curTicket = await this.GetById(id);
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
                 const changeDepLogFields = {

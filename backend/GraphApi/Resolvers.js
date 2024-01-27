@@ -290,6 +290,9 @@ export const resolvers = {
         helper: async (parent, args) => {
             return await Helper.GetById(parent.helperId);
         },
+        assistant: async (parent, args) => {
+            return await Helper.GetById(parent.assistantId);
+        },
         messages: async (parent, args, context) => {
             return await Message.GetListByTicket(parent.id, context.user);
         },
@@ -323,9 +326,6 @@ export const resolvers = {
         },
         attachs: async (parent, args) => {
             return await Attachment.GetListByMsg(parent.id);
-        },
-        ticket: async (parent, args) => {
-            return await Ticket.GetById(parent.ticketId);
         },
     },
     SubTheme: {
