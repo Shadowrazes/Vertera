@@ -145,6 +145,7 @@ export const ObjectTypes = `
         text: String!
         date: DateTime!
         readed: Boolean!
+        visibility: Int!
     }
 
     type Attachment {

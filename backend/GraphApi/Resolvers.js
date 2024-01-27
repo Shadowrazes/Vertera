@@ -63,11 +63,11 @@ export const resolvers = {
         ticketListByClient: async (_, args) => {
             return await Ticket.GetList(args.filters, args.clientId);
         },
-        message: async (_, { id }) => {
-            return await Message.GetById(id);
+        message: async (_, { id }, context) => {
+            return await Message.GetById(id, context.user);
         },
-        messageList: async (_, { ticketId }) => {
-            return await Message.GetListByTicket(ticketId);
+        messageList: async (_, { ticketId }, context) => {
+            return await Message.GetListByTicket(ticketId, context.user);
         },
         attachment: async (_, { id }) => {
             return await Attachment.GetById(id);
@@ -290,8 +290,8 @@ export const resolvers = {
         helper: async (parent, args) => {
             return await Helper.GetById(parent.helperId);
         },
-        messages: async (parent, args) => {
-            return await Message.GetListByTicket(parent.id);
+        messages: async (parent, args, context) => {
+            return await Message.GetListByTicket(parent.id, context.user);
         },
         lastMessage: async (parent, args) => {
             return await Ticket.GetLastMsg(parent.id);

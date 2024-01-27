@@ -18,20 +18,30 @@ class Message extends Entity {
     static ReadField = 'readed';
     static TextField = 'text';
     static DateField = 'date';
+    static VisibilityField = 'visibility';
 
     static TypeDefault = 'common';
     static TypeSystem = 'system';
 
+    static VisibleByAll = 1;
+    static VisibleByHelpers = 2;
+
     static ClientAllowedStatusIds = [1, 5];
 
-    static async GetById(id) {
-        const sql = `SELECT * from ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+    static async GetById(id, initiator) {
+        let sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        if(initiator.role == User.RoleClient){
+            sql += ` AND ${this.VisibilityField} < ${this.VisibleByHelpers}`;
+        }
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetListByTicket(ticketId) {
+    static async GetListByTicket(ticketId, initiator) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.TicketIdField} = ?`;
+        if(initiator.role == User.RoleClient){
+            sql += ` AND ${this.VisibilityField} < ${this.VisibleByHelpers}`;
+        }
         const result = await super.Request(sql, [ticketId]);
         return result;
     }
@@ -46,10 +56,15 @@ class Message extends Entity {
                 throw new Error(Errors.MsgSendForbidden);
             }
 
+            let visibility = this.VisibleByAll;
+            if (curTicket.statusId == Ticket.StatusIdOnRevision){
+                visibility = this.VisibleByHelpers;
+            }
+
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const fields = {
                 senderId: args.senderId, recieverId: args.recieverId, type: args.type, readed: 0,
-                ticketId: args.ticketId, text: args.text, date: new Date(),
+                ticketId: args.ticketId, text: args.text, date: new Date(), visibility
             };
 
             const result = await super.TransRequest(conn, sql, [fields]);

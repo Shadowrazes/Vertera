@@ -290,13 +290,17 @@ class Ticket extends Entity {
                 createTicketLogFields.info = 'Создал (сплит)';
                 createTicketLogFields.initiatorId = args.initiator.id;
 
+                const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
+
                 const msgSysFields = {
                     senderId: User.AdminId, recieverId: ticketFields.clientId, type: Message.TypeSystem,
                     readed: 0, ticketId: result.insertId, text: `Обращение создано разделением`
                 };
                 const msgSysResult = await Message.TransInsert(msgSysFields, conn);
             }
-            const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
+            else {
+                const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
+            }
 
             const helperAssignLogFields = {
                 type: TicketLog.TypeHelperAssign, ticketId: result.insertId,
