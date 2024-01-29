@@ -65,6 +65,10 @@ function allTickets() {
   const [selectedDateBefore, setSelectedDateBefore] = useState(null);
   const [selectedDateAfter, setSelectedDateAfter] = useState(null);
   const [wordsFilterValue, setWordsFilterValue] = useState("");
+  const [numberFilterValue, setNumberFilterValue] = useState("");
+  const [daysFilterValue, setDaysFilterValue] = useState("");
+  const [idFilterValue, setIdFilterValue] = useState("");
+  const [numberIdFilterValue, setNumberIdFilterValue] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedStatusesId, setSelectedStatusesId] = useState([]);
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
@@ -156,6 +160,10 @@ function allTickets() {
     setSelectedDateBefore(null);
     setSelectedReaction(null);
     setWordsFilterValue("");
+    setNumberFilterValue("");
+    setDaysFilterValue("");
+    setIdFilterValue("");
+    setNumberIdFilterValue("");
     setSelectedStatuses([]);
     setSelectedStatusesId([]);
     setQueryReaction(null);
@@ -563,6 +571,22 @@ function allTickets() {
     setWordsFilterValue(e.target.value);
   };
 
+  const handleNumberFilterValueChange = (e) => {
+    setNumberFilterValue(e.target.value);
+  };
+
+  const handleDaysFilterValueChange = (e) => {
+    setDaysFilterValue(e.target.value);
+  };
+
+  const handleIdFilterValueChange = (e) => {
+    setIdFilterValue(e.target.value);
+  };
+
+  const handleNumberIdFilterValueChange = (e) => {
+    setNumberIdFilterValue(e.target.value);
+  };
+
   const handleReactionClick = (reaction) => {
     setSelectedReaction(reaction);
     switch (reaction) {
@@ -755,7 +779,7 @@ function allTickets() {
               {isAdmin() ? (
                 <div className="alltickets__filters-container">
                   <Form>
-                    <Row>
+                    <Row className="alltickets__row">
                       <Col className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
@@ -926,18 +950,43 @@ function allTickets() {
                             Создано более чем
                           </div>
                           <Form.Control
-                            type="text"
+                            type="number"
+                            min={0}
                             placeholder="X число назад"
-                            className="add-currator__input"
-                            value={wordsFilterValue}
-                            onChange={handleWordsFilterValueChange}
+                            className="add-currator__input alltickets__days-ago-input"
+                            value={numberFilterValue}
+                            onChange={handleNumberFilterValueChange}
                           />
                           <Form.Control
-                            type="text"
+                            type="number"
+                            min={0}
                             placeholder="мин/часов/дней"
-                            className="add-currator__input"
-                            value={wordsFilterValue}
-                            onChange={handleWordsFilterValueChange}
+                            className="add-currator__input alltickets__days-ago-input right-input"
+                            value={daysFilterValue}
+                            onChange={handleDaysFilterValueChange}
+                          />
+                        </Form.Group>
+
+                        <Form.Group
+                          className="alltickets__days-ago"
+                          controlId="wordsFilterForm"
+                        >
+                          <div className="alltickets__days-ago-label">ID</div>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="Партнер/Стр-ра"
+                            className="add-currator__input alltickets__days-ago-input"
+                            value={idFilterValue}
+                            onChange={handleIdFilterValueChange}
+                          />
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="Номер ID"
+                            className="add-currator__input alltickets__days-ago-input right-input"
+                            value={numberIdFilterValue}
+                            onChange={handleNumberIdFilterValueChange}
                           />
                         </Form.Group>
                       </Col>
