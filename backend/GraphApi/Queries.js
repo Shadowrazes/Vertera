@@ -14,6 +14,8 @@ export const Queries = `
         attachmentList(messageId: Int!): [Attachment]
 
         allThemeTree: [Unit]
+        
+        countryList: [Country]
     }
 
     type HelperQuery {
@@ -37,16 +39,14 @@ export const Queries = `
         subTheme(id: Int!): SubTheme
 
         ticketStatusList: [TicketStatus]
+        
+        departmentList: [Department]
     }
 
     type AdminQuery {
         class: String!
 
-        departmentList: [Department]
-
         jobTitleList: [HelperJobTitle]
-
-        countryList: [Country]
 
         translationList(lang: String!): [Translation]
         translationListByType(lang: String!, type: String!): [Translation]

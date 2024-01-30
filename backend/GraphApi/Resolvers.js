@@ -78,6 +78,9 @@ export const resolvers = {
         allThemeTree: async (_, args) => {
             return await Unit.GetList();
         },
+        countryList: async (_, args) => {
+            return await Country.GetList();
+        },
     },
     HelperQuery: {
         user: async (_, { id }) => {
@@ -116,16 +119,13 @@ export const resolvers = {
         ticketStatusList: async (_, args) => {
             return await TicketStatus.GetList();
         },
-    },
-    AdminQuery: {
         departmentList: async (_, args) => {
             return await Department.GetList();
         },
+    },
+    AdminQuery: {
         jobTitleList: async (_, args) => {
             return await HelperJobTitle.GetList();
-        },
-        countryList: async (_, args) => {
-            return await Country.GetList();
         },
         translationList: async (_, args) => {
             return await Translation.GetList(args.lang);
