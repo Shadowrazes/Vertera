@@ -49,26 +49,28 @@ class Message extends Entity {
     static async TransInsert(args, conn) {
         const transFunc = async (conn) => {
             const curTicket = await Ticket.GetById(args.ticketId);
-            if (curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
+            if (curTicket && curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
 
             const sender = await User.GetById(args.senderId);
-            if (sender.role == User.RoleClient && !this.ClientAllowedStatusIds.includes(curTicket.statusId)) {
+            if (curTicket && sender.role == User.RoleClient && !this.ClientAllowedStatusIds.includes(curTicket.statusId)) {
                 throw new Error(Errors.MsgSendForbidden);
             }
 
-            const allowedSenderIds = [
-                curTicket.clientId,
-                curTicket.helperId,
-                curTicket.assistantId,
-                User.AdminId
-            ];
-            if (!allowedSenderIds.includes(sender.id)) 
-            {
-                throw new Error(Errors.MsgSendForbidden);
+            if(curTicket){
+                const allowedSenderIds = [
+                    curTicket.clientId,
+                    curTicket.helperId,
+                    curTicket.assistantId,
+                    User.AdminId
+                ];
+                if (!allowedSenderIds.includes(sender.id)) 
+                {
+                    throw new Error(Errors.MsgSendForbidden);
+                }
             }
 
             let visibility = this.VisibleByAll;
-            if (curTicket.statusId == Ticket.StatusIdOnRevision){
+            if (curTicket && curTicket.statusId == Ticket.StatusIdOnRevision){
                 visibility = this.VisibleByHelpers;
             }
 
