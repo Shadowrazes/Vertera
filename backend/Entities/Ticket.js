@@ -29,6 +29,7 @@ class Ticket extends Entity {
     static SubThemeField = 'subThemeId';
     static ReactionField = 'reaction';
     static LinkField = 'link';
+    static TitleField = 'title';
 
     static StatusIdOpened = 1;
     static StatusIdClosed = 2;
@@ -123,7 +124,7 @@ class Ticket extends Entity {
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
-                ${this.TableName}.${this.AssistantIdField},
+                ${this.TableName}.${this.AssistantIdField}, ${this.TableName}.${this.TitleField},
                 ${unitColSql}
                 ${themeColSql}
                 MAX(${Message.TableName}.${Message.DateField}) AS ${lastMsgDateAS}, 
