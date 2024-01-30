@@ -34,6 +34,15 @@ export const InputsSpecific = `
         lang: String!
     }
 
+    input HelperStatsFilter {
+        orderBy: String!
+        orderDir: String!
+        limit: Int!
+        offset: Int!
+        dateAfter: DateTime
+        dateBefore: DateTime
+    }
+
     input TicketSplitArgItem {
         ticketFields: TicketInsert!
         messageFields: MessageInsert!

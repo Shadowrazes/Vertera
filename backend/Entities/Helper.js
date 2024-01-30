@@ -25,32 +25,55 @@ class Helper extends Entity {
         return result;
     }
 
-    static async GetStatsById(helperId) {
-        const sql = `
+    static async GetStatsById(helperId, dateAfter, dateBefore) {
+        let sql = `
             SELECT 
                 COUNT(*) AS totalTickets,
-                IFNULL(SUM(statusId = ${Ticket.StatusIdOpened}), 0) AS newTickets,
-                IFNULL(SUM(statusId = ${Ticket.StatusIdClosed}), 0) AS closedTickets,
-                IFNULL(SUM(statusId = ${Ticket.StatusIdInProgress}), 0) AS inProgressTickets,
-                IFNULL(SUM(statusId = ${Ticket.StatusIdOnRevision}), 0) AS onRevisionTickets,
-                IFNULL(SUM(statusId = ${Ticket.StatusIdOnExtension}), 0) AS onExtensionTickets,
-                IFNULL(SUM(reaction = ${Ticket.ReactionMarkLike}), 0) AS likes,
-                IFNULL(SUM(reaction = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
-                COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOpened}), 0) AS newTickets,
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdClosed}), 0) AS closedTickets,
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdInProgress}), 0) AS inProgressTickets,
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOnRevision}), 0) AS onRevisionTickets,
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOnExtension}), 0) AS onExtensionTickets,
+                IFNULL(SUM(${Ticket.ReactionField} = ${Ticket.ReactionMarkLike}), 0) AS likes,
+                IFNULL(SUM(${Ticket.ReactionField} = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
+                COUNT(CASE WHEN ${Ticket.ReactionField} IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
             WHERE ${Ticket.HelperIdField} = ?
         `;
 
-        const result = await super.Request(sql, [helperId]);
+        let fields = [helperId];
+        if(dateAfter) {
+            sql += ` AND ${Ticket.DateField} >= ?`;
+            fields.push(dateAfter);
+        }
+
+        if(dateBefore) {
+            sql += ` AND ${Ticket.DateField} <= ?`;
+            fields.push(dateBefore);
+        }
+
+        const result = await super.Request(sql, fields);
 
         let stats = result[0];
 
-        const msgSql = `
+        let msgSql = `
             SELECT  ${Message.SenderIdField}, ${Message.DateField}  
             FROM    ${Message.TableName} 
-            WHERE   ${Message.SenderIdField} = ? OR ${Message.RecieverIdField} = ?
+            WHERE   (${Message.SenderIdField} = ? OR ${Message.RecieverIdField} = ?)
         `;
-        const msgResult = await super.Request(msgSql, [helperId, helperId]);
+
+        let msgSqlFields = [helperId, helperId];
+        if(dateAfter) {
+            msgSql += ` AND ${Message.DateField} >= ?`;
+            msgSqlFields.push(dateAfter);
+        }
+
+        if(dateBefore) {
+            msgSql += ` AND ${Message.DateField} <= ?`;
+            msgSqlFields.push(dateBefore);
+        }
+
+        const msgResult = await super.Request(msgSql, msgSqlFields);
 
         // первое сообщение всегда от клиента
         let clientMsg = msgResult[0];
@@ -80,25 +103,25 @@ class Helper extends Entity {
         return stats;
     }
 
-    static async GetStatsList(orderBy, orderDir, limit, offset) {
+    static async GetStatsList(filters) {
         let result = [];
         const helpers = await this.GetList();
 
         for (const helper of helpers) {
             let helperStatData = {};
             helperStatData.helper = helper;
-            helperStatData.stats = await this.GetStatsById(helper.id);
+            helperStatData.stats = await this.GetStatsById(helper.id, filters.dateAfter, filters.dateBefore);
             result.push(helperStatData);
         }
 
-        if (orderDir === 'desc') {
-            result.sort((a, b) => b.stats[orderBy] - a.stats[orderBy]);
+        if (filters.orderDir === 'DESC') {
+            result.sort((a, b) => b.stats[filters.orderBy] - a.stats[filters.orderBy]);
         }
         else {
-            result.sort((a, b) => a.stats[orderBy] - b.stats[orderBy]);
+            result.sort((a, b) => a.stats[filters.orderBy] - b.stats[filters.orderBy]);
         }
 
-        const limitedResult = result.slice(0 + offset, limit + offset);
+        const limitedResult = result.slice(0 + filters.offset, filters.limit + filters.offset);
 
         return limitedResult;
     }

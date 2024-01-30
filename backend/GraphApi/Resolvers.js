@@ -96,7 +96,7 @@ export const resolvers = {
             return await Helper.GetList();
         },
         helperStatList: async (_, args) => {
-            return await Helper.GetStatsList(args.orderBy, args.orderDir, args.limit, args.offset);
+            return await Helper.GetStatsList(args.filters);
         },
         clientList: async (_, args) => {
             return await Client.GetList();

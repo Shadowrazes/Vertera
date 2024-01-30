@@ -14,7 +14,7 @@ export const Queries = `
         attachmentList(messageId: Int!): [Attachment]
 
         allThemeTree: [Unit]
-        
+
         countryList: [Country]
     }
 
@@ -30,7 +30,7 @@ export const Queries = `
 
         helper(id: Int!): Helper
         helperList: [Helper]
-        helperStatList(orderBy: String!, orderDir: String!, limit: Int!, offset: Int!): [HelperStatListItem]
+        helperStatList(filters: HelperStatsFilter!): [HelperStatListItem]
 
         subThemeList: [SubTheme]
 
