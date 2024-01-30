@@ -39,11 +39,11 @@ export const resolvers = {
             return {class: 'client'};
         },
         helperQuery: async (_, args, context) => {
-            //context.user = await Access(User.RoleHelper, args.token);
+            context.user = await Access(User.RoleHelper, args.token);
             return {class: 'helper'};
         },
         adminQuery: async (_, args, context) => {
-            //context.user = await Access(User.RoleAdmin, args.token);
+            context.user = await Access(User.RoleAdmin, args.token);
             return {class: 'admin'};
         },
     },
@@ -136,7 +136,7 @@ export const resolvers = {
     },
     Mutation: {
         clientMutation: async (_, args, context) => {
-            //context.user = await Access(User.RoleClient, args.token);
+            context.user = await Access(User.RoleClient, args.token);
             return {class: 'client'};
         },
         helperMutation: async (_, args, context) => {
@@ -144,7 +144,7 @@ export const resolvers = {
             return {class: 'helper'};
         },
         adminMutation: async (_, args) => {
-            //context.user = await Access(User.RoleAdmin, args.token);
+            context.user = await Access(User.RoleAdmin, args.token);
             return {class: 'admin'};
         },
     },
@@ -268,13 +268,16 @@ export const resolvers = {
         user: async (parent, args) => {
             return await User.GetById(parent.id);
         },
-        jobTitle: async (parent, args) => {
+        jobTitle: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await HelperJobTitle.GetById(parent.jobTitleId);
         },
-        departments: async (parent, args) => {
+        departments: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await HelperDepartment.GetListByHelperId(parent.id);
         },
-        stats: async (parent, args) => {
+        stats: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await Helper.GetStatsById(parent.id);
         },
     },
@@ -290,7 +293,8 @@ export const resolvers = {
         helper: async (parent, args) => {
             return await Helper.GetById(parent.helperId);
         },
-        assistant: async (parent, args) => {
+        assistant: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await Helper.GetById(parent.assistantId);
         },
         messages: async (parent, args, context) => {
@@ -308,7 +312,8 @@ export const resolvers = {
         status: async (parent, args) => {
             return await TicketStatus.GetById(parent.statusId);
         },
-        log: async (parent, args) => {
+        log: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await TicketLog.GetListByTicket(parent.id);
         },
     },

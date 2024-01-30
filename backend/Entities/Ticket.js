@@ -289,7 +289,7 @@ class Ticket extends Entity {
                 info: 'Создал', initiatorId: ticketFields.clientId
             };
             if (args.split) {
-                createTicketLogFields.type = 'splitCreate';
+                createTicketLogFields.type = TicketLog.TypeSplitCreate;
                 createTicketLogFields.info = 'Создал (сплит)';
                 createTicketLogFields.initiatorId = args.initiator.id;
 

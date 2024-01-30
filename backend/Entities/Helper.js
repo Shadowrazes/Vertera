@@ -38,7 +38,7 @@ class Helper extends Entity {
                 IFNULL(SUM(reaction = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
                 COUNT(CASE WHEN reaction IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
-            WHERE ${Ticket.HelperIdField} = ?;
+            WHERE ${Ticket.HelperIdField} = ?
         `;
 
         const result = await super.Request(sql, [helperId]);

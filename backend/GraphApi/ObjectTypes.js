@@ -1,9 +1,4 @@
 export const ObjectTypes = `
-    type LoginInfo {
-        token: String!
-        userId: Int!
-    }
-
     type User {
         id: Int!
         name: String!
@@ -63,6 +58,7 @@ export const ObjectTypes = `
 
     type Ticket {
         id: Int!
+        helperId: Int!
         client: Client!
         helper: Helper!
         assistant: Helper
@@ -163,5 +159,10 @@ export const ObjectTypes = `
         id: Int!
         clientId: Int!
         link: String!
+    }
+
+    type LoginInfo {
+        token: String!
+        userId: Int!
     }
 `;
