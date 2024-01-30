@@ -9,7 +9,6 @@ import {
   Dropdown,
   ButtonGroup,
 } from "react-bootstrap";
-import { DateRangePicker } from "rsuite";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { DateTime } from "luxon";
@@ -20,14 +19,17 @@ import {
   THEME_LIST,
   CURATORS_LIST,
   COUNTRY_LIST,
+  STATUS_LIST,
 } from "../apollo/queries";
 
+import { DateRangePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 
 import "../css/all-tickets.css";
+import "../css/add-curator.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
 function allTickets() {
@@ -36,6 +38,7 @@ function allTickets() {
   const [dataTheme, setDataTheme] = useState([]);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
   const [countryList, setCountryList] = useState([]);
+  const [statusList, setStatusList] = useState([]);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -44,16 +47,30 @@ function allTickets() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
-  const [selectedCurator, setSelectedCurator] = useState(null);
-  const [selectedCuratorId, setSelectedCuratorId] = useState(null);
-  const [selectedCuratorCountry, setSelectedCuratorCountry] = useState(null);
-  const [selectedCuratorCountryId, setSelectedCuratorCountryId] =
-    useState(null);
+  const [selectedCurators, setSelectedCurators] = useState([]);
+  const [selectedCuratorsId, setSelectedCuratorsId] = useState([]);
+  const [selectedCuratorsCountries, setSelectedCuratorsCountries] = useState(
+    []
+  );
+  const [selectedCuratorsCountiesId, setSelectedCuratorsCountriesId] = useState(
+    []
+  );
+  const [selectedClientsCountries, setSelectedClientsCountries] = useState([]);
+  const [selectedClientsCountiesId, setSelectedClientsCountriesId] = useState(
+    []
+  );
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [queryReaction, setQueryReaction] = useState(null);
   const [dateRange, setDateRange] = useState(null);
   const [selectedDateBefore, setSelectedDateBefore] = useState(null);
   const [selectedDateAfter, setSelectedDateAfter] = useState(null);
+  const [wordsFilterValue, setWordsFilterValue] = useState("");
+  const [numberFilterValue, setNumberFilterValue] = useState("");
+  const [daysFilterValue, setDaysFilterValue] = useState("");
+  const [idFilterValue, setIdFilterValue] = useState("");
+  const [numberIdFilterValue, setNumberIdFilterValue] = useState("");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [selectedStatusesId, setSelectedStatusesId] = useState([]);
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
 
@@ -67,7 +84,7 @@ function allTickets() {
   const [fastFilterStr, setFastFilterStr] = useState("my");
 
   const [isVisible, setIsVisible] = useState(false);
-  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
+  const [isVisibleFilters, setIsVisibleFilters] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
@@ -132,14 +149,27 @@ function allTickets() {
     setSelectedThemeId(null);
     setSelectedSubTheme(null);
     setSelectedSubThemeId(null);
+    setSelectedCurators([]);
+    setSelectedCuratorsId([]);
+    setSelectedCuratorsCountries([]);
+    setSelectedCuratorsCountriesId([]);
+    setSelectedClientsCountries([]);
+    setSelectedClientsCountriesId([]);
     setDateRange(null);
     setSelectedDateAfter(null);
     setSelectedDateBefore(null);
     setSelectedReaction(null);
+    setWordsFilterValue("");
+    setNumberFilterValue("");
+    setDaysFilterValue("");
+    setIdFilterValue("");
+    setNumberIdFilterValue("");
+    setSelectedStatuses([]);
+    setSelectedStatusesId([]);
     setQueryReaction(null);
 
     if (isAdmin()) {
-      console.log(1);
+      // console.log(1);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -181,9 +211,10 @@ function allTickets() {
   const { data: themeData } = useQuery(THEME_LIST);
   const { data: dataCurators } = useQuery(CURATORS_LIST);
   const { data: dataCountryList } = useQuery(COUNTRY_LIST);
+  const { data: dataStatusList } = useQuery(STATUS_LIST);
 
   const adminRequest = () => {
-    console.log(2);
+    // console.log(2);
     return useQuery(TABLE_TICKETS, {
       variables: {
         filters: {
@@ -239,7 +270,7 @@ function allTickets() {
     // console.log("fastfilter status ", fastFilterStatus);
 
     if (isAdmin()) {
-      console.log(3);
+      // console.log(3);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -295,6 +326,10 @@ function allTickets() {
       if (dataCountryList && dataCountryList.adminQuery.countryList) {
         setCountryList(dataCountryList.adminQuery.countryList);
       }
+
+      if (dataStatusList && dataStatusList.helperQuery.ticketStatusList) {
+        setStatusList(dataStatusList.helperQuery.ticketStatusList);
+      }
     } else {
       if (data && data.clientQuery.ticketListByClient.array) {
         setDataTableTickets(data.clientQuery.ticketListByClient.array);
@@ -326,6 +361,7 @@ function allTickets() {
     themeData,
     dataCurators,
     dataCountryList,
+    dataStatusList,
     selectedSort,
     prevSelectedSort,
     currentPage,
@@ -401,7 +437,7 @@ function allTickets() {
     setOrderDir(_orderDir);
 
     if (isAdmin()) {
-      console.log(4);
+      // console.log(4);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
@@ -502,22 +538,19 @@ function allTickets() {
     // console.log(subThemeId);
   };
 
-  const handleCuratorClick = (
-    curatorName,
-    curatorSurname,
-    curatorPatronymic,
-    curatorId
-  ) => {
-    let fullName = `${curatorSurname} ${curatorName} ${
-      curatorPatronymic ? ` ${curatorPatronymic}` : ""
-    }`;
-    setSelectedCurator(fullName);
-    setSelectedCuratorId(curatorId);
+  const handleCuratorsOnChange = (curators) => {
+    setSelectedCurators(curators);
+    setSelectedCuratorsId(curators.map((curator) => curator.id));
   };
 
-  const handleCountryClick = (country, countryId) => {
-    setSelectedCuratorCountry(country);
-    setSelectedCuratorCountryId(countryId);
+  const handleCuratorsCountriesOnChange = (country) => {
+    setSelectedCuratorsCountries(country);
+    setSelectedCuratorsCountriesId(country.map((country) => country.id));
+  };
+
+  const handleClientsCountriesOnChange = (country) => {
+    setSelectedClientsCountries(country);
+    setSelectedClientsCountriesId(country.map((country) => country.id));
   };
 
   const handlePeriodClick = (period) => {
@@ -532,6 +565,26 @@ function allTickets() {
     setSelectedDateAfter(formattedDate[0] + " 00:00:00");
     setSelectedDateBefore(formattedDate[1] + " 23:59:59");
     console.log(formattedDate[0]);
+  };
+
+  const handleWordsFilterValueChange = (e) => {
+    setWordsFilterValue(e.target.value);
+  };
+
+  const handleNumberFilterValueChange = (e) => {
+    setNumberFilterValue(e.target.value);
+  };
+
+  const handleDaysFilterValueChange = (e) => {
+    setDaysFilterValue(e.target.value);
+  };
+
+  const handleIdFilterValueChange = (e) => {
+    setIdFilterValue(e.target.value);
+  };
+
+  const handleNumberIdFilterValueChange = (e) => {
+    setNumberIdFilterValue(e.target.value);
   };
 
   const handleReactionClick = (reaction) => {
@@ -549,6 +602,11 @@ function allTickets() {
     // console.log(queryReaction);
   };
 
+  const handleStatusesOnChange = (statuses) => {
+    setSelectedStatuses(statuses);
+    setSelectedStatusesId(statuses.map((status) => status.id));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     // console.log(selectedUnit);
@@ -559,16 +617,20 @@ function allTickets() {
     // console.log(queryReaction);
 
     if (isAdmin()) {
-      console.log(5);
+      // console.log(5);
       const variables = {
         filters: {
           helperIds: helperIdsFilter,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
+          helperIds: selectedCuratorsId,
+          helperCountryIds: selectedCuratorsCountiesId,
+          clientCountryIds: selectedClientsCountiesId,
           dateBefore: selectedDateBefore,
           dateAfter: selectedDateAfter,
           reaction: queryReaction,
+          statusIds: selectedStatusesId,
           limit: itemsPerPage,
           offset: offset,
           orderBy: orderBy,
@@ -624,7 +686,7 @@ function allTickets() {
     }
 
     if (isAdmin()) {
-      console.log(6);
+      // console.log(6);
       console.log("helperID ", helperIdsFilter);
       const variables = {
         filters: {
@@ -679,6 +741,23 @@ function allTickets() {
     }
   };
 
+  const newCuratorList = dataQueryCurators.map((curator) => ({
+    name: `${curator.user.surname} ${curator.user.name} ${
+      curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+    }`,
+    id: curator.id,
+  }));
+
+  const newCountriesList = countryList.map((country) => ({
+    name: country.name.stroke,
+    id: country.id,
+  }));
+
+  const newStatusesList = statusList.map((status) => ({
+    name: status.name.stroke,
+    id: status.id,
+  }));
+
   return (
     <>
       <div className="alltickets__container">
@@ -700,7 +779,7 @@ function allTickets() {
               {isAdmin() ? (
                 <div className="alltickets__filters-container">
                   <Form>
-                    <Row>
+                    <Row className="alltickets__row">
                       <Col className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
@@ -769,6 +848,40 @@ function allTickets() {
                               ))}
                           </DropdownButton>
                         )}
+
+                        <MultiSelect
+                          value={selectedCurators}
+                          onChange={(e) => handleCuratorsOnChange(e.value)}
+                          options={newCuratorList}
+                          optionLabel="name"
+                          className="add-curator__multiselect"
+                          placeholder="Куратор"
+                          filter
+                        />
+
+                        <MultiSelect
+                          value={selectedCuratorsCountries}
+                          onChange={(e) =>
+                            handleCuratorsCountriesOnChange(e.value)
+                          }
+                          options={newCountriesList}
+                          optionLabel="name"
+                          className="add-curator__multiselect"
+                          placeholder="Страны кураторов"
+                          filter
+                        />
+
+                        <MultiSelect
+                          value={selectedClientsCountries}
+                          onChange={(e) =>
+                            handleClientsCountriesOnChange(e.value)
+                          }
+                          options={newCountriesList}
+                          optionLabel="name"
+                          className="add-curator__multiselect"
+                          placeholder="Страны партнеров"
+                          filter
+                        />
                       </Col>
                       <Col className="alltickets__column">
                         <DateRangePicker
@@ -790,6 +903,7 @@ function allTickets() {
                           onChange={handlePeriodClick}
                           value={dateRange}
                         />
+
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
@@ -808,6 +922,73 @@ function allTickets() {
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
+
+                        <Form.Group controlId="wordsFilterForm">
+                          <Form.Control
+                            type="text"
+                            placeholder="Есть слова"
+                            className="add-currator__input"
+                            value={wordsFilterValue}
+                            onChange={handleWordsFilterValueChange}
+                          />
+                        </Form.Group>
+
+                        <MultiSelect
+                          value={selectedStatuses}
+                          onChange={(e) => handleStatusesOnChange(e.value)}
+                          options={newStatusesList}
+                          optionLabel="name"
+                          className="add-curator__multiselect"
+                          placeholder="Статус темы"
+                        />
+
+                        <Form.Group
+                          className="alltickets__days-ago"
+                          controlId="wordsFilterForm"
+                        >
+                          <div className="alltickets__days-ago-label">
+                            Создано более чем
+                          </div>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="X число назад"
+                            className="add-currator__input alltickets__days-ago-input"
+                            value={numberFilterValue}
+                            onChange={handleNumberFilterValueChange}
+                          />
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="мин/часов/дней"
+                            className="add-currator__input alltickets__days-ago-input right-input"
+                            value={daysFilterValue}
+                            onChange={handleDaysFilterValueChange}
+                          />
+                        </Form.Group>
+
+                        <Form.Group
+                          className="alltickets__days-ago"
+                          controlId="wordsFilterForm"
+                        >
+                          <div className="alltickets__days-ago-label">ID</div>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="Партнер/Стр-ра"
+                            className="add-currator__input alltickets__days-ago-input"
+                            value={idFilterValue}
+                            onChange={handleIdFilterValueChange}
+                          />
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            placeholder="Номер ID"
+                            className="add-currator__input alltickets__days-ago-input right-input"
+                            value={numberIdFilterValue}
+                            onChange={handleNumberIdFilterValueChange}
+                          />
+                        </Form.Group>
                       </Col>
                     </Row>
                     <Row className="alltickets__button-row">
@@ -1044,7 +1225,7 @@ function allTickets() {
                   <tr key={ticket.id}>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1056,7 +1237,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1068,7 +1249,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1084,7 +1265,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1096,7 +1277,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1114,7 +1295,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -1126,7 +1307,7 @@ function allTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,

@@ -79,6 +79,7 @@ function EditSubtheme() {
       setSelectedItem(data.helperQuery.subTheme.theme.unit.name.stroke);
       setSelectedTheme(data.helperQuery.subTheme.theme.name.stroke);
       setSelectedThemeId(data.helperQuery.subTheme.theme.id);
+      setOrderNum(data.helperQuery.subTheme.orderNum);
       // console.log(data.subTheme.theme.unit.id);
     }
 

@@ -4,9 +4,9 @@ import "../css/ticket-title.css";
 
 const getStatusColor = (status) => {
   switch (status) {
-    case "Открыта":
+    case "Открыто":
       return "#00AB97";
-    case "Закрыта":
+    case "Закрыто":
       return "#AB0000";
     default:
       return "black";

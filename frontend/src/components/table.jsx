@@ -283,7 +283,7 @@ function TableTickets() {
                   <tr key={ticket.id}>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -295,7 +295,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -307,7 +307,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -323,7 +323,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -335,7 +335,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -353,7 +353,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
@@ -365,7 +365,7 @@ function TableTickets() {
                     </td>
                     <td>
                       <Link
-                        to={`/dialog/${userId}/${ticket.id}`}
+                        to={`/dialog/${ticket.link}`}
                         state={{
                           status: ticket.status.name.stroke,
                           linkPrev: window.location.href,
