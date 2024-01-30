@@ -38,7 +38,7 @@ class Message extends Entity {
     }
 
     static async GetListByTicket(ticketId, initiator) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.TicketIdField} = ?`;
+        let sql = `SELECT * FROM ${this.TableName} WHERE ${this.TicketIdField} = ?`;
         if(initiator.role == User.RoleClient){
             sql += ` AND ${this.VisibilityField} < ${this.VisibleByHelpers}`;
         }
