@@ -4,7 +4,6 @@ import {
   Modal,
   Button,
   Form,
-  Row,
   Col,
   Spinner,
   Alert,
@@ -34,8 +33,12 @@ function Header({ user }) {
     password: "",
   });
 
-  const [userName, setUserName] = useState(null);
-  const [userSurname, setUserSurname] = useState(null);
+  const [userName, setUserName] = useState(
+    JSON.parse(localStorage.getItem("user"))?.name
+  );
+  const [userSurname, setUserSurname] = useState(
+    JSON.parse(localStorage.getItem("user"))?.surname
+  );
 
   const { data, refetch } = useQuery(LOGIN);
 
@@ -67,7 +70,6 @@ function Header({ user }) {
   const handleSubmit = async () => {
     if (user) {
       localStorage.removeItem("user");
-      localStorage.removeItem("userRole");
       document.location.href = "/";
     }
 
@@ -79,17 +81,17 @@ function Header({ user }) {
         localStorage.setItem(
           "user",
           JSON.stringify({
-            id: loginData.login.userId,
+            id: loginData.login.user.id,
+            name: loginData.login.user.name,
+            surname: loginData.login.user.surname,
+            role: loginData.login.user.role,
             login: loginVariables.login,
             token: loginData.login.token,
           })
         );
-        localStorage.setItem(
-          "userRole",
-          JSON.stringify({
-            role: { role: "helper" },
-          })
-        );
+        setUserName(loginData.login.user.name);
+        setUserSurname(loginData.login.user.surname);
+        console.log(userName);
         document.location.href = "/all-tickets";
       }
     } catch (error) {
@@ -106,38 +108,26 @@ function Header({ user }) {
   const userInLocalStorage = JSON.parse(localStorage.getItem("user"));
 
   if (userInLocalStorage !== null) {
-    const { error: loadingUser, data: dataUser } = useQuery(USER, {
-      variables: {
-        id: userInLocalStorage.id,
-      },
-    });
-
     useEffect(() => {
       if (data) {
         localStorage.setItem(
           "user",
           JSON.stringify({
-            id: data.login.userId,
+            id: data.login.user.id,
+            name: data.login.user.name,
+            surname: data.login.user.surname,
+            role: data.login.user.role,
             login: loginVariables.login,
             token: data.login.token,
           })
         );
+        setUserName(data.login.user.name);
+        setUserSurname(data.login.user.surname);
+        console.log(userName);
         document.location.href = "/all-tickets";
       }
-
-      if (dataUser && dataUser.helperQuery.user) {
-        localStorage.setItem(
-          "userRole",
-          JSON.stringify({
-            role: dataUser.helperQuery.user,
-          })
-        );
-        setUserName(dataUser.helperQuery.user.name);
-        setUserSurname(dataUser.helperQuery.user.surname);
-      }
-      //console.log(JSON.parse(localStorage.getItem("userRole")).role);
       refetch();
-    }, [data, dataUser, loginVariables]);
+    }, [data, loginVariables]);
   }
 
   const popover = (

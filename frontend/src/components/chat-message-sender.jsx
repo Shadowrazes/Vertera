@@ -33,7 +33,12 @@ function ChatMessage({ message, sender, time, attachs }) {
       <div className="chat-message-sender__container">
         <div className="chat-message-sender__box">
           <h3 className="chat-message-sender__name">{getFullName(sender)}</h3>
-          <div className="chat-message-sender__text">{message}</div>
+          <div
+            dangerouslySetInnerHTML={{ __html: message }}
+            className="chat-message-sender__text"
+          >
+            {/* {message} */}
+          </div>
           {!isVisible && (
             <>
               <span className="chat-message-sender__attachs-title">

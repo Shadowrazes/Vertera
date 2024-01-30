@@ -45,9 +45,12 @@ function EditTicket() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
-      id: parseInt(itemId),
+      token: user.token,
+      link: itemId,
     },
   });
 
@@ -55,13 +58,21 @@ function EditTicket() {
     loading: loadingTheme,
     error: errorTheme,
     data: dataTheme,
-  } = useQuery(THEME_LIST);
+  } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const {
     loading: loadingCurators,
     error: errorCurators,
     data: dataCurators,
-  } = useQuery(CURATORS_LIST);
+  } = useQuery(CURATORS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
 
@@ -294,7 +305,10 @@ function EditTicket() {
 
   return (
     <>
-      <BackTitle title={`Редактировать тикет #${itemId}`} linkPrev={linkPrev} />
+      <BackTitle
+        title={`Редактировать тикет ${data.clientQuery.ticket.title}`}
+        linkPrev={linkPrev}
+      />
 
       <Tabs
         defaultActiveKey="theme"

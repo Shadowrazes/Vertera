@@ -34,7 +34,13 @@ function AddTheme() {
   const [nameValue, setNameValue] = useState("");
   const [orderNum, setOrderNum] = useState(0);
 
-  const { loading, error, data } = useQuery(THEME_LIST);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 

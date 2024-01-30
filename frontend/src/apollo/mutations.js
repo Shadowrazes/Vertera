@@ -8,6 +8,8 @@ export const ADD_STATUS = gql`
 
 export const ADD_TICKET = gql`
   mutation addTicket(
+    $token: String!
+    $title: String!
     $clientId: Int!
     $unitId: Int!
     $themeId: Int!
@@ -15,29 +17,30 @@ export const ADD_TICKET = gql`
     $senderId: Int!
     $recieverId: Int!
     $ticketId: Int!
-    $type: String!
     $text: String!
     $attachPaths: [String]
   ) {
-    addTicket(
-      ticketFields: {
-        clientId: $clientId
-        unitId: $unitId
-        themeId: $themeId
-        subThemeId: $subThemeId
+    clientMutation(token: $token) {
+      addTicket(
+        ticketFields: {
+          title: $title
+          clientId: $clientId
+          unitId: $unitId
+          themeId: $themeId
+          subThemeId: $subThemeId
+        }
+        messageFields: {
+          senderId: $senderId
+          recieverId: $recieverId
+          ticketId: $ticketId
+          text: $text
+          attachPaths: $attachPaths
+        }
+      ) {
+        id
+        clientId
+        link
       }
-      messageFields: {
-        senderId: $senderId
-        recieverId: $recieverId
-        ticketId: $ticketId
-        type: $type
-        text: $text
-        attachPaths: $attachPaths
-      }
-    ) {
-      id
-      clientId
-      link
     }
   }
 `;

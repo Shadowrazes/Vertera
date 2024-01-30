@@ -108,8 +108,8 @@ function EditCurator() {
       setSelectedJobTitleId(data.helperQuery.helper.jobTitle.id);
     }
 
-    if (dataDepartmentsList && dataDepartmentsList.adminQuery.departmentList) {
-      setDepartmentList(dataDepartmentsList.adminQuery.departmentList);
+    if (dataDepartmentsList && dataDepartmentsList.helperQuery.departmentList) {
+      setDepartmentList(dataDepartmentsList.helperQuery.departmentList);
     }
 
     if (dataJobTitleList && dataJobTitleList.adminQuery.jobTitleList) {
@@ -117,8 +117,8 @@ function EditCurator() {
       setJobTitleList(dataJobTitleList.adminQuery.jobTitleList);
     }
 
-    if (dataCountryList && dataCountryList.adminQuery.countryList) {
-      setCountryList(dataCountryList.adminQuery.countryList);
+    if (dataCountryList && dataCountryList.clientQuery.countryList) {
+      setCountryList(dataCountryList.clientQuery.countryList);
     }
 
     if (location.state && location.state.linkPrev) {

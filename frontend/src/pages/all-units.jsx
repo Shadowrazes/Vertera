@@ -14,7 +14,14 @@ import "../css/units.css";
 
 function Units() {
   const [dataQuery, setData] = useState([]);
-  const { loading, error, data, refetch } = useQuery(THEME_LIST);
+
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data, refetch } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 

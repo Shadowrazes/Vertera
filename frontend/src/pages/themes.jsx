@@ -17,7 +17,13 @@ function Theme() {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const { loading, error, data, refetch } = useQuery(THEME_LIST);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data, refetch } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 

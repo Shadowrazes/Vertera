@@ -36,7 +36,10 @@ function ChatMessage({ message, sender, time, attachs }) {
           <h3 className="chat-message-recipient__name">
             {getFullName(sender)}
           </h3>
-          <div className="chat-message-recipient__text">{message}</div>
+          <div
+            dangerouslySetInnerHTML={{ __html: message }}
+            className="chat-message-recipient__text"
+          ></div>
           {!isVisible && (
             <>
               <span className="chat-message-recipient__attachs-title">

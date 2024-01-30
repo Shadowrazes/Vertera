@@ -45,8 +45,18 @@ function AddCurator() {
   const [loginValue, setLoginValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
 
-  const { loading, error, data } = useQuery(DEPARTMENTS_LIST);
-  const { data: dataJobTitle } = useQuery(JOB_TITLE_LIST);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data } = useQuery(DEPARTMENTS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataJobTitle } = useQuery(JOB_TITLE_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -55,8 +65,8 @@ function AddCurator() {
   };
 
   useEffect(() => {
-    if (data && data.adminQuery.departmentList) {
-      setDepartmentList(data.adminQuery.departmentList);
+    if (data && data.helperQuery.departmentList) {
+      setDepartmentList(data.helperQuery.departmentList);
     }
 
     if (dataJobTitle && dataJobTitle.adminQuery.jobTitleList) {

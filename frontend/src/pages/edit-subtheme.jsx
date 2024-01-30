@@ -40,18 +40,29 @@ function EditSubtheme() {
   const [showTwo, setShowTwo] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const {
     loading: loadingTheme,
     error: errorTheme,
     data: dataTheme,
-  } = useQuery(THEME_LIST);
+  } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
   const {
     loading: loadingDepartmentList,
     error: errorDepartmentList,
     data: dataDepartmentList,
-  } = useQuery(DEPARTMENTS_LIST);
+  } = useQuery(DEPARTMENTS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
   const { loading, error, data, refetch } = useQuery(SUBTHEME, {
     variables: {
+      token: user.token,
       id: parseInt(subthemeId),
     },
   });
@@ -83,8 +94,8 @@ function EditSubtheme() {
       // console.log(data.subTheme.theme.unit.id);
     }
 
-    if (dataDepartmentList && dataDepartmentList.adminQuery.departmentList) {
-      setDepartmentList(dataDepartmentList.adminQuery.departmentList);
+    if (dataDepartmentList && dataDepartmentList.helperQuery.departmentList) {
+      setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
     if (data && data.helperQuery.subTheme.departments) {

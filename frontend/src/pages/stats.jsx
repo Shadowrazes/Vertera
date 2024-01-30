@@ -53,7 +53,11 @@ function Stats() {
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
 
-  const { loading, error, data, refetch } = useQuery(STATS);
+  const { loading, error, data, refetch } = useQuery(STATS, {
+    variables: {
+      token: user.token,
+    },
+  });
   const getCurrentUserStats = () => {
     return data?.helperQuery.helperStatList.filter((elem) => {
       return elem.helper.id == user.id;
