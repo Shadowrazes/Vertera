@@ -163,6 +163,6 @@ export const ObjectTypes = `
 
     type LoginInfo {
         token: String!
-        userId: Int!
+        user: User!
     }
 `;

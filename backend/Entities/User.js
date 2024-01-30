@@ -43,7 +43,7 @@ class User extends Entity {
         const token = await Token.Generate({ userId });
         const tokenUpdateResult = await this.UpdateToken(userId, { token });
 
-        return { token, userId };
+        return { token, user: userResult[0] };
     }
 
     static ValidateRoleAccess(level, userRole) {
