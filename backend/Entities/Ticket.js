@@ -342,13 +342,12 @@ class Ticket extends Entity {
             if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
 
             if (fields.statusId) {
-                const statusChangeLogFields = {
+                let statusChangeLogFields = {
                     type: TicketLog.TypeStatusChange, ticketId: id,
                     info: 'Статус', initiatorId: initiator.id
                 };
                 if (fields.statusId == this.StatusIdClosed) statusChangeLogFields.info = 'Закрыл';
                 if (fields.statusId == this.StatusIdInProgress) statusChangeLogFields.info = 'В работе';
-                if (fields.statusId == this.StatusIdOnRevision) statusChangeLogFields.info = 'На уточнении';
                 if (fields.statusId == this.StatusIdOnExtension) statusChangeLogFields.info = 'Требует дополнения';
 
                 const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
@@ -356,12 +355,20 @@ class Ticket extends Entity {
 
             const curTicket = await this.GetById(id);
             if(fields.assistantId){
-                const assistantConnLogFields = {
+                let assistantConnLogFields = {
                     type: TicketLog.TypeAssistantConn, ticketId: id,
                     info: 'Подключен к диалогу', initiatorId: fields.assistantId
                 };
+                let statusChangeLogFields = {
+                    type: TicketLog.TypeStatusChange, ticketId: id,
+                    info: 'На уточнении', initiatorId: User.AdminId
+                };
+
                 if(fields.assistantId > 0){
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
+
+                    fields.statusId = this.StatusIdOnRevision;
+                    const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
                 else {
                     assistantConnLogFields.info = 'Отключен от диалога';
@@ -373,6 +380,10 @@ class Ticket extends Entity {
                     ;
                     const res = await super.TransRequest(conn, sql, [id]);
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
+
+                    fields.statusId = this.StatusIdInProgress;
+                    statusChangeLogFields.info = 'В работе';
+                    const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
             }
 

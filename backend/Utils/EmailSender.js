@@ -20,13 +20,13 @@ class EmailSender {
             text: text
         };
 
-        this.Transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
+        // this.Transporter.sendMail(mailOptions, (error, info) => {
+        //     if (error) {
+        //         console.log(error);
+        //     } else {
+        //         console.log('Email sent: ' + info.response);
+        //     }
+        // });
     }
 }
 
