@@ -84,7 +84,7 @@ function allTickets() {
   const [fastFilterStr, setFastFilterStr] = useState("my");
 
   const [isVisible, setIsVisible] = useState(false);
-  const [isVisibleFilters, setIsVisibleFilters] = useState(true);
+  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
@@ -92,28 +92,17 @@ function allTickets() {
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role.role
-  );
 
   let userId = null;
 
   if (user === null) {
-    userId = 999;
+    userId = <></>;
   } else {
     userId = user.id;
   }
 
   const [helperIdsFilter, setHelperIdsFilter] = useState(userId);
   const [helperStatusFilter, setHelperStatusFilter] = useState(null);
-
-  let userCurRole = null;
-
-  if (userRole === null) {
-    userCurRole = "helper";
-  } else {
-    userCurRole = userRole;
-  }
 
   let fastFilterHelperId = userId;
   let fastFilterStatus = null;
@@ -125,7 +114,7 @@ function allTickets() {
   const itemsPerPageArray = [25, 50, 100];
 
   const isAdmin = () => {
-    return userRole === "helper";
+    return user.role === "helper" || user.role === "system";
   };
 
   const navigate = useNavigate();
@@ -208,15 +197,32 @@ function allTickets() {
     }
   };
 
-  const { data: themeData } = useQuery(THEME_LIST);
-  const { data: dataCurators } = useQuery(CURATORS_LIST);
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST);
-  const { data: dataStatusList } = useQuery(STATUS_LIST);
+  const { data: themeData } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataStatusList } = useQuery(STATUS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const adminRequest = () => {
     // console.log(2);
     return useQuery(TABLE_TICKETS, {
       variables: {
+        token: user.token,
         filters: {
           helperIds: helperIdsFilter,
           limit: itemsPerPage,
@@ -232,6 +238,7 @@ function allTickets() {
   const clientRequest = () => {
     return useQuery(TABLE_TICKETS_USER, {
       variables: {
+        token: user.token,
         clientId: userId,
         filters: {
           limit: itemsPerPage,
@@ -323,8 +330,8 @@ function allTickets() {
         setDataQueryCurators(dataCurators.helperQuery.helperList);
       }
 
-      if (dataCountryList && dataCountryList.adminQuery.countryList) {
-        setCountryList(dataCountryList.adminQuery.countryList);
+      if (dataCountryList && dataCountryList.clientQuery.countryList) {
+        setCountryList(dataCountryList.clientQuery.countryList);
       }
 
       if (dataStatusList && dataStatusList.helperQuery.ticketStatusList) {
@@ -591,10 +598,10 @@ function allTickets() {
     setSelectedReaction(reaction);
     switch (reaction) {
       case "Понравилось":
-        setQueryReaction("like");
+        setQueryReaction(1);
         break;
       case "Не понравилось":
-        setQueryReaction("dislike");
+        setQueryReaction(0);
         break;
       default:
         setQueryReaction(null);
@@ -624,13 +631,11 @@ function allTickets() {
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
-          helperIds: selectedCuratorsId,
           helperCountryIds: selectedCuratorsCountiesId,
           clientCountryIds: selectedClientsCountiesId,
           dateBefore: selectedDateBefore,
           dateAfter: selectedDateAfter,
           reaction: queryReaction,
-          statusIds: selectedStatusesId,
           limit: itemsPerPage,
           offset: offset,
           orderBy: orderBy,
@@ -687,7 +692,7 @@ function allTickets() {
 
     if (isAdmin()) {
       // console.log(6);
-      console.log("helperID ", helperIdsFilter);
+      // console.log("helperID ", helperIdsFilter);
       const variables = {
         filters: {
           helperIds: fastFilterHelperId,
@@ -1211,7 +1216,7 @@ function allTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID тикет</th>
+                  <th>ID</th>
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
@@ -1244,7 +1249,16 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.subTheme.theme.unit.name.stroke}
+                        {`${
+                          ticket.subTheme.theme.unit.name.stroke ===
+                          "Партнерам/Клиентам"
+                            ? "П/К"
+                            : "ДО"
+                        } | ${ticket.subTheme.theme.name.stroke} ${
+                          ticket.subTheme.name.stroke === "none"
+                            ? ""
+                            : `| ${ticket.subTheme.name.stroke}`
+                        }`}
                       </Link>
                     </td>
                     <td>
@@ -1272,7 +1286,7 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.subTheme.theme.name.stroke}
+                        {ticket.title}
                       </Link>
                     </td>
                     <td>
@@ -1302,7 +1316,7 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.messages.length}
+                        {ticket.messages?.length}
                       </Link>
                     </td>
                     <td>

@@ -23,8 +23,11 @@ function EditUnit() {
   const [showTwo, setShowTwo] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const { loading, error, data, refetch } = useQuery(UNIT, {
     variables: {
+      token: user.token,
       id: parseInt(unitId),
     },
   });

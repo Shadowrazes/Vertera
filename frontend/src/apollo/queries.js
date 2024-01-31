@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 
 export const TABLE_TICKETS = gql`
-  query ($filters: TicketFilter!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $filters: TicketFilter!) {
+    helperQuery(token: $token) {
       ticketList(filters: $filters) {
         count
         array {
           id
           link
+          title
           client {
             id
           }
@@ -15,7 +16,13 @@ export const TABLE_TICKETS = gql`
             id
           }
           subTheme {
+            name(lang: "ru") {
+              stroke
+            }
             theme {
+              name(lang: "ru") {
+                stroke
+              }
               unit {
                 name(lang: "ru") {
                   stroke
@@ -54,13 +61,14 @@ export const TABLE_TICKETS = gql`
 `;
 
 export const TABLE_TICKETS_USER = gql`
-  query ($clientId: Int!, $filters: TicketClientFilter!) {
-    clientQuery(token: "123") {
+  query ($token: String!, $clientId: Int!, $filters: TicketClientFilter!) {
+    clientQuery(token: $token) {
       ticketListByClient(clientId: $clientId, filters: $filters) {
         count
         array {
           id
           link
+          title
           client {
             id
           }
@@ -68,7 +76,13 @@ export const TABLE_TICKETS_USER = gql`
             id
           }
           subTheme {
+            name(lang: "ru") {
+              stroke
+            }
             theme {
+              name(lang: "ru") {
+                stroke
+              }
               unit {
                 name(lang: "ru") {
                   stroke
@@ -107,10 +121,11 @@ export const TABLE_TICKETS_USER = gql`
 `;
 
 export const MESSAGES_CHAT = gql`
-  query ($link: String!) {
-    clientQuery(token: "123") {
+  query ($token: String!, $link: String!) {
+    clientQuery(token: $token) {
       ticket(link: $link) {
         id
+        title
         helper {
           id
           user {
@@ -185,14 +200,19 @@ export const LOGIN = gql`
   query ($login: String!, $password: String!) {
     login(login: $login, password: $password) {
       token
-      userId
+      user {
+        id
+        name
+        surname
+        role
+      }
     }
   }
 `;
 
 export const USER = gql`
-  query ($id: Int!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
       user(id: $id) {
         name
         surname
@@ -204,8 +224,8 @@ export const USER = gql`
 `;
 
 export const THEME_LIST = gql`
-  query {
-    clientQuery(token: "123") {
+  query ($token: String!) {
+    clientQuery(token: $token) {
       allThemeTree {
         id
         name(lang: "ru") {
@@ -238,8 +258,8 @@ export const THEME_LIST = gql`
 `;
 
 export const DEPARTMENTS_LIST = gql`
-  query {
-    adminQuery(token: "123") {
+  query ($token: String!) {
+    helperQuery(token: $token) {
       departmentList {
         id
         name(lang: "ru") {
@@ -251,8 +271,8 @@ export const DEPARTMENTS_LIST = gql`
 `;
 
 export const ATTACHEMNTS_LIST = gql`
-  query ($messageId: Int!) {
-    clientQuery(token: "123") {
+  query ($token: String!, $messageId: Int!) {
+    clientQuery(token: $token) {
       attachmentList(messageId: $messageId) {
         id
         path
@@ -262,8 +282,8 @@ export const ATTACHEMNTS_LIST = gql`
 `;
 
 export const CURATORS_LIST = gql`
-  query {
-    helperQuery(token: "123") {
+  query ($token: String!) {
+    helperQuery(token: $token) {
       helperList {
         id
         jobTitle {
@@ -292,8 +312,8 @@ export const CURATORS_LIST = gql`
 `;
 
 export const JOB_TITLE_LIST = gql`
-  query {
-    adminQuery(token: "123") {
+  query ($token: String!) {
+    adminQuery(token: $token) {
       jobTitleList {
         id
         name(lang: "ru") {
@@ -305,8 +325,8 @@ export const JOB_TITLE_LIST = gql`
 `;
 
 export const HELPER = gql`
-  query ($id: Int!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
       helper(id: $id) {
         id
         jobTitle {
@@ -341,8 +361,8 @@ export const HELPER = gql`
 `;
 
 export const COUNTRY_LIST = gql`
-  query {
-    adminQuery(token: "123") {
+  query ($token: String!) {
+    clientQuery(token: $token) {
       countryList {
         id
         name(lang: "ru") {
@@ -354,8 +374,8 @@ export const COUNTRY_LIST = gql`
 `;
 
 export const UNIT = gql`
-  query ($id: Int!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
       unit(id: $id) {
         name(lang: "ru") {
           stroke
@@ -367,8 +387,8 @@ export const UNIT = gql`
 `;
 
 export const THEME = gql`
-  query ($id: Int!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
       theme(id: $id) {
         name(lang: "ru") {
           stroke
@@ -386,8 +406,8 @@ export const THEME = gql`
 `;
 
 export const SUBTHEME = gql`
-  query ($id: Int!) {
-    helperQuery(token: "123") {
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
       subTheme(id: $id) {
         name(lang: "ru") {
           stroke
@@ -417,8 +437,8 @@ export const SUBTHEME = gql`
 `;
 
 export const STATS = gql`
-  query {
-    helperQuery(token: "123") {
+  query ($token: String!) {
+    helperQuery(token: $token) {
       helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
         helper {
           id
@@ -445,8 +465,8 @@ export const STATS = gql`
 `;
 
 export const STATUS_LIST = gql`
-  query {
-    helperQuery(token: "123") {
+  query ($token: String!) {
+    helperQuery(token: $token) {
       ticketStatusList {
         id
         name(lang: "ru") {

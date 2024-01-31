@@ -34,13 +34,20 @@ function EditTheme() {
   const [showTwo, setShowTwo] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const {
     loading: loadingTheme,
     error: errorTheme,
     data: dataTheme,
-  } = useQuery(THEME_LIST);
+  } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
   const { loading, error, data, refetch } = useQuery(THEME, {
     variables: {
+      token: user.token,
       id: parseInt(themeId),
     },
   });

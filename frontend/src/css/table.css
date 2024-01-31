@@ -10,7 +10,7 @@
 }
 
 .table__sort {
-  font-size: 17px;
+  font-size: 15px;
   color: black;
   cursor: pointer;
 }
@@ -37,7 +37,7 @@
   text-align: center;
   padding: 45px 25px 15px 25px !important;
   min-width: 115px;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 500;
 }
 
@@ -45,7 +45,7 @@
   text-align: center;
   vertical-align: middle;
   padding: 5px 25px 5px 25px !important;
-  font-size: 17px;
+  font-size: 13px;
 }
 
 .table__status {

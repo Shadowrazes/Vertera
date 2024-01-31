@@ -10,10 +10,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "react-bootstrap";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
 
 import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
 import { ADD_MESSAGE, UPDATE_STATUS, EDIT_TICKET } from "../apollo/mutations";
 
+import { Editor } from "react-draft-wysiwyg";
 import Loader from "../pages/loading";
 import TicketTitle from "../components/ticket-title";
 import ChatMessageSender from "../components/chat-message-sender";
@@ -22,8 +25,12 @@ import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
+import "/node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 function Chat() {
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
@@ -60,7 +67,6 @@ function Chat() {
   const inputRef = useRef(null);
 
   let userId = null;
-  let userCurRole = null;
 
   if (user === null) {
     userId = 999;
@@ -68,18 +74,13 @@ function Chat() {
     userId = user.id;
   }
 
-  if (userRole === null) {
-    userCurRole = "client";
-  } else {
-    userCurRole = userRole;
-  }
-
   const isAdmin = () => {
-    return userCurRole === "helper";
+    return user.role === "helper" || user.role === "system";
   };
 
   const { loading, error, data } = useQuery(MESSAGES_CHAT, {
     variables: {
+      token: user.token,
       link: itemId,
     },
   });
@@ -88,7 +89,11 @@ function Chat() {
     loading: loadingTheme,
     error: errorTheme,
     data: dataTheme,
-  } = useQuery(THEME_LIST);
+  } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   useEffect(() => {
     if (data && data.clientQuery.ticket) {
@@ -130,7 +135,12 @@ function Chat() {
 
   const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
     useMutation(ADD_MESSAGE, {
-      refetchQueries: [{ query: MESSAGES_CHAT, variables: { link: itemId } }],
+      refetchQueries: [
+        {
+          query: MESSAGES_CHAT,
+          variables: { token: user.token, link: itemId },
+        },
+      ],
     });
 
   const [
@@ -165,6 +175,20 @@ function Chat() {
   //   setIsHideMessages(false);
   // };
 
+  const handleEditorChange = (newEditorState) => {
+    setEditorState(newEditorState);
+  };
+
+  const getContent = () => {
+    const contentState = editorState.getCurrentContent();
+    const rawContent = convertToRaw(contentState);
+
+    setMessage(draftToHtml(rawContent));
+
+    console.log(draftToHtml(rawContent));
+    return draftToHtml(rawContent);
+  };
+
   const errorMsg = () => {
     let error = "";
 
@@ -172,7 +196,7 @@ function Chat() {
       error = "Максимальный размер файла - 10 Мб";
     } else if (isFilesLimitExceeded) {
       error = "Вы можете загружать до 5 файлов";
-    } else if (message.trim() == "") {
+    } else if (textareaValue.trim() == "<p></p>") {
       error = "Введите текст сообщения";
     }
 
@@ -297,8 +321,7 @@ function Chat() {
             senderId: userId,
             recieverId: senderId,
             ticketId: ticketId,
-            type: "message",
-            text: message,
+            text: getContent(),
             attachPaths: filePaths,
           },
         });
@@ -424,7 +447,7 @@ function Chat() {
   };
 
   const handleSubmit = () => {
-    if (message.trim() == "") {
+    if (getContent().trim() == "") {
       setIsVisibleError(true);
     }
   };
@@ -484,21 +507,13 @@ function Chat() {
       >
         {currentStatus !== null && currentStatus !== "Закрыт" ? (
           <TicketTitle
-            title={
-              isAdmin()
-                ? `Обращение #${data.clientQuery.ticket.id}`
-                : `Обращение`
-            }
+            title={`${data.clientQuery.ticket.title}`}
             state="Открыто"
             linkPrev={linkPrev}
           />
         ) : (
           <TicketTitle
-            title={
-              isAdmin()
-                ? `Обращение #${data.clientQuery.ticket.id}`
-                : `Обращение`
-            }
+            title={`${data.clientQuery.ticket.title}`}
             state="Закрыто"
             linkPrev={linkPrev}
           />
@@ -592,14 +607,14 @@ function Chat() {
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
-                <Form.Control
+                {/* <Form.Control
                   as="textarea"
                   placeholder="Текст сообщения"
                   rows={3}
                   value={message}
                   onChange={handleChange}
                   className="chat-input__textarea"
-                />
+                /> */}
               </Form.Group>
               <Form.Group controlId="FileInputForm">
                 <Form.Control
@@ -738,13 +753,17 @@ function Chat() {
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
               <Form.Group controlId="TextareaForm">
-                <Form.Control
+                {/* <Form.Control
                   as="textarea"
                   placeholder="Текст сообщения"
                   rows={3}
                   value={message}
                   onChange={handleChange}
                   className="chat-input__textarea"
+                /> */}
+                <Editor
+                  editorState={editorState}
+                  onEditorStateChange={handleEditorChange}
                 />
               </Form.Group>
               <Form.Group controlId="FileInputForm">

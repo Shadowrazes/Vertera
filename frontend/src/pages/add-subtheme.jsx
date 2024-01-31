@@ -38,12 +38,22 @@ function AddSubtheme() {
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [orderNum, setOrderNum] = useState(0);
 
-  const { loading, error, data } = useQuery(THEME_LIST);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const { loading, error, data } = useQuery(THEME_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
   const {
     loading: loadingDepartmentList,
     error: errorDepartmentList,
     data: dataDepartmentList,
-  } = useQuery(DEPARTMENTS_LIST);
+  } = useQuery(DEPARTMENTS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -56,8 +66,8 @@ function AddSubtheme() {
       setData(data.clientQuery.allThemeTree);
     }
 
-    if (dataDepartmentList && dataDepartmentList.adminQuery.departmentList) {
-      setDepartmentList(dataDepartmentList.adminQuery.departmentList);
+    if (dataDepartmentList && dataDepartmentList.helperQuery.departmentList) {
+      setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
     if (location.state && location.state.linkPrev) {

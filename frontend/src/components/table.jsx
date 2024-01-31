@@ -32,37 +32,26 @@ function TableTickets() {
   const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role.role
-  );
-
   let userId = null;
-  let userCurRole = null;
 
-  if (user === null) {
+  if (user?.id === null) {
     return <></>;
   } else {
-    userId = user.id;
+    userId = user?.id;
   }
-
-  if (userRole === null) {
-    userCurRole = "client";
-  } else {
-    userCurRole = userRole;
-  }
-  // console.log(userId);
 
   const itemsPerPage = 8;
 
   const isAdmin = () => {
-    return userCurRole === "helper";
+    return user?.role === "helper" || user?.role === "system";
   };
 
   const adminRequest = () => {
     return useQuery(TABLE_TICKETS, {
       variables: {
+        token: user?.token,
         filters: {
-          helperIds: userId,
+          helperIds: user?.id,
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
@@ -76,7 +65,8 @@ function TableTickets() {
   const clientRequest = () => {
     return useQuery(TABLE_TICKETS_USER, {
       variables: {
-        clientId: userId,
+        token: user?.token,
+        clientId: user?.id,
         filters: {
           limit: itemsPerPage,
           offset: 0,
@@ -269,7 +259,7 @@ function TableTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID тикет</th>
+                  <th>ID</th>
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
@@ -302,7 +292,16 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.subTheme.theme.unit.name.stroke}
+                        {`${
+                          ticket.subTheme.theme.unit.name.stroke ===
+                          "Партнерам/Клиентам"
+                            ? "П/К"
+                            : "ДО"
+                        } | ${ticket.subTheme.theme.name.stroke} ${
+                          ticket.subTheme.name.stroke === "none"
+                            ? ""
+                            : `| ${ticket.subTheme.name.stroke}`
+                        }`}
                       </Link>
                     </td>
                     <td>
@@ -330,7 +329,7 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.subTheme.theme.name.stroke}
+                        {ticket.title}
                       </Link>
                     </td>
                     <td>

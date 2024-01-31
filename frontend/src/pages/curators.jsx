@@ -19,8 +19,8 @@ function Curators() {
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem("userRole"))?.role.role
   );
+
   let userId = null;
-  let userCurRole = null;
 
   if (user === null) {
     return <></>;
@@ -28,17 +28,15 @@ function Curators() {
     userId = user.id;
   }
 
-  if (userRole === null) {
-    userCurRole = "client";
-  } else {
-    userCurRole = userRole;
-  }
-
   const isAdmin = () => {
-    return userCurRole === "helper";
+    return user.role === "helper" || user.role === "system";
   };
 
-  const { loading, error, data, refetch } = useQuery(CURATORS_LIST);
+  const { loading, error, data, refetch } = useQuery(CURATORS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const navigate = useNavigate();
 

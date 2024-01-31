@@ -8,11 +8,12 @@ import {
   Dropdown,
   Modal,
 } from "react-bootstrap";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { THEME_LIST } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
-import { ADD_CLIENT_USER } from "../apollo/mutations";
 
 import { Editor } from "react-draft-wysiwyg";
 import Loader from "../pages/loading";
@@ -28,10 +29,7 @@ function FormComponent() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
 
-  const [nameValue, setNameValue] = useState("");
-  const [surnameValue, setSurnameValue] = useState("");
-  const [patronymicValue, setPatronymicValue] = useState("");
-  const [emailValue, setEmailValue] = useState(null);
+  const [ticketTitleValue, setTicketTitleValue] = useState("");
 
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
@@ -59,13 +57,18 @@ function FormComponent() {
 
   const [dataQuery, setData] = useState([]);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role.role
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
   );
+
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
-  const { loading, error, data } = useQuery(THEME_LIST);
+  const { loading, error, data } = useQuery(THEME_LIST, {
+    variables: {
+      token: user?.token,
+    },
+  });
 
   let userId = user ? user.id : 999;
 
@@ -76,7 +79,6 @@ function FormComponent() {
   }, [data]);
 
   const [addTicket] = useMutation(ADD_TICKET);
-  const [addClientUser] = useMutation(ADD_CLIENT_USER);
 
   async function uploadFiles() {
     const fileInput = document.getElementById("FileInputForm");
@@ -130,7 +132,7 @@ function FormComponent() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if ((userRole && userRole === "helper") || userRole === "system") {
+  if ((user.role && user.role === "helper") || user.role === "system") {
     // console.log(132);
     return <></>;
   }
@@ -193,24 +195,22 @@ function FormComponent() {
     setIsVisible(false);
   };
 
-  const handleTextareaChange = (e) => {
-    setTextareaValue(e.target.value);
+  const handleEditorChange = (newEditorState) => {
+    setEditorState(newEditorState);
   };
 
-  const handleNameChange = (e) => {
-    setNameValue(e.target.value);
+  const getContent = () => {
+    const contentState = editorState.getCurrentContent();
+    const rawContent = convertToRaw(contentState);
+
+    setTextareaValue(draftToHtml(rawContent));
+
+    console.log(draftToHtml(rawContent));
+    return draftToHtml(rawContent);
   };
 
-  const handleSurnameChange = (e) => {
-    setSurnameValue(e.target.value);
-  };
-
-  const handlePatronymicChange = (e) => {
-    setPatronymicValue(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmailValue(e.target.value);
+  const handleTicketTitleChange = (e) => {
+    setTicketTitleValue(e.target.value);
   };
 
   const errorMsg = () => {
@@ -226,16 +226,10 @@ function FormComponent() {
       error = "Выберите тип обращения";
     } else if (selectedSubThemeId == null) {
       error = "Выберите подтему";
-    } else if (textareaValue.trim() == "") {
+    } else if (textareaValue.trim() == "<p></p>") {
       error = "Опишите ситуацию";
-    } else if (nameValue?.trim() == "") {
-      error = "Укажите ваше имя";
-    } else if (surnameValue?.trim() == "") {
-      error = "Укажите вашу фамилию";
-    } else if (emailValue?.trim() == "") {
-      error = "Введите ваш email";
-    } else if (!emailValue?.includes("@")) {
-      error = "Неверно указан email";
+    } else if (ticketTitleValue.trim() == "") {
+      error = "Укажите тему вышей проблемы";
     }
 
     return error;
@@ -246,6 +240,8 @@ function FormComponent() {
       .then((filePaths) => {
         addTicket({
           variables: {
+            token: user.token,
+            title: ticketTitleValue,
             clientId: userId,
             unitId: selectedUnitId,
             themeId: selectedThemeId,
@@ -253,14 +249,13 @@ function FormComponent() {
             senderId: userId,
             recieverId: 1,
             ticketId: 1,
-            type: "message",
-            text: textareaValue,
+            text: getContent(),
             attachPaths: filePaths,
           },
         }).then((data) => {
           console.log(data.data.addTicket);
-          popupTicketLink = data.data.addTicket.link;
-          popupUserID = data.data.addTicket.clientId;
+          popupTicketLink = data.data.clientMutation.addTicket.link;
+          popupUserID = data.data.clientMutation.addTicket.clientId;
           //setpopupTicketLink(data.data.addTicket.id);
           //setPopupUserID(data.data.addTicket.clientId);
           setIsVisible(false);
@@ -282,60 +277,58 @@ function FormComponent() {
     // console.log(selectedSubTheme);
     // console.log(selectedSubThemeId);
     // console.log(textareaValue);
-    // console.log(imageUrl);
 
     if (
       selectedUnitId == null ||
       selectedThemeId == null ||
       selectedSubThemeId == null ||
-      nameValue?.trim() == "" ||
-      surnameValue?.trim() == "" ||
-      textareaValue.trim() == "" ||
-      emailValue?.trim() == "" ||
-      (emailValue !== null && !emailValue.includes("@"))
+      ticketTitleValue.trim() == "" ||
+      textareaValue.trim() == "<p></p>"
     ) {
       // console.log("xdd");
       setIsVisible(true);
       return;
     }
 
-    if (user === null) {
-      if (patronymicValue.trim() == "") {
-        addClientUser({
-          variables: {
-            name: nameValue.trim(),
-            surname: surnameValue.trim(),
-            login: emailValue.split("@")[0],
-            password: "crown12345",
-            phone: "+79991112233",
-            email: emailValue.trim(),
-          },
-        }).then((newUserId) => {
-          // console.log(newUserId);
-          userId = newUserId.data.addClientUser;
-          addTicketWithFiles();
-        });
-      } else {
-        addClientUser({
-          variables: {
-            name: nameValue.trim(),
-            surname: surnameValue.trim(),
-            patronymic: patronymicValue.trim(),
-            login: emailValue.split("@")[0],
-            password: "crown12345",
-            phone: "+79991112233",
-            email: emailValue.trim(),
-          },
-        }).then((newUserId) => {
-          // console.log(newUserId);
-          userId = newUserId.data.addClientUser;
-          addTicketWithFiles();
-        });
-      }
-    } else {
-      userId = user.id;
-      addTicketWithFiles();
-    }
+    // if (user === null) {
+    //   if (patronymicValue.trim() == "") {
+    //     addClientUser({
+    //       variables: {
+    //         name: nameValue.trim(),
+    //         surname: surnameValue.trim(),
+    //         login: emailValue.split("@")[0],
+    //         password: "crown12345",
+    //         phone: "+79991112233",
+    //         email: emailValue.trim(),
+    //       },
+    //     }).then((newUserId) => {
+    //       // console.log(newUserId);
+    //       userId = newUserId.data.addClientUser;
+    //       addTicketWithFiles();
+    //     });
+    //   } else {
+    //     addClientUser({
+    //       variables: {
+    //         name: nameValue.trim(),
+    //         surname: surnameValue.trim(),
+    //         patronymic: patronymicValue.trim(),
+    //         login: emailValue.split("@")[0],
+    //         password: "crown12345",
+    //         phone: "+79991112233",
+    //         email: emailValue.trim(),
+    //       },
+    //     }).then((newUserId) => {
+    //       // console.log(newUserId);
+    //       userId = newUserId.data.addClientUser;
+    //       addTicketWithFiles();
+    //     });
+    //   }
+    // } else {
+    //   userId = user.id;
+    //
+    // }
+
+    addTicketWithFiles();
   };
 
   const handleFileChange = (e) => {
@@ -452,7 +445,7 @@ function FormComponent() {
           </Col>
 
           <Col className="form__column">
-            {!user && (
+            {/* {!user && (
               <>
                 <Form.Group controlId="NameForm">
                   <Form.Control
@@ -482,8 +475,8 @@ function FormComponent() {
                   />
                 </Form.Group>
               </>
-            )}
-            {!user && (
+            )} */}
+            {/* {!user && (
               <Form.Group controlId="EmailForm">
                 <Form.Control
                   type="email"
@@ -493,8 +486,17 @@ function FormComponent() {
                   onChange={handleEmailChange}
                 />
               </Form.Group>
-            )}
-            <Form.Group controlId="TextareaForm">
+            )} */}
+            <Form.Group controlId="TicketThemeForm">
+              <Form.Control
+                type="text"
+                placeholder="Тема обращения"
+                className="form__input"
+                value={ticketTitleValue}
+                onChange={handleTicketTitleChange}
+              />
+            </Form.Group>
+            {/* <Form.Group controlId="TextareaForm">
               <Form.Control
                 as="textarea"
                 placeholder="Текст обращения"
@@ -502,8 +504,11 @@ function FormComponent() {
                 value={textareaValue}
                 onChange={handleTextareaChange}
               />
-            </Form.Group>
-            {/* <Editor /> */}
+            </Form.Group> */}
+            <Editor
+              editorState={editorState}
+              onEditorStateChange={handleEditorChange}
+            />
             <Form.Group className="mb-3" controlId="FileInputForm">
               <Form.Control
                 type="file"
