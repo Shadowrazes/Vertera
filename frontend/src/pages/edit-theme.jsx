@@ -159,6 +159,7 @@ function EditTheme() {
     try {
       const result = await editTheme({
         variables: {
+          token: user.token,
           id: parseInt(themeId),
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
@@ -187,6 +188,7 @@ function EditTheme() {
     try {
       const result = await deleteTheme({
         variables: {
+          token: user.token,
           id: parseInt(themeId),
         },
       });

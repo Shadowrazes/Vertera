@@ -58,11 +58,7 @@ function Chat() {
   const [isVisible, setIsVisible] = useState(true);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role.role
-  );
   const isBuild = import.meta.env.DEV !== "build";
-  // console.log(userRole);
 
   const inputRef = useRef(null);
 
@@ -275,6 +271,7 @@ function Chat() {
       try {
         const result = await updateStatus({
           variables: {
+            token: user.token,
             id: ticketId,
             fields: {
               statusId: 3,
@@ -290,6 +287,7 @@ function Chat() {
       try {
         const result = await updateStatus({
           variables: {
+            token: user.token,
             id: ticketId,
             fields: {
               statusId: 4,
@@ -318,6 +316,7 @@ function Chat() {
         setMessageDate(new Date());
         addMessage({
           variables: {
+            token: user.token,
             senderId: userId,
             recieverId: senderId,
             ticketId: ticketId,
@@ -331,6 +330,7 @@ function Chat() {
       });
 
     setMessage("");
+    setEditorState(EditorState.createEmpty());
     if (inputRef.current) {
       inputRef.current.value = null;
     }
@@ -355,6 +355,7 @@ function Chat() {
 
       await updateStatus({
         variables: {
+          token: user.token,
           id: ticketId,
           fields: {
             statusId: 2,
@@ -385,6 +386,7 @@ function Chat() {
 
       await updateStatus({
         variables: {
+          token: user.token,
           id: ticketId,
           fields: {
             statusId: 3,
@@ -456,6 +458,7 @@ function Chat() {
     e.preventDefault();
     updateStatus({
       variables: {
+        token: user.token,
         id: ticketId,
         fields: {
           reaction: "like",
@@ -470,6 +473,7 @@ function Chat() {
     e.preventDefault();
     updateStatus({
       variables: {
+        token: user.token,
         id: ticketId,
         fields: {
           reaction: "dislike",
@@ -606,16 +610,20 @@ function Chat() {
         {isVisible && isAdmin() && currentStatus !== "Новый" ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
-              <Form.Group controlId="TextareaForm">
-                {/* <Form.Control
+              {/* <Form.Group controlId="TextareaForm">
+                <Form.Control
                   as="textarea"
                   placeholder="Текст сообщения"
                   rows={3}
                   value={message}
                   onChange={handleChange}
                   className="chat-input__textarea"
-                /> */}
-              </Form.Group>
+                />
+              </Form.Group> */}
+              <Editor
+                editorState={editorState}
+                onEditorStateChange={handleEditorChange}
+              />
               <Form.Group controlId="FileInputForm">
                 <Form.Control
                   type="file"

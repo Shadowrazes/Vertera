@@ -120,6 +120,7 @@ function AddTheme() {
     try {
       const result = await addTheme({
         variables: {
+          token: user.token,
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",

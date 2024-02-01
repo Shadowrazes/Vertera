@@ -221,6 +221,7 @@ function EditSubtheme() {
     try {
       const result = await editSubtheme({
         variables: {
+          token: user.token,
           id: parseInt(subthemeId),
           themeId: selectedThemeId,
           stroke: nameValue.trim(),
@@ -250,6 +251,7 @@ function EditSubtheme() {
     try {
       const result = await deleteSubtheme({
         variables: {
+          token: user.token,
           id: parseInt(subthemeId),
         },
       });

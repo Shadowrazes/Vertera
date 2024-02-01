@@ -18,6 +18,8 @@ function addUnit() {
   const [nameValue, setNameValue] = useState("");
   const [orderNum, setOrderNum] = useState(0);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const navigate = useNavigate();
 
   const goToAllUnits = () => {
@@ -71,6 +73,7 @@ function addUnit() {
     try {
       const result = await addUnit({
         variables: {
+          token: user.token,
           stroke: nameValue.trim(),
           lang: "ru",
           orderNum: parseInt(orderNum),
