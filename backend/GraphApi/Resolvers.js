@@ -143,7 +143,7 @@ export const resolvers = {
             context.user = await Access(User.RoleHelper, args.token);
             return {class: 'helper'};
         },
-        adminMutation: async (_, args) => {
+        adminMutation: async (_, args, context) => {
             context.user = await Access(User.RoleAdmin, args.token);
             return {class: 'admin'};
         },
