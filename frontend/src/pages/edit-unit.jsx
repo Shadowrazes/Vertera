@@ -107,6 +107,7 @@ function EditUnit() {
     try {
       const result = await editUnit({
         variables: {
+          token: user.token,
           id: parseInt(unitId),
           stroke: nameValue.trim(),
           lang: "ru",
@@ -134,6 +135,7 @@ function EditUnit() {
     try {
       const result = await deleteUnit({
         variables: {
+          token: user.token,
           id: parseInt(unitId),
         },
       });

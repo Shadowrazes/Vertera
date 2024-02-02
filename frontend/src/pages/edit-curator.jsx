@@ -17,7 +17,11 @@ import {
   JOB_TITLE_LIST,
   COUNTRY_LIST,
 } from "../apollo/queries";
-import { DELETE_USER, EDIT_HELPER_USER } from "../apollo/mutations";
+import {
+  DELETE_USER,
+  EDIT_HELPER_USER,
+  DISABLE_HELPER_USER,
+} from "../apollo/mutations";
 
 import { DatePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
@@ -53,18 +57,36 @@ function EditCurator() {
   const [showTwo, setShowTwo] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
   const { loading, error, data } = useQuery(HELPER, {
     variables: {
+      token: user.token,
       id: parseInt(curatorId),
     },
   });
 
-  const { data: dataDepartmentsList } = useQuery(DEPARTMENTS_LIST);
-  const { data: dataJobTitleList } = useQuery(JOB_TITLE_LIST);
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST);
+  const { data: dataDepartmentsList } = useQuery(DEPARTMENTS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataJobTitleList } = useQuery(JOB_TITLE_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
 
   const [editHelperUser, { loading: loadingEditHelper }] =
     useMutation(EDIT_HELPER_USER);
+
+  const [disableHelperUser, { loading: loadingDisableHelperUser }] =
+    useMutation(DISABLE_HELPER_USER);
 
   const [deleteUser, { loading: loadingDeleteUser }] = useMutation(DELETE_USER);
 
@@ -144,7 +166,7 @@ function EditCurator() {
     return <Loader />;
   }
 
-  if (loadingDeleteUser) {
+  if (loadingDisableHelperUser) {
     return <Loader />;
   }
 
@@ -251,6 +273,7 @@ function EditCurator() {
       if (patronymicValue == null || patronymicValue.trim() == "") {
         result = await editHelperUser({
           variables: {
+            token: user.token,
             id: parseInt(curatorId),
             name: nameValue.trim(),
             surname: surnameValue.trim(),
@@ -263,6 +286,7 @@ function EditCurator() {
       } else {
         result = await editHelperUser({
           variables: {
+            token: user.token,
             id: parseInt(curatorId),
             name: nameValue.trim(),
             surname: surnameValue.trim(),
@@ -293,9 +317,11 @@ function EditCurator() {
     setShowWarning(false);
 
     try {
-      const result = await deleteUser({
+      const result = await disableHelperUser({
         variables: {
+          token: user.token,
           id: parseInt(curatorId),
+          isActive: false,
         },
       });
       console.log("Куратор успешно удален:", result);

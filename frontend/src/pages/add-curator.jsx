@@ -11,7 +11,11 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { DEPARTMENTS_LIST, JOB_TITLE_LIST } from "../apollo/queries";
+import {
+  COUNTRY_LIST,
+  DEPARTMENTS_LIST,
+  JOB_TITLE_LIST,
+} from "../apollo/queries";
 import { ADD_HELPER_USER } from "../apollo/mutations";
 
 import { DatePicker } from "rsuite";
@@ -25,12 +29,13 @@ import "../css/add-curator.css";
 function AddCurator() {
   const [departmentList, setDepartmentList] = useState([]);
   const [jobTitleList, setJobTitleList] = useState([]);
+  const [countryList, setCountryList] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState(null);
   const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedItemJobTitle, setSelectedItemJobTitle] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCountryId, setSelectedCountryId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
@@ -52,7 +57,22 @@ function AddCurator() {
       token: user.token,
     },
   });
-  const { data: dataJobTitle } = useQuery(JOB_TITLE_LIST, {
+
+  const {
+    loading: loadingCountryList,
+    error: errorCountryList,
+    data: dataCountryList,
+  } = useQuery(COUNTRY_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+
+  const {
+    loading: loadingJobTitleList,
+    error: errorJobTitleList,
+    data: dataJobTitle,
+  } = useQuery(JOB_TITLE_LIST, {
     variables: {
       token: user.token,
     },
@@ -73,6 +93,10 @@ function AddCurator() {
       setJobTitleList(dataJobTitle.adminQuery.jobTitleList);
     }
 
+    if (dataCountryList && dataCountryList.clientQuery.countryList) {
+      setCountryList(dataCountryList.clientQuery.countryList);
+    }
+
     if (location.state && location.state.linkPrev) {
       setLinkPrev(location.state.linkPrev);
     }
@@ -85,6 +109,22 @@ function AddCurator() {
   }
 
   if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingCountryList) {
+    return <Loader />;
+  }
+
+  if (errorCountryList) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingJobTitleList) {
+    return <Loader />;
+  }
+
+  if (errorJobTitleList) {
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -112,6 +152,11 @@ function AddCurator() {
     setPhoneValue(e.target.value);
   };
 
+  const handleCountryClick = (country, countryId) => {
+    setSelectedCountry(country);
+    setSelectedCountryId(countryId);
+  };
+
   const handleDepartmentsOnChange = (departments) => {
     setSelectedDepartments(departments);
     setSelectedDepartmentsId(departments.map((department) => department.id));
@@ -119,7 +164,6 @@ function AddCurator() {
   };
 
   const handleJobTitleClick = (jobTitle, jobTitleId) => {
-    setSelectedItemJobTitle(jobTitle);
     setSelectedJobTitle(jobTitle);
     setSelectedJobTitleId(jobTitleId);
   };
@@ -147,6 +191,8 @@ function AddCurator() {
       error = "Введите номер телефона";
     } else if (selectedDate == null) {
       error = "Выберите дату рождения";
+    } else if (selectedCountryId == null) {
+      error = "Выберите страну";
     } else if (loginValue.trim() == "") {
       error = "Укажите логин";
     } else if (passwordValue.trim() == "") {
@@ -183,6 +229,7 @@ function AddCurator() {
       surnameValue.trim() == "" ||
       phoneValue.trim() == "" ||
       selectedDate == null ||
+      selectedCountryId == null ||
       loginValue.trim() == "" ||
       passwordValue.trim() == "" ||
       passwordValue.trim().length < 6 ||
@@ -200,9 +247,11 @@ function AddCurator() {
       if (patronymicValue.trim() == "") {
         result = await addHelperUser({
           variables: {
+            token: user.token,
             name: nameValue.trim(),
             surname: surnameValue.trim(),
             phone: phoneValue.trim(),
+            countryId: selectedCountryId,
             login: loginValue.trim(),
             password: passwordValue.trim(),
             departmentId: selectedDepartmentsId,
@@ -213,10 +262,12 @@ function AddCurator() {
       } else {
         result = await addHelperUser({
           variables: {
+            token: user.token,
             name: nameValue.trim(),
             surname: surnameValue.trim(),
             patronymic: patronymicValue.trim(),
             phone: phoneValue.trim(),
+            countryId: selectedCountryId,
             login: loginValue.trim(),
             password: passwordValue.trim(),
             departmentId: selectedDepartmentsId,
@@ -312,9 +363,33 @@ function AddCurator() {
             format="dd.MM.yyyy"
             onChange={handlePeriodClick}
           />
+
+          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
+          <ButtonCustom
+            title="Применить"
+            className={"add-curator__btn"}
+            onClick={handleAddCurator}
+          />
         </Col>
 
         <Col className="add-curator__column">
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={selectedCountry || "Страна"}
+          >
+            {countryList.map((country, index) => (
+              <Dropdown.Item
+                key={index}
+                onClick={() =>
+                  handleCountryClick(country.name.stroke, country.id)
+                }
+                href="#"
+              >
+                {country.name.stroke}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+
           <Form.Group controlId="LoginForm">
             <Form.Control
               type="text"
@@ -346,7 +421,7 @@ function AddCurator() {
 
           <DropdownButton
             id="dropdown-custom-1"
-            title={selectedItemJobTitle || "Должность"}
+            title={selectedJobTitle || "Должность"}
           >
             {jobTitleList.map((jobTitle, index) => (
               <Dropdown.Item
@@ -360,12 +435,6 @@ function AddCurator() {
               </Dropdown.Item>
             ))}
           </DropdownButton>
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <ButtonCustom
-            title="Применить"
-            className={"add-curator__btn"}
-            onClick={handleAddCurator}
-          />
         </Col>
       </Row>
 

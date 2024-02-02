@@ -162,6 +162,7 @@ function AddSubtheme() {
     try {
       const result = await addSubtheme({
         variables: {
+          token: user.token,
           themeId: selectedThemeId,
           stroke: nameValue.trim(),
           lang: "ru",

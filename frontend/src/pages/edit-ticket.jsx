@@ -28,6 +28,7 @@ function EditTicket() {
 
   const [dataQuery, setData] = useState([]);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
+  const [ticketId, setTicketId] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
@@ -78,6 +79,7 @@ function EditTicket() {
 
   useEffect(() => {
     if (data && data.clientQuery.ticket) {
+      setTicketId(data.clientQuery.ticket.id);
       setSelectedItem(data.clientQuery.ticket.subTheme.theme.unit.name.stroke);
       setSelectedUnit(data.clientQuery.ticket.subTheme.theme.unit.name.stroke);
       setSelectedUnitId(data.clientQuery.ticket.subTheme.theme.unit.id);
@@ -277,7 +279,8 @@ function EditTicket() {
     try {
       const result = await editTicket({
         variables: {
-          id: parseInt(itemId),
+          token: user.token,
+          id: ticketId,
           helperId: selectedCuratorId,
           unitId: selectedUnitId,
           themeId: selectedThemeId,

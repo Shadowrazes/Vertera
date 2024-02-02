@@ -1,11 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const ADD_STATUS = gql`
-  mutation addStatus {
-    addTicketStatus(fields: { lang: "ru", stroke: "В ожидании" })
-  }
-`;
-
 export const ADD_TICKET = gql`
   mutation addTicket(
     $token: String!
@@ -47,36 +41,40 @@ export const ADD_TICKET = gql`
 
 export const ADD_MESSAGE = gql`
   mutation (
+    $token: String!
     $senderId: Int!
     $recieverId: Int!
     $ticketId: Int!
-    $type: String!
     $text: String!
     $attachPaths: [String]
   ) {
-    addMessage(
-      fields: {
-        senderId: $senderId
-        recieverId: $recieverId
-        ticketId: $ticketId
-        type: $type
-        text: $text
-        attachPaths: $attachPaths
-      }
-    )
+    clientMutation(token: $token) {
+      addMessage(
+        fields: {
+          senderId: $senderId
+          recieverId: $recieverId
+          ticketId: $ticketId
+          text: $text
+          attachPaths: $attachPaths
+        }
+      )
+    }
   }
 `;
 
 export const UPDATE_STATUS = gql`
-  mutation ($id: Int!, $fields: TicketUpdate!) {
-    updateTicket(id: $id, fields: $fields) {
-      changed
+  mutation ($token: String!, $id: Int!, $fields: TicketUpdate!) {
+    helperMutation(token: $token) {
+      updateTicket(id: $id, fields: $fields) {
+        changed
+      }
     }
   }
 `;
 
 export const ADD_CLIENT_USER = gql`
   mutation (
+    $token: String!
     $name: String!
     $surname: String!
     $patronymic: String
@@ -85,54 +83,61 @@ export const ADD_CLIENT_USER = gql`
     $phone: String
     $email: String!
   ) {
-    addClientUser(
-      userFields: {
-        name: $name
-        surname: $surname
-        patronymic: $patronymic
-        countryId: 1
-        login: $login
-        password: $password
-        phone: $phone
-      }
-      clientFields: { email: $email }
-    )
+    clientMutation(token: $token) {
+      addClientUser(
+        userFields: {
+          name: $name
+          surname: $surname
+          patronymic: $patronymic
+          countryId: 1
+          login: $login
+          password: $password
+          phone: $phone
+        }
+        clientFields: { email: $email }
+      )
+    }
   }
 `;
 
 export const ADD_HELPER_USER = gql`
   mutation (
+    $token: String!
     $name: String!
     $surname: String!
     $patronymic: String
     $phone: String
+    $countryId: Int!
     $login: String
     $password: String
     $jobTitleId: Int!
     $birthday: DateTime!
     $departmentId: [Int]!
   ) {
-    addHelperUser(
-      userFields: {
-        name: $name
-        surname: $surname
-        patronymic: $patronymic
-        phone: $phone
-        login: $login
-        password: $password
-        countryId: 1
-      }
-      helperFields: {
-        jobTitleId: $jobTitleId
-        birthday: $birthday
-        departmentIds: $departmentId
-      }
-    )
+    adminMutation(token: $token) {
+      addHelperUser(
+        userFields: {
+          name: $name
+          surname: $surname
+          patronymic: $patronymic
+          countryId: $countryId
+          phone: $phone
+          login: $login
+          password: $password
+        }
+        helperFields: {
+          jobTitleId: $jobTitleId
+          birthday: $birthday
+          departmentIds: $departmentId
+        }
+      )
+    }
   }
 `;
 
 export const EDIT_HELPER_USER = gql`
   mutation (
+    $token: String!
     $id: Int!
     $name: String!
     $surname: String!
@@ -142,117 +147,169 @@ export const EDIT_HELPER_USER = gql`
     $departmentId: [Int]!
     $jobTitleId: Int!
   ) {
-    updateHelperUser(
-      id: $id
-      userFields: {
-        name: $name
-        surname: $surname
-        patronymic: $patronymic
-        countryId: $countryId
+    adminMutation(token: $token) {
+      updateHelperUser(
+        id: $id
+        userFields: {
+          name: $name
+          surname: $surname
+          patronymic: $patronymic
+          countryId: $countryId
+        }
+        helperFields: {
+          jobTitleId: $jobTitleId
+          birthday: $birthday
+          departmentIds: $departmentId
+        }
+      ) {
+        changed
       }
-      helperFields: {
-        jobTitleId: $jobTitleId
-        birthday: $birthday
-        departmentIds: $departmentId
+    }
+  }
+`;
+
+export const DISABLE_HELPER_USER = gql`
+  mutation ($token: String!, $id: Int!, $isActive: Boolean) {
+    adminMutation(token: $token) {
+      updateHelperUser(
+        id: $id
+        userFields: { isActive: $isActive }
+        helperFields: {}
+      ) {
+        changed
       }
-    ) {
-      changed
     }
   }
 `;
 
 export const DELETE_USER = gql`
-  mutation ($id: Int!) {
-    deleteUser(id: $id)
+  mutation ($token: String!, $id: Int!) {
+    adminMutation(token: $token) {
+      deleteUser(id: $id)
+    }
   }
 `;
 
 export const ADD_UNIT = gql`
-  mutation ($stroke: String!, $lang: String!, $orderNum: Int!) {
-    addUnit(fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum })
+  mutation (
+    $token: String!
+    $stroke: String!
+    $lang: String!
+    $orderNum: Int!
+  ) {
+    adminMutation(token: $token) {
+      addUnit(fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum })
+    }
   }
 `;
 
 export const EDIT_UNIT = gql`
-  mutation ($id: Int!, $stroke: String!, $lang: String!, $orderNum: Int) {
-    updateUnit(
-      id: $id
-      fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum }
-    ) {
-      changed
+  mutation (
+    $token: String!
+    $id: Int!
+    $stroke: String!
+    $lang: String!
+    $orderNum: Int
+  ) {
+    adminMutation(token: $token) {
+      updateUnit(
+        id: $id
+        fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum }
+      ) {
+        changed
+      }
     }
   }
 `;
 
 export const DELETE_UNIT = gql`
-  mutation ($id: Int!) {
-    deleteUnit(id: $id)
+  mutation ($token: String!, $id: Int!) {
+    adminMutation(token: $token) {
+      deleteUnit(id: $id)
+    }
   }
 `;
 
 export const ADD_THEME = gql`
-  mutation ($unitId: Int!, $stroke: String!, $lang: String!, $orderNum: Int!) {
-    addTheme(
-      fields: {
-        unitId: $unitId
-        stroke: $stroke
-        lang: $lang
-        orderNum: $orderNum
-      }
-    )
+  mutation (
+    $token: String!
+    $unitId: Int!
+    $stroke: String!
+    $lang: String!
+    $orderNum: Int!
+  ) {
+    adminMutation(token: $token) {
+      addTheme(
+        fields: {
+          unitId: $unitId
+          stroke: $stroke
+          lang: $lang
+          orderNum: $orderNum
+        }
+      )
+    }
   }
 `;
 
 export const EDIT_THEME = gql`
   mutation (
+    $token: String!
     $id: Int!
     $unitId: Int
     $stroke: String
     $lang: String!
     $orderNum: Int
   ) {
-    updateTheme(
-      id: $id
-      fields: {
-        unitId: $unitId
-        stroke: $stroke
-        lang: $lang
-        orderNum: $orderNum
+    adminMutation(token: $token) {
+      updateTheme(
+        id: $id
+        fields: {
+          unitId: $unitId
+          stroke: $stroke
+          lang: $lang
+          orderNum: $orderNum
+        }
+      ) {
+        changed
       }
-    ) {
-      changed
     }
   }
 `;
 
 export const DELETE_THEME = gql`
-  mutation ($id: Int!) {
-    deleteTheme(id: $id)
+  mutation ($token: String!, $id: Int!) {
+    adminMutation(token: $token) {
+      deleteTheme(id: $id)
+    }
   }
 `;
 
 export const ADD_SUBTHEME = gql`
   mutation (
+    $token: String!
     $themeId: Int!
     $stroke: String!
     $lang: String!
     $departmentIds: [Int]!
     $orderNum: Int!
   ) {
-    addSubTheme(
-      fields: {
-        themeId: $themeId
-        stroke: $stroke
-        lang: $lang
-        departmentIds: $departmentIds
-        orderNum: $orderNum
-      }
-    )
+    adminMutation(token: $token) {
+      addSubTheme(
+        fields: {
+          themeId: $themeId
+          stroke: $stroke
+          lang: $lang
+          departmentIds: $departmentIds
+          orderNum: $orderNum
+        }
+      )
+    }
   }
 `;
 
 export const EDIT_SUBTHEME = gql`
   mutation (
+    $token: String!
     $id: Int!
     $themeId: Int
     $stroke: String
@@ -260,29 +317,34 @@ export const EDIT_SUBTHEME = gql`
     $departmentIds: [Int]
     $orderNum: Int
   ) {
-    updateSubTheme(
-      id: $id
-      fields: {
-        themeId: $themeId
-        stroke: $stroke
-        lang: $lang
-        departmentIds: $departmentIds
-        orderNum: $orderNum
+    adminMutation(token: $token) {
+      updateSubTheme(
+        id: $id
+        fields: {
+          themeId: $themeId
+          stroke: $stroke
+          lang: $lang
+          departmentIds: $departmentIds
+          orderNum: $orderNum
+        }
+      ) {
+        changed
       }
-    ) {
-      changed
     }
   }
 `;
 
 export const DELETE_SUBTHEME = gql`
-  mutation ($id: Int!) {
-    deleteSubTheme(id: $id)
+  mutation ($token: String!, $id: Int!) {
+    adminMutation(token: $token) {
+      deleteSubTheme(id: $id)
+    }
   }
 `;
 
 export const EDIT_TICKET = gql`
   mutation (
+    $token: String!
     $id: Int!
     $helperId: Int
     $unitId: Int
@@ -290,17 +352,60 @@ export const EDIT_TICKET = gql`
     $subThtmeId: Int
     $departmentId: Int
   ) {
-    updateTicket(
-      id: $id
-      fields: {
-        helperId: $helperId
-        unitId: $unitId
-        themeId: $themeId
-        subThemeId: $subThtmeId
+    helperMutation(token: $token) {
+      updateTicket(
+        id: $id
+        fields: {
+          helperId: $helperId
+          unitId: $unitId
+          themeId: $themeId
+          subThemeId: $subThtmeId
+        }
+        departmentId: $departmentId
+      ) {
+        changed
       }
-      departmentId: $departmentId
-    ) {
-      changed
+    }
+  }
+`;
+
+export const SPLIT_TICKET = gql`
+  mutation (
+    $token: String!
+    $id: Int!
+    $title: String!
+    $clientId: Int!
+    $unitId: Int!
+    $themeId: Int!
+    $subThemeId: Int!
+    $senderId: Int!
+    $recieverId: Int!
+    $ticketId: Int!
+    $text: String!
+    $attachPaths: [String]
+  ) {
+    helperMutation(token: $token) {
+      splitTicket(
+        id: $id
+        argsList: [
+          {
+            ticketFields: {
+              title: $title
+              clientId: $clientId
+              unitId: $unitId
+              themeId: $themeId
+              subThemeId: $subThemeId
+            }
+            messageFields: {
+              senderId: $senderId
+              recieverId: $recieverId
+              ticketId: $ticketId
+              text: $text
+              attachPaths: $attachPaths
+            }
+          }
+        ]
+      )
     }
   }
 `;
