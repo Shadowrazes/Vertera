@@ -487,7 +487,7 @@ function FormComponent() {
                 />
               </Form.Group>
             )} */}
-            <Form.Group controlId="TicketThemeForm">
+            <Form.Group controlId="TicketTitleForm">
               <Form.Control
                 type="text"
                 placeholder="Тема обращения"

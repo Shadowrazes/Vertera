@@ -9,12 +9,21 @@ import {
   Table,
   ToggleButton,
   ToggleButtonGroup,
+  DropdownButton,
+  Dropdown,
+  Modal,
+  Button,
 } from "react-bootstrap";
 import draftToHtml from "draftjs-to-html";
 import { EditorState, convertToRaw } from "draft-js";
 
 import { MESSAGES_CHAT, THEME_LIST } from "../apollo/queries";
-import { ADD_MESSAGE, UPDATE_STATUS, EDIT_TICKET } from "../apollo/mutations";
+import {
+  ADD_MESSAGE,
+  UPDATE_STATUS,
+  EDIT_TICKET,
+  SPLIT_TICKET,
+} from "../apollo/mutations";
 
 import { Editor } from "react-draft-wysiwyg";
 import Loader from "../pages/loading";
@@ -31,6 +40,7 @@ function Chat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const [dataQuery, setData] = useState([]);
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
@@ -55,7 +65,19 @@ function Chat() {
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
+  const [newTicketsCount, setNewTicketsCount] = useState(undefined);
+  const [inputValues, setInputValues] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const [isVisible, setIsVisible] = useState(true);
+  const [isVisibleSplit, setIsVisibleSplit] = useState(false);
+  const [isVisibleSplitFields, setisVisibleSplitFields] = useState(false);
+  const [isSubThemeDropdownVisible, setIsSubThemeDropdownVisible] =
+    useState(true);
+  const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
@@ -78,6 +100,16 @@ function Chat() {
     variables: {
       token: user.token,
       link: itemId,
+    },
+  });
+
+  const {
+    loading: loadingThemeList,
+    error: errorThemeList,
+    data: dataThemeList,
+  } = useQuery(THEME_LIST, {
+    variables: {
+      token: user?.token,
     },
   });
 
@@ -109,6 +141,10 @@ function Chat() {
         setIsVisible(false);
       }
 
+      if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+        setData(dataThemeList.clientQuery.allThemeTree);
+      }
+
       if (location.state && location.state.linkPrev) {
         setLinkPrev(location.state.linkPrev);
       }
@@ -120,8 +156,24 @@ function Chat() {
       } else {
         setReaction(null);
       }
+
+      if (newTicketsCount !== undefined) {
+        const inputs = Array.from({ length: newTicketsCount }, (_, index) => ({
+          id: index + 1,
+          title: "",
+          unit: null,
+          unitId: null,
+          theme: null,
+          themeId: null,
+          subtheme: null,
+          subthemeId: null,
+          editorContent: EditorState.createEmpty(),
+          text: "",
+        }));
+        setInputValues(inputs);
+      }
     }
-  }, [data, location.state]);
+  }, [data, dataThemeList, location.state, newTicketsCount]);
 
   const navigate = useNavigate();
 
@@ -146,11 +198,22 @@ function Chat() {
 
   const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
 
+  const [splitTicket, { loading: loadingSplitTicket }] =
+    useMutation(SPLIT_TICKET);
+
   if (loading) {
     return <Loader />;
   }
 
   if (error) {
+    return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingThemeList) {
+    return <Loader />;
+  }
+
+  if (errorThemeList) {
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -163,6 +226,10 @@ function Chat() {
   }
 
   if (loadingEditTicket) {
+    return <Loader />;
+  }
+
+  if (loadingSplitTicket) {
     return <Loader />;
   }
 
@@ -336,12 +403,13 @@ function Chat() {
     }
   };
 
-  const handleChange = (e) => {
-    setMessage(e.target.value);
-  };
+  // const handleChange = (e) => {
+  //   setMessage(e.target.value);
+  // };
 
   const handleClose = async () => {
     setIsVisible(false);
+    setShowWarning(false);
 
     if (loaderUpdateStatus) {
       return <Loader />;
@@ -499,8 +567,181 @@ function Chat() {
     return result;
   };
 
+  const handleSplitTicket = () => {
+    setIsVisibleSplit(true);
+  };
+
+  const handleOnChangeNewTicketsCount = (e) => {
+    setNewTicketsCount(e.target.value);
+  };
+
+  const handleSplitTicketFields = () => {
+    setIsVisibleSplit(false);
+    setisVisibleSplitFields(true);
+  };
+
+  const handleInputChange = (id, value) => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === id ? { ...input, title: value } : input
+    );
+
+    setInputValues(updatedInputValues);
+  };
+
+  const handleUnitClick = (unit, unitId) => {
+    let theme, themeId, subtheme, subthemeId;
+
+    if (unit !== selectedUnit) {
+      theme = null;
+      themeId = null;
+      subtheme = null;
+      subthemeId = null;
+      setIsSubThemeDropdownVisible(true);
+    }
+
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            unit: unit,
+            unitId: unitId,
+            theme: theme,
+            themeId: themeId,
+            subtheme: subtheme,
+            subthemeId: subthemeId,
+          }
+        : input
+    );
+
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+    setInputValues(updatedInputValues);
+  };
+
+  const handleThemeClick = (theme, themeId) => {
+    let subthemeId;
+
+    if (theme !== selectedTheme) {
+      setIsSubThemeDropdownVisible(true);
+
+      switch ((selectedUnitId, themeId)) {
+        case (1, 14):
+          subthemeId = 73;
+          setIsSubThemeDropdownVisible(false);
+          break;
+        case (2, 15):
+          subthemeId = 74;
+          setIsSubThemeDropdownVisible(false);
+          break;
+        case (2, 16):
+          subthemeId = 75;
+          setIsSubThemeDropdownVisible(false);
+          break;
+        case (2, 22):
+          subthemeId = 102;
+          setIsSubThemeDropdownVisible(false);
+          break;
+        case (2, 23):
+          subthemeId = 103;
+          setIsSubThemeDropdownVisible(false);
+          break;
+        default:
+      }
+    }
+
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? { ...input, theme: theme, themeId: themeId, subthemeId: subthemeId }
+        : input
+    );
+
+    setSelectedTheme(theme);
+    setInputValues(updatedInputValues);
+  };
+
+  const handleSubThemeClick = (subtheme, subthemeId) => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? { ...input, subtheme: subtheme, subthemeId: subthemeId }
+        : input
+    );
+    setInputValues(updatedInputValues);
+  };
+
+  const handleSplitEditorChange = (newEditorState, inputId) => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === inputId
+        ? {
+            ...input,
+            editorContent: newEditorState,
+            text: draftToHtml(convertToRaw(newEditorState.getCurrentContent())),
+          }
+        : input
+    );
+
+    setInputValues(updatedInputValues);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      Math.min(prevIndex + 1, inputValues.length - 1)
+    );
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
   const handleToggleChange = (value) => {
     setSelectedValue(value);
+  };
+
+  const handleShowWarning = () => {
+    setShowWarning(true);
+  };
+
+  const handleCloseWarning = () => {
+    setShowWarning(false);
+  };
+
+  const handleMutationSplitTicket = async () => {
+    console.log(inputValues);
+    let senderId;
+
+    if (userId == clientId) {
+      senderId = helperId;
+    } else {
+      senderId = clientId;
+    }
+
+    try {
+      const result = await splitTicket({
+        variables: {
+          token: user.token,
+          id: ticketId,
+          argsList: inputValues.map((input) => ({
+            ticketFields: {
+              title: input.title,
+              clientId: clientId,
+              unitId: input.unitId,
+              themeId: input.themeId,
+              subThemeId: input.subThemeId,
+            },
+            messageFields: {
+              senderId: userId,
+              recieverId: senderId,
+              ticketId: ticketId,
+              text: input.text,
+              attachPaths: [],
+            },
+          })),
+        },
+      });
+
+      console.log("Тикет успешно разделен:", result);
+    } catch (error) {
+      console.error("Ошибка при разделении тикета:", error);
+    }
   };
 
   return (
@@ -521,6 +762,127 @@ function Chat() {
             state="Закрыто"
             linkPrev={linkPrev}
           />
+        )}
+
+        {isVisibleSplit && (
+          <>
+            <Form.Control
+              type="number"
+              className="add-currator__input"
+              placeholder="Количество новых тикетов"
+              value={newTicketsCount}
+              onChange={handleOnChangeNewTicketsCount}
+              min={0}
+            />
+            <ButtonCustom
+              title="Создать новые тикеты"
+              className="chat-input__button-close"
+              onClick={handleSplitTicketFields}
+            />
+          </>
+        )}
+
+        {isVisibleSplitFields && (
+          <>
+            {inputValues.map((input, index) => (
+              <Form.Group
+                key={input.id}
+                controlId={`TicketTitleForm_${input.id}`}
+                style={{ display: index === currentIndex ? "block" : "none" }}
+              >
+                <h3>Новый тикет #{input.id}</h3>
+                <Form.Control
+                  type="text"
+                  placeholder="Тема обращения"
+                  className="form__input"
+                  value={input.title}
+                  onChange={(e) => handleInputChange(input.id, e.target.value)}
+                />
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={input.unit || "Выберите подразделение"}
+                >
+                  {dataQuery.map((unit, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                      href="#"
+                    >
+                      {unit.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+                {input.unit && (
+                  <DropdownButton
+                    id="dropdown-custom-1"
+                    title={input.theme || "Тип обращения"}
+                  >
+                    {dataQuery
+                      .find((unit) => unit.name.stroke === input.unit)
+                      ?.themes.map((theme) => (
+                        <Dropdown.Item
+                          key={theme.id}
+                          onClick={() =>
+                            handleThemeClick(theme.name.stroke, theme.id)
+                          }
+                          href="#"
+                        >
+                          {theme.name.stroke}
+                        </Dropdown.Item>
+                      ))}
+                  </DropdownButton>
+                )}
+                {isSubThemeDropdownVisible && input.theme && (
+                  <DropdownButton
+                    id="dropdown-custom-1"
+                    title={input.subtheme || "Подтема"}
+                  >
+                    {dataQuery
+                      .find((unit) => unit.name.stroke === input.unit)
+                      ?.themes.find(
+                        (theme) => theme.name.stroke === input.theme
+                      )
+                      ?.subThemes.map((subTheme) => (
+                        <Dropdown.Item
+                          key={subTheme.id}
+                          onClick={() =>
+                            handleSubThemeClick(
+                              subTheme.name.stroke,
+                              subTheme.id
+                            )
+                          }
+                          href="#"
+                        >
+                          {subTheme.name.stroke}
+                        </Dropdown.Item>
+                      ))}
+                  </DropdownButton>
+                )}
+                <Editor
+                  editorState={input.editorContent}
+                  onEditorStateChange={(newEditorState) =>
+                    handleSplitEditorChange(newEditorState, input.id)
+                  }
+                />
+              </Form.Group>
+            ))}
+
+            <Button onClick={handlePrevious} disabled={currentIndex === 0}>
+              Предыдущий
+            </Button>
+            <Button
+              onClick={handleNext}
+              disabled={currentIndex === inputValues.length - 1}
+            >
+              Следующий
+            </Button>
+
+            <ButtonCustom
+              title="Создать новые обращения"
+              className="chat-input__button-send"
+              onClick={handleMutationSplitTicket}
+            />
+          </>
         )}
 
         <Row>
@@ -671,7 +1033,7 @@ function Chat() {
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"
-                    onClick={handleClose}
+                    onClick={handleShowWarning}
                   />
                 ) : (
                   <></>
@@ -689,18 +1051,29 @@ function Chat() {
                 <></>
               )}
               {isAdmin() && currentStatus !== "Закрыт" && (
-                <Link
-                  to={`/edit-ticket/${itemId}`}
-                  state={{
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  <ButtonCustom
-                    title="Изменить тикет"
-                    className="chat-input__button-close single"
-                  />
-                </Link>
+                <>
+                  <Link
+                    to={`/edit-ticket/${itemId}`}
+                    state={{
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    <ButtonCustom
+                      title="Изменить тикет"
+                      className="chat-input__button-close single"
+                    />
+                  </Link>
+                  {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Разделить тикет"
+                        className="chat-input__button-close single"
+                        onClick={handleSplitTicket}
+                      />
+                    </a>
+                  )}
+                </>
               )}
             </Row>
           </Form>
@@ -718,7 +1091,7 @@ function Chat() {
                   <ButtonCustom
                     title="Закрыть заявку"
                     className="chat-input__button-close"
-                    onClick={handleClose}
+                    onClick={handleShowWarning}
                   />
                 ) : (
                   <></>
@@ -736,18 +1109,29 @@ function Chat() {
                 <></>
               )}
               {isAdmin() && currentStatus !== "Закрыт" && (
-                <Link
-                  to={`/edit-ticket/${itemId}`}
-                  state={{
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  <ButtonCustom
-                    title="Изменить тикет"
-                    className="chat-input__button-close single"
-                  />
-                </Link>
+                <>
+                  <Link
+                    to={`/edit-ticket/${itemId}`}
+                    state={{
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    <ButtonCustom
+                      title="Изменить тикет"
+                      className="chat-input__button-close single"
+                    />
+                  </Link>
+                  {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Разделить тикет"
+                        className="chat-input__button-close single"
+                        onClick={handleSplitTicket}
+                      />
+                    </a>
+                  )}
+                </>
               )}
             </Row>
           </Form>
@@ -887,6 +1271,22 @@ function Chat() {
           )}
         </div>
       )}
+      <Modal show={showWarning} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Предупреждение</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Вы уверены, что хотите закрыть это обращение?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseWarning}>
+            Отмена
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Продолжить
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
