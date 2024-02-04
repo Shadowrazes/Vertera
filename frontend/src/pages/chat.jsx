@@ -45,6 +45,7 @@ function Chat() {
   );
   const [dataQuery, setData] = useState([]);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
+  const [dataLogQuery, setDataLogQuery] = useState([]);
   const [message, setMessage] = useState("");
   const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
@@ -178,6 +179,7 @@ function Chat() {
     if (data && data.clientQuery.ticket) {
       setTicketId(data.clientQuery.ticket.id);
       setMessagesQuery(data.clientQuery.ticket.messages);
+      setDataLogQuery(data.clientQuery.ticket.log);
       setCurrentStatus(data.clientQuery.ticket.status.name.stroke);
       setHelperId(data.clientQuery.ticket.helper.id);
       setClientId(data.clientQuery.ticket.client.id);
@@ -1814,6 +1816,31 @@ function Chat() {
           )}
         </div>
       )}
+
+      <Table className="table__table" hover>
+        <thead>
+          <tr>
+            <th>Имя</th>
+            <th>Дата</th>
+            <th>Событие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dataLogQuery.map((log, index) => (
+            <tr key={index}>
+              <td>{getFullName(log.initiator)}</td>
+              <td>
+                {DateTime.fromISO(log.date, {
+                  zone: "utc",
+                })
+                  .toLocal()
+                  .toFormat("yyyy.MM.dd HH:mm:ss")}
+              </td>
+              <td>{log.info}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
 
       <Modal show={show} onHide={handleCloseModal}>
         <Modal.Header closeButton>
