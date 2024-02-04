@@ -6,7 +6,7 @@
 
 .form__input {
   width: 672px !important;
-  font-size: 20px !important;
+  font-size: 16px !important;
   border: 1px solid #8c8c8c !important;
 }
 
@@ -15,7 +15,7 @@
   height: 260px;
   padding: 20px 13px;
   resize: none;
-  font-size: 20px;
+  font-size: 16px;
   border: 1px solid #8c8c8c !important;
 }
 
@@ -25,7 +25,7 @@
 
 .form__error {
   font-family: "TT Norms Pro", sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   color: red;
 }
 
@@ -34,6 +34,23 @@
   background: #00ab97 !important;
   border-radius: 5px;
   border: none;
+}
+
+#AddFileButton {
+  border: 1px solid #00ab97;
+  border-radius: 5px;
+  color: #00ab97;
+  background-color: white;
+  transition: .3s;
+}
+
+#AddFileButton:hover {
+  background: #00ab97;
+  color: white;
+}
+
+.dropdown button{
+  font-size: 16px !important;
 }
 
 @media screen and (max-width: 768px) {

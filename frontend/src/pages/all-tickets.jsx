@@ -1134,7 +1134,7 @@ function allTickets() {
           )}
 
           {isAdmin() && (
-            <ButtonGroup className="mb-3">
+            <ButtonGroup className="mb-3 filter-buttonGroup">
               <Button
                 onClick={handleFastFilter.bind(null, "my")}
                 variant={fastFilterStr === "my" ? "primary" : "outline-primary"}

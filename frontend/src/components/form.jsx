@@ -20,7 +20,6 @@ import Loader from "../pages/loading";
 import TitleH2 from "./title";
 
 import "../css/form.css";
-import "/node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 function FormComponent() {
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -64,6 +63,10 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
+  const [fileInputs, setFileInputs] = useState([{
+    'fileInput': true
+  }])
+
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
@@ -81,15 +84,22 @@ function FormComponent() {
   const [addTicket] = useMutation(ADD_TICKET);
 
   async function uploadFiles() {
-    const fileInput = document.getElementById("FileInputForm");
+    const fileInputs = document.querySelectorAll(".fileInputForm input");
     let filePaths = [];
+    let files = [];
 
-    if (fileInput.files.length > 0) {
+    for (let fileInput of fileInputs) {
+      if (fileInput.files.length > 0) {
+        files.push(fileInput.files[0]);
+      }
+    }
+    
+    if (files.length > 0) {
       let formdata = new FormData();
       let filesValid = true;
 
-      for (let i = 0; i < fileInput.files.length; i++) {
-        const file = fileInput.files[i];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         formdata.append(`fileFields`, file);
       }
 
@@ -331,6 +341,16 @@ function FormComponent() {
     addTicketWithFiles();
   };
 
+  const handleAddFileInput = () => {
+    if(fileInputs.length >= 5) {
+      alert("Вы можете загрузить не более 5 файлов");
+      return;
+    }
+    setFileInputs(fileInputs.concat([{
+      'fileInput': true
+    }]));
+  }
+
   const handleFileChange = (e) => {
     const files = e.target.files;
     let isFileSizeExceeded = false;
@@ -339,7 +359,7 @@ function FormComponent() {
       e.target.value = null;
       setIsVisible(true);
       setIsFilesLimitExceeded(true);
-      console.log("Вы можете загружать до 5 файлов");
+      console.log("Вы можете загрузить не более 5 файлов");
       return;
     }
 
@@ -505,19 +525,46 @@ function FormComponent() {
                 onChange={handleTextareaChange}
               />
             </Form.Group> */}
-            <Editor
-              editorState={editorState}
-              onEditorStateChange={handleEditorChange}
-            />
-            <Form.Group className="mb-3" controlId="FileInputForm">
-              <Form.Control
-                type="file"
-                multiple
-                accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                onChange={handleFileChange}
+            <Form.Group className="custom-editor">
+              <Editor
+                editorState={editorState}
+                onEditorStateChange={handleEditorChange}
+                toolbarStyle={{border: "1px solid #dee2e6", borderRadius: "6px 6px 0 0"}}
+                editorStyle={{border: "1px solid #dee2e6", borderRadius: "0 0 6px 6px", padding: "10px"}}
+                placeholder={"Введите здесь Ваш вопрос или опишите Вашу проблему"}
+                toolbar={{
+                  options: ['inline', 'list', 'emoji', 'remove', 'history'],
+                  inline: {
+                    options: ['bold', 'italic', 'underline', 'strikethrough'],
+                  },
+                  list: {
+                    options: ['unordered', 'ordered']
+                  }
+                }}
               />
             </Form.Group>
+            <div className="file-inputs">
+              {fileInputs.map((fileInput, index) => (
+                <Form.Group className="mb-3 fileInputForm" key={index}>
+                  <Form.Control
+                    type="file"
+                    accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                    onChange={handleFileChange}
+                  />
+                </Form.Group>
+              ))}
+              
+              <Button
+                variant="outline-primary"
+                id="AddFileButton"
+                onClick={handleAddFileInput}
+              >
+                Добавить файл
+              </Button>
+            </div>
+
             {isVisible && <span className="form__error">{errorMsg()}</span>}
+
             <Button
               variant="primary"
               id="ButtonForm"
