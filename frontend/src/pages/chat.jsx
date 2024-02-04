@@ -154,6 +154,25 @@ function Chat() {
       token: user.token,
     },
   });
+  const [fileInputs, setFileInputs] = useState([
+    {
+      fileInput: true,
+    },
+  ]);
+
+  const handleAddFileInput = () => {
+    if (fileInputs.length >= 5) {
+      alert("Вы можете загрузить не более 5 файлов");
+      return;
+    }
+    setFileInputs(
+      fileInputs.concat([
+        {
+          fileInput: true,
+        },
+      ])
+    );
+  };
 
   useEffect(() => {
     if (data && data.clientQuery.ticket) {
@@ -330,25 +349,22 @@ function Chat() {
   };
 
   async function uploadFiles() {
-    const fileInput = document.getElementById("FileInputForm");
+    const fileInputs = document.querySelectorAll(".fileInputForm input");
     let filePaths = [];
+    let files = [];
 
-    if (fileInput.files.length > 0) {
-      const maxFileSize = 10 * 1024 * 1024;
+    for (let fileInput of fileInputs) {
+      if (fileInput.files.length > 0) {
+        files.push(fileInput.files[0]);
+      }
+    }
+
+    if (files.length > 0) {
       let formdata = new FormData();
       let filesValid = true;
 
-      for (let i = 0; i < fileInput.files.length; i++) {
-        const file = fileInput.files[i];
-
-        if (file.size > maxFileSize) {
-          console.log(`Файл ${file.name} превышает максимальный размер (10MB)`);
-          filesValid = false;
-          setIsVisibleError(true);
-          setIsFilesSizeExceeded(false);
-          break;
-        }
-
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         formdata.append(`fileFields`, file);
       }
 
@@ -1147,10 +1163,27 @@ function Chat() {
                   </DropdownButton>
                 )}
                 <Editor
-                  editorState={input.editorContent}
-                  onEditorStateChange={(newEditorState) =>
-                    handleSplitEditorChange(newEditorState, input.id)
-                  }
+                  editorState={editorState}
+                  onEditorStateChange={handleEditorChange}
+                  toolbarStyle={{
+                    border: "1px solid #dee2e6",
+                    borderRadius: "6px 6px 0 0",
+                  }}
+                  editorStyle={{
+                    border: "1px solid #dee2e6",
+                    borderRadius: "0 0 6px 6px",
+                    padding: "10px",
+                  }}
+                  placeholder={"Введите здесь ваше сообщение"}
+                  toolbar={{
+                    options: ["inline", "list", "emoji", "remove", "history"],
+                    inline: {
+                      options: ["bold", "italic", "underline", "strikethrough"],
+                    },
+                    list: {
+                      options: ["unordered", "ordered"],
+                    },
+                  }}
                 />
               </Form.Group>
             ))}
@@ -1430,19 +1463,51 @@ function Chat() {
                   className="chat-input__textarea"
                 />
               </Form.Group> */}
-              <Editor
-                editorState={editorState}
-                onEditorStateChange={handleEditorChange}
-              />
-              <Form.Group controlId="FileInputForm">
-                <Form.Control
-                  type="file"
-                  multiple
-                  accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                  onChange={handleFileChange}
-                  ref={inputRef}
+              <Form.Group className="custom-editor">
+                <Editor
+                  editorState={editorState}
+                  onEditorStateChange={handleEditorChange}
+                  toolbarStyle={{
+                    border: "1px solid #dee2e6",
+                    borderRadius: "6px 6px 0 0",
+                  }}
+                  editorStyle={{
+                    border: "1px solid #dee2e6",
+                    borderRadius: "0 0 6px 6px",
+                    padding: "10px",
+                  }}
+                  placeholder={"Введите здесь ваше сообщение"}
+                  toolbar={{
+                    options: ["inline", "list", "emoji", "remove", "history"],
+                    inline: {
+                      options: ["bold", "italic", "underline", "strikethrough"],
+                    },
+                    list: {
+                      options: ["unordered", "ordered"],
+                    },
+                  }}
                 />
               </Form.Group>
+              <div className="file-inputs">
+                {fileInputs.map((fileInput, index) => (
+                  <Form.Group key={index} className="mb-3 fileInputForm">
+                    <Form.Control
+                      type="file"
+                      accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                      onChange={handleFileChange}
+                    />
+                  </Form.Group>
+                ))}
+
+                <Button
+                  variant="outline-primary"
+                  id="AddFileButton"
+                  onClick={handleAddFileInput}
+                >
+                  Добавить файл
+                </Button>
+              </div>
+
               {isVisibleError && (
                 <span className="form__error">{errorMsg()}</span>
               )}
@@ -1583,36 +1648,74 @@ function Chat() {
         !isAdmin() &&
         (currentStatus === "Новый" || currentStatus === "На уточнении") ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
-            <Row className="chat-input__row">
-              <Form.Group controlId="TextareaForm">
-                {/* <Form.Control
-                  as="textarea"
-                  placeholder="Текст сообщения"
-                  rows={3}
-                  value={message}
-                  onChange={handleChange}
-                  className="chat-input__textarea"
-                /> */}
-                <Editor
-                  editorState={editorState}
-                  onEditorStateChange={handleEditorChange}
+            <Row>
+              <Col className="chat-input__row">
+                <Form.Group controlId="TextareaForm">
+                  {/* <Form.Control
+                    as="textarea"
+                    placeholder="Текст сообщения"
+                    rows={3}
+                    value={message}
+                    onChange={handleChange}
+                    className="chat-input__textarea"
+                  /> */}
+                  <Editor
+                    editorState={editorState}
+                    onEditorStateChange={handleEditorChange}
+                    toolbarStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px 6px 0 0",
+                    }}
+                    editorStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0 0 6px 6px",
+                      padding: "10px",
+                    }}
+                    placeholder={"Введите здесь ваше сообщение"}
+                    toolbar={{
+                      options: ["inline", "list", "emoji", "remove", "history"],
+                      inline: {
+                        options: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "strikethrough",
+                        ],
+                      },
+                      list: {
+                        options: ["unordered", "ordered"],
+                      },
+                    }}
+                  />
+                </Form.Group>
+
+                <div className="file-inputs">
+                  {fileInputs.map((fileInput, index) => (
+                    <Form.Group key={index} className="mb-3 fileInputForm">
+                      <Form.Control
+                        type="file"
+                        accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                        onChange={handleFileChange}
+                      />
+                    </Form.Group>
+                  ))}
+
+                  <Button
+                    variant="outline-primary"
+                    id="AddFileButton"
+                    onClick={handleAddFileInput}
+                  >
+                    Добавить файл
+                  </Button>
+                </div>
+
+                <ButtonCustom
+                  title="Отправить"
+                  className="chat-input__button-send single"
+                  type="submit"
+                  onClick={handleSubmit}
                 />
-              </Form.Group>
-              <Form.Group controlId="FileInputForm">
-                <Form.Control
-                  type="file"
-                  multiple
-                  accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                  onChange={handleFileChange}
-                  ref={inputRef}
-                />
-              </Form.Group>
-              <ButtonCustom
-                title="Отправить"
-                className="chat-input__button-send single"
-                type="submit"
-                onClick={handleSubmit}
-              />
+              </Col>
             </Row>
           </Form>
         ) : (

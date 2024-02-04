@@ -66,7 +66,9 @@
 }
 
 .chat-input__row {
-  gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .chat-input__textarea {
@@ -80,7 +82,7 @@
 
 .chat-input__button-send {
   min-width: 400px !important;
-  padding: 15px;
+  padding: 6px 12px;
   font-family: "TT Norms Pro", sans-serif;
 }
 
@@ -93,7 +95,7 @@
 }
 
 .chat-input__button-row .chat-input__button-close {
-  padding: 15px;
+  padding: 6px 12px;
   background: #fff !important;
   border: 1px solid #00ab97 !important;
   font-family: "TT Norms Pro", sans-serif;
@@ -101,7 +103,7 @@
 }
 
 .chat-input__close-container .chat-input__button-close {
-  padding: 15px;
+  padding: 6px 12px;
   background: #fff !important;
   border: 1px solid #00ab97 !important;
   font-family: "TT Norms Pro", sans-serif;
@@ -109,12 +111,11 @@
 }
 
 .chat-input__row .chat-input__button-send {
-  padding: 15px;
   font-family: "TT Norms Pro", sans-serif;
 }
 
 .chat-input__row .chat-input__button-close {
-  padding: 15px;
+  padding: 6px 12px;
   background: #fff !important;
   border: 1px solid #00ab97 !important;
   font-family: "TT Norms Pro", sans-serif;

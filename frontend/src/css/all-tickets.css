@@ -1,6 +1,7 @@
 .alltickets__container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 100px;
   margin-bottom: 50px;
 }
@@ -29,6 +30,7 @@
   width: 165px !important;
   font-size: 16px !important;
   border-radius: 0;
+  border-left: none !important;
 }
 
 .alltickets__filters-container .right-input {
@@ -65,12 +67,12 @@
 
 .alltickets__date-range-picker input {
   color: black;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .alltickets__date-range-picker span {
   color: black !important;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .alltickets__link {
@@ -186,11 +188,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 6px 12px;
   width: fit-content;
   border: 1px solid #8c8c8c;
   border-radius: 6px 0px 0px 6px;
   background: #f8f9fa;
+}
+
+.filter-buttonGroup button {
+  font-size: 16px;
 }
 
 @media screen and (max-width: 768px) {

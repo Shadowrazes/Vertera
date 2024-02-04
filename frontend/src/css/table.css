@@ -5,12 +5,12 @@
 }
 
 .table__sorts-label {
-  font-size: 17px;
+  font-size: 16px;
   color: #787878;
 }
 
 .table__sort {
-  font-size: 15px;
+  font-size: 16px;
   color: black;
   cursor: pointer;
 }
