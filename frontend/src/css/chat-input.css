@@ -2,6 +2,46 @@
   /* margin-bottom: 350px; */
 }
 
+.chat__split-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.chat__new-fields {
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.chat__new-fields .form__input {
+  width: 416px !important;
+}
+
+.chat__new-fields .rdw-editor-wrapper {
+  width: 416px !important;
+}
+
+.chat__new-fields .rdw-editor-main {
+  height: 150px !important;
+  border: 1px solid #8c8c8c !important;
+}
+
+.chat__new-fields-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 416px;
+  margin-bottom: 20px;
+}
+
+.chat__new-fields-buttons-pagination {
+  display: flex;
+  justify-content: space-between;
+  width: 416px;
+}
+
 .chat-input__container {
   /* position: fixed;
   bottom: 10px;

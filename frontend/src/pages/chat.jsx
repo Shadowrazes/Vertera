@@ -35,6 +35,7 @@ import ButtonCustom from "../components/button";
 
 import "../css/chat-input.css";
 import "/node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import "../css/all-tickets.css";
 
 function Chat() {
   const [editorState, setEditorState] = useState(() =>
@@ -77,6 +78,7 @@ function Chat() {
   const [isVisibleSplitFields, setisVisibleSplitFields] = useState(false);
   const [isSubThemeDropdownVisible, setIsSubThemeDropdownVisible] =
     useState(true);
+  const [show, setShow] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -179,6 +181,10 @@ function Chat() {
 
   const goToCreateTicket = () => {
     navigate("/");
+  };
+
+  const goToAllTickets = () => {
+    navigate("/all-tickets");
   };
 
   const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
@@ -704,6 +710,20 @@ function Chat() {
     setShowWarning(false);
   };
 
+  const errorMsgSplit = () => {
+    let error = "";
+
+    if (nameValue.trim() == "") {
+      error = "Введите имя";
+    } else if (surnameValue.trim() == "") {
+      error = "Введите Фамилию";
+    } else {
+      error = "Ошибка делении тикета";
+    }
+
+    return error;
+  };
+
   const handleMutationSplitTicket = async () => {
     console.log(inputValues);
     let senderId;
@@ -725,7 +745,7 @@ function Chat() {
               clientId: clientId,
               unitId: input.unitId,
               themeId: input.themeId,
-              subThemeId: input.subThemeId,
+              subThemeId: input.subthemeId,
             },
             messageFields: {
               senderId: userId,
@@ -737,11 +757,20 @@ function Chat() {
           })),
         },
       });
-
+      handleShowModal();
       console.log("Тикет успешно разделен:", result);
     } catch (error) {
       console.error("Ошибка при разделении тикета:", error);
     }
+  };
+
+  const handleShowModal = () => {
+    setShow(true);
+  };
+
+  const handleCloseModal = () => {
+    setShow(false);
+    goToAllTickets();
   };
 
   return (
@@ -766,19 +795,22 @@ function Chat() {
 
         {isVisibleSplit && (
           <>
-            <Form.Control
-              type="number"
-              className="add-currator__input"
-              placeholder="Количество новых тикетов"
-              value={newTicketsCount}
-              onChange={handleOnChangeNewTicketsCount}
-              min={0}
-            />
-            <ButtonCustom
-              title="Создать новые тикеты"
-              className="chat-input__button-close"
-              onClick={handleSplitTicketFields}
-            />
+            <div className="chat__split-ticket">
+              <Form.Control
+                type="number"
+                className="add-currator__input"
+                placeholder="Количество новых тикетов"
+                value={newTicketsCount}
+                onChange={handleOnChangeNewTicketsCount}
+                min={0}
+                id="splitTicket"
+              />
+              <ButtonCustom
+                title="Создать новые тикеты"
+                className="chat-input__button-close"
+                onClick={handleSplitTicketFields}
+              />
+            </div>
           </>
         )}
 
@@ -788,7 +820,8 @@ function Chat() {
               <Form.Group
                 key={input.id}
                 controlId={`TicketTitleForm_${input.id}`}
-                style={{ display: index === currentIndex ? "block" : "none" }}
+                style={{ display: index === currentIndex ? "flex" : "none" }}
+                className="chat__new-fields"
               >
                 <h3>Новый тикет #{input.id}</h3>
                 <Form.Control
@@ -866,22 +899,32 @@ function Chat() {
                 />
               </Form.Group>
             ))}
-
-            <Button onClick={handlePrevious} disabled={currentIndex === 0}>
-              Предыдущий
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={currentIndex === inputValues.length - 1}
-            >
-              Следующий
-            </Button>
-
-            <ButtonCustom
-              title="Создать новые обращения"
-              className="chat-input__button-send"
-              onClick={handleMutationSplitTicket}
-            />
+            <div className="chat__new-fields-buttons">
+              <div className="chat__new-fields-buttons-pagination">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentIndex === 0}
+                  className="alltickets__page-btn"
+                >
+                  Предыдущий
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={currentIndex === inputValues.length - 1}
+                  className="alltickets__page-btn"
+                >
+                  Следующий
+                </button>
+              </div>
+              {isErrorVisible && (
+                <span className="form__error">{errorMsgSplit()}</span>
+              )}
+              <ButtonCustom
+                title="Создать новые обращения"
+                className="chat-input__button-send"
+                onClick={handleMutationSplitTicket}
+              />
+            </div>
           </>
         )}
 
@@ -1271,6 +1314,21 @@ function Chat() {
           )}
         </div>
       )}
+
+      <Modal show={show} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Обращение разделено</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Тикет успешно разделен</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <Modal show={showWarning} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Предупреждение</Modal.Title>

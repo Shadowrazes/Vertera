@@ -440,7 +440,7 @@ function AddCurator() {
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Ваше обращение создано</Modal.Title>
+          <Modal.Title>Куратор создан</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>Новый куратор успешно добавлен</p>

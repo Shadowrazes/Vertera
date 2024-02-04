@@ -411,7 +411,7 @@ export const EDIT_TICKET = gql`
 // `;
 
 export const SPLIT_TICKET = gql`
-  mutation ($token: String!, $id: Int!, $argsList: [TicketSplitArgItem]!) {
+  mutation ($token: String!, $id: Int!, $argsList: [TicketSplitArgItem!]!) {
     helperMutation(token: $token) {
       splitTicket(id: $id, argsList: $argsList)
     }
