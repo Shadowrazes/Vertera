@@ -126,6 +126,18 @@ export const MESSAGES_CHAT = gql`
       ticket(link: $link) {
         id
         title
+        log {
+          date
+          type
+          initiator {
+            id
+            name
+            surname
+            patronymic
+            role
+          }
+          info
+        }
         helper {
           id
           user {

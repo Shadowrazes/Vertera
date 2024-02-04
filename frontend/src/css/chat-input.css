@@ -42,6 +42,10 @@
   width: 416px;
 }
 
+.chat__edit-button {
+  margin-bottom: 20px;
+}
+
 .chat-input__container {
   /* position: fixed;
   bottom: 10px;
