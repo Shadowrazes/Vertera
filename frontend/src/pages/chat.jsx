@@ -717,8 +717,24 @@ function Chat() {
       error = "Введите имя";
     } else if (surnameValue.trim() == "") {
       error = "Введите Фамилию";
+    } else if (phoneValue.trim() == "") {
+      error = "Введите номер телефона";
+    } else if (selectedDate == null) {
+      error = "Выберите дату рождения";
+    } else if (selectedCountryId == null) {
+      error = "Выберите страну";
+    } else if (loginValue.trim() == "") {
+      error = "Укажите логин";
+    } else if (passwordValue.trim() == "") {
+      error = "Укажите пароль";
+    } else if (passwordValue.trim().length < 6) {
+      error = "Плохой пароль";
+    } else if (selectedDepartmentsId == []) {
+      error = "Выберите департамент";
+    } else if (selectedJobTitleId == null) {
+      error = "Выберите должность";
     } else {
-      error = "Ошибка делении тикета";
+      error = "Ошибка при добавлении куратора";
     }
 
     return error;
@@ -916,9 +932,7 @@ function Chat() {
                   Следующий
                 </button>
               </div>
-              {isErrorVisible && (
-                <span className="form__error">{errorMsgSplit()}</span>
-              )}
+
               <ButtonCustom
                 title="Создать новые обращения"
                 className="chat-input__button-send"
