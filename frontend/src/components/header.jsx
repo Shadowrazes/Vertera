@@ -10,7 +10,11 @@ import {
   Overlay,
   Popover,
   OverlayTrigger,
+  Dropdown,
+  DropdownButton,
+  ButtonGroup,
   Nav,
+  NavDropdown
 } from "react-bootstrap";
 
 import { LOGIN, USER } from "../apollo/queries";
@@ -26,7 +30,45 @@ function Header({ user }) {
   const [menuTarget, setMenuTarget] = useState(null);
   const [isLoad, setIsLoad] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [language, setLanguage] = useState(
+    localStorage.getItem("language")
+  );
   const ref = useRef(null);
+
+  const languagesList = [
+    {
+      "title": "Русский",
+      "code": "RU",
+    },
+    {
+      "title": "English",
+      "code": "EN",
+    },
+    {
+      "title": "Español",
+      "code": "ES",
+    },
+    {
+      "title": "Čeština",
+      "code": "CS",
+    },
+    {
+      "title": "Български",
+      "code": "BG",
+    },
+    {
+      "title": "Deutsch",
+      "code": "DE",
+    },
+    {
+      "title": "Magyar",
+      "code": "HU",
+    },
+    {
+      "title": "Қазақша",
+      "code": "KZ",
+    },
+  ]
 
   const [loginVariables, setLoginVariables] = useState({
     login: "",
@@ -40,12 +82,18 @@ function Header({ user }) {
     JSON.parse(localStorage.getItem("user"))?.surname
   );
 
+
   const { data, refetch } = useQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);
     setShowLogoutModal(false);
   };
+
+  const handleChangeLanguage = (code) => {
+    localStorage.setItem('language', code);
+    location.reload();
+  }
 
   const handleShow = () => {
     if (user) {
@@ -107,28 +155,33 @@ function Header({ user }) {
 
   const userInLocalStorage = JSON.parse(localStorage.getItem("user"));
 
-  if (userInLocalStorage !== null) {
-    useEffect(() => {
-      if (data) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: data.login.user.id,
-            name: data.login.user.name,
-            surname: data.login.user.surname,
-            role: data.login.user.role,
-            login: loginVariables.login,
-            token: data.login.token,
-          })
-        );
-        setUserName(data.login.user.name);
-        setUserSurname(data.login.user.surname);
-        console.log(userName);
-        document.location.href = "/all-tickets";
-      }
-      refetch();
-    }, [data, loginVariables]);
-  }
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: data.login.user.id,
+          name: data.login.user.name,
+          surname: data.login.user.surname,
+          role: data.login.user.role,
+          login: loginVariables.login,
+          token: data.login.token,
+        })
+      );
+      setUserName(data.login.user.name);
+      setUserSurname(data.login.user.surname);
+      console.log(userName);
+      document.location.href = "/all-tickets";
+    }
+    refetch();
+  }, [data, loginVariables]);
+
+  useEffect(() => {
+    if(language === null) {
+      setLanguage("ru");
+      localStorage.setItem("language", "RU");
+    }
+  }, [language])
 
   const popover = (
     <Popover id="popover-basic">
@@ -144,12 +197,33 @@ function Header({ user }) {
 
   return (
     <>
+    
       <section className="header">
         <div className="header__container container">
           <a href="/">
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
           <div className="header__btn-group" ref={ref}>
+          <Dropdown className="language-menu">
+            <Dropdown.Toggle variant="outline-success" className="language-menu__item-top">
+              {languagesList.filter((languageItem) => {
+                return languageItem.code === language;
+              }).map((languageItem, index) => (
+                <NavDropdown.Item className="language-menu__item" key={index}>
+                  <img className="language-menu__flag" src={"/flags/" + languageItem.code.toLocaleLowerCase() + ".svg"} alt="" />
+                  <span className="language-menu__text">{languageItem.title}</span>
+                </NavDropdown.Item>
+              ))}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {languagesList.map((language, index) => (
+                <NavDropdown.Item onClick={handleChangeLanguage.bind(null, language.code)} className="language-menu__item" key={index}>
+                  <img className="language-menu__flag" src={"/flags/" + language.code.toLocaleLowerCase() + ".svg"} alt="" />
+                  <span className="language-menu__text">{language.title}</span>
+                </NavDropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
             <a
               className="header__exit"
               href="#"
