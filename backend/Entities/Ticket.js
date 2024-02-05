@@ -380,6 +380,7 @@ class Ticket extends Entity {
                     ;
                     const res = await super.TransRequest(conn, sql, [id]);
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
+                    delete fields.assistantId;
 
                     fields.statusId = this.StatusIdInProgress;
                     statusChangeLogFields.info = 'В работе';

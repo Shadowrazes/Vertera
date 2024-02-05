@@ -70,7 +70,7 @@ class Message extends Entity {
             }
 
             let visibility = this.VisibleByAll;
-            if (curTicket && curTicket.statusId == Ticket.StatusIdOnRevision){
+            if (curTicket && curTicket.statusId == Ticket.StatusIdOnRevision && sender.role == User.RoleHelper){
                 visibility = this.VisibleByHelpers;
             }
 
