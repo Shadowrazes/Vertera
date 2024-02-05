@@ -40,6 +40,14 @@ function Header({ user }) {
     JSON.parse(localStorage.getItem("user"))?.surname
   );
 
+  const isAdmin = () => {
+    return user?.role === "helper" || user?.role === "system";
+  };
+
+  const isHelper = () => {
+    return user?.role === "helper";
+  };
+
   const { data, refetch } = useQuery(LOGIN);
 
   const handleClose = () => {
@@ -146,7 +154,7 @@ function Header({ user }) {
     <>
       <section className="header">
         <div className="header__container container">
-          <a href="/">
+          <a href={isAdmin() ? "/all-tickets" : "/"}>
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
           <div className="header__btn-group" ref={ref}>

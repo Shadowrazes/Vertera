@@ -82,6 +82,8 @@ function Chat() {
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorId, setSelectedCuratorId] = useState(null);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
+  const [selectedCuratorChat, setSelectedCuratorChat] = useState(null);
+  const [selectedCuratorIdChat, setSelectedCuratorIdChat] = useState(null);
 
   const [isVisibleError, setIsVisibleError] = useState(false);
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
@@ -90,17 +92,22 @@ function Chat() {
   const [isErrorVisibleNewFields, setIsErrorVisibleNewFields] = useState(false);
   const [isVisibleEditTicketView, setIsVisibleEditTicketView] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
   const [isVisibleSplit, setIsVisibleSplit] = useState(false);
   const [isVisibleEdit, setIsVisibleEdit] = useState(false);
   const [isVisibleSplitFields, setisVisibleSplitFields] = useState(false);
+  const [isVisibleCuratorsChat, setIsVisibleCuratorsChat] = useState(false);
   const [isSubThemeDropdownVisible, setIsSubThemeDropdownVisible] =
     useState(true);
   const [isSubThemeDropdownVisibleEdit, setIsSubThemeDropdownVisibleEdit] =
     useState(true);
   const [isErrorVisibleEdit, setIsErrorVisibleEdit] = useState(false);
+  const [isErrorVisibleCuratorChat, setIsErrorVisibleCuratorChat] =
+    useState(false);
   const [show, setShow] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showCuratorChat, setShowCuratorChat] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
@@ -322,6 +329,10 @@ function Chat() {
   //   setIsHideMessages(false);
   // };
 
+  const handleHideComponent = () => {
+    setIsVisibleFilters((prevVisibility) => !prevVisibility);
+  };
+
   const handleEditorChange = (newEditorState) => {
     setEditorState(newEditorState);
   };
@@ -415,7 +426,7 @@ function Chat() {
       return;
     }
 
-    if (isAdmin() && selectedValue == 1) {
+    if (isAdmin() && currentStatus !== "На уточнении" && selectedValue == 1) {
       try {
         const result = await updateStatus({
           variables: {
@@ -438,7 +449,7 @@ function Chat() {
             token: user.token,
             id: ticketId,
             fields: {
-              statusId: 4,
+              statusId: 5,
             },
           },
         });
@@ -1038,7 +1049,80 @@ function Chat() {
       handleShow();
     } catch (error) {
       console.error("Ошибка при обновлении тикета:", error);
-      setIsErrorVisible(true);
+    }
+  };
+
+  const handleCuratorsChat = () => {
+    setIsVisibleCuratorsChat(true);
+  };
+
+  const handleCuratorChatClick = (
+    curatorName,
+    curatorSurname,
+    curatorPatronymic,
+    curatorId
+  ) => {
+    let fullName = `${curatorSurname} ${curatorName} ${
+      curatorPatronymic ? ` ${curatorPatronymic}` : ""
+    }`;
+    setSelectedCuratorChat(fullName);
+    setSelectedCuratorIdChat(curatorId);
+
+    setIsErrorVisibleCuratorChat(false);
+  };
+
+  const errorMsgCuratorChat = () => {
+    let error = "";
+
+    if (selectedCuratorChat == null) {
+      error = "Выберите куратора";
+    } else {
+      error = "Ошибка при добавлении куратора";
+    }
+
+    return error;
+  };
+
+  const handleAddCuratorChat = async () => {
+    if (selectedCuratorChat == null) {
+      setIsErrorVisibleCuratorChat(true);
+      return;
+    }
+    setIsErrorVisibleCuratorChat(false);
+
+    try {
+      const result = await editTicket({
+        variables: {
+          token: user.token,
+          id: ticketId,
+          assistantId: selectedCuratorIdChat,
+        },
+      });
+
+      console.log("Куратор успешно добавлен:", result);
+      handleShowAddCurator();
+    } catch (error) {
+      console.error("Ошибка при добавлении куратора:", error);
+    }
+  };
+
+  const handleShowAddCurator = () => {
+    setShowCuratorChat(true);
+  };
+
+  const handleEndCuratorChat = async () => {
+    try {
+      const result = await editTicket({
+        variables: {
+          token: user.token,
+          id: ticketId,
+          assistantId: -1,
+        },
+      });
+
+      console.log("Диалог с куратором успешно завершен:", result);
+    } catch (error) {
+      console.error("Ошибка при завершении диалога с куратором:", error);
     }
   };
 
@@ -1049,17 +1133,68 @@ function Chat() {
         className={currentStatus == "Закрыт" ? "" : "chat-messages__container"}
       >
         {currentStatus !== null && currentStatus !== "Закрыт" ? (
-          <TicketTitle
-            title={`${data.clientQuery.ticket.title}`}
-            state="Открыто"
-            linkPrev={linkPrev}
-          />
+          <div className="alltickets__container">
+            <TicketTitle
+              title={`${data.clientQuery.ticket.title}`}
+              state="Открыто"
+              linkPrev={linkPrev}
+            />
+            <ButtonCustom
+              title={
+                isVisibleFilters == false
+                  ? "Показать историю"
+                  : "Скрыть историю"
+              }
+              onClick={handleHideComponent}
+              className={"alltickets__btn"}
+            />
+          </div>
         ) : (
-          <TicketTitle
-            title={`${data.clientQuery.ticket.title}`}
-            state="Закрыто"
-            linkPrev={linkPrev}
-          />
+          <div className="alltickets__container">
+            <TicketTitle
+              title={`${data.clientQuery.ticket.title}`}
+              state="Закрыто"
+              linkPrev={linkPrev}
+            />
+            <ButtonCustom
+              title={
+                isVisibleFilters == false
+                  ? "Показать историю"
+                  : "Скрыть историю"
+              }
+              onClick={handleHideComponent}
+              className={"alltickets__btn"}
+            />
+          </div>
+        )}
+
+        {isVisibleFilters && (
+          <>
+            <Table className="table__table" hover>
+              <thead>
+                <tr>
+                  <th>Имя</th>
+                  <th>Дата</th>
+                  <th>Событие</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataLogQuery.map((log, index) => (
+                  <tr key={index}>
+                    <td>{getFullName(log.initiator)}</td>
+                    <td>
+                      {DateTime.fromISO(log.date, {
+                        zone: "utc",
+                      })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
+                    </td>
+                    <td>{log.info}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </>
         )}
 
         {isVisibleSplit && (
@@ -1165,8 +1300,10 @@ function Chat() {
                   </DropdownButton>
                 )}
                 <Editor
-                  editorState={editorState}
-                  onEditorStateChange={handleEditorChange}
+                  editorState={input.editorContent}
+                  onEditorStateChange={(newEditorState) =>
+                    handleSplitEditorChange(newEditorState, input.id)
+                  }
                   toolbarStyle={{
                     border: "1px solid #dee2e6",
                     borderRadius: "6px 6px 0 0",
@@ -1213,6 +1350,48 @@ function Chat() {
                 title="Создать новые обращения"
                 className="chat-input__button-send"
                 onClick={handleMutationSplitTicket}
+              />
+            </div>
+          </>
+        )}
+
+        {isVisibleCuratorsChat && (
+          <>
+            <div className="chat__split-ticket">
+              <h3>Выберите куратора</h3>
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedCuratorChat || "Куратор"}
+                className="themes__dropdown"
+              >
+                {dataQueryCurators.map((curator, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleCuratorChatClick(
+                        curator.user.name,
+                        curator.user.surname,
+                        curator.user.patronymic,
+                        curator.id
+                      )
+                    }
+                    href="#"
+                  >
+                    {`${curator.user.surname} ${curator.user.name} ${
+                      curator.user.patronymic
+                        ? ` ${curator.user.patronymic}`
+                        : ""
+                    }`}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+              {isErrorVisibleCuratorChat && (
+                <span className="form__error">{errorMsgCuratorChat()}</span>
+              )}
+              <ButtonCustom
+                title="Добавить куратора"
+                className={"add-curator__btn"}
+                onClick={handleAddCuratorChat}
               />
             </div>
           </>
@@ -1513,20 +1692,22 @@ function Chat() {
               {isVisibleError && (
                 <span className="form__error">{errorMsg()}</span>
               )}
-              <ToggleButtonGroup
-                type="radio"
-                name="options"
-                defaultValue={1}
-                value={selectedValue}
-                onChange={handleToggleChange}
-              >
-                <ToggleButton id="tbg-radio-1" value={1}>
-                  Запретить писать клиенту
-                </ToggleButton>
-                <ToggleButton id="tbg-radio-2" value={2}>
-                  Разрешить писать клиенту
-                </ToggleButton>
-              </ToggleButtonGroup>
+              {isAdmin() && currentStatus !== "На уточнении" && (
+                <ToggleButtonGroup
+                  type="radio"
+                  name="options"
+                  defaultValue={1}
+                  value={selectedValue}
+                  onChange={handleToggleChange}
+                >
+                  <ToggleButton id="tbg-radio-1" value={1}>
+                    Запретить писать клиенту
+                  </ToggleButton>
+                  <ToggleButton id="tbg-radio-2" value={2}>
+                    Разрешить писать клиенту
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              )}
               <div
                 className={
                   currentStatus == "В процессе"
@@ -1567,15 +1748,32 @@ function Chat() {
               )}
 
               <>
-                {isAdmin() && !isVisibleEdit && currentStatus !== "Закрыт" && (
-                  <a className="alltickets__link">
-                    <ButtonCustom
-                      title="Изменить тикет"
-                      className="chat-input__button-close single"
-                      onClick={handleEditTicketView}
-                    />
-                  </a>
-                )}
+                {isAdmin() &&
+                  !isVisibleEdit &&
+                  currentStatus !== "Закрыт" &&
+                  user.id !== data.clientQuery.ticket.assistant?.id && (
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Изменить тикет"
+                        className="chat-input__button-close single"
+                        onClick={handleEditTicketView}
+                      />
+                    </a>
+                  )}
+
+                {isAdmin() &&
+                  currentStatus == "На уточнении" &&
+                  user.id == data.clientQuery.ticket.helper.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Закончить диалог с куратором"
+                          className="chat-input__button-close single"
+                          onClick={handleEndCuratorChat}
+                        />
+                      </a>
+                    </>
+                  )}
                 {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
                   <a className="alltickets__link">
                     <ButtonCustom
@@ -1585,6 +1783,21 @@ function Chat() {
                     />
                   </a>
                 )}
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Новый" &&
+                  currentStatus !== "На уточнении" &&
+                  !isVisibleCuratorsChat && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Консультация с другим куратором"
+                          className="chat-input__button-close single"
+                          onClick={handleCuratorsChat}
+                        />
+                      </a>
+                    </>
+                  )}
               </>
             </Row>
           </Form>
@@ -1621,15 +1834,18 @@ function Chat() {
               )}
 
               <>
-                {isAdmin() && !isVisibleEdit && currentStatus !== "Закрыт" && (
-                  <a className="alltickets__link">
-                    <ButtonCustom
-                      title="Изменить тикет"
-                      className="chat-input__button-close single"
-                      onClick={handleEditTicketView}
-                    />
-                  </a>
-                )}
+                {isAdmin() &&
+                  !isVisibleEdit &&
+                  currentStatus !== "Закрыт" &&
+                  user.id !== data.clientQuery.ticket.assistant?.id && (
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Изменить тикет"
+                        className="chat-input__button-close single"
+                        onClick={handleEditTicketView}
+                      />
+                    </a>
+                  )}
                 {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
                   <a className="alltickets__link">
                     <ButtonCustom
@@ -1639,6 +1855,21 @@ function Chat() {
                     />
                   </a>
                 )}
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Новый" &&
+                  currentStatus !== "На уточнении" &&
+                  !isVisibleCuratorsChat && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Консультация с другим куратором"
+                          className="chat-input__button-close single"
+                          onClick={handleCuratorsChat}
+                        />
+                      </a>
+                    </>
+                  )}
               </>
             </Row>
           </Form>
@@ -1648,7 +1879,8 @@ function Chat() {
       <div className="chat-input__container">
         {isVisible &&
         !isAdmin() &&
-        (currentStatus === "Новый" || currentStatus === "На уточнении") ? (
+        (currentStatus === "Новый" ||
+          currentStatus === "Ожидает дополнения") ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row>
               <Col className="chat-input__row">
@@ -1817,31 +2049,6 @@ function Chat() {
         </div>
       )}
 
-      <Table className="table__table" hover>
-        <thead>
-          <tr>
-            <th>Имя</th>
-            <th>Дата</th>
-            <th>Событие</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataLogQuery.map((log, index) => (
-            <tr key={index}>
-              <td>{getFullName(log.initiator)}</td>
-              <td>
-                {DateTime.fromISO(log.date, {
-                  zone: "utc",
-                })
-                  .toLocal()
-                  .toFormat("yyyy.MM.dd HH:mm:ss")}
-              </td>
-              <td>{log.info}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
       <Modal show={show} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Обращение разделено</Modal.Title>
@@ -1879,6 +2086,20 @@ function Chat() {
         </Modal.Header>
         <Modal.Body>
           <p>Данные тикета успешно обновлены</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showCuratorChat} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Новый куратор добавлен</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Новый куратор успешно добавлен в чат</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>

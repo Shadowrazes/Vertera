@@ -18,6 +18,7 @@ import { ADD_TICKET } from "../apollo/mutations";
 import { Editor } from "react-draft-wysiwyg";
 import Loader from "../pages/loading";
 import TitleH2 from "./title";
+import ButtonCustom from "../components/button";
 
 import "../css/form.css";
 
@@ -63,9 +64,11 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
-  const [fileInputs, setFileInputs] = useState([{
-    'fileInput': true
-  }])
+  const [fileInputs, setFileInputs] = useState([
+    {
+      fileInput: true,
+    },
+  ]);
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
@@ -93,7 +96,7 @@ function FormComponent() {
         files.push(fileInput.files[0]);
       }
     }
-    
+
     if (files.length > 0) {
       let formdata = new FormData();
       let filesValid = true;
@@ -139,7 +142,22 @@ function FormComponent() {
   }
 
   if (error) {
-    return <h2>Что-то пошло не так</h2>;
+    return (
+      <>
+        {userId == 999 ? (
+          <>
+            <div className="auth">
+              <h2>Необходимо авторизироваться</h2>
+              <a href="#">
+                <ButtonCustom title="Авторизироваться" />
+              </a>
+            </div>
+          </>
+        ) : (
+          <h2>Что-то пошло не так</h2>
+        )}
+      </>
+    );
   }
 
   if ((user.role && user.role === "helper") || user.role === "system") {
@@ -342,14 +360,18 @@ function FormComponent() {
   };
 
   const handleAddFileInput = () => {
-    if(fileInputs.length >= 5) {
+    if (fileInputs.length >= 5) {
       alert("Вы можете загрузить не более 5 файлов");
       return;
     }
-    setFileInputs(fileInputs.concat([{
-      'fileInput': true
-    }]));
-  }
+    setFileInputs(
+      fileInputs.concat([
+        {
+          fileInput: true,
+        },
+      ])
+    );
+  };
 
   const handleFileChange = (e) => {
     const files = e.target.files;
@@ -529,17 +551,26 @@ function FormComponent() {
               <Editor
                 editorState={editorState}
                 onEditorStateChange={handleEditorChange}
-                toolbarStyle={{border: "1px solid #dee2e6", borderRadius: "6px 6px 0 0"}}
-                editorStyle={{border: "1px solid #dee2e6", borderRadius: "0 0 6px 6px", padding: "10px"}}
-                placeholder={"Введите здесь Ваш вопрос или опишите Вашу проблему"}
+                toolbarStyle={{
+                  border: "1px solid #dee2e6",
+                  borderRadius: "6px 6px 0 0",
+                }}
+                editorStyle={{
+                  border: "1px solid #dee2e6",
+                  borderRadius: "0 0 6px 6px",
+                  padding: "10px",
+                }}
+                placeholder={
+                  "Введите здесь Ваш вопрос или опишите Вашу проблему"
+                }
                 toolbar={{
-                  options: ['inline', 'list', 'emoji', 'remove', 'history'],
+                  options: ["inline", "list", "emoji", "remove", "history"],
                   inline: {
-                    options: ['bold', 'italic', 'underline', 'strikethrough'],
+                    options: ["bold", "italic", "underline", "strikethrough"],
                   },
                   list: {
-                    options: ['unordered', 'ordered']
-                  }
+                    options: ["unordered", "ordered"],
+                  },
                 }}
               />
             </Form.Group>
@@ -553,7 +584,7 @@ function FormComponent() {
                   />
                 </Form.Group>
               ))}
-              
+
               <Button
                 variant="outline-primary"
                 id="AddFileButton"

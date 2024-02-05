@@ -146,6 +146,9 @@ export const MESSAGES_CHAT = gql`
             patronymic
           }
         }
+        assistant {
+          id
+        }
         reaction
         client {
           id
@@ -451,7 +454,9 @@ export const SUBTHEME = gql`
 export const STATS = gql`
   query ($token: String!) {
     helperQuery(token: $token) {
-      helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
+      helperStatList(
+        filters: { orderBy: "id", orderDir: "", limit: 50, offset: 0 }
+      ) {
         helper {
           id
           user {
