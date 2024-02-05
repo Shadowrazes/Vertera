@@ -211,7 +211,7 @@ class Ticket extends Entity {
             fields.push(filter.dateAfter);
             fields.push(filter.dateBefore);
         }
-        if (filter.reaction) {
+        if (filter.reaction != undefined) {
             sql += ` AND ${this.ReactionField} = ?`;
             fields.push(filter.reaction);
         }
@@ -225,7 +225,7 @@ class Ticket extends Entity {
             `;
             fields.push(filter.outerId);
         }
-
+        
         sql += ` GROUP BY ${this.TableName}.${this.PrimaryField}`;
 
         const countSql = `SELECT COUNT(*) AS total FROM ( ${sql} ) AS subquery`;
