@@ -19,6 +19,7 @@ import AddSubtheme from "./pages/add-subtheme";
 import EditSubtheme from "./pages/edit-subtheme";
 import EditTicket from "./pages/edit-ticket";
 import Stats from "./pages/stats";
+import NotFoundPage from "./pages/not-found-page";
 
 import "./App.css";
 
@@ -67,6 +68,7 @@ function App() {
             element={<EditTicket />}
           />
           <Route path="/stats" element={<Stats />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </div>

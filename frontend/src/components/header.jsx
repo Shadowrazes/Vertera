@@ -17,7 +17,7 @@ import {
   NavDropdown
 } from "react-bootstrap";
 
-import { LOGIN, USER } from "../apollo/queries";
+import { LOGIN } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
@@ -82,6 +82,13 @@ function Header({ user }) {
     JSON.parse(localStorage.getItem("user"))?.surname
   );
 
+  const isAdmin = () => {
+    return user?.role === "helper" || user?.role === "system";
+  };
+
+  const isHelper = () => {
+    return user?.role === "helper";
+  };
 
   const { data, refetch } = useQuery(LOGIN);
 
@@ -200,7 +207,7 @@ function Header({ user }) {
     
       <section className="header">
         <div className="header__container container">
-          <a href="/">
+          <a href={isAdmin() ? "/all-tickets" : "/"}>
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
           <div className="header__btn-group" ref={ref}>

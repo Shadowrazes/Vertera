@@ -146,6 +146,85 @@ export const MESSAGES_CHAT = gql`
             patronymic
           }
         }
+        assistant {
+          id
+        }
+        reaction
+        client {
+          id
+          user {
+            name
+            surname
+            patronymic
+          }
+          email
+        }
+        messages {
+          id
+          text
+          attachs {
+            id
+            path
+            name
+          }
+          sender {
+            id
+            name
+            surname
+            patronymic
+            role
+          }
+          date
+        }
+        status {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+        subTheme {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+          departments {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+          }
+          theme {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+            unit {
+              id
+              name(lang: "ru") {
+                stroke
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const MESSAGES_CHAT_CLIENT = gql`
+  query ($token: String!, $link: String!) {
+    clientQuery(token: $token) {
+      ticket(link: $link) {
+        id
+        title
+        helper {
+          id
+          user {
+            name
+            surname
+            patronymic
+          }
+        }
         reaction
         client {
           id
@@ -451,7 +530,9 @@ export const SUBTHEME = gql`
 export const STATS = gql`
   query ($token: String!) {
     helperQuery(token: $token) {
-      helperStatList(orderBy: "id", orderDir: "", limit: 50, offset: 0) {
+      helperStatList(
+        filters: { orderBy: "id", orderDir: "", limit: 50, offset: 0 }
+      ) {
         helper {
           id
           user {
