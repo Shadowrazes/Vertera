@@ -93,6 +93,7 @@
 .chat-message-recipient__attachs {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 5px;
 }

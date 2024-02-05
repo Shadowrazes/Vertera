@@ -370,42 +370,9 @@ export const EDIT_TICKET = gql`
 `;
 
 export const SPLIT_TICKET = gql`
-  mutation (
-    $token: String!
-    $id: Int!
-    $title: String!
-    $clientId: Int!
-    $unitId: Int!
-    $themeId: Int!
-    $subThemeId: Int!
-    $senderId: Int!
-    $recieverId: Int!
-    $ticketId: Int!
-    $text: String!
-    $attachPaths: [String]
-  ) {
+  mutation ($token: String!, $id: Int!, $argsList: [TicketSplitArgItem!]!) {
     helperMutation(token: $token) {
-      splitTicket(
-        id: $id
-        argsList: [
-          {
-            ticketFields: {
-              title: $title
-              clientId: $clientId
-              unitId: $unitId
-              themeId: $themeId
-              subThemeId: $subThemeId
-            }
-            messageFields: {
-              senderId: $senderId
-              recieverId: $recieverId
-              ticketId: $ticketId
-              text: $text
-              attachPaths: $attachPaths
-            }
-          }
-        ]
-      )
+      splitTicket(id: $id, argsList: $argsList)
     }
   }
 `;
