@@ -19,7 +19,12 @@ import {
 import draftToHtml from "draftjs-to-html";
 import { EditorState, convertToRaw } from "draft-js";
 
-import { MESSAGES_CHAT, THEME_LIST, CURATORS_LIST } from "../apollo/queries";
+import {
+  MESSAGES_CHAT,
+  MESSAGES_CHAT_CLIENT,
+  THEME_LIST,
+  CURATORS_LIST,
+} from "../apollo/queries";
 import {
   ADD_MESSAGE,
   UPDATE_STATUS,
@@ -126,12 +131,34 @@ function Chat() {
     return user.role === "helper" || user.role === "system";
   };
 
-  const { loading, error, data } = useQuery(MESSAGES_CHAT, {
-    variables: {
-      token: user.token,
-      link: itemId,
-    },
-  });
+  // const { loading, error, data } = useQuery(MESSAGES_CHAT, {
+  //   variables: {
+  //     token: user.token,
+  //     link: itemId,
+  //   },
+  // });
+
+  const adminRequest = () => {
+    return useQuery(MESSAGES_CHAT, {
+      variables: {
+        token: user.token,
+        link: itemId,
+      },
+    });
+  };
+
+  const clientRequest = () => {
+    return useQuery(MESSAGES_CHAT_CLIENT, {
+      variables: {
+        token: user.token,
+        link: itemId,
+      },
+    });
+  };
+
+  const { loading, error, data, refetch } = isAdmin()
+    ? adminRequest()
+    : clientRequest();
 
   const {
     loading: loadingThemeList,
@@ -183,10 +210,14 @@ function Chat() {
   };
 
   useEffect(() => {
+    if (isAdmin()) {
+      if (data && data.clientQuery.ticket) {
+        setDataLogQuery(data.clientQuery.ticket.log);
+      }
+    }
     if (data && data.clientQuery.ticket) {
       setTicketId(data.clientQuery.ticket.id);
       setMessagesQuery(data.clientQuery.ticket.messages);
-      setDataLogQuery(data.clientQuery.ticket.log);
       setCurrentStatus(data.clientQuery.ticket.status.name.stroke);
       setHelperId(data.clientQuery.ticket.helper.id);
       setClientId(data.clientQuery.ticket.client.id);

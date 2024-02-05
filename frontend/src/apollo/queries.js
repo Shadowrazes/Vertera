@@ -211,6 +211,82 @@ export const MESSAGES_CHAT = gql`
   }
 `;
 
+export const MESSAGES_CHAT_CLIENT = gql`
+  query ($token: String!, $link: String!) {
+    clientQuery(token: $token) {
+      ticket(link: $link) {
+        id
+        title
+        helper {
+          id
+          user {
+            name
+            surname
+            patronymic
+          }
+        }
+        reaction
+        client {
+          id
+          user {
+            name
+            surname
+            patronymic
+          }
+          email
+        }
+        messages {
+          id
+          text
+          attachs {
+            id
+            path
+            name
+          }
+          sender {
+            id
+            name
+            surname
+            patronymic
+            role
+          }
+          date
+        }
+        status {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+        }
+        subTheme {
+          id
+          name(lang: "ru") {
+            stroke
+          }
+          departments {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+          }
+          theme {
+            id
+            name(lang: "ru") {
+              stroke
+            }
+            unit {
+              id
+              name(lang: "ru") {
+                stroke
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const LOGIN = gql`
   query ($login: String!, $password: String!) {
     login(login: $login, password: $password) {

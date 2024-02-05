@@ -13,7 +13,7 @@ import {
   Nav,
 } from "react-bootstrap";
 
-import { LOGIN, USER } from "../apollo/queries";
+import { LOGIN } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
