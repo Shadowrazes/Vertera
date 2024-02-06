@@ -166,7 +166,7 @@ export const resolvers = {
             return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
         },
         updateTicketByClient: async (_, args, context) => {
-            return await Ticket.TransUpdate(args.id, args.fields, departmentId = undefined, context.user);
+            return await Ticket.TransUpdate(args.id, args.fields, undefined, context.user);
         },
     },
     HelperMutation: {
