@@ -347,6 +347,7 @@ export const EDIT_TICKET = gql`
     $token: String!
     $id: Int!
     $helperId: Int
+    $assistantId: Int
     $unitId: Int
     $themeId: Int
     $subThtmeId: Int
@@ -360,6 +361,7 @@ export const EDIT_TICKET = gql`
           unitId: $unitId
           themeId: $themeId
           subThemeId: $subThtmeId
+          assistantId: $assistantId
         }
         departmentId: $departmentId
       ) {

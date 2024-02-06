@@ -191,7 +191,7 @@ function TableTickets() {
   }
 
   if (error) {
-    return <h2>Что-то пошло не так</h2>;
+    return <>{userId == null ? <></> : <h2>xdd</h2>}</>;
   }
 
   const getStatusColor = (status) => {
@@ -202,6 +202,8 @@ function TableTickets() {
         return "#E6E3F6";
       case "На уточнении":
         return "rgba(171, 144, 0, 0.11)";
+      case "Ожидает дополнения":
+        return "rgba(102, 163, 209, 0.4)";
       case "Закрыт":
         return "rgba(171, 0, 0, 0.11)";
       default:

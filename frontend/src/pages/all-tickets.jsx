@@ -71,6 +71,7 @@ function allTickets() {
   const [numberIdFilterValue, setNumberIdFilterValue] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedStatusesId, setSelectedStatusesId] = useState([]);
+  const [selectedOuterId, setSelectedOuterId] = useState(null);
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
 
@@ -110,7 +111,8 @@ function allTickets() {
   const pageNumbers = [];
   // const itemsPerPage = 8;
 
-  const reactions = ["Понравилось", "Не понравилось", "Все реакции"];
+  const reactions = ["Понравилось", "Не понравилось"];
+  const outerIdSelect = ["Партнер", "Структура"];
   const itemsPerPageArray = [25, 50, 100];
 
   const isAdmin = () => {
@@ -220,6 +222,7 @@ function allTickets() {
 
   const adminRequest = () => {
     // console.log(2);
+    // console.log(helperIdsFilter);
     return useQuery(TABLE_TICKETS, {
       variables: {
         token: user.token,
@@ -502,7 +505,9 @@ function allTickets() {
     // console.log(unitId);
 
     setSelectedTheme(null);
+    setSelectedThemeId(null);
     setSelectedSubTheme(null);
+    setSelectedSubThemeId(null);
     setSubThemeDropdownVisible(true);
   };
 
@@ -586,8 +591,8 @@ function allTickets() {
     setDaysFilterValue(e.target.value);
   };
 
-  const handleIdFilterValueChange = (e) => {
-    setIdFilterValue(e.target.value);
+  const handleOuterIdClick = (outerId) => {
+    setSelectedOuterId(outerId);
   };
 
   const handleNumberIdFilterValueChange = (e) => {
@@ -596,6 +601,7 @@ function allTickets() {
 
   const handleReactionClick = (reaction) => {
     setSelectedReaction(reaction);
+
     switch (reaction) {
       case "Понравилось":
         setQueryReaction(1);
@@ -616,31 +622,43 @@ function allTickets() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     // console.log(selectedUnit);
+    // console.log(selectedUnitId);
     // console.log(selectedTheme);
+    // console.log(selectedThemeId);
     // console.log(selectedSubTheme);
+    // console.log(selectedSubThemeId);
     // console.log(selectedDateBefore);
     // console.log(selectedDateAfter);
     // console.log(queryReaction);
 
     if (isAdmin()) {
       // console.log(5);
+      let helperIds;
+      if (selectedCuratorsId.length === 0) {
+        helperIds = user.id;
+      } else {
+        helperIds = selectedCuratorsId;
+      }
+
       const variables = {
         filters: {
-          helperIds: helperIdsFilter,
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
           subThemeIds: selectedSubThemeId,
+          helperIds: helperIds,
           helperCountryIds: selectedCuratorsCountiesId,
           clientCountryIds: selectedClientsCountiesId,
           dateBefore: selectedDateBefore,
           dateAfter: selectedDateAfter,
           reaction: queryReaction,
           limit: itemsPerPage,
+          words: wordsFilterValue,
+          statusIds: selectedStatusesId,
           offset: offset,
           orderBy: orderBy,
           orderDir: orderDir,
-          statusIds: helperStatusFilter,
           lang: "ru",
         },
       };
@@ -679,7 +697,7 @@ function allTickets() {
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "in-process") {
-      fastFilterHelperId = null;
+      fastFilterHelperId = userId;
       fastFilterStatus = 3;
       setHelperIdsFilter(null);
       setHelperStatusFilter(fastFilterStatus);
@@ -739,6 +757,8 @@ function allTickets() {
         return "#E6E3F6";
       case "На уточнении":
         return "rgba(171, 144, 0, 0.11)";
+      case "Ожидает дополнения":
+        return "rgba(102, 163, 209, 0.4)";
       case "Закрыт":
         return "rgba(171, 0, 0, 0.11)";
       default:
@@ -912,9 +932,9 @@ function allTickets() {
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
-                            selectedReaction || isAdmin()
-                              ? "Реакции"
-                              : "Мои реакции"
+                            isAdmin()
+                              ? selectedReaction || "Реакции"
+                              : selectedReaction || "Мои реакции"
                           }
                         >
                           {reactions.map((reaction, index) => (
@@ -977,14 +997,20 @@ function allTickets() {
                           controlId="wordsFilterForm"
                         >
                           <div className="alltickets__days-ago-label">ID</div>
-                          <Form.Control
-                            type="number"
-                            min={0}
-                            placeholder="Партнер/Стр-ра"
-                            className="add-currator__input alltickets__days-ago-input"
-                            value={idFilterValue}
-                            onChange={handleIdFilterValueChange}
-                          />
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={selectedOuterId || "Партнер/Стр-ра"}
+                          >
+                            {outerIdSelect.map((outerId, index) => (
+                              <Dropdown.Item
+                                key={index}
+                                onClick={() => handleOuterIdClick(outerId)}
+                                href="#"
+                              >
+                                {outerId}
+                              </Dropdown.Item>
+                            ))}
+                          </DropdownButton>
                           <Form.Control
                             type="number"
                             min={0}
@@ -1102,9 +1128,9 @@ function allTickets() {
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
-                            selectedReaction || isAdmin()
-                              ? "Реакции"
-                              : "Мои реакции"
+                            isAdmin()
+                              ? selectedReaction || "Реакции"
+                              : selectedReaction || "Мои реакции"
                           }
                         >
                           {reactions.map((reaction, index) => (

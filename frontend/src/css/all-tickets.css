@@ -199,6 +199,11 @@
   font-size: 16px;
 }
 
+.alltickets__days-ago #dropdown-custom-1 {
+  width: 165px !important;
+  border-radius: 0;
+}
+
 @media screen and (max-width: 768px) {
   .alltickets__container {
     display: flex;
