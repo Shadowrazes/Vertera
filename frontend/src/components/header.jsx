@@ -14,7 +14,7 @@ import {
   DropdownButton,
   ButtonGroup,
   Nav,
-  NavDropdown
+  NavDropdown,
 } from "react-bootstrap";
 
 import { LOGIN } from "../apollo/queries";
@@ -30,45 +30,43 @@ function Header({ user }) {
   const [menuTarget, setMenuTarget] = useState(null);
   const [isLoad, setIsLoad] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [language, setLanguage] = useState(
-    localStorage.getItem("language")
-  );
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
   const ref = useRef(null);
 
   const languagesList = [
     {
-      "title": "Русский",
-      "code": "RU",
+      title: "Русский",
+      code: "RU",
     },
     {
-      "title": "English",
-      "code": "EN",
+      title: "English",
+      code: "EN",
     },
     {
-      "title": "Español",
-      "code": "ES",
+      title: "Español",
+      code: "ES",
     },
     {
-      "title": "Čeština",
-      "code": "CS",
+      title: "Čeština",
+      code: "CS",
     },
     {
-      "title": "Български",
-      "code": "BG",
+      title: "Български",
+      code: "BG",
     },
     {
-      "title": "Deutsch",
-      "code": "DE",
+      title: "Deutsch",
+      code: "DE",
     },
     {
-      "title": "Magyar",
-      "code": "HU",
+      title: "Magyar",
+      code: "HU",
     },
     {
-      "title": "Қазақша",
-      "code": "KZ",
+      title: "Қазақша",
+      code: "KZ",
     },
-  ]
+  ];
 
   const [loginVariables, setLoginVariables] = useState({
     login: "",
@@ -98,9 +96,9 @@ function Header({ user }) {
   };
 
   const handleChangeLanguage = (code) => {
-    localStorage.setItem('language', code);
+    localStorage.setItem("language", code);
     location.reload();
-  }
+  };
 
   const handleShow = () => {
     if (user) {
@@ -113,6 +111,10 @@ function Header({ user }) {
   const handleShowMenu = (event) => {
     setShowMenu(!showMenu);
     setMenuTarget(event.target);
+  };
+
+  const handleCloseOverlay = () => {
+    setShowMenu(false);
   };
 
   const handleInput = (event) => {
@@ -184,11 +186,25 @@ function Header({ user }) {
   }, [data, loginVariables]);
 
   useEffect(() => {
-    if(language === null) {
+    if (language === null) {
       setLanguage("ru");
       localStorage.setItem("language", "RU");
     }
-  }, [language])
+  }, [language]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        handleCloseOverlay();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
 
   const popover = (
     <Popover id="popover-basic">
@@ -204,33 +220,62 @@ function Header({ user }) {
 
   return (
     <>
-    
       <section className="header">
         <div className="header__container container">
           <a href={isAdmin() ? "/all-tickets" : "/"}>
             <img className="header__logo" src={Logo} alt=""></img>
           </a>
           <div className="header__btn-group" ref={ref}>
-          <Dropdown className="language-menu">
-            <Dropdown.Toggle variant="outline-success" className="language-menu__item-top">
-              {languagesList.filter((languageItem) => {
-                return languageItem.code === language;
-              }).map((languageItem, index) => (
-                <NavDropdown.Item className="language-menu__item" key={index}>
-                  <img className="language-menu__flag" src={"/flags/" + languageItem.code.toLocaleLowerCase() + ".svg"} alt="" />
-                  <span className="language-menu__text">{languageItem.title}</span>
-                </NavDropdown.Item>
-              ))}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {languagesList.map((language, index) => (
-                <NavDropdown.Item onClick={handleChangeLanguage.bind(null, language.code)} className="language-menu__item" key={index}>
-                  <img className="language-menu__flag" src={"/flags/" + language.code.toLocaleLowerCase() + ".svg"} alt="" />
-                  <span className="language-menu__text">{language.title}</span>
-                </NavDropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
+            <Dropdown className="language-menu">
+              <Dropdown.Toggle
+                variant="outline-success"
+                className="language-menu__item-top"
+              >
+                {languagesList
+                  .filter((languageItem) => {
+                    return languageItem.code === language;
+                  })
+                  .map((languageItem, index) => (
+                    <NavDropdown.Item
+                      className="language-menu__item"
+                      key={index}
+                    >
+                      <img
+                        className="language-menu__flag"
+                        src={
+                          "/flags/" +
+                          languageItem.code.toLocaleLowerCase() +
+                          ".svg"
+                        }
+                        alt=""
+                      />
+                      <span className="language-menu__text">
+                        {languageItem.title}
+                      </span>
+                    </NavDropdown.Item>
+                  ))}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {languagesList.map((language, index) => (
+                  <NavDropdown.Item
+                    onClick={handleChangeLanguage.bind(null, language.code)}
+                    className="language-menu__item"
+                    key={index}
+                  >
+                    <img
+                      className="language-menu__flag"
+                      src={
+                        "/flags/" + language.code.toLocaleLowerCase() + ".svg"
+                      }
+                      alt=""
+                    />
+                    <span className="language-menu__text">
+                      {language.title}
+                    </span>
+                  </NavDropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
             <a
               className="header__exit"
               href="#"
@@ -255,6 +300,7 @@ function Header({ user }) {
         placement="bottom-end"
         container={ref}
         containerPadding={20}
+        rootClose={true}
       >
         <Popover id="popover-contained">
           <Popover.Body className="header-menu">
@@ -263,9 +309,13 @@ function Header({ user }) {
               className="flex-column"
             >
               <Nav.Link href="/all-tickets">Тикеты</Nav.Link>
-              <Nav.Link href="/stats">Статистика</Nav.Link>
-              <Nav.Link href="/curators">Кураторы</Nav.Link>
-              <Nav.Link href="/themes">Темы</Nav.Link>
+              {isAdmin() && (
+                <>
+                  <Nav.Link href="/stats">Статистика</Nav.Link>
+                  <Nav.Link href="/curators">Кураторы</Nav.Link>
+                  <Nav.Link href="/themes">Темы</Nav.Link>
+                </>
+              )}
               <Nav.Link>
                 <Button variant="danger" size="sm" onClick={handleShow}>
                   Выйти

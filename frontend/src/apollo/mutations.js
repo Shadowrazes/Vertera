@@ -62,10 +62,20 @@ export const ADD_MESSAGE = gql`
   }
 `;
 
-export const UPDATE_STATUS = gql`
+export const UPDATE_TICKET = gql`
   mutation ($token: String!, $id: Int!, $fields: TicketUpdate!) {
     helperMutation(token: $token) {
       updateTicket(id: $id, fields: $fields) {
+        changed
+      }
+    }
+  }
+`;
+
+export const UPDATE_STATUS = gql`
+  mutation ($token: String!, $id: Int!, $reaction: Int) {
+    clientMutation(token: $token) {
+      updateTicketByClient(id: $id, fields: { reaction: $reaction }) {
         changed
       }
     }

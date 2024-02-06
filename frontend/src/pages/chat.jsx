@@ -27,6 +27,7 @@ import {
 } from "../apollo/queries";
 import {
   ADD_MESSAGE,
+  UPDATE_TICKET,
   UPDATE_STATUS,
   EDIT_TICKET,
   SPLIT_TICKET,
@@ -94,6 +95,7 @@ function Chat() {
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
   const [isErrorVisibleSplit, setIsErrorVisibleSplit] = useState(false);
+  const [isVisibleHelperButtons, setIsVisibleHelperButtons] = useState(true);
   const [isErrorVisibleNewFields, setIsErrorVisibleNewFields] = useState(false);
   const [isVisibleEditTicketView, setIsVisibleEditTicketView] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -189,6 +191,7 @@ function Chat() {
       token: user.token,
     },
   });
+
   const [fileInputs, setFileInputs] = useState([
     {
       fileInput: true,
@@ -267,9 +270,9 @@ function Chat() {
         setLinkPrev(location.state.linkPrev);
       }
 
-      if (data.clientQuery.ticket.reaction == "like") {
+      if (data.clientQuery.ticket.reaction == 1) {
         setReaction("like");
-      } else if (data.clientQuery.ticket.reaction == "dislike") {
+      } else if (data.clientQuery.ticket.reaction == 0) {
         setReaction("dislike");
       } else {
         setReaction(null);
@@ -314,9 +317,11 @@ function Chat() {
     });
 
   const [
-    updateStatus,
+    updateTicket,
     { loading: loaderUpdateStatus, error: errorUpdateStatus },
-  ] = useMutation(UPDATE_STATUS);
+  ] = useMutation(UPDATE_TICKET);
+
+  const [updateStatus] = useMutation(UPDATE_STATUS);
 
   const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
 
@@ -459,7 +464,7 @@ function Chat() {
 
     if (isAdmin() && currentStatus !== "На уточнении" && selectedValue == 1) {
       try {
-        const result = await updateStatus({
+        const result = await updateTicket({
           variables: {
             token: user.token,
             id: ticketId,
@@ -475,7 +480,7 @@ function Chat() {
       }
     } else if (isAdmin() && selectedValue == 2) {
       try {
-        const result = await updateStatus({
+        const result = await updateTicket({
           variables: {
             token: user.token,
             id: ticketId,
@@ -540,7 +545,7 @@ function Chat() {
     try {
       setIsLoadingClose(true);
 
-      await updateStatus({
+      await updateTicket({
         variables: {
           token: user.token,
           id: ticketId,
@@ -571,7 +576,7 @@ function Chat() {
     try {
       setIsLoadingClose(true);
 
-      await updateStatus({
+      await updateTicket({
         variables: {
           token: user.token,
           id: ticketId,
@@ -643,13 +648,11 @@ function Chat() {
 
   const handleLike = (e) => {
     e.preventDefault();
-    updateStatus({
+    updateTicket({
       variables: {
         token: user.token,
         id: ticketId,
-        fields: {
-          reaction: "like",
-        },
+        reaction: 1,
       },
     });
     setReaction("like");
@@ -658,13 +661,11 @@ function Chat() {
 
   const handleDislike = (e) => {
     e.preventDefault();
-    updateStatus({
+    updateTicket({
       variables: {
         token: user.token,
         id: ticketId,
-        fields: {
-          reaction: "dislike",
-        },
+        reaction: 0,
       },
     });
     setReaction("dislike");
@@ -687,9 +688,11 @@ function Chat() {
   };
 
   const handleSplitTicket = () => {
+    setIsVisibleHelperButtons(false);
     setIsVisibleSplit(true);
-    setIsVisibleEditTicketView(false);
-    setIsVisibleEdit(false);
+
+    setNewTicketsCount(undefined);
+    setIsErrorVisibleSplit(false);
   };
 
   const handleOnChangeNewTicketsCount = (e) => {
@@ -712,6 +715,7 @@ function Chat() {
       setIsErrorVisibleNewFields(true);
       return;
     }
+    setIsVisibleHelperButtons(false);
     setIsVisibleSplit(false);
     setisVisibleSplitFields(true);
   };
@@ -941,9 +945,31 @@ function Chat() {
 
   const handleEditTicketView = () => {
     setIsVisibleEditTicketView(true);
-    setIsVisibleEdit(true);
-    setIsVisibleSplit(false);
-    setisVisibleSplitFields(false);
+    setIsVisibleHelperButtons(false);
+
+    setSelectedUnitEdit(
+      data.clientQuery.ticket.subTheme.theme.unit.name.stroke
+    );
+    setSelectedUnitIdEdit(data.clientQuery.ticket.subTheme.theme.unit.id);
+    setSelectedThemeEdit(data.clientQuery.ticket.subTheme.theme.name.stroke);
+    setSelectedThemeIdEdit(data.clientQuery.ticket.subTheme.theme.id);
+    setSelectedSubThemeEdit(data.clientQuery.ticket.subTheme.name.stroke);
+    setSelectedSubThemeIdEdit(data.clientQuery.ticket.subTheme.id);
+    setSelectedCurator(
+      `${data.clientQuery.ticket.helper.user.surname} ${
+        data.clientQuery.ticket.helper.user.name
+      } ${
+        data.clientQuery.ticket.helper.user.patronymic
+          ? ` ${data.clientQuery.ticket.helper.user.patronymic}`
+          : ""
+      }`
+    );
+    setSelectedCuratorId(data.clientQuery.ticket.helper.id);
+    setSelectedDepartmentsId(
+      data.clientQuery.ticket.subTheme.departments.map(
+        (department) => department.id
+      )
+    );
   };
 
   const handleUnitClickEdit = (unit, unitId) => {
@@ -1083,8 +1109,23 @@ function Chat() {
     }
   };
 
+  const handleEditCloseClick = () => {
+    setIsVisibleHelperButtons(true);
+    setIsVisibleEditTicketView(false);
+    setIsVisibleCuratorsChat(false);
+    setIsVisibleSplit(false);
+    setisVisibleSplitFields(false);
+  };
+
+  const handleShow = () => {
+    setShowEdit(true);
+  };
+
   const handleCuratorsChat = () => {
     setIsVisibleCuratorsChat(true);
+    setIsVisibleHelperButtons(false);
+
+    setSelectedCuratorChat(null);
   };
 
   const handleCuratorChatClick = (
@@ -1170,15 +1211,6 @@ function Chat() {
               state="Открыто"
               linkPrev={linkPrev}
             />
-            <ButtonCustom
-              title={
-                isVisibleFilters == false
-                  ? "Показать историю"
-                  : "Скрыть историю"
-              }
-              onClick={handleHideComponent}
-              className={"alltickets__btn"}
-            />
           </div>
         ) : (
           <div className="alltickets__container">
@@ -1187,243 +1219,50 @@ function Chat() {
               state="Закрыто"
               linkPrev={linkPrev}
             />
-            <ButtonCustom
-              title={
-                isVisibleFilters == false
-                  ? "Показать историю"
-                  : "Скрыть историю"
-              }
-              onClick={handleHideComponent}
-              className={"alltickets__btn"}
-            />
           </div>
         )}
 
-        {isVisibleFilters && (
+        {isAdmin() && isVisibleHelperButtons && (
           <>
-            <Table className="table__table" hover>
-              <thead>
-                <tr>
-                  <th>Имя</th>
-                  <th>Дата</th>
-                  <th>Событие</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dataLogQuery.map((log, index) => (
-                  <tr key={index}>
-                    <td>{getFullName(log.initiator)}</td>
-                    <td>
-                      {DateTime.fromISO(log.date, {
-                        zone: "utc",
-                      })
-                        .toLocal()
-                        .toFormat("yyyy.MM.dd HH:mm:ss")}
-                    </td>
-                    <td>{log.info}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </>
-        )}
-
-        {isVisibleSplit && (
-          <>
-            <div className="chat__split-ticket">
-              <h3>Разделение тикета</h3>
-              <Form.Control
-                type="number"
-                className="add-currator__input"
-                placeholder="Количество новых тикетов"
-                value={newTicketsCount}
-                onChange={handleOnChangeNewTicketsCount}
-                min={2}
-                id="splitTicket"
-              />
-              {isErrorVisibleNewFields && (
-                <span className="form__error">{errorMsgNewFields()}</span>
-              )}
-              <ButtonCustom
-                title="Создать новые тикеты"
-                className="chat-input__button-close"
-                onClick={handleSplitTicketFields}
-              />
-            </div>
-          </>
-        )}
-
-        {isVisibleSplitFields && (
-          <>
-            {inputValues.map((input, index) => (
-              <Form.Group
-                key={input.id}
-                controlId={`TicketTitleForm_${input.id}`}
-                style={{ display: index === currentIndex ? "flex" : "none" }}
-                className="chat__new-fields"
-              >
-                <h3>Новый тикет #{input.id}</h3>
-                <Form.Control
-                  type="text"
-                  placeholder="Тема обращения"
-                  className="form__input"
-                  value={input.title}
-                  onChange={(e) => handleInputChange(input.id, e.target.value)}
-                />
-                <DropdownButton
-                  id="dropdown-custom-1"
-                  title={input.unit || "Выберите подразделение"}
-                >
-                  {dataQuery.map((unit, index) => (
-                    <Dropdown.Item
-                      key={index}
-                      onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                      href="#"
-                    >
-                      {unit.name.stroke}
-                    </Dropdown.Item>
-                  ))}
-                </DropdownButton>
-                {input.unit && (
-                  <DropdownButton
-                    id="dropdown-custom-1"
-                    title={input.theme || "Тип обращения"}
-                  >
-                    {dataQuery
-                      .find((unit) => unit.name.stroke === input.unit)
-                      ?.themes.map((theme) => (
-                        <Dropdown.Item
-                          key={theme.id}
-                          onClick={() =>
-                            handleThemeClick(theme.name.stroke, theme.id)
-                          }
-                          href="#"
-                        >
-                          {theme.name.stroke}
-                        </Dropdown.Item>
-                      ))}
-                  </DropdownButton>
+            <div className="chat__helper-buttons">
+              {isAdmin() &&
+                !isVisibleEdit &&
+                currentStatus !== "Закрыт" &&
+                user.id !== data.clientQuery.ticket.assistant?.id && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Изменить тикет"
+                      className="chat-input__button-close"
+                      onClick={handleEditTicketView}
+                    />
+                  </a>
                 )}
-                {isSubThemeDropdownVisible && input.theme && (
-                  <DropdownButton
-                    id="dropdown-custom-1"
-                    title={input.subtheme || "Подтема"}
-                  >
-                    {dataQuery
-                      .find((unit) => unit.name.stroke === input.unit)
-                      ?.themes.find(
-                        (theme) => theme.name.stroke === input.theme
-                      )
-                      ?.subThemes.map((subTheme) => (
-                        <Dropdown.Item
-                          key={subTheme.id}
-                          onClick={() =>
-                            handleSubThemeClick(
-                              subTheme.name.stroke,
-                              subTheme.id
-                            )
-                          }
-                          href="#"
-                        >
-                          {subTheme.name.stroke}
-                        </Dropdown.Item>
-                      ))}
-                  </DropdownButton>
-                )}
-                <Editor
-                  editorState={input.editorContent}
-                  onEditorStateChange={(newEditorState) =>
-                    handleSplitEditorChange(newEditorState, input.id)
-                  }
-                  toolbarStyle={{
-                    border: "1px solid #dee2e6",
-                    borderRadius: "6px 6px 0 0",
-                  }}
-                  editorStyle={{
-                    border: "1px solid #dee2e6",
-                    borderRadius: "0 0 6px 6px",
-                    padding: "10px",
-                  }}
-                  placeholder={"Введите здесь ваше сообщение"}
-                  toolbar={{
-                    options: ["inline", "list", "emoji", "remove", "history"],
-                    inline: {
-                      options: ["bold", "italic", "underline", "strikethrough"],
-                    },
-                    list: {
-                      options: ["unordered", "ordered"],
-                    },
-                  }}
-                />
-              </Form.Group>
-            ))}
-            <div className="chat__new-fields-buttons">
-              <div className="chat__new-fields-buttons-pagination">
-                <button
-                  onClick={handlePrevious}
-                  disabled={currentIndex === 0}
-                  className="alltickets__page-btn"
-                >
-                  Предыдущий
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={currentIndex === inputValues.length - 1}
-                  className="alltickets__page-btn"
-                >
-                  Следующий
-                </button>
-              </div>
-              {isErrorVisibleSplit && (
-                <span className="form__error">{errorMsgSplit()}</span>
-              )}
-              <ButtonCustom
-                title="Создать новые обращения"
-                className="chat-input__button-send"
-                onClick={handleMutationSplitTicket}
-              />
-            </div>
-          </>
-        )}
 
-        {isVisibleCuratorsChat && (
-          <>
-            <div className="chat__split-ticket">
-              <h3>Выберите куратора</h3>
-              <DropdownButton
-                id="dropdown-custom-1"
-                title={selectedCuratorChat || "Куратор"}
-                className="themes__dropdown"
-              >
-                {dataQueryCurators.map((curator, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() =>
-                      handleCuratorChatClick(
-                        curator.user.name,
-                        curator.user.surname,
-                        curator.user.patronymic,
-                        curator.id
-                      )
-                    }
-                    href="#"
-                  >
-                    {`${curator.user.surname} ${curator.user.name} ${
-                      curator.user.patronymic
-                        ? ` ${curator.user.patronymic}`
-                        : ""
-                    }`}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
-              {isErrorVisibleCuratorChat && (
-                <span className="form__error">{errorMsgCuratorChat()}</span>
+              {isAdmin() &&
+                currentStatus !== "Закрыт" &&
+                currentStatus !== "Новый" &&
+                currentStatus !== "На уточнении" &&
+                !isVisibleCuratorsChat && (
+                  <>
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Консультация с другим куратором"
+                        className="chat-input__button-close"
+                        onClick={handleCuratorsChat}
+                      />
+                    </a>
+                  </>
+                )}
+
+              {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+                <a className="alltickets__link">
+                  <ButtonCustom
+                    title="Разделить тикет"
+                    className="chat-input__button-close"
+                    onClick={handleSplitTicket}
+                  />
+                </a>
               )}
-              <ButtonCustom
-                title="Добавить куратора"
-                className={"add-curator__btn"}
-                onClick={handleAddCuratorChat}
-              />
             </div>
           </>
         )}
@@ -1436,7 +1275,14 @@ function Chat() {
               className="mb-3 edit-ticket__tabs"
               justify
             >
-              <Tab eventKey="theme" title="Редактирова тему">
+              <Tab
+                className="chat__tab-wrapper"
+                eventKey="theme"
+                title="Редактирова тему"
+              >
+                <a onClick={handleEditCloseClick}>
+                  <div className="chat__edit-close"></div>
+                </a>
                 <div className="edit-subtheme__field">
                   <Form.Label className="edit-curator__field-label">
                     Раздел
@@ -1524,7 +1370,14 @@ function Chat() {
                   </div>
                 )}
               </Tab>
-              <Tab eventKey="curator" title="Изменить куратора">
+              <Tab
+                eventKey="curator"
+                className="chat__tab-wrapper"
+                title="Изменить куратора"
+              >
+                <a onClick={handleEditCloseClick}>
+                  <div className="chat__edit-close"></div>
+                </a>
                 <div className="edit-subtheme__field">
                   <Form.Label className="edit-curator__field-label">
                     Куратор
@@ -1578,33 +1431,259 @@ function Chat() {
           </>
         )}
 
-        <Row>
-          <Col md={6}>
-            <Table striped bordered hover>
-              <tbody>
-                <tr>
-                  <td>
-                    <b>Создатель обращения:</b>
-                  </td>
-                  <td>
-                    {getFullName(data?.clientQuery.ticket?.client?.user)} |{" "}
-                    <a
-                      href={"mailto:" + data?.clientQuery.ticket?.client?.email}
+        {isVisibleCuratorsChat && (
+          <>
+            <div className="chat__split-ticket">
+              <h3>Выберите куратора</h3>
+              <a onClick={handleEditCloseClick}>
+                <div className="chat__edit-close"></div>
+              </a>
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedCuratorChat || "Куратор"}
+                className="themes__dropdown"
+              >
+                {dataQueryCurators.map((curator, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleCuratorChatClick(
+                        curator.user.name,
+                        curator.user.surname,
+                        curator.user.patronymic,
+                        curator.id
+                      )
+                    }
+                    href="#"
+                  >
+                    {`${curator.user.surname} ${curator.user.name} ${
+                      curator.user.patronymic
+                        ? ` ${curator.user.patronymic}`
+                        : ""
+                    }`}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+              {isErrorVisibleCuratorChat && (
+                <span className="form__error">{errorMsgCuratorChat()}</span>
+              )}
+              <ButtonCustom
+                title="Добавить куратора"
+                className={"add-curator__btn"}
+                onClick={handleAddCuratorChat}
+              />
+            </div>
+          </>
+        )}
+
+        {isVisibleSplit && (
+          <>
+            <div className="chat__split-ticket">
+              <h3>Разделение тикета</h3>
+              <a onClick={handleEditCloseClick}>
+                <div className="chat__edit-close"></div>
+              </a>
+              <Form.Control
+                type="number"
+                className="add-currator__input"
+                placeholder="Количество новых тикетов"
+                value={newTicketsCount}
+                onChange={handleOnChangeNewTicketsCount}
+                min={2}
+                id="splitTicket"
+              />
+              {isErrorVisibleNewFields && (
+                <span className="form__error">{errorMsgNewFields()}</span>
+              )}
+              <ButtonCustom
+                title="Создать новые тикеты"
+                className="chat-input__button-close"
+                onClick={handleSplitTicketFields}
+              />
+            </div>
+          </>
+        )}
+
+        {isVisibleSplitFields && (
+          <>
+            <div className="chat__tab-wrapper">
+              <a onClick={handleEditCloseClick}>
+                <div className="chat__edit-close"></div>
+              </a>
+              {inputValues.map((input, index) => (
+                <Form.Group
+                  key={input.id}
+                  controlId={`TicketTitleForm_${input.id}`}
+                  style={{ display: index === currentIndex ? "flex" : "none" }}
+                  className="chat__new-fields"
+                >
+                  <h3>Новый тикет #{input.id}</h3>
+                  <Form.Control
+                    type="text"
+                    placeholder="Тема обращения"
+                    className="form__input"
+                    value={input.title}
+                    onChange={(e) =>
+                      handleInputChange(input.id, e.target.value)
+                    }
+                  />
+                  <DropdownButton
+                    id="dropdown-custom-1"
+                    title={input.unit || "Выберите подразделение"}
+                  >
+                    {dataQuery.map((unit, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleUnitClick(unit.name.stroke, unit.id)
+                        }
+                        href="#"
+                      >
+                        {unit.name.stroke}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                  {input.unit && (
+                    <DropdownButton
+                      id="dropdown-custom-1"
+                      title={input.theme || "Тип обращения"}
                     >
-                      {data?.clientQuery.ticket?.client?.email}
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Текущий куратор:</b>
-                  </td>
-                  <td>{getFullName(data?.clientQuery.ticket?.helper?.user)}</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
+                      {dataQuery
+                        .find((unit) => unit.name.stroke === input.unit)
+                        ?.themes.map((theme) => (
+                          <Dropdown.Item
+                            key={theme.id}
+                            onClick={() =>
+                              handleThemeClick(theme.name.stroke, theme.id)
+                            }
+                            href="#"
+                          >
+                            {theme.name.stroke}
+                          </Dropdown.Item>
+                        ))}
+                    </DropdownButton>
+                  )}
+                  {isSubThemeDropdownVisible && input.theme && (
+                    <DropdownButton
+                      id="dropdown-custom-1"
+                      title={input.subtheme || "Подтема"}
+                    >
+                      {dataQuery
+                        .find((unit) => unit.name.stroke === input.unit)
+                        ?.themes.find(
+                          (theme) => theme.name.stroke === input.theme
+                        )
+                        ?.subThemes.map((subTheme) => (
+                          <Dropdown.Item
+                            key={subTheme.id}
+                            onClick={() =>
+                              handleSubThemeClick(
+                                subTheme.name.stroke,
+                                subTheme.id
+                              )
+                            }
+                            href="#"
+                          >
+                            {subTheme.name.stroke}
+                          </Dropdown.Item>
+                        ))}
+                    </DropdownButton>
+                  )}
+                  <Editor
+                    editorState={input.editorContent}
+                    onEditorStateChange={(newEditorState) =>
+                      handleSplitEditorChange(newEditorState, input.id)
+                    }
+                    toolbarStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px 6px 0 0",
+                    }}
+                    editorStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0 0 6px 6px",
+                      padding: "10px",
+                    }}
+                    placeholder={"Введите здесь ваше сообщение"}
+                    toolbar={{
+                      options: ["inline", "list", "emoji", "remove", "history"],
+                      inline: {
+                        options: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "strikethrough",
+                        ],
+                      },
+                      list: {
+                        options: ["unordered", "ordered"],
+                      },
+                    }}
+                  />
+                </Form.Group>
+              ))}
+              <div className="chat__new-fields-buttons">
+                <div className="chat__new-fields-buttons-pagination">
+                  <button
+                    onClick={handlePrevious}
+                    disabled={currentIndex === 0}
+                    className="alltickets__page-btn"
+                  >
+                    Предыдущий
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={currentIndex === inputValues.length - 1}
+                    className="alltickets__page-btn"
+                  >
+                    Следующий
+                  </button>
+                </div>
+                {isErrorVisibleSplit && (
+                  <span className="form__error">{errorMsgSplit()}</span>
+                )}
+                <ButtonCustom
+                  title="Создать новые обращения"
+                  className="chat-input__button-send"
+                  onClick={handleMutationSplitTicket}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {isAdmin() && (
+          <Row>
+            <Col md={6}>
+              <Table striped bordered hover>
+                <tbody>
+                  <tr>
+                    <td>
+                      <b>Создатель обращения:</b>
+                    </td>
+                    <td>
+                      {getFullName(data?.clientQuery.ticket?.client?.user)} |{" "}
+                      <a
+                        href={
+                          "mailto:" + data?.clientQuery.ticket?.client?.email
+                        }
+                      >
+                        {data?.clientQuery.ticket?.client?.email}
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Текущий куратор:</b>
+                    </td>
+                    <td>
+                      {getFullName(data?.clientQuery.ticket?.helper?.user)}
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+        )}
 
         {/* {isHideMessages && (
           <div className="chat-input__more">
@@ -1660,6 +1739,20 @@ function Chat() {
                 </div>
               )
           )}
+        {isAdmin() && (
+          <div className="chat__counter-wrapper">
+            <span className="chat__counter-label">Счетчик:</span>
+            <span
+              className={
+                currentStatus == "В процессе"
+                  ? "chat__counter-work"
+                  : "chat__counter-stop"
+              }
+            >
+              {currentStatus == "В процессе" ? "Запущен" : "Остановлен"}
+            </span>
+          </div>
+        )}
       </div>
       <div className="chat-input__container">
         {isVisible && isAdmin() && currentStatus !== "Новый" ? (
@@ -1766,32 +1859,51 @@ function Chat() {
                   <></>
                 )}
               </div>
+              {isAdmin() && (
+                <>
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title={
+                        isVisibleFilters == false
+                          ? "Показать историю"
+                          : "Скрыть историю"
+                      }
+                      onClick={handleHideComponent}
+                      className={"alltickets__btn single"}
+                    />
+                  </a>
+                </>
+              )}
               {isAdmin() && currentStatus == "Новый" ? (
-                <div className="chat-input__button-row">
-                  <ButtonCustom
-                    title="Начать работу"
-                    className="chat-input__button-send single"
-                    onClick={handleInProgress}
-                  />
-                </div>
+                <>
+                  <div className="chat-input__button-row">
+                    <ButtonCustom
+                      title="Начать работу"
+                      className="chat-input__button-send single"
+                      onClick={handleInProgress}
+                    />
+                  </div>
+                  {isAdmin() && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title={
+                            isVisibleFilters == false
+                              ? "Показать историю"
+                              : "Скрыть историю"
+                          }
+                          onClick={handleHideComponent}
+                          className={"alltickets__btn single"}
+                        />
+                      </a>
+                    </>
+                  )}
+                </>
               ) : (
                 <></>
               )}
 
               <>
-                {isAdmin() &&
-                  !isVisibleEdit &&
-                  currentStatus !== "Закрыт" &&
-                  user.id !== data.clientQuery.ticket.assistant?.id && (
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Изменить тикет"
-                        className="chat-input__button-close single"
-                        onClick={handleEditTicketView}
-                      />
-                    </a>
-                  )}
-
                 {isAdmin() &&
                   currentStatus == "На уточнении" &&
                   user.id == data.clientQuery.ticket.helper.id && (
@@ -1801,30 +1913,6 @@ function Chat() {
                           title="Закончить диалог с куратором"
                           className="chat-input__button-close single"
                           onClick={handleEndCuratorChat}
-                        />
-                      </a>
-                    </>
-                  )}
-                {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
-                  <a className="alltickets__link">
-                    <ButtonCustom
-                      title="Разделить тикет"
-                      className="chat-input__button-close single"
-                      onClick={handleSplitTicket}
-                    />
-                  </a>
-                )}
-                {isAdmin() &&
-                  currentStatus !== "Закрыт" &&
-                  currentStatus !== "Новый" &&
-                  currentStatus !== "На уточнении" &&
-                  !isVisibleCuratorsChat && (
-                    <>
-                      <a className="alltickets__link">
-                        <ButtonCustom
-                          title="Консультация с другим куратором"
-                          className="chat-input__button-close single"
-                          onClick={handleCuratorsChat}
                         />
                       </a>
                     </>
@@ -1853,55 +1941,33 @@ function Chat() {
                 )}
               </div>
               {isAdmin() && currentStatus == "Новый" ? (
-                <div className="chat-input__button-row">
-                  <ButtonCustom
-                    title="Начать работу"
-                    className="chat-input__button-send single"
-                    onClick={handleInProgress}
-                  />
-                </div>
-              ) : (
-                <></>
-              )}
-
-              <>
-                {isAdmin() &&
-                  !isVisibleEdit &&
-                  currentStatus !== "Закрыт" &&
-                  user.id !== data.clientQuery.ticket.assistant?.id && (
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Изменить тикет"
-                        className="chat-input__button-close single"
-                        onClick={handleEditTicketView}
-                      />
-                    </a>
-                  )}
-                {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
-                  <a className="alltickets__link">
+                <>
+                  <div className="chat-input__button-row">
                     <ButtonCustom
-                      title="Разделить тикет"
-                      className="chat-input__button-close single"
-                      onClick={handleSplitTicket}
+                      title="Начать работу"
+                      className="chat-input__button-send single"
+                      onClick={handleInProgress}
                     />
-                  </a>
-                )}
-                {isAdmin() &&
-                  currentStatus !== "Закрыт" &&
-                  currentStatus !== "Новый" &&
-                  currentStatus !== "На уточнении" &&
-                  !isVisibleCuratorsChat && (
+                  </div>
+                  {isAdmin() && (
                     <>
                       <a className="alltickets__link">
                         <ButtonCustom
-                          title="Консультация с другим куратором"
-                          className="chat-input__button-close single"
-                          onClick={handleCuratorsChat}
+                          title={
+                            isVisibleFilters == false
+                              ? "Показать историю"
+                              : "Скрыть историю"
+                          }
+                          onClick={handleHideComponent}
+                          className={"alltickets__btn single"}
                         />
                       </a>
                     </>
                   )}
-              </>
+                </>
+              ) : (
+                <></>
+              )}
             </Row>
           </Form>
         )}
@@ -1980,6 +2046,17 @@ function Chat() {
                   type="submit"
                   onClick={handleSubmit}
                 />
+                {isAdmin() && (
+                  <ButtonCustom
+                    title={
+                      isVisibleFilters == false
+                        ? "Показать историю"
+                        : "Скрыть историю"
+                    }
+                    onClick={handleHideComponent}
+                    className={"alltickets__btn"}
+                  />
+                )}
               </Col>
             </Row>
           </Form>
@@ -2078,6 +2155,45 @@ function Chat() {
             />
           )}
         </div>
+      )}
+
+      {isVisibleFilters && (
+        <>
+          <div className="chat__table-log">
+            <Table className="table__table" hover>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Имя</th>
+                  <th>Роль</th>
+                  <th>Событие</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataLogQuery.map((log, index) => (
+                  <tr key={index}>
+                    <td>
+                      {DateTime.fromISO(log.date, {
+                        zone: "utc",
+                      })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd HH:mm:ss")}
+                    </td>
+                    <td>{getFullName(log.initiator)}</td>
+                    <td>
+                      {log.initiator.role == "system"
+                        ? "Система"
+                        : log.initiator.role == "helper"
+                        ? "Куратор"
+                        : "Партнер"}
+                    </td>
+                    <td>{log.info}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        </>
       )}
 
       <Modal show={show} onHide={handleCloseModal}>

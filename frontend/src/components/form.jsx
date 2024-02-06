@@ -40,16 +40,6 @@ function FormComponent() {
 
   const [show, setShow] = useState(false);
 
-  const [newTicketLink, setNewTicketLink] = useState(null);
-
-  const [isCopy, setIsCopy] = useState(false);
-
-  //const [popupTicketLink, setpopupTicketLink] = useState(null);
-  //const [popupUserID, setPopupUserID] = useState(null);
-
-  let popupTicketLink = null;
-  let popupUserID = null;
-
   const [isVisible, setIsVisible] = useState(false);
 
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
@@ -282,10 +272,6 @@ function FormComponent() {
           },
         }).then((data) => {
           console.log(data.data.addTicket);
-          popupTicketLink = data.data.clientMutation.addTicket.link;
-          popupUserID = data.data.clientMutation.addTicket.clientId;
-          //setpopupTicketLink(data.data.addTicket.id);
-          //setPopupUserID(data.data.addTicket.clientId);
           setIsVisible(false);
           handleShow();
           //resetState();
@@ -407,18 +393,12 @@ function FormComponent() {
   };
 
   const handleShow = () => {
-    setNewTicketLink(popupTicketLink);
     setShow(true);
   };
 
   const handleClose = () => {
     setShow(false);
     window.location.reload();
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(newTicketLink);
-    setIsCopy(true);
   };
 
   return (
@@ -617,15 +597,8 @@ function FormComponent() {
             Ваше обращение в техподдержку VERTERA принято в обработку. В
             ближайшее время вы получите ответ.
           </p>
-          <p>
-            Отслеживать статус обращения вы можете{" "}
-            <a href={newTicketLink}>по ссылке:</a>
-          </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleCopy}>
-            {!isCopy ? "Скопировать ссылку" : "Ссылка скопирована"}
-          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Закрыть
           </Button>

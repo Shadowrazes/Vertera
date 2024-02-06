@@ -11,13 +11,8 @@
   width: 1075px;
   text-align: center;
   border-radius: 15px;
-  background: linear-gradient(
-      0deg,
-      rgba(0, 171, 151, 0.11) 0%,
-      rgba(0, 171, 151, 0.11) 100%
-    ),
-    rgb(255, 255, 255);
-  padding: 50px 50px 50px 50px;
+  background: #f7f7f7;
+  padding: 50px 50px 30px 50px;
 }
 
 .chat-message-system__text {
@@ -30,6 +25,9 @@
   font-family: "TT Norms Pro", sans-serif;
   font-size: 15px;
   color: #5c5c5c;
+  display: block;
+  margin-top: 30px;
+  text-align: center;
 }
 
 @media screen and (max-width: 768px) {
