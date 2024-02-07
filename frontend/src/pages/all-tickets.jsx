@@ -1242,7 +1242,7 @@ function allTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  {isAdmin() && <th>ID</th>}
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
@@ -1254,18 +1254,20 @@ function allTickets() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    <td>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.id}
-                      </Link>
-                    </td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {ticket.id}
+                        </Link>
+                      </td>
+                    )}
                     <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
@@ -1278,7 +1280,7 @@ function allTickets() {
                         {`${
                           ticket.subTheme.theme.unit.name.stroke ===
                           "Партнерам/Клиентам"
-                            ? "П/К"
+                            ? "ПК"
                             : "ДО"
                         } | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"

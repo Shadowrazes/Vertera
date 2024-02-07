@@ -191,7 +191,7 @@ function TableTickets() {
   }
 
   if (error) {
-    return <>{userId == null ? <></> : <h2>xdd</h2>}</>;
+    return <>{userId == null ? <></> : <h2>Что-то пошло не так</h2>}</>;
   }
 
   const getStatusColor = (status) => {
@@ -261,7 +261,7 @@ function TableTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  {isAdmin() && <th>ID</th>}
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
@@ -273,18 +273,20 @@ function TableTickets() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    <td>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.id}
-                      </Link>
-                    </td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {ticket.id}
+                        </Link>
+                      </td>
+                    )}
                     <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
@@ -297,7 +299,7 @@ function TableTickets() {
                         {`${
                           ticket.subTheme.theme.unit.name.stroke ===
                           "Партнерам/Клиентам"
-                            ? "П/К"
+                            ? "ПК"
                             : "ДО"
                         } | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
