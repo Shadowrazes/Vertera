@@ -1193,6 +1193,7 @@ function Chat() {
       });
 
       console.log("Диалог с куратором успешно завершен:", result);
+      goToAllTickets();
     } catch (error) {
       console.error("Ошибка при завершении диалога с куратором:", error);
     }
@@ -1249,6 +1250,20 @@ function Chat() {
                         title="Консультация с другим куратором"
                         className="chat-input__button-close"
                         onClick={handleCuratorsChat}
+                      />
+                    </a>
+                  </>
+                )}
+
+              {isAdmin() &&
+                currentStatus == "На уточнении" &&
+                user.id == data.clientQuery.ticket.helper.id && (
+                  <>
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Закончить диалог с куратором"
+                        className="chat-input__button-close"
+                        onClick={handleEndCuratorChat}
                       />
                     </a>
                   </>
@@ -1443,26 +1458,29 @@ function Chat() {
                 title={selectedCuratorChat || "Куратор"}
                 className="themes__dropdown"
               >
-                {dataQueryCurators.map((curator, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() =>
-                      handleCuratorChatClick(
-                        curator.user.name,
-                        curator.user.surname,
-                        curator.user.patronymic,
-                        curator.id
-                      )
-                    }
-                    href="#"
-                  >
-                    {`${curator.user.surname} ${curator.user.name} ${
-                      curator.user.patronymic
-                        ? ` ${curator.user.patronymic}`
-                        : ""
-                    }`}
-                  </Dropdown.Item>
-                ))}
+                {dataQueryCurators.map(
+                  (curator, index) =>
+                    data.clientQuery.ticket.helper.id !== curator.id && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleCuratorChatClick(
+                            curator.user.name,
+                            curator.user.surname,
+                            curator.user.patronymic,
+                            curator.id
+                          )
+                        }
+                        href="#"
+                      >
+                        {`${curator.user.surname} ${curator.user.name} ${
+                          curator.user.patronymic
+                            ? ` ${curator.user.patronymic}`
+                            : ""
+                        }`}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
               {isErrorVisibleCuratorChat && (
                 <span className="form__error">{errorMsgCuratorChat()}</span>
@@ -1654,7 +1672,7 @@ function Chat() {
         {isAdmin() && (
           <Row>
             <Col md={6}>
-              <Table striped bordered hover>
+              <Table bordered hover>
                 <tbody>
                   <tr>
                     <td>
@@ -1679,6 +1697,16 @@ function Chat() {
                       {getFullName(data?.clientQuery.ticket?.helper?.user)}
                     </td>
                   </tr>
+                  {isAdmin() && currentStatus == "На уточнении" && (
+                    <tr>
+                      <td>
+                        <b>Уточняющий куратор:</b>
+                      </td>
+                      <td>
+                        {getFullName(data?.clientQuery.ticket?.assistant.user)}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </Table>
             </Col>
@@ -1902,22 +1930,6 @@ function Chat() {
               ) : (
                 <></>
               )}
-
-              <>
-                {isAdmin() &&
-                  currentStatus == "На уточнении" &&
-                  user.id == data.clientQuery.ticket.helper.id && (
-                    <>
-                      <a className="alltickets__link">
-                        <ButtonCustom
-                          title="Закончить диалог с куратором"
-                          className="chat-input__button-close single"
-                          onClick={handleEndCuratorChat}
-                        />
-                      </a>
-                    </>
-                  )}
-              </>
             </Row>
           </Form>
         ) : (

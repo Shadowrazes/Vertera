@@ -148,6 +148,11 @@ export const MESSAGES_CHAT = gql`
         }
         assistant {
           id
+          user {
+            name
+            surname
+            patronymic
+          }
         }
         reaction
         client {
