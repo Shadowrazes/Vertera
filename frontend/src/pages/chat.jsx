@@ -212,6 +212,12 @@ function Chat() {
     );
   };
 
+  const handleRemoveFileInput = (indexToRemove) => {
+    setFileInputs((prevFileInputs) =>
+      prevFileInputs.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
   useEffect(() => {
     if (isAdmin()) {
       if (data && data.clientQuery.ticket) {
@@ -1829,6 +1835,14 @@ function Chat() {
                       accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
                       onChange={handleFileChange}
                     />
+                    {index > 0 && (
+                      <Button
+                        variant="outline-danger"
+                        onClick={() => handleRemoveFileInput(index)}
+                      >
+                        Удалить
+                      </Button>
+                    )}
                   </Form.Group>
                 ))}
 
@@ -2040,6 +2054,14 @@ function Chat() {
                         accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
                         onChange={handleFileChange}
                       />
+                      {index > 0 && (
+                        <Button
+                          variant="outline-danger"
+                          onClick={() => handleRemoveFileInput(index)}
+                        >
+                          Удалить
+                        </Button>
+                      )}
                     </Form.Group>
                   ))}
 
