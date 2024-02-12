@@ -40,16 +40,6 @@ function FormComponent() {
 
   const [show, setShow] = useState(false);
 
-  const [newTicketLink, setNewTicketLink] = useState(null);
-
-  const [isCopy, setIsCopy] = useState(false);
-
-  //const [popupTicketLink, setpopupTicketLink] = useState(null);
-  //const [popupUserID, setPopupUserID] = useState(null);
-
-  let popupTicketLink = null;
-  let popupUserID = null;
-
   const [isVisible, setIsVisible] = useState(false);
 
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
@@ -142,9 +132,18 @@ function FormComponent() {
   }
 
   if (error) {
+    if (
+      error.networkError.message ==
+      "Response not successful: Received status code 500"
+    ) {
+      console.log("123");
+    }
+
     return (
       <>
-        {userId == 999 ? (
+        {userId == 999 ||
+        error.networkError.message ==
+          "Response not successful: Received status code 500" ? (
           <>
             <div className="auth">
               <h2>Необходимо авторизироваться</h2>
@@ -282,10 +281,6 @@ function FormComponent() {
           },
         }).then((data) => {
           console.log(data.data.addTicket);
-          popupTicketLink = data.data.clientMutation.addTicket.link;
-          popupUserID = data.data.clientMutation.addTicket.clientId;
-          //setpopupTicketLink(data.data.addTicket.id);
-          //setPopupUserID(data.data.addTicket.clientId);
           setIsVisible(false);
           handleShow();
           //resetState();
@@ -373,6 +368,12 @@ function FormComponent() {
     );
   };
 
+  const handleRemoveFileInput = (indexToRemove) => {
+    setFileInputs((prevFileInputs) =>
+      prevFileInputs.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
   const handleFileChange = (e) => {
     const files = e.target.files;
     let isFileSizeExceeded = false;
@@ -407,18 +408,12 @@ function FormComponent() {
   };
 
   const handleShow = () => {
-    setNewTicketLink(popupTicketLink);
     setShow(true);
   };
 
   const handleClose = () => {
     setShow(false);
     window.location.reload();
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(newTicketLink);
-    setIsCopy(true);
   };
 
   return (
@@ -559,6 +554,7 @@ function FormComponent() {
                   border: "1px solid #dee2e6",
                   borderRadius: "0 0 6px 6px",
                   padding: "10px",
+                  heigth: "250px",
                 }}
                 placeholder={
                   "Введите здесь Ваш вопрос или опишите Вашу проблему"
@@ -582,6 +578,14 @@ function FormComponent() {
                     accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
                     onChange={handleFileChange}
                   />
+                  {index > 0 && (
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => handleRemoveFileInput(index)}
+                    >
+                      Удалить
+                    </Button>
+                  )}
                 </Form.Group>
               ))}
 
@@ -617,15 +621,8 @@ function FormComponent() {
             Ваше обращение в техподдержку VERTERA принято в обработку. В
             ближайшее время вы получите ответ.
           </p>
-          <p>
-            Отслеживать статус обращения вы можете{" "}
-            <a href={newTicketLink}>по ссылке:</a>
-          </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleCopy}>
-            {!isCopy ? "Скопировать ссылку" : "Ссылка скопирована"}
-          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Закрыть
           </Button>

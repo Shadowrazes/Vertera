@@ -703,7 +703,7 @@ function allTickets() {
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "clarification") {
       fastFilterHelperId = null;
-      fastFilterStatus = 4;
+      fastFilterStatus = [4, 5];
       setHelperIdsFilter(null);
       setHelperStatusFilter(fastFilterStatus);
     }
@@ -805,7 +805,7 @@ function allTickets() {
                 <div className="alltickets__filters-container">
                   <Form>
                     <Row className="alltickets__row">
-                      <Col className="alltickets__column">
+                      <div className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={selectedItem || "Выберите подразделение"}
@@ -907,8 +907,8 @@ function allTickets() {
                           placeholder="Страны партнеров"
                           filter
                         />
-                      </Col>
-                      <Col className="alltickets__column">
+                      </div>
+                      <div className="alltickets__column">
                         <DateRangePicker
                           className="alltickets__date-range-picker"
                           placeholder="Задать период"
@@ -1020,7 +1020,7 @@ function allTickets() {
                             onChange={handleNumberIdFilterValueChange}
                           />
                         </Form.Group>
-                      </Col>
+                      </div>
                     </Row>
                     <Row className="alltickets__button-row">
                       <ButtonCustom title="Применить" onClick={handleSubmit} />
@@ -1036,7 +1036,7 @@ function allTickets() {
                 <div className="alltickets__filters-container">
                   <Form>
                     <Row>
-                      <Col className="alltickets__column">
+                      <div className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={selectedItem || "Выберите подразделение"}
@@ -1104,8 +1104,8 @@ function allTickets() {
                               ))}
                           </DropdownButton>
                         )}
-                      </Col>
-                      <Col className="alltickets__column">
+                      </div>
+                      <div className="alltickets__column">
                         <DateRangePicker
                           className="alltickets__date-range-picker"
                           placeholder="Задать период"
@@ -1143,7 +1143,7 @@ function allTickets() {
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
-                      </Col>
+                      </div>
                     </Row>
                     <Row className="alltickets__button-row">
                       <ButtonCustom title="Применить" onClick={handleSubmit} />
@@ -1242,10 +1242,11 @@ function allTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  {isAdmin() && <th>ID</th>}
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
+                  {isAdmin() && <th>Куратор</th>}
                   <th>Последнее сообщение</th>
                   <th>Сообщений</th>
                   <th>Статус</th>
@@ -1254,19 +1255,21 @@ function allTickets() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    <td>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.id}
-                      </Link>
-                    </td>
-                    <td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {ticket.id}
+                        </Link>
+                      </td>
+                    )}
+                    <td style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -1278,7 +1281,7 @@ function allTickets() {
                         {`${
                           ticket.subTheme.theme.unit.name.stroke ===
                           "Партнерам/Клиентам"
-                            ? "П/К"
+                            ? "ПК"
                             : "ДО"
                         } | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
@@ -1300,7 +1303,13 @@ function allTickets() {
                           zone: "utc",
                         })
                           .toLocal()
-                          .toFormat("yyyy.MM.dd HH:mm:ss")}
+                          .toFormat("yyyy.MM.dd")}
+                        <br />
+                        {DateTime.fromISO(ticket.date, {
+                          zone: "utc",
+                        })
+                          .toLocal()
+                          .toFormat("HH:mm:ss")}
                       </Link>
                     </td>
                     <td>
@@ -1312,9 +1321,25 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.title}
+                        {ticket.title.length > 12
+                          ? `${ticket.title.slice(0, 12)}...`
+                          : `${ticket.title}`}
                       </Link>
                     </td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                        </Link>
+                      </td>
+                    )}
                     <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
@@ -1330,7 +1355,9 @@ function allTickets() {
                         |{" "}
                         {ticket.lastMessage.sender.surname === "system"
                           ? "Системное сообщение"
-                          : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
+                          : `${
+                              ticket.lastMessage.sender.name
+                            } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
                     <td>

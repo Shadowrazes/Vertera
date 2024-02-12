@@ -191,7 +191,7 @@ function TableTickets() {
   }
 
   if (error) {
-    return <>{userId == null ? <></> : <h2>xdd</h2>}</>;
+    return <>{userId == null ? <></> : <h2>Что-то пошло не так</h2>}</>;
   }
 
   const getStatusColor = (status) => {
@@ -261,10 +261,11 @@ function TableTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  {isAdmin() && <th>ID</th>}
                   <th>Раздел</th>
                   <th>Дата создания</th>
                   <th>Тема</th>
+                  {isAdmin() && <th>Куратор</th>}
                   <th>Последнее сообщение</th>
                   <th>Сообщений</th>
                   <th>Статус</th>
@@ -273,19 +274,21 @@ function TableTickets() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    <td>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.id}
-                      </Link>
-                    </td>
-                    <td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {ticket.id}
+                        </Link>
+                      </td>
+                    )}
+                    <td style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -297,7 +300,7 @@ function TableTickets() {
                         {`${
                           ticket.subTheme.theme.unit.name.stroke ===
                           "Партнерам/Клиентам"
-                            ? "П/К"
+                            ? "ПК"
                             : "ДО"
                         } | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
@@ -319,7 +322,13 @@ function TableTickets() {
                           zone: "utc",
                         })
                           .toLocal()
-                          .toFormat("yyyy.MM.dd HH:mm:ss")}
+                          .toFormat("yyyy.MM.dd")}
+                        <br />
+                        {DateTime.fromISO(ticket.date, {
+                          zone: "utc",
+                        })
+                          .toLocal()
+                          .toFormat("HH:mm:ss")}
                       </Link>
                     </td>
                     <td>
@@ -331,9 +340,25 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {ticket.title}
+                        {ticket.title.length > 12
+                          ? `${ticket.title.slice(0, 12)}...`
+                          : `${ticket.title}`}
                       </Link>
                     </td>
+                    {isAdmin() && (
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                        </Link>
+                      </td>
+                    )}
                     <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
@@ -349,7 +374,9 @@ function TableTickets() {
                         |{" "}
                         {ticket.lastMessage.sender.surname === "system"
                           ? "Системное сообщение"
-                          : `${ticket.lastMessage.sender.surname} ${ticket.lastMessage.sender.name}`}
+                          : `${
+                              ticket.lastMessage.sender.name
+                            } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
                     <td>
@@ -379,6 +406,7 @@ function TableTickets() {
                             background: getStatusColor(
                               ticket.status.name.stroke
                             ),
+                            minWidth: "103px",
                           }}
                         >
                           {ticket.status.name.stroke}

@@ -14,6 +14,11 @@ export const TABLE_TICKETS = gql`
           }
           helper {
             id
+            user {
+              name
+              surname
+              patronymic
+            }
           }
           subTheme {
             name(lang: "ru") {
@@ -74,6 +79,11 @@ export const TABLE_TICKETS_USER = gql`
           }
           helper {
             id
+            user {
+              name
+              surname
+              patronymic
+            }
           }
           subTheme {
             name(lang: "ru") {
@@ -148,6 +158,11 @@ export const MESSAGES_CHAT = gql`
         }
         assistant {
           id
+          user {
+            name
+            surname
+            patronymic
+          }
         }
         reaction
         client {

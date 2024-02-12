@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
-import { STATS } from "../apollo/queries";
+import { STATS, CURATORS_LIST } from "../apollo/queries";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -46,6 +46,11 @@ ChartJS.register(
 
 function Stats() {
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const [dataQueryCurators, setDataQueryCurators] = useState([]);
+  const [selectedCurator, setSelectedCurator] = useState(null);
+  const [selectedCuratorId, setSelectedCuratorId] = useState(null);
+
   const [totalData, setTotalData] = useState({});
   const [likeData, setLikeData] = useState({});
   const [tableInfo, setTableInfo] = useState({});
@@ -53,15 +58,38 @@ function Stats() {
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
 
+  const isHelper = () => {
+    return user.role === "helper" || user.role === "system";
+  };
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
+
   const { loading, error, data, refetch } = useQuery(STATS, {
     variables: {
       token: user.token,
     },
   });
+
+  const {
+    loading: loadingCurators,
+    error: errorCurators,
+    data: dataCurators,
+  } = useQuery(CURATORS_LIST, {
+    variables: {
+      token: user.token,
+    },
+  });
+
   const getCurrentUserStats = () => {
-    return data?.helperQuery.helperStatList.filter((elem) => {
-      return elem.helper.id == user.id;
-    });
+    if (isAdmin()) {
+      return data?.helperQuery.helperStatList;
+    } else {
+      return data?.helperQuery.helperStatList.filter((elem) => {
+        return elem.helper.id == user.id;
+      });
+    }
   };
 
   const getAvgReplyTimeAllUsers = () => {
@@ -210,7 +238,36 @@ function Stats() {
     return result !== "" ? result : "0 сек.";
   };
 
+  const handleCuratorClick = (
+    curatorName,
+    curatorSurname,
+    curatorPatronymic,
+    curatorId
+  ) => {
+    let fullName = `${curatorSurname} ${curatorName} ${
+      curatorPatronymic ? ` ${curatorPatronymic}` : ""
+    }`;
+    setSelectedCurator(fullName);
+    setSelectedCuratorId(curatorId);
+  };
+
   useEffect(() => {
+    if (isAdmin()) {
+      if (dataCurators && dataCurators.helperQuery.helperList) {
+        setDataQueryCurators(dataCurators.helperQuery.helperList);
+        setSelectedCurator(
+          `${dataCurators.helperQuery.helperList.at(0).user.surname} ${
+            dataCurators.helperQuery.helperList.at(0).user.name
+          } ${
+            dataCurators.helperQuery.helperList.at(0).user.patronymic
+              ? ` ${dataCurators.helperQuery.helperList.at(0).user.patronymic}`
+              : ""
+          }`
+        );
+        setSelectedCuratorId(dataCurators.helperQuery.helperList.at(0).user.id);
+      }
+    }
+
     let currentStats = getCurrentUserStats();
     if (currentStats) {
       currentStats = currentStats[0].stats;
@@ -298,7 +355,7 @@ function Stats() {
 
     setRateLike(getRateLike(data));
     setRateAvgTime(getRateAvgTime(data));
-  }, [data]);
+  }, [data, dataQueryCurators]);
 
   if (loading) {
     return <Loader />;
@@ -311,6 +368,33 @@ function Stats() {
   return (
     <>
       <TitleH2 title="Статистика" className="title__heading" />
+
+      {isAdmin() && (
+        <DropdownButton
+          id="dropdown-custom-1"
+          title={selectedCurator || "Куратор"}
+          className="themes__dropdown"
+        >
+          {dataQueryCurators.map((curator, index) => (
+            <Dropdown.Item
+              key={index}
+              onClick={() =>
+                handleCuratorClick(
+                  curator.user.name,
+                  curator.user.surname,
+                  curator.user.patronymic,
+                  curator.id
+                )
+              }
+              href="#"
+            >
+              {`${curator.user.surname} ${curator.user.name} ${
+                curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+              }`}
+            </Dropdown.Item>
+          ))}
+        </DropdownButton>
+      )}
       <Row>
         <Col>
           <Table striped bordered hover>

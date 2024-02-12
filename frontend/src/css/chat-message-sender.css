@@ -8,10 +8,10 @@
 }
 
 .chat-message-sender__box {
-  width: 1075px;
+  width: 100%;
   border-radius: 15px;
   background: rgba(134, 211, 255, 0.09);
-  padding: 50px 150px 50px 50px;
+  padding: 50px 150px 30px 50px;
 }
 
 .chat-message-sender__text {
@@ -24,6 +24,10 @@
   font-family: "TT Norms Pro", sans-serif;
   font-size: 15px;
   color: #5c5c5c;
+  display: block;
+  margin-top: 30px;
+  margin-right: -50px;
+  text-align: right;
 }
 
 .chat-message-sender__attachs-title {

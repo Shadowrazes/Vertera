@@ -69,8 +69,8 @@ function ChatMessage({ message, sender, time, attachs }) {
               </div>
             </>
           )}
+          <span className="chat-message-sender__time">{time}</span>
         </div>
-        <span className="chat-message-sender__time">{time}</span>
       </div>
     </>
   );

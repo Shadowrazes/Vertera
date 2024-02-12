@@ -2,7 +2,24 @@
   /* margin-bottom: 350px; */
 }
 
+.chat__tab-wrapper {
+  position: relative;
+}
+
+.chat__edit-close {cursor: pointer; position: absolute; top: 35px; right: 30px;}
+.chat__edit-close:before, .chat__edit-close:after {content: ""; position: absolute; width: 24px; height: 4px; background: gray;}
+.chat__edit-close:before {transform: rotate(45deg);}
+.chat__edit-close:after {transform: rotate(-45deg);}
+
+.chat__helper-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .chat__split-ticket {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -46,6 +63,42 @@
   margin-bottom: 20px;
 }
 
+.chat__counter-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+.chat__counter-label {
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 18px;
+  margin-right: 10px; 
+}
+
+.chat__counter-work {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 18px;
+  background: linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), rgb(255, 255, 255);
+  padding: 7px;
+  border-radius: 6px;
+}
+
+.chat__counter-stop {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 18px;
+  background: rgba(171, 0, 0, 0.11);
+  padding: 7px;
+  border-radius: 6px;
+}
+
 .chat-input__container {
   /* position: fixed;
   bottom: 10px;
@@ -81,7 +134,7 @@
 }
 
 .chat-input__button-send {
-  min-width: 400px !important;
+  min-width: 275px !important;
   padding: 6px 12px;
   font-family: "TT Norms Pro", sans-serif;
 }
@@ -164,6 +217,7 @@
   padding-left: 50px; */
   width: 1075px;
   padding: 50px 150px 50px 50px;
+  margin-top: 20px;
   margin-bottom: 50px;
   border-radius: 15px;
   border: 1px solid #dee2e6;
@@ -172,6 +226,27 @@
 .chat-input__close-text {
   font-family: "TT Norms Pro", sans-serif;
   font-size: 20px;
+}
+
+.chat__table-log {
+  margin: 30px auto;
+  width: 60%;
+}
+
+.btn-check:checked + .btn {
+  background-color: #f8f9fa !important;
+  color: black !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+.btn-check:checked + .btn:hover {
+  background-color: #dee2e6 !important;
+}
+
+.btn-check + .btn {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #dee2e6 !important;
 }
 
 @media screen and (max-width: 768px) {
