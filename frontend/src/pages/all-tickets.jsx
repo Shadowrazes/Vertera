@@ -768,6 +768,10 @@ function allTickets() {
     }
   };
 
+  const handleCreateTicket = () => {
+    location.href = '/';
+  }
+
   const newCuratorList = dataQueryCurators.map((curator) => ({
     name: `${curator.user.surname} ${curator.user.name} ${
       curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
@@ -789,15 +793,37 @@ function allTickets() {
     <>
       <div className="alltickets__container">
         <TitleH2 title={get_translation('INTERFACE_ALL_APPEALS')} className="title__heading-nomargin" />
-        {!loading && (
-          <ButtonCustom
-            title={
-              isVisibleFilters == false ? get_translation('INTERFACE_SHOW_FILTER') : get_translation('INTERFACE_HIDE_FILTER')
-            }
-            onClick={handleHideComponent}
-            className={"alltickets__btn"}
-          />
-        )}
+        {!loading && 
+          
+          !isAdmin() ? (
+            <div className="alltickets__nav-info">
+              {!isAdmin() && (
+                <ButtonCustom
+                  title="Написать обращение"
+                  onClick={handleCreateTicket}
+                  className={"alltickets__btn"}
+                />
+              )}
+              
+              <ButtonCustom
+                title={
+                  isVisibleFilters == false ? get_translation('INTERFACE_SHOW_FILTER') : get_translation('INTERFACE_HIDE_FILTER')
+                }
+                onClick={handleHideComponent}
+                className={"alltickets__btn alltickets__btn-outlined"}
+              />
+            </div> 
+          ) : (
+            <ButtonCustom
+              title={
+                isVisibleFilters == false ? get_translation('INTERFACE_SHOW_FILTER') : get_translation('INTERFACE_HIDE_FILTER')
+              }
+              onClick={handleHideComponent}
+              className={"alltickets__btn alltickets__btn-outlined"}
+            />
+          )
+          
+        }
       </div>
       {!loading && (
         <>
@@ -1037,7 +1063,7 @@ function allTickets() {
               ) : (
                 <div className="alltickets__filters-container">
                   <Form>
-                    <Row>
+                    <Row className="alltickets__row">
                       <div className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
@@ -1145,6 +1171,15 @@ function allTickets() {
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
+                        <Form.Group controlId="wordsFilterForm">
+                          <Form.Control
+                            type="text"
+                            placeholder={get_translation('INTERFACE_REG_EXP')}
+                            className="add-currator__input"
+                            value={wordsFilterValue}
+                            onChange={handleWordsFilterValueChange}
+                          />
+                        </Form.Group>
                       </div>
                     </Row>
                     <Row className="alltickets__button-row">

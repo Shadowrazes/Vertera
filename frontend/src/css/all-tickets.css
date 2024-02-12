@@ -4,6 +4,7 @@
   align-items: center;
   margin-top: 100px;
   margin-bottom: 50px;
+  gap: 20px;
 }
 
 .alltickets__row {
@@ -89,7 +90,7 @@
 }
 
 .alltickets__column:last-child {
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .alltickets__button-row {
@@ -167,6 +168,7 @@
 .alltickets__amount {
   display: flex;
   justify-content: flex-end;
+  margin-right: 50px;
 }
 
 .alltickets__amount #dropdown-custom-1 {
@@ -208,6 +210,19 @@
 .alltickets__days-ago #dropdown-custom-1 {
   width: 165px !important;
   border-radius: 0;
+}
+
+.alltickets__nav-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex: 1 1 auto;
+}
+
+.alltickets__btn-outlined {
+  border: 1px solid #00AB97 !important;
+  color: #00AB97 !important;
+  background-color: white !important;
 }
 
 @media screen and (max-width: 768px) {

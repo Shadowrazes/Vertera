@@ -2125,7 +2125,7 @@ function Chat() {
         <div className="chat-input__close-container">
           <div className="chat-input__close-box">
             <span className="chat-input__close-text">Заявка закрыта</span>
-            <div className="chat-message-recepient__separator"></div>
+          </div>
             {!isAdmin() && (
               <div className="chat-message-recepient__rate-container">
                 {!reaction ? (
@@ -2202,14 +2202,13 @@ function Chat() {
                 )}
               </div>
             )}
-          </div>
-          {!isAdmin() && (
-            <ButtonCustom
-              title="Создать новую заявку"
-              className="chat-input__button-close"
-              onClick={goToCreateTicket}
-            />
-          )}
+            {!isAdmin() && (
+              <ButtonCustom
+                title="Создать новую заявку"
+                className=""
+                onClick={goToCreateTicket}
+              />
+            )}
         </div>
       )}
 

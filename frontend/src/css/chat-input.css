@@ -240,17 +240,17 @@
   /* display: flex;
   align-items: center;
   padding-left: 50px; */
-  width: 1075px;
-  padding: 50px 150px 50px 50px;
-  margin-top: 20px;
-  margin-bottom: 50px;
+  width: 100%;
+  background-color: #f7f7f7;
+  padding: 30px 50px;
+  margin-bottom: 20px;
   border-radius: 15px;
-  border: 1px solid #dee2e6;
+  text-align: center;
 }
 
 .chat-input__close-text {
   font-family: "TT Norms Pro", sans-serif;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .chat__table-log {
