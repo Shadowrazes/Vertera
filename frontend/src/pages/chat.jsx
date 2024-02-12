@@ -1778,12 +1778,20 @@ function Chat() {
             <span className="chat__counter-label">Счетчик:</span>
             <span
               className={
-                currentStatus == "В процессе"
+                currentStatus == "В процессе" ||
+                (currentStatus == "На уточнении" &&
+                  messagesQuery.at(-1).sender.id !==
+                    data.clientQuery.ticket.helper.id)
                   ? "chat__counter-work"
                   : "chat__counter-stop"
               }
             >
-              {currentStatus == "В процессе" ? "Запущен" : "Остановлен"}
+              {currentStatus == "В процессе" ||
+              (currentStatus == "На уточнении" &&
+                messagesQuery.at(-1).sender.id !==
+                  data.clientQuery.ticket.helper.id)
+                ? "Запущен"
+                : "Остановлен"}
             </span>
           </div>
         )}
@@ -1792,7 +1800,8 @@ function Chat() {
         {isVisible && isAdmin() && currentStatus !== "Новый" ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
             <Row className="chat-input__row">
-              {/* <Form.Group controlId="TextareaForm">
+              <Col className="chat-input__row">
+                {/* <Form.Group controlId="TextareaForm">
                 <Form.Control
                   as="textarea"
                   placeholder="Текст сообщения"
@@ -1802,148 +1811,156 @@ function Chat() {
                   className="chat-input__textarea"
                 />
               </Form.Group> */}
-              <Form.Group className="custom-editor">
-                <Editor
-                  editorState={editorState}
-                  onEditorStateChange={handleEditorChange}
-                  toolbarStyle={{
-                    border: "1px solid #dee2e6",
-                    borderRadius: "6px 6px 0 0",
-                  }}
-                  editorStyle={{
-                    border: "1px solid #dee2e6",
-                    borderRadius: "0 0 6px 6px",
-                    padding: "10px",
-                  }}
-                  placeholder={"Введите здесь ваше сообщение"}
-                  toolbar={{
-                    options: ["inline", "list", "emoji", "remove", "history"],
-                    inline: {
-                      options: ["bold", "italic", "underline", "strikethrough"],
-                    },
-                    list: {
-                      options: ["unordered", "ordered"],
-                    },
-                  }}
-                />
-              </Form.Group>
-              <div className="file-inputs">
-                {fileInputs.map((fileInput, index) => (
-                  <Form.Group key={index} className="mb-3 fileInputForm">
-                    <Form.Control
-                      type="file"
-                      accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                      onChange={handleFileChange}
-                    />
-                    {index > 0 && (
-                      <Button
-                        variant="outline-danger"
-                        onClick={() => handleRemoveFileInput(index)}
-                      >
-                        Удалить
-                      </Button>
-                    )}
-                  </Form.Group>
-                ))}
-
-                <Button
-                  variant="outline-primary"
-                  id="AddFileButton"
-                  onClick={handleAddFileInput}
-                >
-                  Добавить файл
-                </Button>
-              </div>
-
-              {isVisibleError && (
-                <span className="form__error">{errorMsg()}</span>
-              )}
-              {isAdmin() && currentStatus !== "На уточнении" && (
-                <ToggleButtonGroup
-                  type="radio"
-                  name="options"
-                  defaultValue={1}
-                  value={selectedValue}
-                  onChange={handleToggleChange}
-                >
-                  <ToggleButton id="tbg-radio-1" value={1}>
-                    Запретить писать клиенту
-                  </ToggleButton>
-                  <ToggleButton id="tbg-radio-2" value={2}>
-                    Разрешить писать клиенту
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              )}
-              <div
-                className={
-                  currentStatus == "В процессе"
-                    ? "chat-input__button-row chat-input__button-row-gap"
-                    : "chat-input__button-row"
-                }
-              >
-                <ButtonCustom
-                  title="Отправить"
-                  className={
-                    isAdmin()
-                      ? "chat-input__button-send single"
-                      : "chat-input__button-send single"
-                  }
-                  type="submit"
-                  onClick={handleSubmit}
-                />
-                {isAdmin() && currentStatus == "В процессе" ? (
-                  <ButtonCustom
-                    title="Закрыть заявку"
-                    className="chat-input__button-close"
-                    onClick={handleShowWarning}
+                <Form.Group className="custom-editor">
+                  <Editor
+                    editorState={editorState}
+                    onEditorStateChange={handleEditorChange}
+                    toolbarStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px 6px 0 0",
+                    }}
+                    editorStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0 0 6px 6px",
+                      padding: "10px",
+                      height: "150px",
+                    }}
+                    placeholder={"Введите здесь ваше сообщение"}
+                    toolbar={{
+                      options: ["inline", "list", "emoji", "remove", "history"],
+                      inline: {
+                        options: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "strikethrough",
+                        ],
+                      },
+                      list: {
+                        options: ["unordered", "ordered"],
+                      },
+                    }}
                   />
+                </Form.Group>
+                <div className="file-inputs">
+                  {fileInputs.map((fileInput, index) => (
+                    <Form.Group key={index} className="mb-3 fileInputForm">
+                      <Form.Control
+                        type="file"
+                        accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                        onChange={handleFileChange}
+                      />
+                      {index > 0 && (
+                        <Button
+                          variant="outline-danger"
+                          onClick={() => handleRemoveFileInput(index)}
+                        >
+                          Удалить
+                        </Button>
+                      )}
+                    </Form.Group>
+                  ))}
+
+                  <Button
+                    variant="outline-primary"
+                    id="AddFileButton"
+                    onClick={handleAddFileInput}
+                  >
+                    Добавить файл
+                  </Button>
+                </div>
+
+                {isVisibleError && (
+                  <span className="form__error">{errorMsg()}</span>
+                )}
+                {isAdmin() && currentStatus !== "На уточнении" && (
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="options"
+                    defaultValue={1}
+                    value={selectedValue}
+                    onChange={handleToggleChange}
+                  >
+                    <ToggleButton id="tbg-radio-1" value={1}>
+                      Запретить писать клиенту
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-2" value={2}>
+                      Разрешить писать клиенту
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                )}
+                <div
+                  className={
+                    currentStatus == "В процессе"
+                      ? "chat-input__button-row chat-input__button-row-gap"
+                      : "chat-input__button-row"
+                  }
+                >
+                  <ButtonCustom
+                    title="Отправить"
+                    className={
+                      isAdmin()
+                        ? "chat-input__button-send single"
+                        : "chat-input__button-send single"
+                    }
+                    type="submit"
+                    onClick={handleSubmit}
+                  />
+                  {isAdmin() && currentStatus == "В процессе" ? (
+                    <ButtonCustom
+                      title="Закрыть заявку"
+                      className="chat-input__button-close"
+                      id="AddFileButton"
+                      onClick={handleShowWarning}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                {isAdmin() && (
+                  <>
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title={
+                          isVisibleFilters == false
+                            ? "Показать историю"
+                            : "Скрыть историю"
+                        }
+                        onClick={handleHideComponent}
+                        className={"alltickets__btn single"}
+                      />
+                    </a>
+                  </>
+                )}
+                {isAdmin() && currentStatus == "Новый" ? (
+                  <>
+                    <div className="chat-input__button-row">
+                      <ButtonCustom
+                        title="Начать работу"
+                        className="chat-input__button-send single"
+                        onClick={handleInProgress}
+                      />
+                    </div>
+                    {isAdmin() && (
+                      <>
+                        <a className="alltickets__link">
+                          <ButtonCustom
+                            title={
+                              isVisibleFilters == false
+                                ? "Показать историю"
+                                : "Скрыть историю"
+                            }
+                            onClick={handleHideComponent}
+                            className={"alltickets__btn single"}
+                          />
+                        </a>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <></>
                 )}
-              </div>
-              {isAdmin() && (
-                <>
-                  <a className="alltickets__link">
-                    <ButtonCustom
-                      title={
-                        isVisibleFilters == false
-                          ? "Показать историю"
-                          : "Скрыть историю"
-                      }
-                      onClick={handleHideComponent}
-                      className={"alltickets__btn single"}
-                    />
-                  </a>
-                </>
-              )}
-              {isAdmin() && currentStatus == "Новый" ? (
-                <>
-                  <div className="chat-input__button-row">
-                    <ButtonCustom
-                      title="Начать работу"
-                      className="chat-input__button-send single"
-                      onClick={handleInProgress}
-                    />
-                  </div>
-                  {isAdmin() && (
-                    <>
-                      <a className="alltickets__link">
-                        <ButtonCustom
-                          title={
-                            isVisibleFilters == false
-                              ? "Показать историю"
-                              : "Скрыть историю"
-                          }
-                          onClick={handleHideComponent}
-                          className={"alltickets__btn single"}
-                        />
-                      </a>
-                    </>
-                  )}
-                </>
-              ) : (
-                <></>
-              )}
+              </Col>
             </Row>
           </Form>
         ) : (
@@ -2005,9 +2022,9 @@ function Chat() {
         (currentStatus === "Новый" ||
           currentStatus === "Ожидает дополнения") ? (
           <Form className="chat-input__form" onSubmit={sendMsg}>
-            <Row>
+            <Row className="chat-input__row">
               <Col className="chat-input__row">
-                <Form.Group controlId="TextareaForm">
+                <Form.Group className="custom-editor">
                   {/* <Form.Control
                     as="textarea"
                     placeholder="Текст сообщения"
@@ -2027,6 +2044,7 @@ function Chat() {
                       border: "1px solid #dee2e6",
                       borderRadius: "0 0 6px 6px",
                       padding: "10px",
+                      height: "150px",
                     }}
                     placeholder={"Введите здесь ваше сообщение"}
                     toolbar={{
@@ -2119,14 +2137,14 @@ function Chat() {
                 <div className="chat-message-recepient__rate">
                   {!reaction && (
                     <>
-                      <a href="#" onClick={handleDislike}>
-                        <span className="chat-message-recepient__rate-icon-dislike">
-                          <img src="/dislike.svg" alt="" />
-                        </span>
-                      </a>
                       <a href="#" onClick={handleLike}>
                         <span className="chat-message-recepient__rate-icon-like">
                           <img src="/like.svg" alt="" />
+                        </span>
+                      </a>
+                      <a href="#" onClick={handleDislike}>
+                        <span className="chat-message-recepient__rate-icon-dislike">
+                          <img src="/dislike.svg" alt="" />
                         </span>
                       </a>
                     </>

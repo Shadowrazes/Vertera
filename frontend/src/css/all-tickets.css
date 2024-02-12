@@ -7,6 +7,7 @@
 }
 
 .alltickets__row {
+  justify-content: space-between;
   flex-wrap: nowrap !important;
 }
 

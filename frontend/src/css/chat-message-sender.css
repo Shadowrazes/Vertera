@@ -8,7 +8,7 @@
 }
 
 .chat-message-sender__box {
-  width: 1075px;
+  width: 100%;
   border-radius: 15px;
   background: rgba(134, 211, 255, 0.09);
   padding: 50px 150px 30px 50px;
