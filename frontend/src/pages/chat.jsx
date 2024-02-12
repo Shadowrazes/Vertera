@@ -1205,9 +1205,13 @@ function Chat() {
     }
   };
 
+  if(isLoadingClose || !data.clientQuery.ticket) {
+    refetch();
+    return <Loader />
+  }
+
   return (
     <>
-      {isLoadingClose && <Loader />}
       <div
         className={currentStatus == "Закрыт" ? "" : "chat-messages__container"}
       >

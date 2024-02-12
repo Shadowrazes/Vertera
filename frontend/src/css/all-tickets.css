@@ -85,6 +85,11 @@
   display: flex;
   flex-direction: column;
   gap: 25px;
+  width: auto !important;
+}
+
+.alltickets__column:last-child {
+  align-items: flex-end;
 }
 
 .alltickets__button-row {

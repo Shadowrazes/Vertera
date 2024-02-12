@@ -56,9 +56,12 @@
   width: 416px !important;
 }
 
-.chat__new-fields .rdw-editor-main {
+.rdw-editor-main {
+  border: 1px solid #8c8c8c55 !important;
+}
+
+.DraftEditor-root {
   height: 150px !important;
-  border: 1px solid #8c8c8c !important;
 }
 
 .chat__new-fields-buttons {
@@ -143,6 +146,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  flex: 0 0 100%;
 }
 
 .chat-input__textarea {
