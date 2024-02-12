@@ -81,6 +81,12 @@ export const resolvers = {
         countryList: async (_, args) => {
             return await Country.GetList();
         },
+        translationList: async (_, args) => {
+            return await Translation.GetList(args.lang);
+        },
+        translationListByType: async (_, args) => {
+            return await Translation.GetListByType(args.lang, args.type);
+        },
     },
     HelperQuery: {
         user: async (_, { id }) => {
@@ -126,12 +132,6 @@ export const resolvers = {
     AdminQuery: {
         jobTitleList: async (_, args) => {
             return await HelperJobTitle.GetList();
-        },
-        translationList: async (_, args) => {
-            return await Translation.GetList(args.lang);
-        },
-        translationListByType: async (_, args) => {
-            return await Translation.GetListByType(args.lang, args.type);
         },
     },
     Mutation: {

@@ -16,6 +16,9 @@ export const Queries = `
         allThemeTree: [Unit]
 
         countryList: [Country]
+
+        translationList(lang: String!): [Translation]
+        translationListByType(lang: String!, type: String!): [Translation]
     }
 
     type HelperQuery {
@@ -47,8 +50,5 @@ export const Queries = `
         class: String!
 
         jobTitleList: [HelperJobTitle]
-
-        translationList(lang: String!): [Translation]
-        translationListByType(lang: String!, type: String!): [Translation]
     }
 `;
