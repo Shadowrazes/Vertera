@@ -68,6 +68,7 @@
   justify-content: flex-end;
   align-items: center;
   margin-right: 20px;
+  margin-bottom: 20px;
 }
 
 .chat__counter-label {
@@ -133,7 +134,7 @@
 }
 
 .chat-input__button-send {
-  min-width: 400px !important;
+  min-width: 275px !important;
   padding: 6px 12px;
   font-family: "TT Norms Pro", sans-serif;
 }
@@ -230,6 +231,22 @@
 .chat__table-log {
   margin: 30px auto;
   width: 60%;
+}
+
+.btn-check:checked + .btn {
+  background-color: #f8f9fa !important;
+  color: black !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+.btn-check:checked + .btn:hover {
+  background-color: #dee2e6 !important;
+}
+
+.btn-check + .btn {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #dee2e6 !important;
 }
 
 @media screen and (max-width: 768px) {

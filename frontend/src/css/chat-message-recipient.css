@@ -8,7 +8,7 @@
 }
 
 .chat-message-recipient__box {
-  width: 1075px;
+  width: 100%;
   border: 1px solid #dee2e6;
   border-radius: 15px;
   background: white;

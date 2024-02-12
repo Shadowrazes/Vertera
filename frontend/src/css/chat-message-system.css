@@ -8,11 +8,11 @@
 }
 
 .chat-message-system__box {
-  width: 1075px;
   text-align: center;
   border-radius: 15px;
   background: #f7f7f7;
   padding: 50px 50px 30px 50px;
+  width: 60%;
 }
 
 .chat-message-system__text {
