@@ -18,6 +18,7 @@ import {
 } from "react-bootstrap";
 
 import { LOGIN } from "../apollo/queries";
+import { TRANSLATE } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
@@ -32,6 +33,13 @@ function Header({ user }) {
   const [isError, setIsError] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem("language"));
   const ref = useRef(null);
+
+  const { languageData, languageRefetch } = useQuery(TRANSLATE, {
+    variables: {
+      token: user?.token,
+      lang: "ru"
+    },
+  });
 
   const languagesList = [
     {
