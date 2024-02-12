@@ -318,7 +318,7 @@ export const LOGIN = gql`
 
 export const TRANSLATE = gql`
   query ($token: String!, $lang: String!) {
-    adminQuery (token: $token) {
+    clientQuery (token: $token) {
       translationList(lang: $lang) {
         type
         code

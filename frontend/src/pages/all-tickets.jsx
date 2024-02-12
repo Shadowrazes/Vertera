@@ -32,6 +32,8 @@ import "../css/all-tickets.css";
 import "../css/add-curator.css";
 import "rsuite/dist/rsuite-no-reset.min.css";
 
+import get_translation from "../helpers/translation";
+
 function allTickets() {
   const [dataTableTickets, setDataTableTickets] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
@@ -401,7 +403,7 @@ function allTickets() {
     "subTheme.theme.name.stroke",
     "lastMessage.text",
   ];
-  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
+  const columnsName = [get_translation('INTERFACE_CHAPTER'), get_translation('INTERFACE_DATE'), get_translation('INTERFACE_THEME'), get_translation('INTERFACE_LAST_MSG')];
 
   const handleSorts = async (index) => {
     setSelectedSort(index);
@@ -786,11 +788,11 @@ function allTickets() {
   return (
     <>
       <div className="alltickets__container">
-        <TitleH2 title="Все обращения" className="title__heading-nomargin" />
+        <TitleH2 title={get_translation('INTERFACE_ALL_APPEALS')} className="title__heading-nomargin" />
         {!loading && (
           <ButtonCustom
             title={
-              isVisibleFilters == false ? "Показать фильтр" : "Скрыть фильтр"
+              isVisibleFilters == false ? get_translation('INTERFACE_SHOW_FILTER') : get_translation('INTERFACE_HIDE_FILTER')
             }
             onClick={handleHideComponent}
             className={"alltickets__btn"}
@@ -808,7 +810,7 @@ function allTickets() {
                       <div className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
-                          title={selectedItem || "Выберите подразделение"}
+                          title={selectedItem || get_translation('INTERFACE_SELECT_UNIT')}
                         >
                           {dataTheme.map((unit, index) => (
                             <Dropdown.Item
@@ -826,7 +828,7 @@ function allTickets() {
                         {selectedUnit && (
                           <DropdownButton
                             id="dropdown-custom-1"
-                            title={selectedTheme || "Тип обращения"}
+                            title={selectedTheme || get_translation('INTERFACE_TYPE_APPEALS')}
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
@@ -850,7 +852,7 @@ function allTickets() {
                         {isSubThemeDropdownVisible && selectedTheme && (
                           <DropdownButton
                             id="dropdown-custom-1"
-                            title={selectedSubTheme || "Подтема"}
+                            title={selectedSubTheme || get_translation('INTERFACE_SUBTHEME')}
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
@@ -880,7 +882,7 @@ function allTickets() {
                           options={newCuratorList}
                           optionLabel="name"
                           className="add-curator__multiselect"
-                          placeholder="Куратор"
+                          placeholder={get_translation('INTERFACE_CURATOR')}
                           filter
                         />
 
@@ -892,7 +894,7 @@ function allTickets() {
                           options={newCountriesList}
                           optionLabel="name"
                           className="add-curator__multiselect"
-                          placeholder="Страны кураторов"
+                          placeholder={get_translation('INTERFACE_CURATORS_COUNTRY')}
                           filter
                         />
 
@@ -904,14 +906,14 @@ function allTickets() {
                           options={newCountriesList}
                           optionLabel="name"
                           className="add-curator__multiselect"
-                          placeholder="Страны партнеров"
+                          placeholder={get_translation('INTERFACE_PARTNERS_COUNTRY')}
                           filter
                         />
                       </div>
                       <div className="alltickets__column">
                         <DateRangePicker
                           className="alltickets__date-range-picker"
-                          placeholder="Задать период"
+                          placeholder={get_translation('INTERFACE_SET_PERIOD')}
                           locale={{
                             sunday: "Вс",
                             monday: "Пн",
@@ -933,7 +935,7 @@ function allTickets() {
                           id="dropdown-custom-1"
                           title={
                             isAdmin()
-                              ? selectedReaction || "Реакции"
+                              ? selectedReaction || get_translation('INTERFACE_REACTIONS')
                               : selectedReaction || "Мои реакции"
                           }
                         >
@@ -951,7 +953,7 @@ function allTickets() {
                         <Form.Group controlId="wordsFilterForm">
                           <Form.Control
                             type="text"
-                            placeholder="Есть слова"
+                            placeholder={get_translation('INTERFACE_REG_EXP')}
                             className="add-currator__input"
                             value={wordsFilterValue}
                             onChange={handleWordsFilterValueChange}
@@ -964,7 +966,7 @@ function allTickets() {
                           options={newStatusesList}
                           optionLabel="name"
                           className="add-curator__multiselect"
-                          placeholder="Статус темы"
+                          placeholder={get_translation('INTERFACE_THEME_STATUS')}
                         />
 
                         <Form.Group
@@ -972,12 +974,12 @@ function allTickets() {
                           controlId="wordsFilterForm"
                         >
                           <div className="alltickets__days-ago-label">
-                            Создано более чем
+                            {get_translation('INTERFACE_CREATE_MORE')}
                           </div>
                           <Form.Control
                             type="number"
                             min={0}
-                            placeholder="X число назад"
+                            placeholder={get_translation('INTERFACE_DAY_AGO')}
                             className="add-currator__input alltickets__days-ago-input"
                             value={numberFilterValue}
                             onChange={handleNumberFilterValueChange}
@@ -985,7 +987,7 @@ function allTickets() {
                           <Form.Control
                             type="number"
                             min={0}
-                            placeholder="мин/часов/дней"
+                            placeholder={get_translation('INTERFACE_TIME')}
                             className="add-currator__input alltickets__days-ago-input right-input"
                             value={daysFilterValue}
                             onChange={handleDaysFilterValueChange}
@@ -1014,7 +1016,7 @@ function allTickets() {
                           <Form.Control
                             type="number"
                             min={0}
-                            placeholder="Номер ID"
+                            placeholder={get_translation('INTERFACE_ID_NUMBER')}
                             className="add-currator__input alltickets__days-ago-input right-input"
                             value={numberIdFilterValue}
                             onChange={handleNumberIdFilterValueChange}
@@ -1023,9 +1025,9 @@ function allTickets() {
                       </div>
                     </Row>
                     <Row className="alltickets__button-row">
-                      <ButtonCustom title="Применить" onClick={handleSubmit} />
+                      <ButtonCustom title={get_translation('INTERFACE_APPLY')} onClick={handleSubmit} />
                       <ButtonCustom
-                        title="Сбросить"
+                        title={get_translation('INTERFACE_RESET')}
                         className="alltickets__button-two"
                         onClick={handleResetFilters}
                       />
@@ -1039,7 +1041,7 @@ function allTickets() {
                       <div className="alltickets__column">
                         <DropdownButton
                           id="dropdown-custom-1"
-                          title={selectedItem || "Выберите подразделение"}
+                          title={selectedItem || get_translation('INTERFACE_SELECT_UNIT')}
                         >
                           {dataTheme.map((unit, index) => (
                             <Dropdown.Item
@@ -1057,7 +1059,7 @@ function allTickets() {
                         {selectedUnit && (
                           <DropdownButton
                             id="dropdown-custom-1"
-                            title={selectedTheme || "Тип обращения"}
+                            title={selectedTheme || get_translation('INTERFACE_TYPE_APPEALS')}
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
@@ -1081,7 +1083,7 @@ function allTickets() {
                         {isSubThemeDropdownVisible && selectedTheme && (
                           <DropdownButton
                             id="dropdown-custom-1"
-                            title={selectedSubTheme || "Подтема"}
+                            title={selectedSubTheme || get_translation('INTERFACE_SUBTHEME')}
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
@@ -1108,7 +1110,7 @@ function allTickets() {
                       <div className="alltickets__column">
                         <DateRangePicker
                           className="alltickets__date-range-picker"
-                          placeholder="Задать период"
+                          placeholder={get_translation('INTERFACE_SET_PERIOD')}
                           locale={{
                             sunday: "Вс",
                             monday: "Пн",
@@ -1129,7 +1131,7 @@ function allTickets() {
                           id="dropdown-custom-1"
                           title={
                             isAdmin()
-                              ? selectedReaction || "Реакции"
+                              ? selectedReaction || get_translation('INTERFACE_REACTIONS')
                               : selectedReaction || "Мои реакции"
                           }
                         >
@@ -1146,9 +1148,9 @@ function allTickets() {
                       </div>
                     </Row>
                     <Row className="alltickets__button-row">
-                      <ButtonCustom title="Применить" onClick={handleSubmit} />
+                      <ButtonCustom title={get_translation('INTERFACE_APPLY')} onClick={handleSubmit} />
                       <ButtonCustom
-                        title="Сбросить"
+                        title={get_translation('INTERFACE_RESET')}
                         className="alltickets__button-two"
                         onClick={handleResetFilters}
                       />
@@ -1165,7 +1167,7 @@ function allTickets() {
                 onClick={handleFastFilter.bind(null, "my")}
                 variant={fastFilterStr === "my" ? "primary" : "outline-primary"}
               >
-                Мои тикеты
+                {get_translation('INTERFACE_MY_TICKETS')}
               </Button>
               <Button
                 onClick={handleFastFilter.bind(null, "all")}
@@ -1173,7 +1175,7 @@ function allTickets() {
                   fastFilterStr === "all" ? "primary" : "outline-primary"
                 }
               >
-                Все тикеты
+                {get_translation('INTERFACE_ALL_TICKETS')}
               </Button>
               <Button
                 onClick={handleFastFilter.bind(null, "in-process")}
@@ -1181,7 +1183,7 @@ function allTickets() {
                   fastFilterStr === "in-process" ? "primary" : "outline-primary"
                 }
               >
-                В процессе рассмотрения
+                {get_translation('INTERFACE_IN_PROCESS')}
               </Button>
               <Button
                 onClick={handleFastFilter.bind(null, "clarification")}
@@ -1191,13 +1193,13 @@ function allTickets() {
                     : "outline-primary"
                 }
               >
-                На уточнении
+                {get_translation('INTERFACE_ON_CLARIFICATION')}
               </Button>
             </ButtonGroup>
           )}
 
           <div className="table__sorts">
-            <span className="table__sorts-label">Сортировать по:</span>
+            <span className="table__sorts-label">{get_translation('INTERFACE_SORT')}:</span>
             {columns.map((column, index) => (
               <span
                 key={column}
@@ -1243,13 +1245,13 @@ function allTickets() {
               <thead>
                 <tr>
                   {isAdmin() && <th>ID</th>}
-                  <th>Раздел</th>
-                  <th>Дата создания</th>
-                  <th>Тема</th>
-                  {isAdmin() && <th>Куратор</th>}
-                  <th>Последнее сообщение</th>
-                  <th>Сообщений</th>
-                  <th>Статус</th>
+                  <th>{get_translation('INTERFACE_CHAPTER')}</th>
+                  <th>{get_translation('INTERFACE_DATE_CREATE')}</th>
+                  <th>{get_translation('INTERFACE_THEME')}</th>
+                  {isAdmin() && <th>{get_translation('INTERFACE_CURATOR')}</th>}
+                  <th>{get_translation('INTERFACE_LAST_MSG')}</th>
+                  <th>{get_translation('INTERFACE_MSG')}</th>
+                  <th>{get_translation('INTERFACE_STATUS')}</th>
                 </tr>
               </thead>
               <tbody>

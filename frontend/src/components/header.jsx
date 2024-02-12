@@ -24,6 +24,8 @@ import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
 import "../css/header.css";
 
+import get_translation from "../helpers/translation";
+
 function Header({ user }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -34,13 +36,29 @@ function Header({ user }) {
   const [language, setLanguage] = useState(localStorage.getItem("language"));
   const ref = useRef(null);
 
-  const { languageData, languageRefetch } = useQuery(TRANSLATE, {
+  const { 
+    loading: languageLoading,
+    error: languageError,
+    data: languageData,
+  } = useQuery(TRANSLATE, {
     variables: {
       token: user?.token,
-      lang: "ru"
+      lang: language
     },
   });
 
+  useEffect(() => {
+    
+    if(languageData?.clientQuery?.translationList) {
+      let translateList = {};
+      languageData.clientQuery.translationList.map((translate) => {
+        translateList[translate.code] = translate.stroke;
+      })
+      localStorage.setItem('translation', JSON.stringify(translateList));
+    }
+   
+  }, [languageData])
+  
   const languagesList = [
     {
       title: "Русский",
@@ -230,10 +248,10 @@ function Header({ user }) {
     <>
       <section className="header">
         <div className="header__container container">
-          <a href={isAdmin() ? "/all-tickets" : "/"}>
-            <img className="header__logo" src={Logo} alt=""></img>
-          </a>
-          <div className="header__btn-group" ref={ref}>
+          <div className="header__logo-wrapper">
+            <a href={isAdmin() ? "/all-tickets" : "/"}>
+              <img className="header__logo" src={Logo} alt=""></img>
+            </a>
             <Dropdown className="language-menu">
               <Dropdown.Toggle
                 variant="outline-success"
@@ -257,9 +275,6 @@ function Header({ user }) {
                         }
                         alt=""
                       />
-                      <span className="language-menu__text">
-                        {languageItem.title}
-                      </span>
                     </NavDropdown.Item>
                   ))}
               </Dropdown.Toggle>
@@ -284,12 +299,14 @@ function Header({ user }) {
                 ))}
               </Dropdown.Menu>
             </Dropdown>
+          </div>
+          <div className="header__btn-group" ref={ref}>
             <a
               className="header__exit"
               href="#"
               onClick={user ? handleShowMenu : handleShow}
             >
-              {user ? `${userSurname} ${userName}` : "Войти"}
+              {user ? `${userSurname} ${userName}` : get_translation('INTERFACE_LOG_IN')}
             </a>
             <a
               href="#"
@@ -316,17 +333,17 @@ function Header({ user }) {
               defaultActiveKey={window.location.pathname}
               className="flex-column"
             >
-              <Nav.Link href="/all-tickets">Тикеты</Nav.Link>
+              <Nav.Link href="/all-tickets">{get_translation('INTERFACE_TICKETS')}</Nav.Link>
               {isAdmin() && (
                 <>
-                  <Nav.Link href="/stats">Статистика</Nav.Link>
-                  <Nav.Link href="/curators">Кураторы</Nav.Link>
-                  <Nav.Link href="/themes">Темы</Nav.Link>
+                  <Nav.Link href="/stats">{get_translation('INTERFACE_STATS')}</Nav.Link>
+                  <Nav.Link href="/curators">{get_translation('INTERFACE_CURATORS')}</Nav.Link>
+                  <Nav.Link href="/themes">{get_translation('INTERFACE_THEMES')}</Nav.Link>
                 </>
               )}
               <Nav.Link>
                 <Button variant="danger" size="sm" onClick={handleShow}>
-                  Выйти
+                  {get_translation('INTERFACE_LOG_OUT')}
                 </Button>
               </Nav.Link>
             </Nav>
@@ -405,7 +422,7 @@ function Header({ user }) {
             id="loginSubmit"
             onClick={handleSubmit}
           >
-            Выйти
+            {get_translation('INTERFACE_LOG_OUT')}
           </Button>
         </Modal.Footer>
       </Modal>

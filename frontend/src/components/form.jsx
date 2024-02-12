@@ -22,6 +22,8 @@ import ButtonCustom from "../components/button";
 
 import "../css/form.css";
 
+import get_translation from "../helpers/translation";
+
 function FormComponent() {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
@@ -418,13 +420,13 @@ function FormComponent() {
 
   return (
     <>
-      <TitleH2 title="Создать обращение" className="title__heading" />
+      <TitleH2 title={get_translation("INTERFACE_CREATE_TICKET")} className="title__heading" />
       <Form method="post">
         <Row className="form__row">
           <Col className="form__column">
             <DropdownButton
               id="dropdown-custom-1"
-              title={selectedItem || "Выберите подразделение"}
+              title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
             >
               {dataQuery.map((unit, index) => (
                 <Dropdown.Item
@@ -440,7 +442,7 @@ function FormComponent() {
             {selectedUnit && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedTheme || "Тип обращения"}
+                title={selectedTheme || get_translation('INTERFACE_TYPE_APPEALS')}
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -461,7 +463,7 @@ function FormComponent() {
             {isSubThemeDropdownVisible && selectedTheme && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedSubTheme || "Подтема"}
+                title={selectedSubTheme || get_translation('INTERFACE_SUBTHEME')}
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -557,7 +559,7 @@ function FormComponent() {
                   heigth: "250px",
                 }}
                 placeholder={
-                  "Введите здесь Ваш вопрос или опишите Вашу проблему"
+                  get_translation('INTERFACE_ENTER_MSG')
                 }
                 toolbar={{
                   options: ["inline", "list", "emoji", "remove", "history"],
@@ -594,7 +596,7 @@ function FormComponent() {
                 id="AddFileButton"
                 onClick={handleAddFileInput}
               >
-                Добавить файл
+                {get_translation('INTERFACE_ADD_FILE')}
               </Button>
             </div>
 
@@ -606,7 +608,7 @@ function FormComponent() {
               type="submit"
               onClick={handleNewTicket}
             >
-              Отправить обращение
+              {get_translation('INTERFACE_SEND')}
             </Button>
           </Col>
         </Row>

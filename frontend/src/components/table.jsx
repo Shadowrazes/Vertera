@@ -14,6 +14,8 @@ import ButtonCustom from "./button";
 import "../css/table.css";
 import "../css/all-tickets.css";
 
+import get_translation from "../helpers/translation";
+
 function TableTickets() {
   const [dataQuery, setData] = useState([]);
   const [dataAmount, setDataAmount] = useState(0);
@@ -29,7 +31,7 @@ function TableTickets() {
     "subTheme.theme.name.stroke",
     "lastMessage.text",
   ];
-  const columnsName = ["Раздел", "Дата", "Тема", "Последнее сообщение"];
+  const columnsName = [get_translation('INTERFACE_CHAPTER'), get_translation('INTERFACE_DATE'), get_translation('INTERFACE_THEME'), get_translation('INTERFACE_LAST_MSG')];
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   let userId = null;
@@ -215,9 +217,9 @@ function TableTickets() {
     <>
       {!loading && (
         <>
-          <TitleH2 title="Мои обращения" className="title__heading" />
+          <TitleH2 title={get_translation('INTERFACE_MY_APPEALS')} className="title__heading" />
           <div className="table__sorts">
-            <span className="table__sorts-label">Сортировать по:</span>
+            <span className="table__sorts-label">{get_translation('INTERFACE_SORT')}:</span>
             {columns.map((column, index) => (
               <span
                 key={column}
@@ -262,13 +264,13 @@ function TableTickets() {
               <thead>
                 <tr>
                   {isAdmin() && <th>ID</th>}
-                  <th>Раздел</th>
-                  <th>Дата создания</th>
-                  <th>Тема</th>
-                  {isAdmin() && <th>Куратор</th>}
-                  <th>Последнее сообщение</th>
-                  <th>Сообщений</th>
-                  <th>Статус</th>
+                  <th>{get_translation('INTERFACE_CHAPTER')}</th>
+                  <th>{get_translation('INTERFACE_DATE_CREATE')}</th>
+                  <th>{get_translation('INTERFACE_THEME')}</th>
+                  {isAdmin() && <th>{get_translation('INTERFACE_CURATOR')}</th>}
+                  <th>{get_translation('INTERFACE_LAST_MSG')}</th>
+                  <th>{get_translation('INTERFACE_MSG')}</th>
+                  <th>{get_translation('INTERFACE_STATUS')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -419,7 +421,7 @@ function TableTickets() {
             </Table>
           </div>
           <ButtonCustom
-            title="Показать все обращения"
+            title={get_translation('INTERFACE_SHOW_ALL_TICKETS')}
             onClick={goToAllTickets}
           />
         </>
