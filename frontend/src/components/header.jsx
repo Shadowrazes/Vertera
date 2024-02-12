@@ -48,7 +48,6 @@ function Header({ user }) {
   });
 
   useEffect(() => {
-    
     if(languageData?.clientQuery?.translationList) {
       let translateList = {};
       languageData.clientQuery.translationList.map((translate) => {
