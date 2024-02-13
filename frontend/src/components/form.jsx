@@ -56,6 +56,8 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
+  let userId = user ? user.id : 999;
+
   const [fileInputs, setFileInputs] = useState([
     {
       fileInput: true,
@@ -67,8 +69,6 @@ function FormComponent() {
       token: user?.token,
     },
   });
-
-  let userId = user ? user.id : 999;
 
   useEffect(() => {
     if (data && data.clientQuery.allThemeTree) {
@@ -134,12 +134,14 @@ function FormComponent() {
   }
 
   if (error) {
-    if (
-      error.networkError.message ==
-      "Response not successful: Received status code 500"
-    ) {
-      console.log("123");
-    }
+    // if (
+    //   error.networkError.message ==
+    //   "Response not successful: Received status code 500"
+    // ) {
+    //   console.log("123");
+    // }
+
+    // console.log(error.graphQLErrors);
 
     return (
       <>
@@ -420,7 +422,19 @@ function FormComponent() {
 
   return (
     <>
-      <TitleH2 title={get_translation("INTERFACE_CREATE_TICKET")} className="title__heading" />
+      <TitleH2
+        title={get_translation("INTERFACE_CREATE_TICKET")}
+        className="title__heading"
+      />
+      <div>
+        <h2>Good: {data.goodField}</h2>
+        <pre>
+          Bad:{" "}
+          {error.graphQLErrors.map(({ message }, i) => (
+            <span key={i}>{message}</span>
+          ))}
+        </pre>
+      </div>
       <Form method="post">
         <Row className="form__row">
           <Col className="form__column">
@@ -442,7 +456,9 @@ function FormComponent() {
             {selectedUnit && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedTheme || get_translation('INTERFACE_TYPE_APPEALS')}
+                title={
+                  selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
+                }
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -463,7 +479,9 @@ function FormComponent() {
             {isSubThemeDropdownVisible && selectedTheme && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedSubTheme || get_translation('INTERFACE_SUBTHEME')}
+                title={
+                  selectedSubTheme || get_translation("INTERFACE_SUBTHEME")
+                }
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -558,9 +576,7 @@ function FormComponent() {
                   padding: "10px",
                   heigth: "250px",
                 }}
-                placeholder={
-                  get_translation('INTERFACE_ENTER_MSG')
-                }
+                placeholder={get_translation("INTERFACE_ENTER_MSG")}
                 toolbar={{
                   options: ["inline", "list", "emoji", "remove", "history"],
                   inline: {
@@ -596,7 +612,7 @@ function FormComponent() {
                 id="AddFileButton"
                 onClick={handleAddFileInput}
               >
-                {get_translation('INTERFACE_ADD_FILE')}
+                {get_translation("INTERFACE_ADD_FILE")}
               </Button>
             </div>
 
@@ -608,7 +624,7 @@ function FormComponent() {
               type="submit"
               onClick={handleNewTicket}
             >
-              {get_translation('INTERFACE_SEND')}
+              {get_translation("INTERFACE_SEND")}
             </Button>
           </Col>
         </Row>

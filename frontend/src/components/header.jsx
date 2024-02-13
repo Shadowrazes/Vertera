@@ -36,28 +36,27 @@ function Header({ user }) {
   const [language, setLanguage] = useState(localStorage.getItem("language"));
   const ref = useRef(null);
 
-  const { 
+  const {
     loading: languageLoading,
     error: languageError,
     data: languageData,
   } = useQuery(TRANSLATE, {
     variables: {
       token: user?.token,
-      lang: language
+      lang: language,
     },
   });
 
   useEffect(() => {
-    if(languageData?.clientQuery?.translationList) {
+    if (languageData?.clientQuery?.translationList) {
       let translateList = {};
       languageData.clientQuery.translationList.map((translate) => {
         translateList[translate.code] = translate.stroke;
-      })
-      localStorage.setItem('translation', JSON.stringify(translateList));
+      });
+      localStorage.setItem("translation", JSON.stringify(translateList));
     }
-   
-  }, [languageData])
-  
+  }, [languageData]);
+
   const languagesList = [
     {
       title: "Русский",
@@ -106,11 +105,11 @@ function Header({ user }) {
   );
 
   const isAdmin = () => {
-    return user?.role === "helper" || user?.role === "system";
+    return user?.role === "system";
   };
 
   const isHelper = () => {
-    return user?.role === "helper";
+    return user?.role === "helper" || user?.role === "system";
   };
 
   const { data, refetch } = useQuery(LOGIN);
@@ -305,7 +304,9 @@ function Header({ user }) {
               href="#"
               onClick={user ? handleShowMenu : handleShow}
             >
-              {user ? `${userSurname} ${userName}` : get_translation('INTERFACE_LOG_IN')}
+              {user
+                ? `${userSurname} ${userName}`
+                : get_translation("INTERFACE_LOG_IN")}
             </a>
             <a
               href="#"
@@ -332,17 +333,27 @@ function Header({ user }) {
               defaultActiveKey={window.location.pathname}
               className="flex-column"
             >
-              <Nav.Link href="/all-tickets">{get_translation('INTERFACE_TICKETS')}</Nav.Link>
+              <Nav.Link href="/all-tickets">
+                {get_translation("INTERFACE_TICKETS")}
+              </Nav.Link>
+              {isHelper() && (
+                <Nav.Link href="/stats">
+                  {get_translation("INTERFACE_STATS")}
+                </Nav.Link>
+              )}
               {isAdmin() && (
                 <>
-                  <Nav.Link href="/stats">{get_translation('INTERFACE_STATS')}</Nav.Link>
-                  <Nav.Link href="/curators">{get_translation('INTERFACE_CURATORS')}</Nav.Link>
-                  <Nav.Link href="/themes">{get_translation('INTERFACE_THEMES')}</Nav.Link>
+                  <Nav.Link href="/curators">
+                    {get_translation("INTERFACE_CURATORS")}
+                  </Nav.Link>
+                  <Nav.Link href="/themes">
+                    {get_translation("INTERFACE_THEMES")}
+                  </Nav.Link>
                 </>
               )}
               <Nav.Link>
                 <Button variant="danger" size="sm" onClick={handleShow}>
-                  {get_translation('INTERFACE_LOG_OUT')}
+                  {get_translation("INTERFACE_LOG_OUT")}
                 </Button>
               </Nav.Link>
             </Nav>
@@ -421,7 +432,7 @@ function Header({ user }) {
             id="loginSubmit"
             onClick={handleSubmit}
           >
-            {get_translation('INTERFACE_LOG_OUT')}
+            {get_translation("INTERFACE_LOG_OUT")}
           </Button>
         </Modal.Footer>
       </Modal>
