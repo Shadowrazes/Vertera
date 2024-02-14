@@ -66,7 +66,8 @@ function FormComponent() {
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
-      token: user?.token,
+      // token: user?.token,
+      token: "123",
     },
   });
 
@@ -134,14 +135,21 @@ function FormComponent() {
   }
 
   if (error) {
-    // if (
-    //   error.networkError.message ==
-    //   "Response not successful: Received status code 500"
-    // ) {
-    //   console.log("123");
-    // }
+    const networkError = error.networkError;
 
-    // console.log(error.graphQLErrors);
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+      }
+    }
 
     return (
       <>
@@ -151,7 +159,7 @@ function FormComponent() {
           <>
             <div className="auth">
               <h2>Необходимо авторизироваться</h2>
-              <a href="#">
+              <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fvticket.yasanyabeats.ru%2F">
                 <ButtonCustom title="Авторизироваться" />
               </a>
             </div>
