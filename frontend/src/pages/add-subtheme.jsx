@@ -18,6 +18,7 @@ import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import NotFoundPage from "./not-found-page";
 
 function AddSubtheme() {
   const [dataQuery, setData] = useState([]);
@@ -39,6 +40,10 @@ function AddSubtheme() {
   const [orderNum, setOrderNum] = useState(0);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
@@ -82,6 +87,24 @@ function AddSubtheme() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -195,102 +218,111 @@ function AddSubtheme() {
 
   return (
     <>
-      <BackTitle title="Добавить подтему" linkPrev={linkPrev} />
-
-      <DropdownButton
-        id="dropdown-custom-1"
-        title={selectedItem || "Выберите подразделение"}
-        className="add-theme__dropdown"
-      >
-        {dataQuery.map((unit, index) => (
-          <Dropdown.Item
-            key={index}
-            onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-            href="#"
+      {isAdmin() ? (
+        <>
+          <BackTitle title="Добавить подтему" linkPrev={linkPrev} />
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={selectedItem || "Выберите подразделение"}
+            className="add-theme__dropdown"
           >
-            {unit.name.stroke}
-          </Dropdown.Item>
-        ))}
-      </DropdownButton>
-
-      {selectedUnit && (
-        <DropdownButton
-          id="dropdown-custom-1"
-          title={selectedTheme || "Тип обращения"}
-          className="add-theme__dropdown"
-        >
-          {dataQuery
-            .find((unit) => unit.name.stroke === selectedUnit)
-            ?.themes.map((theme) => (
+            {dataQuery.map((unit, index) => (
               <Dropdown.Item
-                key={theme.id}
-                onClick={() => handleThemeClick(theme.name.stroke, theme.id)}
+                key={index}
+                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
                 href="#"
               >
-                {theme.name.stroke}
+                {unit.name.stroke}
               </Dropdown.Item>
             ))}
-        </DropdownButton>
+          </DropdownButton>
+
+          {selectedUnit && (
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedTheme || "Тип обращения"}
+              className="add-theme__dropdown"
+            >
+              {dataQuery
+                .find((unit) => unit.name.stroke === selectedUnit)
+                ?.themes.map((theme) => (
+                  <Dropdown.Item
+                    key={theme.id}
+                    onClick={() =>
+                      handleThemeClick(theme.name.stroke, theme.id)
+                    }
+                    href="#"
+                  >
+                    {theme.name.stroke}
+                  </Dropdown.Item>
+                ))}
+            </DropdownButton>
+          )}
+
+          <Row className="add-curator__row">
+            <Col className="add-curator__column">
+              <Form.Group controlId="NameForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Название подтемы"
+                  value={nameValue}
+                  className="add-currator__input"
+                  onChange={handleNameChange}
+                />
+              </Form.Group>
+
+              <MultiSelect
+                value={selectedDepartments}
+                onChange={(e) => handleDepartmentsOnChange(e.value)}
+                options={newDepartmentList}
+                optionLabel="name"
+                placeholder="Выбрать департамент"
+                className="add-curator__multiselect"
+              />
+
+              <div>
+                <Form.Label className="edit-curator__field-label">
+                  Порядок
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  className="add-currator__input"
+                  placeholder="Порядок"
+                  value={orderNum}
+                  onChange={handleOrderNumChange}
+                  min={0}
+                />
+              </div>
+
+              {isErrorVisible && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
+
+              <ButtonCustom
+                title="Применить"
+                className={"add-curator__btn"}
+                onClick={handleAddSubtheme}
+              />
+            </Col>
+          </Row>
+
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Подтема создана</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Новая подтема успешно создана</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
       )}
-
-      <Row className="add-curator__row">
-        <Col className="add-curator__column">
-          <Form.Group controlId="NameForm">
-            <Form.Control
-              type="text"
-              placeholder="Название подтемы"
-              value={nameValue}
-              className="add-currator__input"
-              onChange={handleNameChange}
-            />
-          </Form.Group>
-
-          <MultiSelect
-            value={selectedDepartments}
-            onChange={(e) => handleDepartmentsOnChange(e.value)}
-            options={newDepartmentList}
-            optionLabel="name"
-            placeholder="Выбрать департамент"
-            className="add-curator__multiselect"
-          />
-
-          <div>
-            <Form.Label className="edit-curator__field-label">
-              Порядок
-            </Form.Label>
-            <Form.Control
-              type="number"
-              className="add-currator__input"
-              placeholder="Порядок"
-              value={orderNum}
-              onChange={handleOrderNumChange}
-              min={0}
-            />
-          </div>
-
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-
-          <ButtonCustom
-            title="Применить"
-            className={"add-curator__btn"}
-            onClick={handleAddSubtheme}
-          />
-        </Col>
-      </Row>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Подтема создана</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Новая подтема успешно создана</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 }

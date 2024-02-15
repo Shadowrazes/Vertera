@@ -198,6 +198,21 @@ function TableTickets() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+      }
+    }
     return <>{userId == null ? <></> : <h2>Что-то пошло не так</h2>}</>;
   }
 

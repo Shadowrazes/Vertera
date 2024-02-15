@@ -16,6 +16,7 @@ import { EDIT_THEME, DELETE_THEME } from "../apollo/mutations";
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
+import NotFoundPage from "./not-found-page";
 
 function EditTheme() {
   const { themeId } = useParams();
@@ -35,6 +36,10 @@ function EditTheme() {
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const {
     loading: loadingTheme,
@@ -89,6 +94,24 @@ function EditTheme() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -223,109 +246,122 @@ function EditTheme() {
 
   return (
     <>
-      <BackTitle title={`Редактировать тему #${themeId}`} linkPrev={linkPrev} />
-      <DropdownButton
-        id="dropdown-custom-1"
-        title={selectedItem}
-        className="add-theme__dropdown"
-      >
-        {dataQuery.map((unit, index) => (
-          <Dropdown.Item
-            key={index}
-            onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-            href="#"
+      {isAdmin() ? (
+        <>
+          <BackTitle
+            title={`Редактировать тему #${themeId}`}
+            linkPrev={linkPrev}
+          />
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={selectedItem}
+            className="add-theme__dropdown"
           >
-            {unit.name.stroke}
-          </Dropdown.Item>
-        ))}
-      </DropdownButton>
-      <Col className="edit-curator__column">
-        <Form.Group controlId="NameForm">
-          <Form.Label className="edit-curator__field-label">
-            Название темы
-          </Form.Label>
-          <Form.Control
-            type="text"
-            className="add-currator__input add-theme__dropdown"
-            value={nameValue}
-            onChange={handleOnChangeName}
-          />
-          <Form.Label className="edit-curator__field-label">Порядок</Form.Label>
-          <Form.Control
-            type="number"
-            className="add-currator__input"
-            value={orderNum}
-            onChange={handleOnChangeOrderNum}
-            min={0}
-          />
-        </Form.Group>
+            {dataQuery.map((unit, index) => (
+              <Dropdown.Item
+                key={index}
+                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                href="#"
+              >
+                {unit.name.stroke}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+          <Col className="edit-curator__column">
+            <Form.Group controlId="NameForm">
+              <Form.Label className="edit-curator__field-label">
+                Название темы
+              </Form.Label>
+              <Form.Control
+                type="text"
+                className="add-currator__input add-theme__dropdown"
+                value={nameValue}
+                onChange={handleOnChangeName}
+              />
+              <Form.Label className="edit-curator__field-label">
+                Порядок
+              </Form.Label>
+              <Form.Control
+                type="number"
+                className="add-currator__input"
+                value={orderNum}
+                onChange={handleOnChangeOrderNum}
+                min={0}
+              />
+            </Form.Group>
 
-        <div className="edit-curator__column">
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <div className="edit-curator__btn-row">
-            <ButtonCustom
-              title="Применить"
-              className={"add-curator__btn edit-curator__btn"}
-              onClick={handleEditTheme}
-            />
-            <ButtonCustom
-              title="Удалить тему"
-              className={
-                "add-curator__btn edit-curator__btn alltickets__button-two"
-              }
-              onClick={handleDeleteTheme}
-            />
-          </div>
-        </div>
-      </Col>
+            <div className="edit-curator__column">
+              {isErrorVisible && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
+              <div className="edit-curator__btn-row">
+                <ButtonCustom
+                  title="Применить"
+                  className={"add-curator__btn edit-curator__btn"}
+                  onClick={handleEditTheme}
+                />
+                <ButtonCustom
+                  title="Удалить тему"
+                  className={
+                    "add-curator__btn edit-curator__btn alltickets__button-two"
+                  }
+                  onClick={handleDeleteTheme}
+                />
+              </div>
+            </div>
+          </Col>
 
-      <Modal show={show} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Тема обновлена</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Название темы успешно обновлено</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={show} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Тема обновлена</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Название темы успешно обновлено</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showTwo} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Тема удалена</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Тема успешно удалена</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showTwo} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Тема удалена</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Тема успешно удалена</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showWarning} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Предупреждение</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Вы уверены, что хотите удалить эту тему, а также все подтемы,
-            соответствующие ей?
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Отмена
-          </Button>
-          <Button variant="primary" onClick={handleConfirm}>
-            Продолжить
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showWarning} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Предупреждение</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                Вы уверены, что хотите удалить эту тему, а также все подтемы,
+                соответствующие ей?
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Отмена
+              </Button>
+              <Button variant="primary" onClick={handleConfirm}>
+                Продолжить
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

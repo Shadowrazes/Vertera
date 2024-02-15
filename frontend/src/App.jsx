@@ -17,7 +17,6 @@ import EditTheme from "./pages/edit-theme";
 import SubThemes from "./pages/subthemes";
 import AddSubtheme from "./pages/add-subtheme";
 import EditSubtheme from "./pages/edit-subtheme";
-import EditTicket from "./pages/edit-ticket";
 import Stats from "./pages/stats";
 import NotFoundPage from "./pages/not-found-page";
 
@@ -61,11 +60,6 @@ function App() {
             path="/edit-subtheme/:subthemeId"
             Component={EditSubtheme}
             element={<EditSubtheme />}
-          />
-          <Route
-            path="/edit-ticket/:itemId"
-            Component={EditTicket}
-            element={<EditTicket />}
           />
           <Route path="/stats" element={<Stats />} />
           <Route path="*" element={<NotFoundPage />} />

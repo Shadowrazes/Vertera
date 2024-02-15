@@ -28,6 +28,7 @@ import { MultiSelect } from "primereact/multiselect";
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
+import NotFoundPage from "./not-found-page";
 
 import "../css/edit-curator.css";
 import "../css/dropdown.css";
@@ -159,6 +160,23 @@ function EditCurator() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -360,203 +378,211 @@ function EditCurator() {
 
   return (
     <>
-      <BackTitle
-        title={`Редактировать куратора #${curatorId}`}
-        linkPrev={linkPrev}
-      />
-      <Row className="edit-curator__row">
-        <Col className="edit-curator__column">
-          <Form.Group controlId="NameForm">
-            <Form.Label className="edit-curator__field-label">Имя</Form.Label>
-            <Form.Control
-              type="text"
-              className="add-currator__input"
-              value={nameValue}
-              onChange={handleOnChangeName}
-            />
-          </Form.Group>
+      {isAdmin() ? (
+        <>
+          <BackTitle
+            title={`Редактировать куратора #${curatorId}`}
+            linkPrev={linkPrev}
+          />
+          <Row className="edit-curator__row">
+            <Col className="edit-curator__column">
+              <Form.Group controlId="NameForm">
+                <Form.Label className="edit-curator__field-label">
+                  Имя
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input"
+                  value={nameValue}
+                  onChange={handleOnChangeName}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="SurnameForm">
-            <Form.Label className="edit-curator__field-label">
-              Фамилия
-            </Form.Label>
-            <Form.Control
-              type="text"
-              className="add-currator__input"
-              value={surnameValue}
-              onChange={handleOnChangeSurname}
-            />
-          </Form.Group>
+              <Form.Group controlId="SurnameForm">
+                <Form.Label className="edit-curator__field-label">
+                  Фамилия
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input"
+                  value={surnameValue}
+                  onChange={handleOnChangeSurname}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="PatronymicForm">
-            <Form.Label className="edit-curator__field-label">
-              Отчество
-            </Form.Label>
-            <Form.Control
-              type="text"
-              className="add-currator__input"
-              value={patronymicValue}
-              onChange={handleOnChangePatronymic}
-            />
-          </Form.Group>
+              <Form.Group controlId="PatronymicForm">
+                <Form.Label className="edit-curator__field-label">
+                  Отчество
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input"
+                  value={patronymicValue}
+                  onChange={handleOnChangePatronymic}
+                />
+              </Form.Group>
 
-          <Form.Group
-            className="edit-curator__field-column"
-            controlId="BirthdayForm"
-          >
-            <Form.Label className="edit-curator__field-label">
-              Дата рождения
-            </Form.Label>
-            <DatePicker
-              id="DatePicker"
-              className="add-curator__date-picker"
-              locale={{
-                sunday: "Вс",
-                monday: "Пн",
-                tuesday: "Вт",
-                wednesday: "Ср",
-                thursday: "Чт",
-                friday: "Пн",
-                saturday: "Сб",
-                ok: "OK",
-                today: "Сегодня",
-                yesterday: "Вчера",
-              }}
-              format="dd.MM.yyyy"
-              value={birthdayValue}
-              onChange={(date) => setBirthdayValue(date)}
-            />
-          </Form.Group>
-        </Col>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="BirthdayForm"
+              >
+                <Form.Label className="edit-curator__field-label">
+                  Дата рождения
+                </Form.Label>
+                <DatePicker
+                  id="DatePicker"
+                  className="add-curator__date-picker"
+                  locale={{
+                    sunday: "Вс",
+                    monday: "Пн",
+                    tuesday: "Вт",
+                    wednesday: "Ср",
+                    thursday: "Чт",
+                    friday: "Пн",
+                    saturday: "Сб",
+                    ok: "OK",
+                    today: "Сегодня",
+                    yesterday: "Вчера",
+                  }}
+                  format="dd.MM.yyyy"
+                  value={birthdayValue}
+                  onChange={(date) => setBirthdayValue(date)}
+                />
+              </Form.Group>
+            </Col>
 
-        <Col className="edit-curator__column">
-          <Form.Group
-            className="edit-curator__field-column"
-            controlId="CountryForm"
-          >
-            <Form.Label className="edit-curator__field-label">
-              Страна
-            </Form.Label>
-            <DropdownButton id="dropdown-custom-1" title={selectedCountry}>
-              {countryList.map((country, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() =>
-                    handleCountryClick(country.name.stroke, country.id)
-                  }
-                  href="#"
-                >
-                  {country.name.stroke}
-                </Dropdown.Item>
-              ))}
-            </DropdownButton>
-          </Form.Group>
+            <Col className="edit-curator__column">
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="CountryForm"
+              >
+                <Form.Label className="edit-curator__field-label">
+                  Страна
+                </Form.Label>
+                <DropdownButton id="dropdown-custom-1" title={selectedCountry}>
+                  {countryList.map((country, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() =>
+                        handleCountryClick(country.name.stroke, country.id)
+                      }
+                      href="#"
+                    >
+                      {country.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+              </Form.Group>
 
-          <Form.Group
-            className="edit-curator__field-column"
-            controlId="DepartmentsForm"
-          >
-            <Form.Label className="edit-curator__field-label">
-              Департаменты
-            </Form.Label>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="DepartmentsForm"
+              >
+                <Form.Label className="edit-curator__field-label">
+                  Департаменты
+                </Form.Label>
 
-            <MultiSelect
-              value={selectedDepartments}
-              onChange={(e) => handleDepartmentsOnChange(e.value)}
-              options={newDepartmentList}
-              optionLabel="name"
-              className="add-curator__multiselect"
-            />
-          </Form.Group>
+                <MultiSelect
+                  value={selectedDepartments}
+                  onChange={(e) => handleDepartmentsOnChange(e.value)}
+                  options={newDepartmentList}
+                  optionLabel="name"
+                  className="add-curator__multiselect"
+                />
+              </Form.Group>
 
-          <Form.Group
-            className="edit-curator__field-column"
-            controlId="JobTitleForm"
-          >
-            <Form.Label className="edit-curator__field-label">
-              Должность
-            </Form.Label>
-            <DropdownButton id="dropdown-custom-1" title={selectedJobTitle}>
-              {jobTltleList.map((jobTitle, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() =>
-                    handleJobTitleClick(jobTitle.name.stroke, jobTitle.id)
-                  }
-                  href="#"
-                >
-                  {jobTitle.name.stroke}
-                </Dropdown.Item>
-              ))}
-            </DropdownButton>
-          </Form.Group>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="JobTitleForm"
+              >
+                <Form.Label className="edit-curator__field-label">
+                  Должность
+                </Form.Label>
+                <DropdownButton id="dropdown-custom-1" title={selectedJobTitle}>
+                  {jobTltleList.map((jobTitle, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() =>
+                        handleJobTitleClick(jobTitle.name.stroke, jobTitle.id)
+                      }
+                      href="#"
+                    >
+                      {jobTitle.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+              </Form.Group>
 
-          <div className="edit-curator__column">
-            {isErrorVisible && (
-              <span className="form__error">{errorMsg()}</span>
-            )}
-            <div className="edit-curator__btn-row">
-              <ButtonCustom
-                title="Применить"
-                className={"add-curator__btn edit-curator__btn"}
-                onClick={handleEditCurator}
-              />
-              <ButtonCustom
-                title="Удалить куратора"
-                className={
-                  "add-curator__btn edit-curator__btn alltickets__button-two"
-                }
-                onClick={handleDeleteCurator}
-              />
-            </div>
-          </div>
-        </Col>
-      </Row>
+              <div className="edit-curator__column">
+                {isErrorVisible && (
+                  <span className="form__error">{errorMsg()}</span>
+                )}
+                <div className="edit-curator__btn-row">
+                  <ButtonCustom
+                    title="Применить"
+                    className={"add-curator__btn edit-curator__btn"}
+                    onClick={handleEditCurator}
+                  />
+                  <ButtonCustom
+                    title="Удалить куратора"
+                    className={
+                      "add-curator__btn edit-curator__btn alltickets__button-two"
+                    }
+                    onClick={handleDeleteCurator}
+                  />
+                </div>
+              </div>
+            </Col>
+          </Row>
 
-      <Modal show={show} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Куратор обновлен</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Данные куратора успешно обновлены</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={show} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Куратор обновлен</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Данные куратора успешно обновлены</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showTwo} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Куратор удален</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Куратор успешно удален</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showTwo} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Куратор удален</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Куратор успешно удален</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showWarning} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Предупреждение</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Вы уверены, что хотите удалить куратора?</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Отмена
-          </Button>
-          <Button variant="primary" onClick={handleConfirm}>
-            Продолжить
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showWarning} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Предупреждение</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Вы уверены, что хотите удалить куратора?</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Отмена
+              </Button>
+              <Button variant="primary" onClick={handleConfirm}>
+                Продолжить
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

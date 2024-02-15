@@ -17,6 +17,7 @@ import { ADD_THEME } from "../apollo/mutations";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import NotFoundPage from "./not-found-page";
 
 import "../css/add-theme.css";
 
@@ -35,6 +36,10 @@ function AddTheme() {
   const [orderNum, setOrderNum] = useState(0);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
@@ -65,6 +70,24 @@ function AddTheme() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -147,68 +170,75 @@ function AddTheme() {
 
   return (
     <>
-      <BackTitle title="Добавить тему" linkPrev={linkPrev} />
-
-      <DropdownButton
-        id="dropdown-custom-1"
-        title={selectedItem || "Выберите подразделение"}
-        className="add-theme__dropdown"
-      >
-        {dataQuery.map((unit, index) => (
-          <Dropdown.Item
-            key={index}
-            onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-            href="#"
+      {isAdmin() ? (
+        <>
+          <BackTitle title="Добавить тему" linkPrev={linkPrev} />
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={selectedItem || "Выберите подразделение"}
+            className="add-theme__dropdown"
           >
-            {unit.name.stroke}
-          </Dropdown.Item>
-        ))}
-      </DropdownButton>
+            {dataQuery.map((unit, index) => (
+              <Dropdown.Item
+                key={index}
+                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                href="#"
+              >
+                {unit.name.stroke}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
 
-      <Row className="add-curator__row">
-        <Col className="add-curator__column">
-          <Form.Group controlId="NameForm">
-            <Form.Control
-              type="text"
-              placeholder="Название темы"
-              value={nameValue}
-              className="add-currator__input add-theme__dropdown"
-              onChange={handleNameChange}
-            />
-            <Form.Label className="edit-curator__field-label">
-              Порядок
-            </Form.Label>
-            <Form.Control
-              type="number"
-              className="add-currator__input"
-              placeholder="Порядок"
-              value={orderNum}
-              onChange={handleOrderNumChange}
-              min={0}
-            />
-          </Form.Group>
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <ButtonCustom
-            title="Применить"
-            className={"add-curator__btn"}
-            onClick={handleAddTheme}
-          />
-        </Col>
-      </Row>
+          <Row className="add-curator__row">
+            <Col className="add-curator__column">
+              <Form.Group controlId="NameForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Название темы"
+                  value={nameValue}
+                  className="add-currator__input add-theme__dropdown"
+                  onChange={handleNameChange}
+                />
+                <Form.Label className="edit-curator__field-label">
+                  Порядок
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  className="add-currator__input"
+                  placeholder="Порядок"
+                  value={orderNum}
+                  onChange={handleOrderNumChange}
+                  min={0}
+                />
+              </Form.Group>
+              {isErrorVisible && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
+              <ButtonCustom
+                title="Применить"
+                className={"add-curator__btn"}
+                onClick={handleAddTheme}
+              />
+            </Col>
+          </Row>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Тема создана</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Новая тема успешно создана</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Тема создана</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Новая тема успешно создана</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

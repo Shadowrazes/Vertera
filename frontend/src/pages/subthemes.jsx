@@ -8,6 +8,7 @@ import { THEME_LIST } from "../apollo/queries";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 import Loader from "./loading";
+import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
 
@@ -18,6 +19,10 @@ function Subthemes() {
   const [selectedTheme, setSelectedTheme] = useState(null);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const { loading, error, data, refetch } = useQuery(THEME_LIST, {
     variables: {
@@ -52,6 +57,24 @@ function Subthemes() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -94,93 +117,99 @@ function Subthemes() {
 
   return (
     <>
-      <TitleH2 title="Подтемы" className="title__heading" />
-      <DropdownButton
-        id="dropdown-custom-1"
-        title={selectedItem || "Выберите подразделение"}
-        className="themes__dropdown"
-      >
-        {dataQuery.map((unit, index) => (
-          <Dropdown.Item
-            key={index}
-            onClick={() => handleUnitClick(unit.name.stroke)}
-            href="#"
+      {isAdmin() ? (
+        <>
+          <TitleH2 title="Подтемы" className="title__heading" />
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={selectedItem || "Выберите подразделение"}
+            className="themes__dropdown"
           >
-            {unit.name.stroke}
-          </Dropdown.Item>
-        ))}
-      </DropdownButton>
-
-      {selectedUnit && (
-        <DropdownButton
-          id="dropdown-custom-1"
-          title={selectedTheme || "Тип обращения"}
-          className="themes__dropdown"
-        >
-          {dataQuery
-            .find((unit) => unit.name.stroke === selectedUnit)
-            ?.themes.map((theme) => (
+            {dataQuery.map((unit, index) => (
               <Dropdown.Item
-                key={theme.id}
-                onClick={() => handleThemeClick(theme.name.stroke)}
+                key={index}
+                onClick={() => handleUnitClick(unit.name.stroke)}
                 href="#"
               >
-                {theme.name.stroke}
+                {unit.name.stroke}
               </Dropdown.Item>
             ))}
-        </DropdownButton>
-      )}
+          </DropdownButton>
 
-      <div className="table__wrapper">
-        <Table className="table__table" hover>
-          <thead>
-            <tr>
-              <td>Порядок</td>
-              <td>Подтема ID</td>
-              <td>Название подтемы</td>
-              <td>Редактировать</td>
-            </tr>
-          </thead>
-          <tbody>
-            {dataQuery
-              .find((unit) => unit.name.stroke === selectedUnit)
-              ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-              ?.subThemes.map((subTheme) => (
-                <tr key={subTheme.id}>
-                  <td>{subTheme.orderNum}</td>
-                  <td>{subTheme.id}</td>
-                  <td>{subTheme.name.stroke}</td>
+          {selectedUnit && (
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedTheme || "Тип обращения"}
+              className="themes__dropdown"
+            >
+              {dataQuery
+                .find((unit) => unit.name.stroke === selectedUnit)
+                ?.themes.map((theme) => (
+                  <Dropdown.Item
+                    key={theme.id}
+                    onClick={() => handleThemeClick(theme.name.stroke)}
+                    href="#"
+                  >
+                    {theme.name.stroke}
+                  </Dropdown.Item>
+                ))}
+            </DropdownButton>
+          )}
 
-                  <td>
-                    <Link
-                      to={`/edit-subtheme/${subTheme.id}`}
-                      state={{
-                        linkPrev: window.location.href,
-                      }}
-                      className="alltickets__link"
-                    >
-                      <img src={EditIcon} alt="" />
-                    </Link>
-                  </td>
+          <div className="table__wrapper">
+            <Table className="table__table" hover>
+              <thead>
+                <tr>
+                  <td>Порядок</td>
+                  <td>Подтема ID</td>
+                  <td>Название подтемы</td>
+                  <td>Редактировать</td>
                 </tr>
-              ))}
-          </tbody>
-        </Table>
-      </div>
+              </thead>
+              <tbody>
+                {dataQuery
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
+                  ?.subThemes.map((subTheme) => (
+                    <tr key={subTheme.id}>
+                      <td>{subTheme.orderNum}</td>
+                      <td>{subTheme.id}</td>
+                      <td>{subTheme.name.stroke}</td>
 
-      <div className="units__btn-row">
-        <ButtonCustom title="Добавить подтему" onClick={goToAddSubtheme} />
-        <ButtonCustom
-          title="Перейти к разделам"
-          className={"add-curator__btn units__btn alltickets__button-two"}
-          onClick={goToUnits}
-        />
-        <ButtonCustom
-          title="Перейти к темам"
-          className={"add-curator__btn units__btn alltickets__button-two"}
-          onClick={goToThemes}
-        />
-      </div>
+                      <td>
+                        <Link
+                          to={`/edit-subtheme/${subTheme.id}`}
+                          state={{
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          <img src={EditIcon} alt="" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
+          </div>
+
+          <div className="units__btn-row">
+            <ButtonCustom title="Добавить подтему" onClick={goToAddSubtheme} />
+            <ButtonCustom
+              title="Перейти к разделам"
+              className={"add-curator__btn units__btn alltickets__button-two"}
+              onClick={goToUnits}
+            />
+            <ButtonCustom
+              title="Перейти к темам"
+              className={"add-curator__btn units__btn alltickets__button-two"}
+              onClick={goToThemes}
+            />
+          </div>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }
