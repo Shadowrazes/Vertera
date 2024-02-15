@@ -44,6 +44,7 @@ export const InputsUpdate = `
     }
 
     input CountryUpdate {
+        code: String!
         stroke: String!
         lang: String!
     }

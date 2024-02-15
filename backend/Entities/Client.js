@@ -7,10 +7,17 @@ class Client extends Entity {
     static PhoneField = 'phone';
     static EmailField = 'email';
     static OuterIdField = 'outerId';
+    static IdRefField = 'idRef';
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
+        return result[0];
+    }
+
+    static async GetByOuterId(outerId) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.OuterIdField} = ?`;
+        const result = await super.Request(sql, [outerId]);
         return result[0];
     }
 

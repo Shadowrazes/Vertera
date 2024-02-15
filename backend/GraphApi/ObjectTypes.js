@@ -12,6 +12,7 @@ export const ObjectTypes = `
 
     type Country {
         id: Int!
+        code: String!
         name(lang: String!): Translation!
     }
 
@@ -19,6 +20,7 @@ export const ObjectTypes = `
         id: Int!
         outerId: Int!
         email: String!
+        idRef: Int!
         user: User!
     }
 

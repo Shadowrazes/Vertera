@@ -5,6 +5,7 @@ class Country extends Entity {
     static TableName = 'countries';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
+    static CodeField = 'code';
     static TranslationType = 'country'
 
     static async GetById(id) {

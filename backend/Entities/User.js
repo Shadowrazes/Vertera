@@ -2,6 +2,7 @@ import Entity from "./Entity.js";
 import Account from "../Utils/Account.js"
 import Token from "../Utils/Token.js"
 import Errors from "../Utils/Errors.js";
+import Client from "./Client.js";
 
 class User extends Entity {
     static TableName = 'users';
@@ -13,7 +14,6 @@ class User extends Entity {
     static CountryIdField = 'countryId';
     static LoginField = 'login';
     static PasswordField = 'password';
-    static TokenField = 'token';
     static IsActiveField = 'isActive';
 
     static AdminId = 0;
@@ -29,7 +29,7 @@ class User extends Entity {
     static async Login(login, password) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
-
+        
         if (userResult.length == 0) throw new Error(Errors.IncorrectLogin);
 
         if (!userResult[0].isActive) throw new Error(Errors.UserDeactivated);
@@ -41,9 +41,26 @@ class User extends Entity {
         if (!isPassValid) throw new Error(Errors.IncorrectPass);
 
         const token = await Token.Generate({ userId });
-        const tokenUpdateResult = await this.UpdateToken(userId, { token });
 
         return { token, user: userResult[0] };
+    }
+
+    static async LoginOuter(userFields, clientFields) {
+        let existingClient = await Client.GetByOuterId(clientFields.outerId);
+        let userId = -1;
+        
+        if (!existingClient){
+            userId = await Client.TransInsert(userFields, clientFields);
+        }
+        else{
+            userId = existingClient.id;
+            const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
+        }
+
+        const token = await Token.Generate({ userId });
+        const user = await this.GetById(userId);
+
+        return { token, user };
     }
 
     static ValidateRoleAccess(level, userRole) {
@@ -111,12 +128,6 @@ class User extends Entity {
 
         const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
         const result = await super.TransRequest(conn, sql, [fields, id]);
-        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
-    }
-
-    static async UpdateToken(id, token) {
-        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [token, id]);
         return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 

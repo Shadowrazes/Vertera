@@ -12,6 +12,7 @@ export const InputsInsert = `
     input ClientInsert {
         outerId: Int!
         email: String!
+        idRef: Int!
     }
 
     input HelperInsert {
@@ -74,6 +75,7 @@ export const InputsInsert = `
     }
 
     input CountryInsert {
+        code: String!
         lang: String!
         stroke: String!
     }
