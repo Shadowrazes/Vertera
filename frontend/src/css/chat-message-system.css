@@ -11,12 +11,12 @@
   text-align: center;
   border-radius: 15px;
   background: #f7f7f7;
-  padding: 50px 50px 30px 50px;
-  width: 60%;
+  padding: 30px 50px 30px 50px;
+  width: 100%;
 }
 
 .chat-message-system__text {
-  max-width: 1075px;
+  max-width: 100%;
   font-family: "TT Norms Pro", sans-serif;
   font-size: 20px;
 }
@@ -26,7 +26,7 @@
   font-size: 15px;
   color: #5c5c5c;
   display: block;
-  margin-top: 30px;
+  margin-top: 15px;
   text-align: center;
 }
 

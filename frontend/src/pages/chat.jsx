@@ -1205,9 +1205,13 @@ function Chat() {
     }
   };
 
+  if (isLoadingClose || !data.clientQuery.ticket) {
+    refetch();
+    return <Loader />;
+  }
+
   return (
     <>
-      {isLoadingClose && <Loader />}
       <div
         className={currentStatus == "Закрыт" ? "" : "chat-messages__container"}
       >
@@ -2121,64 +2125,33 @@ function Chat() {
         <div className="chat-input__close-container">
           <div className="chat-input__close-box">
             <span className="chat-input__close-text">Заявка закрыта</span>
-            <div className="chat-message-recepient__separator"></div>
-            {!isAdmin() && (
-              <div className="chat-message-recepient__rate-container">
-                {!reaction ? (
-                  <span className="chat-message-recepient__rate-title">
-                    Оцените ответ
-                  </span>
-                ) : (
-                  <span className="chat-message-recepient__rate-title">
-                    Ответ оценен
-                  </span>
-                )}
+          </div>
+          {!isAdmin() && (
+            <div className="chat-message-recepient__rate-container">
+              {!reaction ? (
+                <span className="chat-message-recepient__rate-title">
+                  Оцените ответ
+                </span>
+              ) : (
+                <span className="chat-message-recepient__rate-title">
+                  Ответ оценен
+                </span>
+              )}
 
-                <div className="chat-message-recepient__rate">
-                  {!reaction && (
-                    <>
-                      <a href="#" onClick={handleLike}>
-                        <span className="chat-message-recepient__rate-icon-like">
-                          <img src="/like.svg" alt="" />
-                        </span>
-                      </a>
-                      <a href="#" onClick={handleDislike}>
-                        <span className="chat-message-recepient__rate-icon-dislike">
-                          <img src="/dislike.svg" alt="" />
-                        </span>
-                      </a>
-                    </>
-                  )}
-
-                  {reaction === "dislike" && (
-                    <a href="#" className="disabled">
-                      <span className="chat-message-recepient__rate-icon-dislike">
-                        <img src="/dislike.svg" alt="" />
-                      </span>
-                    </a>
-                  )}
-
-                  {reaction === "like" && (
-                    <a href="#" className="disabled">
+              <div className="chat-message-recepient__rate">
+                {!reaction && (
+                  <>
+                    <a href="#" onClick={handleLike}>
                       <span className="chat-message-recepient__rate-icon-like">
                         <img src="/like.svg" alt="" />
                       </span>
                     </a>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {isAdmin() && (
-              <div className="chat-message-recepient__rate-container">
-                <span className="chat-message-recepient__rate-title">
-                  Оценка тикета
-                </span>
-
-                {!reaction && (
-                  <span className="chat-message-recepient__rate chat-message-recepient__text">
-                    Тикет еще не оценен
-                  </span>
+                    <a href="#" onClick={handleDislike}>
+                      <span className="chat-message-recepient__rate-icon-dislike">
+                        <img src="/dislike.svg" alt="" />
+                      </span>
+                    </a>
+                  </>
                 )}
 
                 {reaction === "dislike" && (
@@ -2197,12 +2170,42 @@ function Chat() {
                   </a>
                 )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {isAdmin() && (
+            <div className="chat-message-recepient__rate-container">
+              <span className="chat-message-recepient__rate-title">
+                Оценка тикета
+              </span>
+
+              {!reaction && (
+                <span className="chat-message-recepient__rate chat-message-recepient__text">
+                  Тикет еще не оценен
+                </span>
+              )}
+
+              {reaction === "dislike" && (
+                <a href="#" className="disabled">
+                  <span className="chat-message-recepient__rate-icon-dislike">
+                    <img src="/dislike.svg" alt="" />
+                  </span>
+                </a>
+              )}
+
+              {reaction === "like" && (
+                <a href="#" className="disabled">
+                  <span className="chat-message-recepient__rate-icon-like">
+                    <img src="/like.svg" alt="" />
+                  </span>
+                </a>
+              )}
+            </div>
+          )}
           {!isAdmin() && (
             <ButtonCustom
               title="Создать новую заявку"
-              className="chat-input__button-close"
+              className=""
               onClick={goToCreateTicket}
             />
           )}

@@ -22,6 +22,8 @@ import ButtonCustom from "../components/button";
 
 import "../css/form.css";
 
+import get_translation from "../helpers/translation";
+
 function FormComponent() {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
@@ -54,6 +56,8 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
+  let userId = user ? user.id : 999;
+
   const [fileInputs, setFileInputs] = useState([
     {
       fileInput: true,
@@ -62,11 +66,10 @@ function FormComponent() {
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
-      token: user?.token,
+      // token: user?.token,
+      token: "123",
     },
   });
-
-  let userId = user ? user.id : 999;
 
   useEffect(() => {
     if (data && data.clientQuery.allThemeTree) {
@@ -132,11 +135,20 @@ function FormComponent() {
   }
 
   if (error) {
-    if (
-      error.networkError.message ==
-      "Response not successful: Received status code 500"
-    ) {
-      console.log("123");
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+      }
     }
 
     return (
@@ -147,7 +159,7 @@ function FormComponent() {
           <>
             <div className="auth">
               <h2>Необходимо авторизироваться</h2>
-              <a href="#">
+              <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fvticket.yasanyabeats.ru%2F">
                 <ButtonCustom title="Авторизироваться" />
               </a>
             </div>
@@ -418,13 +430,25 @@ function FormComponent() {
 
   return (
     <>
-      <TitleH2 title="Создать обращение" className="title__heading" />
+      <TitleH2
+        title={get_translation("INTERFACE_CREATE_TICKET")}
+        className="title__heading"
+      />
+      <div>
+        <h2>Good: {data.goodField}</h2>
+        <pre>
+          Bad:{" "}
+          {error.graphQLErrors.map(({ message }, i) => (
+            <span key={i}>{message}</span>
+          ))}
+        </pre>
+      </div>
       <Form method="post">
         <Row className="form__row">
           <Col className="form__column">
             <DropdownButton
               id="dropdown-custom-1"
-              title={selectedItem || "Выберите подразделение"}
+              title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
             >
               {dataQuery.map((unit, index) => (
                 <Dropdown.Item
@@ -440,7 +464,9 @@ function FormComponent() {
             {selectedUnit && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedTheme || "Тип обращения"}
+                title={
+                  selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
+                }
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -461,7 +487,9 @@ function FormComponent() {
             {isSubThemeDropdownVisible && selectedTheme && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedSubTheme || "Подтема"}
+                title={
+                  selectedSubTheme || get_translation("INTERFACE_SUBTHEME")
+                }
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
@@ -556,9 +584,7 @@ function FormComponent() {
                   padding: "10px",
                   heigth: "250px",
                 }}
-                placeholder={
-                  "Введите здесь Ваш вопрос или опишите Вашу проблему"
-                }
+                placeholder={get_translation("INTERFACE_ENTER_MSG")}
                 toolbar={{
                   options: ["inline", "list", "emoji", "remove", "history"],
                   inline: {
@@ -594,7 +620,7 @@ function FormComponent() {
                 id="AddFileButton"
                 onClick={handleAddFileInput}
               >
-                Добавить файл
+                {get_translation("INTERFACE_ADD_FILE")}
               </Button>
             </div>
 
@@ -606,7 +632,7 @@ function FormComponent() {
               type="submit"
               onClick={handleNewTicket}
             >
-              Отправить обращение
+              {get_translation("INTERFACE_SEND")}
             </Button>
           </Col>
         </Row>

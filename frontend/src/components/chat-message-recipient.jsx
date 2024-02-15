@@ -40,6 +40,15 @@ function ChatMessage({ message, sender, time, attachs }) {
             dangerouslySetInnerHTML={{ __html: message }}
             className="chat-message-recipient__text"
           ></div>
+          <div className="chat-message-translate">
+            <span>Перевод с <img src="/flags/ru.svg" className="language-menu__flag" alt="" /> на <img src="/flags/en.svg" className="language-menu__flag" alt="" /></span>
+          </div>
+          <div
+            className="chat-message-recipient__text"
+          >
+            <i>Auto translated message</i>
+          </div>
+          
           {!isVisible && (
             <>
               <span className="chat-message-recipient__attachs-title">

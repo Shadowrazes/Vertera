@@ -50,6 +50,7 @@ function Stats() {
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorId, setSelectedCuratorId] = useState(null);
+  const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
 
   const [totalData, setTotalData] = useState({});
   const [likeData, setLikeData] = useState({});
@@ -242,35 +243,43 @@ function Stats() {
     curatorName,
     curatorSurname,
     curatorPatronymic,
-    curatorId
+    curatorId,
+    curatorIndex
   ) => {
     let fullName = `${curatorSurname} ${curatorName} ${
       curatorPatronymic ? ` ${curatorPatronymic}` : ""
     }`;
     setSelectedCurator(fullName);
     setSelectedCuratorId(curatorId);
+    setSelectedCuratorIndex(curatorIndex);
   };
 
   useEffect(() => {
     if (isAdmin()) {
       if (dataCurators && dataCurators.helperQuery.helperList) {
         setDataQueryCurators(dataCurators.helperQuery.helperList);
-        setSelectedCurator(
-          `${dataCurators.helperQuery.helperList.at(0).user.surname} ${
-            dataCurators.helperQuery.helperList.at(0).user.name
-          } ${
-            dataCurators.helperQuery.helperList.at(0).user.patronymic
-              ? ` ${dataCurators.helperQuery.helperList.at(0).user.patronymic}`
-              : ""
-          }`
-        );
-        setSelectedCuratorId(dataCurators.helperQuery.helperList.at(0).user.id);
+        // setSelectedCurator(
+        //   `${dataCurators.helperQuery.helperList.at(0).user.surname} ${
+        //     dataCurators.helperQuery.helperList.at(0).user.name
+        //   } ${
+        //     dataCurators.helperQuery.helperList.at(0).user.patronymic
+        //       ? ` ${dataCurators.helperQuery.helperList.at(0).user.patronymic}`
+        //       : ""
+        //   }`
+        // );
+        // setSelectedCuratorId(dataCurators.helperQuery.helperList.at(0).user.id);
+        // setSelectedCuratorIndex(0);
       }
     }
 
     let currentStats = getCurrentUserStats();
     if (currentStats) {
-      currentStats = currentStats[0].stats;
+      if (isAdmin()) {
+        currentStats = currentStats[selectedCuratorIndex].stats;
+      } else {
+        setSelectedCurator("");
+        currentStats = currentStats[0].stats;
+      }
     }
 
     let avgReplyTimeAllUsers = getAvgReplyTimeAllUsers();
@@ -355,7 +364,7 @@ function Stats() {
 
     setRateLike(getRateLike(data));
     setRateAvgTime(getRateAvgTime(data));
-  }, [data, dataQueryCurators]);
+  }, [data, dataQueryCurators, selectedCurator, selectedCuratorIndex]);
 
   if (loading) {
     return <Loader />;
@@ -383,7 +392,8 @@ function Stats() {
                   curator.user.name,
                   curator.user.surname,
                   curator.user.patronymic,
-                  curator.id
+                  curator.id,
+                  index
                 )
               }
               href="#"
@@ -395,53 +405,58 @@ function Stats() {
           ))}
         </DropdownButton>
       )}
-      <Row>
-        <Col>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th colSpan={2}>Общая информация</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableInfo.map((elem, index) => (
-                <tr key={index}>
-                  <td>{elem.name}</td>
-                  <td>{elem.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
-      <Row className="mt-5">
-        <h3 className="stats-title stats-title_left">
-          Уровень куратора VERTERA
-        </h3>
-        <Col md={6} className="mt-2">
-          <Level fantasy={fantasy} />
-        </Col>
-      </Row>
-      <Row className="mt-5">
-        <Col md={7}>
-          <h3 className="stats-title">Статистика моя/средняя</h3>
-          <Radar
-            data={totalData}
-            options={{
-              responsive: true,
-              scales: {
-                r: {
-                  beginAtZero: true,
-                },
-              },
-            }}
-          />
-        </Col>
-        <Col md={5}>
-          <h3 className="stats-title">Статистика лайки/дизлайки</h3>
-          <Doughnut data={likeData} options={{ responsive: true }} />
-        </Col>
-      </Row>
+      {selectedCurator != null && !isAdmin() && (
+        <>
+          <Row>
+            <Col>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th colSpan={2}>Общая информация</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableInfo.map((elem, index) => (
+                    <tr key={index}>
+                      <td>{elem.name}</td>
+                      <td>{elem.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+          <Row className="mt-5">
+            <h3 className="stats-title stats-title_left">
+              Уровень куратора VERTERA
+            </h3>
+            <Col md={6} className="mt-2">
+              <Level fantasy={fantasy} />
+            </Col>
+          </Row>
+          <Row className="mt-5">
+            <Col md={7}>
+              <h3 className="stats-title">Статистика моя/средняя</h3>
+              <Radar
+                data={totalData}
+                options={{
+                  responsive: true,
+                  scales: {
+                    r: {
+                      beginAtZero: true,
+                    },
+                  },
+                }}
+              />
+            </Col>
+            <Col md={5}>
+              <h3 className="stats-title">Статистика лайки/дизлайки</h3>
+              <Doughnut data={likeData} options={{ responsive: true }} />
+            </Col>
+          </Row>
+        </>
+      )}
+
       <Row className="mt-5">
         <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
         <Col md={6} className="mt-2">

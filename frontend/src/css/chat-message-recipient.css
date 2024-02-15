@@ -36,11 +36,12 @@
   align-items: center;
   font-family: "TT Norms Pro", sans-serif;
   font-size: 36px;
+  margin-bottom: 20px;
 }
 
 .chat-message-recepient__rate-title {
   font-family: "TT Norms Pro", sans-serif;
-  font-size: 36px;
+  font-size: 20px;
 }
 
 .chat-message-recepient__rate {
@@ -84,7 +85,8 @@
   display: block;
   margin-top: 30px;
   margin-left: -20px;
-  text-align: left;
+  margin-right: -50px;
+  text-align: right;
 }
 
 .chat-message-recipient__attachs-title {
@@ -132,6 +134,14 @@
 .chat-message-recipient__name {
   font-family: 'TT Norms Pro', sans-serif;
   font-weight: 400;
+}
+
+.chat-message-translate {
+  border-top: 1px solid #dee2e6;
+  margin-top: 10px;
+  padding: 20px 0 20px 0;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 @media screen and (max-width: 768px) {

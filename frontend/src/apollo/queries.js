@@ -316,6 +316,18 @@ export const LOGIN = gql`
   }
 `;
 
+export const TRANSLATE = gql`
+  query ($token: String!, $lang: String!) {
+    clientQuery (token: $token) {
+      translationList(lang: $lang) {
+        type
+        code
+        stroke
+      }
+    }
+  }
+`;
+
 export const USER = gql`
   query ($token: String!, $id: Int!) {
     helperQuery(token: $token) {

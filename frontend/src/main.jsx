@@ -9,7 +9,7 @@ import client from "./apollo/client";
 import "bootstrap/dist/css/bootstrap.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <ApolloProvider client={client}>
-      <App />
-    </ApolloProvider>
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>
 );
