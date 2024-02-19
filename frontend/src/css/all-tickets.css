@@ -225,18 +225,78 @@
   background-color: white !important;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1200px) {
   .alltickets__container {
-    display: flex;
-    flex-direction: column;
+    margin-top: 20px;
   }
 
-  .alltickets__btn {
-    margin: 30px auto 0 auto;
+  .alltickets__container .alltickets__button {
+    width: 220px !important;
+    margin-top: 20px;
   }
 
   .alltickets__column {
+    width: 50% !important;
+  }
+
+  .alltickets__filters-container .alltickets__column {
+    width: 45% !important;
+  }
+
+  .alltickets__filters-container .dropdown {
+    width: 100%;
+  }
+
+  .alltickets__filters-container #dropdown-custom-1 {
+    width: 100% !important;
+  }
+
+  .alltickets__filters-container .alltickets__date-range-picker {
+    width: 100% !important;
+  }
+
+  .alltickets__filters-container .alltickets__input-wrapper {
+    width: 100% !important;
+  }
+
+  .alltickets__filters-container .add-currator__input {
+    width: 100% !important;
+  }
+
+  .alltickets__filters-container .p-multiselect {
+    width: 100% !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .alltickets__container {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .alltickets__container .title__heading-nomargin {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .alltickets__container .alltickets__nav-info {
+    flex-direction: column;
     margin-top: 20px;
+  }
+
+  .alltickets__container .alltickets__button {
+    width: 270px !important;
+    margin-top: 20px;
+  }
+
+  .alltickets__row {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .alltickets__filters-container .alltickets__column {
+    width: 100% !important;
   }
 
   .rs-date-range-input {

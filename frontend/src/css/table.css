@@ -56,14 +56,29 @@
 }
 
 @media screen and (max-width: 1585px) {
-  .table__wrapper {
+  /* .table__wrapper {
     overflow-x: auto;
+  } */
+}
+
+@media screen and (max-width: 1200px) {
+  .table__button {
+    width: 215px !important;
+    margin-top: 10px;
   }
 }
 
 @media screen and (max-width: 768px) {
   .table__sorts {
-    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .table__sorts-label {
+    flex: 100% 0 0;
+  }
+
+  .table__sort-wrapper:nth-child(3) {
+    flex: 76% 0 0;
   }
 
   .table__sort-active {

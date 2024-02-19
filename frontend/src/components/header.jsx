@@ -130,6 +130,7 @@ function Header({ user }) {
     } else {
       setShowLoginModal(true);
     }
+    setShowMenu(false);
   };
 
   const handleShowMenu = (event) => {
@@ -247,7 +248,7 @@ function Header({ user }) {
       <section className="header">
         <div className="header__container container">
           <div className="header__logo-wrapper">
-            <a href={isAdmin() ? "/all-tickets" : "/"}>
+            <a href={isAdmin() || isHelper() ? "/all-tickets" : "/"}>
               <img className="header__logo" src={Logo} alt=""></img>
             </a>
             <Dropdown className="language-menu">

@@ -280,6 +280,10 @@
 }
 
 @media screen and (max-width: 768px) {
+  .chat-messages__container .alltickets__container {
+    margin: 0;
+  }
+
   .chat-input__container {
     width: 100%;
   }
