@@ -55,7 +55,7 @@ export const resolvers = {
             return await Client.GetById(id);
         },
         ticket: async (_, { link }, context) => {
-            const isHelper = context.user.role == User.RoleHelper;
+            const isHelper = User.ValidateRoleAccess(User.RoleHelper, context.user.role);
             const reqTicket = await Ticket.GetByLink(link);
             const isOwner = reqTicket.clientId == context.user.id;
 
