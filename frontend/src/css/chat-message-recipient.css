@@ -161,4 +161,8 @@
   .chat-message-recepient__rate-title {
     font-size: 30px;
   }
+
+  .chat-message-recipient__time {
+    margin-right: 0;
+  }
 }

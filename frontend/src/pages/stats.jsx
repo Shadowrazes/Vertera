@@ -8,6 +8,7 @@ import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 import Level from "../components/level";
 import Loader from "./loading";
+import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
 
@@ -371,53 +372,125 @@ function Stats() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
   return (
     <>
-      <TitleH2 title="Статистика" className="title__heading" />
-
-      {isAdmin() && (
-        <DropdownButton
-          id="dropdown-custom-1"
-          title={selectedCurator || "Куратор"}
-          className="themes__dropdown"
-        >
-          {dataQueryCurators.map((curator, index) => (
-            <Dropdown.Item
-              key={index}
-              onClick={() =>
-                handleCuratorClick(
-                  curator.user.name,
-                  curator.user.surname,
-                  curator.user.patronymic,
-                  curator.id,
-                  index
-                )
-              }
-              href="#"
-            >
-              {`${curator.user.surname} ${curator.user.name} ${
-                curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-              }`}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
-      )}
-      {selectedCurator != null && !isAdmin() && (
+      {isHelper() ? (
         <>
-          <Row>
-            <Col>
+          <TitleH2 title="Статистика" className="title__heading" />
+
+          {isAdmin() && (
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedCurator || "Куратор"}
+              className="themes__dropdown"
+            >
+              {dataQueryCurators.map((curator, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() =>
+                    handleCuratorClick(
+                      curator.user.name,
+                      curator.user.surname,
+                      curator.user.patronymic,
+                      curator.id,
+                      index
+                    )
+                  }
+                  href="#"
+                >
+                  {`${curator.user.surname} ${curator.user.name} ${
+                    curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+                  }`}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+          )}
+          {selectedCurator != null && !isAdmin() && (
+            <>
+              <Row>
+                <Col>
+                  <Table striped bordered hover>
+                    <thead>
+                      <tr>
+                        <th colSpan={2}>Общая информация</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tableInfo.map((elem, index) => (
+                        <tr key={index}>
+                          <td>{elem.name}</td>
+                          <td>{elem.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Col>
+              </Row>
+              <Row className="mt-5">
+                <h3 className="stats-title stats-title_left">
+                  Уровень куратора VERTERA
+                </h3>
+                <Col md={6} className="mt-2">
+                  <Level fantasy={fantasy} />
+                </Col>
+              </Row>
+              <Row className="mt-5">
+                <Col md={7}>
+                  <h3 className="stats-title">Статистика моя/средняя</h3>
+                  <Radar
+                    data={totalData}
+                    options={{
+                      responsive: true,
+                      scales: {
+                        r: {
+                          beginAtZero: true,
+                        },
+                      },
+                    }}
+                  />
+                </Col>
+                <Col md={5}>
+                  <h3 className="stats-title">Статистика лайки/дизлайки</h3>
+                  <Doughnut data={likeData} options={{ responsive: true }} />
+                </Col>
+              </Row>
+            </>
+          )}
+
+          <Row className="mt-5">
+            <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
+            <Col md={6} className="mt-2">
               <Table striped bordered hover>
                 <thead>
                   <tr>
-                    <th colSpan={2}>Общая информация</th>
+                    <th colSpan={3}>По времени ответа</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tableInfo.map((elem, index) => (
+                  {rateAvgTime.map((elem, index) => (
                     <tr key={index}>
+                      <td>{index + 1}</td>
                       <td>{elem.name}</td>
                       <td>{elem.value}</td>
                     </tr>
@@ -425,77 +498,29 @@ function Stats() {
                 </tbody>
               </Table>
             </Col>
-          </Row>
-          <Row className="mt-5">
-            <h3 className="stats-title stats-title_left">
-              Уровень куратора VERTERA
-            </h3>
             <Col md={6} className="mt-2">
-              <Level fantasy={fantasy} />
-            </Col>
-          </Row>
-          <Row className="mt-5">
-            <Col md={7}>
-              <h3 className="stats-title">Статистика моя/средняя</h3>
-              <Radar
-                data={totalData}
-                options={{
-                  responsive: true,
-                  scales: {
-                    r: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            </Col>
-            <Col md={5}>
-              <h3 className="stats-title">Статистика лайки/дизлайки</h3>
-              <Doughnut data={likeData} options={{ responsive: true }} />
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th colSpan={3}>По кол-ву положительных отзывов</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rateLike.map((elem, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{elem.name}</td>
+                      <td>{elem.value} отзыв(-ов)</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </Col>
           </Row>
         </>
+      ) : (
+        <NotFoundPage />
       )}
-
-      <Row className="mt-5">
-        <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
-        <Col md={6} className="mt-2">
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th colSpan={3}>По времени ответа</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rateAvgTime.map((elem, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{elem.name}</td>
-                  <td>{elem.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-        <Col md={6} className="mt-2">
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th colSpan={3}>По кол-ву положительных отзывов</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rateLike.map((elem, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{elem.name}</td>
-                  <td>{elem.value} отзыв(-ов)</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
     </>
   );
 }

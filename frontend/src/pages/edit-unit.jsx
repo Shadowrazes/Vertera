@@ -9,6 +9,7 @@ import { EDIT_UNIT, DELETE_UNIT } from "../apollo/mutations";
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
+import NotFoundPage from "./not-found-page";
 
 function EditUnit() {
   const { unitId } = useParams();
@@ -24,6 +25,10 @@ function EditUnit() {
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const { loading, error, data, refetch } = useQuery(UNIT, {
     variables: {
@@ -60,6 +65,24 @@ function EditUnit() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -170,97 +193,107 @@ function EditUnit() {
 
   return (
     <>
-      <BackTitle
-        title={`Редактировать раздел #${unitId}`}
-        linkPrev={linkPrev}
-      />
-      <Col className="edit-curator__column">
-        <Form.Group controlId="NameForm">
-          <Form.Label className="edit-curator__field-label">
-            Название раздела
-          </Form.Label>
-          <Form.Control
-            type="text"
-            className="add-currator__input add-theme__dropdown"
-            value={nameValue}
-            onChange={handleOnChangeName}
+      {isAdmin() ? (
+        <>
+          <BackTitle
+            title={`Редактировать раздел #${unitId}`}
+            linkPrev={linkPrev}
           />
-          <Form.Label className="edit-curator__field-label">Порядок</Form.Label>
-          <Form.Control
-            type="number"
-            className="add-currator__input"
-            value={orderNum}
-            onChange={handleOnChangeOrderNum}
-            min={0}
-          />
-        </Form.Group>
+          <Col className="edit-curator__column">
+            <Form.Group controlId="NameForm">
+              <Form.Label className="edit-curator__field-label">
+                Название раздела
+              </Form.Label>
+              <Form.Control
+                type="text"
+                className="add-currator__input add-theme__dropdown"
+                value={nameValue}
+                onChange={handleOnChangeName}
+              />
+              <Form.Label className="edit-curator__field-label">
+                Порядок
+              </Form.Label>
+              <Form.Control
+                type="number"
+                className="add-currator__input"
+                value={orderNum}
+                onChange={handleOnChangeOrderNum}
+                min={0}
+              />
+            </Form.Group>
 
-        <div className="edit-curator__column">
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <div className="edit-curator__btn-row">
-            <ButtonCustom
-              title="Применить"
-              className={"add-curator__btn edit-curator__btn"}
-              onClick={handleEditUnit}
-            />
-            <ButtonCustom
-              title="Удалить раздел"
-              className={
-                "add-curator__btn edit-curator__btn alltickets__button-two"
-              }
-              onClick={handleDeleteUnit}
-            />
-          </div>
-        </div>
-      </Col>
+            <div className="edit-curator__column">
+              {isErrorVisible && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
+              <div className="edit-curator__btn-row">
+                <ButtonCustom
+                  title="Применить"
+                  className={"add-curator__btn edit-curator__btn"}
+                  onClick={handleEditUnit}
+                />
+                <ButtonCustom
+                  title="Удалить раздел"
+                  className={
+                    "add-curator__btn edit-curator__btn alltickets__button-two"
+                  }
+                  onClick={handleDeleteUnit}
+                />
+              </div>
+            </div>
+          </Col>
 
-      <Modal show={show} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Раздел обновлен</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Название раздела успешно обновлено</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={show} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Раздел обновлен</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Название раздела успешно обновлено</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showTwo} onHide={handleCloseLeave}>
-        <Modal.Header closeButton>
-          <Modal.Title>Раздел удален</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Раздел успешно удален</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseLeave}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showTwo} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Раздел удален</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Раздел успешно удален</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-      <Modal show={showWarning} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Предупреждение</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Вы уверены, что хотите удалить этот раздел, а также все темы и
-            подтемы, соответствующие ему?
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Отмена
-          </Button>
-          <Button variant="primary" onClick={handleConfirm}>
-            Продолжить
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showWarning} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Предупреждение</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                Вы уверены, что хотите удалить этот раздел, а также все темы и
+                подтемы, соответствующие ему?
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Отмена
+              </Button>
+              <Button variant="primary" onClick={handleConfirm}>
+                Продолжить
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

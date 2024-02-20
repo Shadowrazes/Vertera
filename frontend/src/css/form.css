@@ -66,6 +66,21 @@
   gap: 20px;
 }
 
+@media screen and (max-width: 1200px) {
+  .form__row {
+    gap: 20px;
+  }
+
+  #dropdown-custom-1 {
+    max-width: unset !important;
+  }
+
+  .dropdown button {
+    width: 672px !important;
+    max-width: unset;
+  }
+}
+
 @media screen and (max-width: 768px) {
   #TextareaForm {
     width: 100%;

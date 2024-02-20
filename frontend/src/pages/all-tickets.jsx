@@ -84,8 +84,6 @@ function allTickets() {
   const [orderDir, setOrderDir] = useState("DESC");
   const [offset, setOffset] = useState(0);
 
-  const [fastFilterStr, setFastFilterStr] = useState("my");
-
   const [isVisible, setIsVisible] = useState(false);
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
 
@@ -104,10 +102,22 @@ function allTickets() {
     userId = user.id;
   }
 
-  const [helperIdsFilter, setHelperIdsFilter] = useState(userId);
+  const isAdmin = () => {
+    return user.role === "system";
+  };
+
+  const isHelper = () => {
+    return user.role === "helper" || user.role === "system";
+  };
+
+  const [fastFilterStr, setFastFilterStr] = useState(isAdmin() ? "all" : "my");
+
+  const [helperIdsFilter, setHelperIdsFilter] = useState(
+    isAdmin() ? null : userId
+  );
   const [helperStatusFilter, setHelperStatusFilter] = useState(null);
 
-  let fastFilterHelperId = userId;
+  let fastFilterHelperId = isAdmin() ? null : userId;
   let fastFilterStatus = null;
 
   const pageNumbers = [];
@@ -116,10 +126,6 @@ function allTickets() {
   const reactions = ["Понравилось", "Не понравилось"];
   const outerIdSelect = ["Партнер", "Структура"];
   const itemsPerPageArray = [25, 50, 100];
-
-  const isAdmin = () => {
-    return user.role === "helper" || user.role === "system";
-  };
 
   const navigate = useNavigate();
 
@@ -161,7 +167,7 @@ function allTickets() {
     setSelectedStatusesId([]);
     setQueryReaction(null);
 
-    if (isAdmin()) {
+    if (isHelper()) {
       // console.log(1);
       const variables = {
         filters: {
@@ -223,13 +229,18 @@ function allTickets() {
   });
 
   const adminRequest = () => {
-    // console.log(2);
-    // console.log(helperIdsFilter);
+    console.log(2);
+    console.log(helperIdsFilter);
+    let _helperIdsFilter = helperIdsFilter;
+    if (isAdmin()) {
+      _helperIdsFilter = null;
+    }
+    console.log(_helperIdsFilter);
     return useQuery(TABLE_TICKETS, {
       variables: {
         token: user.token,
         filters: {
-          helperIds: helperIdsFilter,
+          helperIds: _helperIdsFilter,
           limit: itemsPerPage,
           offset: 0,
           orderBy: "id",
@@ -256,7 +267,7 @@ function allTickets() {
     });
   };
 
-  const { loading, error, data, refetch } = isAdmin()
+  const { loading, error, data, refetch } = isHelper()
     ? adminRequest()
     : clientRequest();
 
@@ -281,7 +292,7 @@ function allTickets() {
     // console.log("orderdir ", orderDir);
     // console.log("fastfilter status ", fastFilterStatus);
 
-    if (isAdmin()) {
+    if (isHelper()) {
       // console.log(3);
       const variables = {
         filters: {
@@ -322,7 +333,7 @@ function allTickets() {
   };
 
   useEffect(() => {
-    if (isAdmin()) {
+    if (isHelper()) {
       if (data && data.helperQuery.ticketList.array) {
         setDataTableTickets(data.helperQuery.ticketList.array);
       }
@@ -394,6 +405,23 @@ function allTickets() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -454,7 +482,7 @@ function allTickets() {
     setOrderBy(_orderBy);
     setOrderDir(_orderDir);
 
-    if (isAdmin()) {
+    if (isHelper()) {
       // console.log(4);
       const variables = {
         filters: {
@@ -641,7 +669,7 @@ function allTickets() {
     // console.log(selectedDateAfter);
     // console.log(queryReaction);
 
-    if (isAdmin()) {
+    if (isHelper()) {
       // console.log(5);
       let helperIds;
       if (selectedCuratorsId.length === 0) {
@@ -705,18 +733,18 @@ function allTickets() {
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "in-process") {
-      fastFilterHelperId = userId;
+      fastFilterHelperId = isAdmin() ? null : userId;
       fastFilterStatus = 3;
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "clarification") {
-      fastFilterHelperId = userId;
+      fastFilterHelperId = isAdmin() ? null : userId;
       fastFilterStatus = [4, 5];
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     }
 
-    if (isAdmin()) {
+    if (isHelper()) {
       // console.log(6);
       // console.log("helperID ", helperIdsFilter);
       const variables = {
@@ -802,9 +830,9 @@ function allTickets() {
           title={get_translation("INTERFACE_ALL_APPEALS")}
           className="title__heading-nomargin"
         />
-        {!loading && !isAdmin() ? (
+        {!loading && !isHelper() ? (
           <div className="alltickets__nav-info">
-            {!isAdmin() && (
+            {!isHelper() && (
               <ButtonCustom
                 title="Написать обращение"
                 onClick={handleCreateTicket}
@@ -830,7 +858,9 @@ function allTickets() {
                 : get_translation("INTERFACE_HIDE_FILTER")
             }
             onClick={handleHideComponent}
-            className={"alltickets__btn alltickets__btn-outlined"}
+            className={
+              "alltickets__btn alltickets__btn-outlined alltickets__button"
+            }
           />
         )}
       </div>
@@ -838,7 +868,7 @@ function allTickets() {
         <>
           {isVisibleFilters && (
             <>
-              {isAdmin() ? (
+              {isHelper() ? (
                 <div className="alltickets__filters-container">
                   <Form>
                     <Row className="alltickets__row">
@@ -982,7 +1012,7 @@ function allTickets() {
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
-                            isAdmin()
+                            isHelper()
                               ? selectedReaction ||
                                 get_translation("INTERFACE_REACTIONS")
                               : selectedReaction || "Мои реакции"
@@ -999,15 +1029,17 @@ function allTickets() {
                           ))}
                         </DropdownButton>
 
-                        <Form.Group controlId="wordsFilterForm">
-                          <Form.Control
-                            type="text"
-                            placeholder={get_translation("INTERFACE_REG_EXP")}
-                            className="add-currator__input"
-                            value={wordsFilterValue}
-                            onChange={handleWordsFilterValueChange}
-                          />
-                        </Form.Group>
+                        <div className="alltickets__input-wrapper">
+                          <Form.Group controlId="wordsFilterForm">
+                            <Form.Control
+                              type="text"
+                              placeholder={get_translation("INTERFACE_REG_EXP")}
+                              className="add-currator__input"
+                              value={wordsFilterValue}
+                              onChange={handleWordsFilterValueChange}
+                            />
+                          </Form.Group>
+                        </div>
 
                         <MultiSelect
                           value={selectedStatuses}
@@ -1024,7 +1056,10 @@ function allTickets() {
                           className="alltickets__days-ago"
                           controlId="wordsFilterForm"
                         >
-                          <div className="alltickets__days-ago-label">
+                          <div
+                            className="alltickets__days-ago-label"
+                            style={{ minWidth: "105px" }}
+                          >
                             {get_translation("INTERFACE_CREATE_MORE")}
                           </div>
                           <Form.Control
@@ -1193,7 +1228,7 @@ function allTickets() {
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
-                            isAdmin()
+                            isHelper()
                               ? selectedReaction ||
                                 get_translation("INTERFACE_REACTIONS")
                               : selectedReaction || "Мои реакции"
@@ -1209,15 +1244,17 @@ function allTickets() {
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
-                        <Form.Group controlId="wordsFilterForm">
-                          <Form.Control
-                            type="text"
-                            placeholder={get_translation("INTERFACE_REG_EXP")}
-                            className="add-currator__input"
-                            value={wordsFilterValue}
-                            onChange={handleWordsFilterValueChange}
-                          />
-                        </Form.Group>
+                        <div className="alltickets__input-wrapper">
+                          <Form.Group controlId="wordsFilterForm">
+                            <Form.Control
+                              type="text"
+                              placeholder={get_translation("INTERFACE_REG_EXP")}
+                              className="add-currator__input"
+                              value={wordsFilterValue}
+                              onChange={handleWordsFilterValueChange}
+                            />
+                          </Form.Group>
+                        </div>
                       </div>
                     </Row>
                     <Row className="alltickets__button-row">
@@ -1237,14 +1274,18 @@ function allTickets() {
             </>
           )}
 
-          {isAdmin() && (
-            <ButtonGroup className="mb-3 filter-buttonGroup">
-              <Button
-                onClick={handleFastFilter.bind(null, "my")}
-                variant={fastFilterStr === "my" ? "primary" : "outline-primary"}
-              >
-                {get_translation("INTERFACE_MY_TICKETS")}
-              </Button>
+          {isHelper() && (
+            <ButtonGroup size="sm" className="mb-3 filter-buttonGroup">
+              {!isAdmin() && (
+                <Button
+                  onClick={handleFastFilter.bind(null, "my")}
+                  variant={
+                    fastFilterStr === "my" ? "primary" : "outline-primary"
+                  }
+                >
+                  {get_translation("INTERFACE_MY_TICKETS")}
+                </Button>
+              )}
               <Button
                 onClick={handleFastFilter.bind(null, "all")}
                 variant={
@@ -1322,11 +1363,13 @@ function allTickets() {
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  {isAdmin() && <th>ID</th>}
+                  {isHelper() && <th>ID</th>}
                   <th>{get_translation("INTERFACE_CHAPTER")}</th>
                   <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
                   <th>{get_translation("INTERFACE_THEME")}</th>
-                  {isAdmin() && <th>{get_translation("INTERFACE_CURATOR")}</th>}
+                  {isHelper() && (
+                    <th>{get_translation("INTERFACE_CURATOR")}</th>
+                  )}
                   <th>{get_translation("INTERFACE_LAST_MSG")}</th>
                   <th>{get_translation("INTERFACE_MSG")}</th>
                   <th>{get_translation("INTERFACE_STATUS")}</th>
@@ -1335,7 +1378,7 @@ function allTickets() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    {isAdmin() && (
+                    {isHelper() && (
                       <td>
                         <Link
                           to={`/dialog/${ticket.link}`}
@@ -1406,7 +1449,7 @@ function allTickets() {
                           : `${ticket.title}`}
                       </Link>
                     </td>
-                    {isAdmin() && (
+                    {isHelper() && (
                       <td>
                         <Link
                           to={`/dialog/${ticket.link}`}
@@ -1542,7 +1585,7 @@ function allTickets() {
           </ul>
         </>
       )}
-      {dataAmount == 0 && !isAdmin() && (
+      {dataAmount == 0 && !isHelper() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">
             У вас нет тикетов, чтобы создать обращение нажмите на кнопку
@@ -1554,7 +1597,7 @@ function allTickets() {
         </div>
       )}
 
-      {/* {dataAmount == 0 && isAdmin() && (
+      {/* {dataAmount == 0 && isHelper() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">У вас нет тикетов</span>
         </div>

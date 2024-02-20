@@ -40,6 +40,7 @@ import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSystem from "../components/chat-message-system";
 import ButtonCustom from "../components/button";
+import NotFoundPage from "./not-found-page";
 
 import "../css/chat-input.css";
 import "/node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -339,6 +340,27 @@ function Chat() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (!isAdmin() && error.message === "Forbidden") {
+      return <NotFoundPage />;
+    }
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
     return <h2>Что-то пошло не так</h2>;
   }
 

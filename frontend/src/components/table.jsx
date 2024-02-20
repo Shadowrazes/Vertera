@@ -198,6 +198,21 @@ function TableTickets() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+      }
+    }
     return <>{userId == null ? <></> : <h2>Что-то пошло не так</h2>}</>;
   }
 
@@ -231,42 +246,44 @@ function TableTickets() {
               {get_translation("INTERFACE_SORT")}:
             </span>
             {columns.map((column, index) => (
-              <span
-                key={column}
-                onClick={() => {
-                  handleSorts(index);
-                }}
-                className={
-                  selectedSort === index
-                    ? "table__sort table__sort-active"
-                    : "table__sort"
-                }
-              >
-                {columnsName[index]}
-                {selectedSort === index && (
-                  <span className="table__sort-arrow">
-                    <svg
-                      className={
-                        orderDir == "DESC"
-                          ? "table__sort-arrow-svg-rotated"
-                          : "table__sort-arrow-svg"
-                      }
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="7"
-                      height="10"
-                      viewBox="0 0 7 10"
-                      fill="none"
-                    >
-                      <path
-                        d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                        stroke="#00AB97"
-                        strokeWidth="0.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                )}
-              </span>
+              <div className="table__sort-wrapper">
+                <span
+                  key={column}
+                  onClick={() => {
+                    handleSorts(index);
+                  }}
+                  className={
+                    selectedSort === index
+                      ? "table__sort table__sort-active"
+                      : "table__sort"
+                  }
+                >
+                  {columnsName[index]}
+                  {selectedSort === index && (
+                    <span className="table__sort-arrow">
+                      <svg
+                        className={
+                          orderDir == "DESC"
+                            ? "table__sort-arrow-svg-rotated"
+                            : "table__sort-arrow-svg"
+                        }
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="7"
+                        height="10"
+                        viewBox="0 0 7 10"
+                        fill="none"
+                      >
+                        <path
+                          d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                          stroke="#00AB97"
+                          strokeWidth="0.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </span>
+                  )}
+                </span>
+              </div>
             ))}
           </div>
           <div className="table__wrapper">
@@ -285,9 +302,9 @@ function TableTickets() {
               </thead>
               <tbody>
                 {tickets.map((ticket) => (
-                  <tr key={ticket.id}>
+                  <tr className="d-md-table-row" key={ticket.id}>
                     {isAdmin() && (
-                      <td>
+                      <td className="d-md-table-cell">
                         <Link
                           to={`/dialog/${ticket.link}`}
                           state={{
@@ -300,7 +317,10 @@ function TableTickets() {
                         </Link>
                       </td>
                     )}
-                    <td style={{ textAlign: "left" }}>
+                    <td
+                      className="d-md-table-cell"
+                      style={{ textAlign: "left" }}
+                    >
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -321,7 +341,7 @@ function TableTickets() {
                         }`}
                       </Link>
                     </td>
-                    <td>
+                    <td className="d-md-table-cell">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -343,7 +363,7 @@ function TableTickets() {
                           .toFormat("HH:mm:ss")}
                       </Link>
                     </td>
-                    <td>
+                    <td className="d-md-table-cell">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -358,7 +378,7 @@ function TableTickets() {
                       </Link>
                     </td>
                     {isAdmin() && (
-                      <td>
+                      <td className="d-md-table-cell">
                         <Link
                           to={`/dialog/${ticket.link}`}
                           state={{
@@ -371,7 +391,7 @@ function TableTickets() {
                         </Link>
                       </td>
                     )}
-                    <td>
+                    <td className="d-md-table-cell">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -391,7 +411,7 @@ function TableTickets() {
                             } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
-                    <td>
+                    <td className="d-md-table-cell">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -403,7 +423,7 @@ function TableTickets() {
                         {ticket.messages.length}
                       </Link>
                     </td>
-                    <td>
+                    <td className="d-md-table-cell">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -433,6 +453,7 @@ function TableTickets() {
           <ButtonCustom
             title={get_translation("INTERFACE_SHOW_ALL_TICKETS")}
             onClick={goToAllTickets}
+            className={"table__button"}
           />
         </>
       )}

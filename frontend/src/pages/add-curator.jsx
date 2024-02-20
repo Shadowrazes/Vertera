@@ -23,6 +23,7 @@ import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import NotFoundPage from "./not-found-page";
 
 import "../css/add-curator.css";
 
@@ -51,6 +52,10 @@ function AddCurator() {
   const [passwordValue, setPasswordValue] = useState("");
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const isAdmin = () => {
+    return user.role === "system";
+  };
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST, {
     variables: {
@@ -109,6 +114,24 @@ function AddCurator() {
   }
 
   if (error) {
+    const networkError = error.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -301,156 +324,164 @@ function AddCurator() {
 
   return (
     <>
-      <BackTitle title="Добавить куратора" linkPrev={linkPrev} />
-      <Row className="add-curator__row">
-        <Col className="add-curator__column">
-          <Form.Group controlId="NameForm">
-            <Form.Control
-              type="text"
-              placeholder="Имя"
-              value={nameValue}
-              className="add-currator__input"
-              onChange={handleNameChange}
-            />
-          </Form.Group>
+      {isAdmin() ? (
+        <>
+          <BackTitle title="Добавить куратора" linkPrev={linkPrev} />
+          <Row className="add-curator__row">
+            <Col className="add-curator__column">
+              <Form.Group controlId="NameForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Имя"
+                  value={nameValue}
+                  className="add-currator__input"
+                  onChange={handleNameChange}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="SurNameForm">
-            <Form.Control
-              type="text"
-              placeholder="Фамилия"
-              value={surnameValue}
-              className="add-currator__input"
-              onChange={handleSurnameChange}
-            />
-          </Form.Group>
+              <Form.Group controlId="SurNameForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Фамилия"
+                  value={surnameValue}
+                  className="add-currator__input"
+                  onChange={handleSurnameChange}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="PatronymicForm">
-            <Form.Control
-              type="text"
-              placeholder="Отчество (при наличии)"
-              value={patronymicValue}
-              className="add-currator__input"
-              onChange={handlePatronymicChange}
-            />
-          </Form.Group>
+              <Form.Group controlId="PatronymicForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Отчество (при наличии)"
+                  value={patronymicValue}
+                  className="add-currator__input"
+                  onChange={handlePatronymicChange}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="PhoneForm">
-            <Form.Control
-              type="phone"
-              placeholder="Номер телефона"
-              value={phoneValue}
-              className="add-currator__input"
-              onChange={handlePhoneChange}
-            />
-          </Form.Group>
+              <Form.Group controlId="PhoneForm">
+                <Form.Control
+                  type="phone"
+                  placeholder="Номер телефона"
+                  value={phoneValue}
+                  className="add-currator__input"
+                  onChange={handlePhoneChange}
+                />
+              </Form.Group>
 
-          <DatePicker
-            id="DatePicker"
-            placeholder="Дата рождения"
-            className="add-curator__date-picker"
-            locale={{
-              sunday: "Вс",
-              monday: "Пн",
-              tuesday: "Вт",
-              wednesday: "Ср",
-              thursday: "Чт",
-              friday: "Пн",
-              saturday: "Сб",
-              ok: "OK",
-              today: "Сегодня",
-              yesterday: "Вчера",
-            }}
-            format="dd.MM.yyyy"
-            onChange={handlePeriodClick}
-          />
+              <DatePicker
+                id="DatePicker"
+                placeholder="Дата рождения"
+                className="add-curator__date-picker"
+                locale={{
+                  sunday: "Вс",
+                  monday: "Пн",
+                  tuesday: "Вт",
+                  wednesday: "Ср",
+                  thursday: "Чт",
+                  friday: "Пн",
+                  saturday: "Сб",
+                  ok: "OK",
+                  today: "Сегодня",
+                  yesterday: "Вчера",
+                }}
+                format="dd.MM.yyyy"
+                onChange={handlePeriodClick}
+              />
 
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <ButtonCustom
-            title="Применить"
-            className={"add-curator__btn"}
-            onClick={handleAddCurator}
-          />
-        </Col>
+              {isErrorVisible && (
+                <span className="form__error">{errorMsg()}</span>
+              )}
+              <ButtonCustom
+                title="Применить"
+                className={"add-curator__btn"}
+                onClick={handleAddCurator}
+              />
+            </Col>
 
-        <Col className="add-curator__column">
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedCountry || "Страна"}
-          >
-            {countryList.map((country, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() =>
-                  handleCountryClick(country.name.stroke, country.id)
-                }
-                href="#"
+            <Col className="add-curator__column">
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedCountry || "Страна"}
               >
-                {country.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
+                {countryList.map((country, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleCountryClick(country.name.stroke, country.id)
+                    }
+                    href="#"
+                  >
+                    {country.name.stroke}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
 
-          <Form.Group controlId="LoginForm">
-            <Form.Control
-              type="text"
-              placeholder="Логин"
-              value={loginValue}
-              className="add-currator__input"
-              onChange={handleLoginChange}
-            />
-          </Form.Group>
+              <Form.Group controlId="LoginForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Логин"
+                  value={loginValue}
+                  className="add-currator__input"
+                  onChange={handleLoginChange}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="PasswordForm">
-            <Form.Control
-              type="text"
-              placeholder="Пароль"
-              value={passwordValue}
-              className="add-currator__input"
-              onChange={handlePasswordChange}
-            />
-          </Form.Group>
+              <Form.Group controlId="PasswordForm">
+                <Form.Control
+                  type="text"
+                  placeholder="Пароль"
+                  value={passwordValue}
+                  className="add-currator__input"
+                  onChange={handlePasswordChange}
+                />
+              </Form.Group>
 
-          <MultiSelect
-            value={selectedDepartments}
-            onChange={(e) => handleDepartmentsOnChange(e.value)}
-            options={newDepartmentList}
-            optionLabel="name"
-            placeholder="Выбрать департамент"
-            className="add-curator__multiselect"
-          />
+              <MultiSelect
+                value={selectedDepartments}
+                onChange={(e) => handleDepartmentsOnChange(e.value)}
+                options={newDepartmentList}
+                optionLabel="name"
+                placeholder="Выбрать департамент"
+                className="add-curator__multiselect"
+              />
 
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedJobTitle || "Должность"}
-          >
-            {jobTitleList.map((jobTitle, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() =>
-                  handleJobTitleClick(jobTitle.name.stroke, jobTitle.id)
-                }
-                href="#"
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedJobTitle || "Должность"}
               >
-                {jobTitle.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
-        </Col>
-      </Row>
+                {jobTitleList.map((jobTitle, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleJobTitleClick(jobTitle.name.stroke, jobTitle.id)
+                    }
+                    href="#"
+                  >
+                    {jobTitle.name.stroke}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </Col>
+          </Row>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Куратор создан</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Новый куратор успешно добавлен</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Куратор создан</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Новый куратор успешно добавлен</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

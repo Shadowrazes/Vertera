@@ -56,6 +56,10 @@ function FormComponent() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
+  const isAdmin = () => {
+    return user?.role === "helper" || user?.role === "system";
+  };
+
   let userId = user ? user.id : 999;
 
   const [fileInputs, setFileInputs] = useState([
@@ -66,12 +70,15 @@ function FormComponent() {
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
-      // token: user?.token,
-      token: "123",
+      token: user?.token,
     },
   });
 
   useEffect(() => {
+    if (isAdmin()) {
+      document.location.href = "/all-tickets";
+    }
+
     if (data && data.clientQuery.allThemeTree) {
       setData(data.clientQuery.allThemeTree);
     }
@@ -135,6 +142,7 @@ function FormComponent() {
   }
 
   if (error) {
+    // console.error("GraphQL Error:", error);
     const networkError = error.networkError;
 
     if (networkError) {
@@ -375,14 +383,19 @@ function FormComponent() {
       fileInputs.concat([
         {
           fileInput: true,
+          id: generateUniqueId(),
         },
       ])
     );
   };
 
-  const handleRemoveFileInput = (indexToRemove) => {
+  const generateUniqueId = () => {
+    return Math.random().toString(36).substr(2, 9);
+  };
+
+  const handleRemoveFileInput = (idToRemove) => {
     setFileInputs((prevFileInputs) =>
-      prevFileInputs.filter((_, index) => index !== indexToRemove)
+      prevFileInputs.filter((fileInput) => fileInput.id !== idToRemove)
     );
   };
 
@@ -434,15 +447,6 @@ function FormComponent() {
         title={get_translation("INTERFACE_CREATE_TICKET")}
         className="title__heading"
       />
-      <div>
-        <h2>Good: {data.goodField}</h2>
-        <pre>
-          Bad:{" "}
-          {error.graphQLErrors.map(({ message }, i) => (
-            <span key={i}>{message}</span>
-          ))}
-        </pre>
-      </div>
       <Form method="post">
         <Row className="form__row">
           <Col className="form__column">
@@ -598,7 +602,7 @@ function FormComponent() {
             </Form.Group>
             <div className="file-inputs">
               {fileInputs.map((fileInput, index) => (
-                <Form.Group className="mb-3 fileInputForm" key={index}>
+                <Form.Group className="mb-3 fileInputForm" key={fileInput.id}>
                   <Form.Control
                     type="file"
                     accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
@@ -607,7 +611,7 @@ function FormComponent() {
                   {index > 0 && (
                     <Button
                       variant="outline-danger"
-                      onClick={() => handleRemoveFileInput(index)}
+                      onClick={() => handleRemoveFileInput(fileInput.id)}
                     >
                       Удалить
                     </Button>
