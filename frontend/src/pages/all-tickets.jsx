@@ -602,7 +602,7 @@ function allTickets() {
   };
 
   const handlePeriodClick = (period) => {
-    const formattedDate = period.map((originalDate) => {
+    const formattedDate = period?.map((originalDate) => {
       const year = originalDate.getFullYear();
       const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
       const day = ("0" + originalDate.getDate()).slice(-2);

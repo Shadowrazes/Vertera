@@ -318,7 +318,7 @@ export const LOGIN = gql`
 
 export const TRANSLATE = gql`
   query ($token: String!, $lang: String!) {
-    clientQuery (token: $token) {
+    clientQuery(token: $token) {
       translationList(lang: $lang) {
         type
         code
@@ -555,11 +555,9 @@ export const SUBTHEME = gql`
 `;
 
 export const STATS = gql`
-  query ($token: String!) {
+  query ($token: String!, $filters: HelperStatsFilter!) {
     helperQuery(token: $token) {
-      helperStatList(
-        filters: { orderBy: "id", orderDir: "", limit: 50, offset: 0 }
-      ) {
+      helperStatList(filters: $filters) {
         helper {
           id
           user {

@@ -32,9 +32,7 @@ function addUnit() {
   };
 
   useEffect(() => {
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/units");
   }, [location.state]);
 
   const [addUnit] = useMutation(ADD_UNIT);
@@ -121,7 +119,7 @@ function addUnit() {
       {isAdmin() ? (
         <>
           <BackTitle title="Добавить раздел" linkPrev={linkPrev} />
-          <Row className="add-curator__row">
+          <Row className="add-curator__row add-unit__row">
             <Col className="add-curator__column">
               <Form.Group controlId="NameForm">
                 <Form.Control

@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import { STATS, CURATORS_LIST } from "../apollo/queries";
 
+import { DateRangePicker } from "rsuite";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 import Level from "../components/level";
@@ -11,6 +12,8 @@ import Loader from "./loading";
 import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
+
+import "rsuite/dist/rsuite-no-reset.min.css";
 
 import {
   Form,
@@ -34,6 +37,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Radar, Doughnut } from "react-chartjs-2";
+import subDays from "date-fns/subDays";
 
 ChartJS.register(
   RadialLinearScale,
@@ -50,8 +54,10 @@ function Stats() {
 
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
-  const [selectedCuratorId, setSelectedCuratorId] = useState(null);
   const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
+  const [dateRange, setDateRange] = useState(null);
+  const [selectedDateBefore, setSelectedDateBefore] = useState(null);
+  const [selectedDateAfter, setSelectedDateAfter] = useState(null);
 
   const [totalData, setTotalData] = useState({});
   const [likeData, setLikeData] = useState({});
@@ -59,6 +65,25 @@ function Stats() {
   const [fantasy, setFantasy] = useState({});
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
+
+  const predefinedRanges = [
+    {
+      label: "Неделя",
+      value: [subDays(new Date(), 6), new Date()],
+      placement: "bottom",
+    },
+    {
+      label: "Месяц",
+      value: [subDays(new Date(), 29), new Date()],
+      placement: "bottom",
+    },
+
+    {
+      label: "Все время",
+      value: [new Date(new Date().getFullYear() - 1, 0, 1), new Date()],
+      placement: "bottom",
+    },
+  ];
 
   const isHelper = () => {
     return user.role === "helper" || user.role === "system";
@@ -71,6 +96,14 @@ function Stats() {
   const { loading, error, data, refetch } = useQuery(STATS, {
     variables: {
       token: user.token,
+      filters: {
+        limit: 999,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "",
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+      },
     },
   });
 
@@ -145,7 +178,7 @@ function Stats() {
   };
 
   const getRateLike = (allUserData) => {
-    if (!allUserData || !allUserData?.helperStatList) {
+    if (!allUserData) {
       return [];
     }
 
@@ -165,13 +198,13 @@ function Stats() {
   };
 
   const getRateAvgTime = (allUserData) => {
-    if (!allUserData || !allUserData?.helperStatList) {
+    if (!allUserData) {
       return [];
     }
     allUserData = [...allUserData?.helperQuery.helperStatList];
     allUserData = allUserData
       ?.sort((userData1, userData2) => {
-        console.log(userData1.stats.avgReplyTime, userData2.stats.avgReplyTime);
+        // console.log(userData1.stats.avgReplyTime, userData2.stats.avgReplyTime);
         return userData1.stats.avgReplyTime - userData2.stats.avgReplyTime;
       })
       .map((userData) => {
@@ -244,35 +277,53 @@ function Stats() {
     curatorName,
     curatorSurname,
     curatorPatronymic,
-    curatorId,
     curatorIndex
   ) => {
     let fullName = `${curatorSurname} ${curatorName} ${
       curatorPatronymic ? ` ${curatorPatronymic}` : ""
     }`;
     setSelectedCurator(fullName);
-    setSelectedCuratorId(curatorId);
     setSelectedCuratorIndex(curatorIndex);
+  };
+
+  const handlePeriodClick = (period) => {
+    const formattedDate = period?.map((originalDate) => {
+      const year = originalDate.getFullYear();
+      const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
+      const day = ("0" + originalDate.getDate()).slice(-2);
+
+      return `${year}-${month}-${day}`;
+    });
+
+    setDateRange(period);
+    setSelectedDateAfter(formattedDate[0] + " 00:00:00");
+    setSelectedDateBefore(formattedDate[1] + " 23:59:59");
+
+    // console.log(formattedDate[0]);
+    // console.log(formattedDate[1]);
+  };
+
+  const handlePeriodSubmit = async () => {
+    const variables = {
+      filters: {
+        limit: 999,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "",
+        dateBefore: selectedDateBefore,
+        dateAfter: selectedDateAfter,
+      },
+    };
+    await refetch(variables);
   };
 
   useEffect(() => {
     if (isAdmin()) {
       if (dataCurators && dataCurators.helperQuery.helperList) {
         setDataQueryCurators(dataCurators.helperQuery.helperList);
-        // setSelectedCurator(
-        //   `${dataCurators.helperQuery.helperList.at(0).user.surname} ${
-        //     dataCurators.helperQuery.helperList.at(0).user.name
-        //   } ${
-        //     dataCurators.helperQuery.helperList.at(0).user.patronymic
-        //       ? ` ${dataCurators.helperQuery.helperList.at(0).user.patronymic}`
-        //       : ""
-        //   }`
-        // );
-        // setSelectedCuratorId(dataCurators.helperQuery.helperList.at(0).user.id);
-        // setSelectedCuratorIndex(0);
       }
     }
-
+    console.log("xdd");
     let currentStats = getCurrentUserStats();
     if (currentStats) {
       if (isAdmin()) {
@@ -413,7 +464,6 @@ function Stats() {
                       curator.user.name,
                       curator.user.surname,
                       curator.user.patronymic,
-                      curator.id,
                       index
                     )
                   }
@@ -426,7 +476,7 @@ function Stats() {
               ))}
             </DropdownButton>
           )}
-          {selectedCurator != null && !isAdmin() && (
+          {selectedCurator != null && (
             <>
               <Row>
                 <Col>
@@ -478,8 +528,21 @@ function Stats() {
             </>
           )}
 
-          <Row className="mt-5">
-            <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
+          <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
+          <DateRangePicker
+            ranges={predefinedRanges}
+            placeholder="Задать период"
+            className="alltickets__date-range-picker"
+            style={{ marginTop: "20px" }}
+            onChange={handlePeriodClick}
+            value={dateRange}
+          />
+          <ButtonCustom
+            title="Применить"
+            onClick={handlePeriodSubmit}
+            className={"alltickets__btn"}
+          />
+          <Row className="mt-3">
             <Col md={6} className="mt-2">
               <Table striped bordered hover>
                 <thead>

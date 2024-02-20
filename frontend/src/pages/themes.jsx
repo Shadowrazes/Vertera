@@ -90,21 +90,23 @@ function Theme() {
       {isAdmin() ? (
         <>
           <TitleH2 title="Темы" className="title__heading" />
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem || "Выберите подразделение"}
-            className="themes__dropdown"
-          >
-            {dataQuery.map((unit, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => handleUnitClick(unit.name.stroke)}
-                href="#"
-              >
-                {unit.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
+          <div className="themes__dropdown-wrapper">
+            <DropdownButton
+              id="dropdown-custom-1"
+              title={selectedItem || "Выберите подразделение"}
+              className="themes__dropdown"
+            >
+              {dataQuery.map((unit, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => handleUnitClick(unit.name.stroke)}
+                  href="#"
+                >
+                  {unit.name.stroke}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+          </div>
 
           <div className="table__wrapper">
             <Table className="table__table" hover>

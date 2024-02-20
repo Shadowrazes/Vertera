@@ -388,15 +388,6 @@ function AddCurator() {
                 format="dd.MM.yyyy"
                 onChange={handlePeriodClick}
               />
-
-              {isErrorVisible && (
-                <span className="form__error">{errorMsg()}</span>
-              )}
-              <ButtonCustom
-                title="Применить"
-                className={"add-curator__btn"}
-                onClick={handleAddCurator}
-              />
             </Col>
 
             <Col className="add-curator__column">
@@ -464,6 +455,12 @@ function AddCurator() {
               </DropdownButton>
             </Col>
           </Row>
+          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
+          <ButtonCustom
+            title="Применить"
+            className={"add-curator__btn"}
+            onClick={handleAddCurator}
+          />
 
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>

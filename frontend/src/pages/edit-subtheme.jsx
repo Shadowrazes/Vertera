@@ -116,9 +116,7 @@ function EditSubtheme() {
       // console.log(data.subTheme.departments);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/subthemes");
 
     refetch();
   }, [data, dataTheme, dataDepartmentList, location.state]);
@@ -338,7 +336,7 @@ function EditSubtheme() {
             title={`Редактировать подтему #${subthemeId}`}
             linkPrev={linkPrev}
           />
-          <Col className="edit-curator__column">
+          <Col className="edit-curator__column edit-subtheme__column">
             <div className="edit-subtheme__field">
               <Form.Label className="edit-curator__field-label">
                 Раздел

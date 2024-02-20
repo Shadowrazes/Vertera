@@ -60,6 +60,10 @@ function EditCurator() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
+  const isAdmin = () => {
+    return user.role === "system";
+  };
+
   const { loading, error, data } = useQuery(HELPER, {
     variables: {
       token: user.token,
