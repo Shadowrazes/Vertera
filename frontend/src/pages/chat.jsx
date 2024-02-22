@@ -1465,7 +1465,7 @@ function Chat() {
               </Tab>
             </Tabs>
 
-            <div className="edit-curator__column chat__edit-button">
+            <div className=" chat__edit-button">
               {isErrorVisibleEdit && (
                 <span className="form__error">{errorMsgEdit()}</span>
               )}

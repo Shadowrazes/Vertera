@@ -90,3 +90,22 @@
     margin-top: 20px;
   }
 }
+
+@media screen and (max-width: 800px) {
+  .table__table {
+    display: flex;
+    flex-direction: column;
+  }
+  .table__table tr { 
+    display: flex; 
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0.5em 0;
+    border: 1px solid rgba(3,3,3,0.2);
+  }
+
+  .table__table td, th {
+    flex: 1 1;
+    border: 0.5px solid rgba(3,3,3,0.2);
+  }
+}

@@ -1,19 +1,17 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { useNavigate, Link } from "react-router-dom";
 
 import { STATS, CURATORS_LIST } from "../apollo/queries";
 
 import { DateRangePicker } from "rsuite";
 import TitleH2 from "../components/title";
-import ButtonCustom from "../components/button";
 import Level from "../components/level";
+import ButtonCustom from "../components/button";
 import Loader from "./loading";
 import NotFoundPage from "./not-found-page";
 
-import EditIcon from "../assets/edit_icon.svg";
-
 import "rsuite/dist/rsuite-no-reset.min.css";
+import "../css/stats.css";
 
 import {
   Form,
@@ -56,8 +54,8 @@ function Stats() {
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
   const [dateRange, setDateRange] = useState(null);
-  const [selectedDateBefore, setSelectedDateBefore] = useState(null);
   const [selectedDateAfter, setSelectedDateAfter] = useState(null);
+  const [selectedDateBefore, setSelectedDateBefore] = useState(null);
 
   const [totalData, setTotalData] = useState({});
   const [likeData, setLikeData] = useState({});
@@ -101,8 +99,8 @@ function Stats() {
         offset: 0,
         orderBy: "id",
         orderDir: "",
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
+        // dateBefore: selectedDateBefore,
+        // dateAfter: selectedDateAfter,
       },
     },
   });
@@ -286,7 +284,7 @@ function Stats() {
     setSelectedCuratorIndex(curatorIndex);
   };
 
-  const handlePeriodClick = (period) => {
+  const handlePeriodChange = async (period) => {
     const formattedDate = period?.map((originalDate) => {
       const year = originalDate.getFullYear();
       const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
@@ -295,23 +293,37 @@ function Stats() {
       return `${year}-${month}-${day}`;
     });
 
-    setDateRange(period);
     setSelectedDateAfter(formattedDate[0] + " 00:00:00");
     setSelectedDateBefore(formattedDate[1] + " 23:59:59");
 
-    // console.log(formattedDate[0]);
-    // console.log(formattedDate[1]);
+    setDateRange(period);
   };
 
-  const handlePeriodSubmit = async () => {
+  const handlePeriodClick = async () => {
     const variables = {
       filters: {
+        dateAfter: selectedDateAfter,
+        dateBefore: selectedDateBefore,
         limit: 999,
         offset: 0,
         orderBy: "id",
         orderDir: "",
-        dateBefore: selectedDateBefore,
-        dateAfter: selectedDateAfter,
+      },
+    };
+    await refetch(variables);
+  };
+
+  const handlePeriodClean = async () => {
+    setDateRange(null);
+
+    const variables = {
+      filters: {
+        dateAfter: null,
+        dateBefore: null,
+        limit: 999,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "",
       },
     };
     await refetch(variables);
@@ -323,7 +335,7 @@ function Stats() {
         setDataQueryCurators(dataCurators.helperQuery.helperList);
       }
     }
-    console.log("xdd");
+
     let currentStats = getCurrentUserStats();
     if (currentStats) {
       if (isAdmin()) {
@@ -449,137 +461,143 @@ function Stats() {
       {isHelper() ? (
         <>
           <TitleH2 title="Статистика" className="title__heading" />
-
-          {isAdmin() && (
-            <DropdownButton
-              id="dropdown-custom-1"
-              title={selectedCurator || "Куратор"}
-              className="themes__dropdown"
-            >
-              {dataQueryCurators.map((curator, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() =>
-                    handleCuratorClick(
-                      curator.user.name,
-                      curator.user.surname,
-                      curator.user.patronymic,
-                      index
-                    )
-                  }
-                  href="#"
-                >
-                  {`${curator.user.surname} ${curator.user.name} ${
-                    curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-                  }`}
-                </Dropdown.Item>
-              ))}
-            </DropdownButton>
-          )}
-          {selectedCurator != null && (
-            <>
-              <Row>
-                <Col>
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th colSpan={2}>Общая информация</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tableInfo.map((elem, index) => (
-                        <tr key={index}>
-                          <td>{elem.name}</td>
-                          <td>{elem.value}</td>
+          <div className="stats__container">
+            {isAdmin() && (
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedCurator || "Куратор"}
+                className="themes__dropdown"
+              >
+                {dataQueryCurators.map((curator, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() =>
+                      handleCuratorClick(
+                        curator.user.name,
+                        curator.user.surname,
+                        curator.user.patronymic,
+                        index
+                      )
+                    }
+                    href="#"
+                  >
+                    {`${curator.user.surname} ${curator.user.name} ${
+                      curator.user.patronymic
+                        ? ` ${curator.user.patronymic}`
+                        : ""
+                    }`}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            )}
+            {selectedCurator != null && (
+              <>
+                <Row>
+                  <Col>
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th colSpan={2}>Общая информация</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Col>
-              </Row>
-              <Row className="mt-5">
-                <h3 className="stats-title stats-title_left">
-                  Уровень куратора VERTERA
-                </h3>
-                <Col md={6} className="mt-2">
-                  <Level fantasy={fantasy} />
-                </Col>
-              </Row>
-              <Row className="mt-5">
-                <Col md={7}>
-                  <h3 className="stats-title">Статистика моя/средняя</h3>
-                  <Radar
-                    data={totalData}
-                    options={{
-                      responsive: true,
-                      scales: {
-                        r: {
-                          beginAtZero: true,
+                      </thead>
+                      <tbody>
+                        {tableInfo.map((elem, index) => (
+                          <tr key={index}>
+                            <td>{elem.name}</td>
+                            <td>{elem.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Col>
+                </Row>
+                <Row className="mt-5">
+                  <h3 className="stats-title stats-title_left">
+                    Уровень куратора VERTERA
+                  </h3>
+                  <Col md={6} className="mt-2">
+                    <Level fantasy={fantasy} />
+                  </Col>
+                </Row>
+                <Row className="mt-5">
+                  <Col md={7}>
+                    <h3 className="stats-title">Статистика моя/средняя</h3>
+                    <Radar
+                      data={totalData}
+                      options={{
+                        responsive: true,
+                        scales: {
+                          r: {
+                            beginAtZero: true,
+                          },
                         },
-                      },
-                    }}
-                  />
-                </Col>
-                <Col md={5}>
-                  <h3 className="stats-title">Статистика лайки/дизлайки</h3>
-                  <Doughnut data={likeData} options={{ responsive: true }} />
-                </Col>
-              </Row>
-            </>
-          )}
+                      }}
+                    />
+                  </Col>
+                  <Col md={5}>
+                    <h3 className="stats-title">Статистика лайки/дизлайки</h3>
+                    <Doughnut data={likeData} options={{ responsive: true }} />
+                  </Col>
+                </Row>
+              </>
+            )}
 
-          <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
-          <DateRangePicker
-            ranges={predefinedRanges}
-            placeholder="Задать период"
-            className="alltickets__date-range-picker"
-            style={{ marginTop: "20px" }}
-            onChange={handlePeriodClick}
-            value={dateRange}
-          />
-          <ButtonCustom
-            title="Применить"
-            onClick={handlePeriodSubmit}
-            className={"alltickets__btn"}
-          />
-          <Row className="mt-3">
-            <Col md={6} className="mt-2">
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th colSpan={3}>По времени ответа</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rateAvgTime.map((elem, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{elem.name}</td>
-                      <td>{elem.value}</td>
+            <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
+            <div className="stats__period-wrapper">
+              <DateRangePicker
+                ranges={predefinedRanges}
+                placeholder="Задать период"
+                className="alltickets__date-range-picker"
+                style={{ marginTop: "20px" }}
+                onChange={handlePeriodChange}
+                onClean={handlePeriodClean}
+                value={dateRange}
+              />
+              <ButtonCustom
+                title="Применить"
+                className={"add-curator__btn"}
+                onClick={handlePeriodClick}
+              />
+            </div>
+            <Row className="mt-3">
+              <Col md={6} className="mt-2">
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th colSpan={3}>По времени ответа</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Col>
-            <Col md={6} className="mt-2">
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th colSpan={3}>По кол-ву положительных отзывов</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rateLike.map((elem, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{elem.name}</td>
-                      <td>{elem.value} отзыв(-ов)</td>
+                  </thead>
+                  <tbody>
+                    {rateAvgTime.map((elem, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{elem.name}</td>
+                        <td>{elem.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Col>
+              <Col md={6} className="mt-2">
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th colSpan={3}>По кол-ву положительных отзывов</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Col>
-          </Row>
+                  </thead>
+                  <tbody>
+                    {rateLike.map((elem, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{elem.name}</td>
+                        <td>{elem.value} отзыв(-ов)</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Col>
+            </Row>
+          </div>
         </>
       ) : (
         <NotFoundPage />

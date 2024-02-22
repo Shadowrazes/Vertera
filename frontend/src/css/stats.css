@@ -1,0 +1,21 @@
+.stats__container .stats__period-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@media screen and (max-width: 1200px) {
+    .stats__container .dropdown button {
+        width: 416px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .stats__container .dropdown button {
+        width: 100% !important;
+    }
+
+    .stats__container .alltickets__date-range-picker {
+        width: 100% !important;
+    }
+}

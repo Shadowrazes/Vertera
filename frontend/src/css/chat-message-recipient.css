@@ -154,6 +154,10 @@
     padding: 20px;
   }
 
+  .chat-message-recipient__text {
+    font-size: 17px;
+  }
+
   .chat-message-recepient__separator {
     width: 100%;
   }

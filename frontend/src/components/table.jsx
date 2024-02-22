@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table } from "react-bootstrap";
+import { Table, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
@@ -235,7 +235,7 @@ function TableTickets() {
 
   return (
     <>
-      {!loading && (
+      {/* {!loading && (
         <>
           <TitleH2
             title={get_translation("INTERFACE_MY_APPEALS")}
@@ -456,7 +456,147 @@ function TableTickets() {
             className={"table__button"}
           />
         </>
-      )}
+      )} */}
+      <Table className="table__table">
+        {tickets.map((ticket) => (
+          <tr key={ticket.id}>
+            {isAdmin() && (
+              <td>
+                <Link
+                  to={`/dialog/${ticket.link}`}
+                  state={{
+                    status: ticket.status.name.stroke,
+                    linkPrev: window.location.href,
+                  }}
+                  className="alltickets__link"
+                >
+                  {ticket.id}
+                </Link>
+              </td>
+            )}
+            <td style={{ textAlign: "left" }}>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                {`${
+                  ticket.subTheme.theme.unit.name.stroke ===
+                  "Партнерам/Клиентам"
+                    ? "ПК"
+                    : "ДО"
+                } | ${ticket.subTheme.theme.name.stroke} ${
+                  ticket.subTheme.name.stroke === "none"
+                    ? ""
+                    : `| ${ticket.subTheme.name.stroke}`
+                }`}
+              </Link>
+            </td>
+            <td>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                {DateTime.fromISO(ticket.date, {
+                  zone: "utc",
+                })
+                  .toLocal()
+                  .toFormat("yyyy.MM.dd")}
+                <br />
+                {DateTime.fromISO(ticket.date, {
+                  zone: "utc",
+                })
+                  .toLocal()
+                  .toFormat("HH:mm:ss")}
+              </Link>
+            </td>
+            <td>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                {ticket.title.length > 20
+                  ? `${ticket.title.slice(0, 20)}...`
+                  : `${ticket.title}`}
+              </Link>
+            </td>
+            {isAdmin() && (
+              <td>
+                <Link
+                  to={`/dialog/${ticket.link}`}
+                  state={{
+                    status: ticket.status.name.stroke,
+                    linkPrev: window.location.href,
+                  }}
+                  className="alltickets__link"
+                >
+                  {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                </Link>
+              </td>
+            )}
+            <td>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                {ticket.lastMessage.sender.surname === "system"
+                  ? "Системное сообщение"
+                  : `${
+                      ticket.lastMessage.sender.name
+                    } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
+              </Link>
+            </td>
+            <td>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                {ticket.messages.length}
+              </Link>
+            </td>
+            <td>
+              <Link
+                to={`/dialog/${ticket.link}`}
+                state={{
+                  status: ticket.status.name.stroke,
+                  linkPrev: window.location.href,
+                }}
+                className="alltickets__link"
+              >
+                <span
+                  className="table__status"
+                  style={{
+                    background: getStatusColor(ticket.status.name.stroke),
+                    minWidth: "103px",
+                  }}
+                >
+                  {ticket.status.name.stroke}
+                </span>
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </Table>
     </>
   );
 }
