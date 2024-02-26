@@ -11,12 +11,14 @@
   "dependencies": {
     "@apollo/client": "^3.8.8",
     "@vue/apollo-util": "^4.0.0-beta.6",
+    "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "cdbreact": "^1.5.18",
     "date-fns": "^3.3.1",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
     "draftjs-to-html": "^0.9.1",
+    "franc": "^6.2.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "history": "^5.3.0",
@@ -37,6 +39,7 @@
     "rsuite": "^5.45.0"
   },
   "devDependencies": {
+    "@types/langdetect": "^0.2.2",
     "@types/luxon": "^3.4.2",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",

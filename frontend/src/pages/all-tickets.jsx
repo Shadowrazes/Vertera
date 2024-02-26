@@ -229,13 +229,13 @@ function allTickets() {
   });
 
   const adminRequest = () => {
-    console.log(2);
-    console.log(helperIdsFilter);
+    // console.log(2);
+    // console.log(helperIdsFilter);
     let _helperIdsFilter = helperIdsFilter;
     if (isAdmin()) {
       _helperIdsFilter = null;
     }
-    console.log(_helperIdsFilter);
+    // console.log(_helperIdsFilter);
     return useQuery(TABLE_TICKETS, {
       variables: {
         token: user.token,

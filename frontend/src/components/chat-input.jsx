@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Form, Row } from "react-bootstrap";
 import ButtonCustom from "./button";
 import "../css/chat-input.css";
@@ -22,7 +22,6 @@ function ChatInput({ onSendMessage }) {
   };
 
   useEffect(() => {
-
     // if (user)
   }, []);
 

@@ -134,13 +134,6 @@ function Chat() {
     return user.role === "helper" || user.role === "system";
   };
 
-  // const { loading, error, data } = useQuery(MESSAGES_CHAT, {
-  //   variables: {
-  //     token: user.token,
-  //     link: itemId,
-  //   },
-  // });
-
   const adminRequest = () => {
     return useQuery(MESSAGES_CHAT, {
       variables: {
@@ -317,7 +310,7 @@ function Chat() {
     useMutation(ADD_MESSAGE, {
       refetchQueries: [
         {
-          query: MESSAGES_CHAT,
+          query: isAdmin() ? MESSAGES_CHAT : MESSAGES_CHAT_CLIENT,
           variables: { token: user.token, link: itemId },
         },
       ],
@@ -1765,14 +1758,21 @@ function Chat() {
               msg.text !== "" && (
                 <div key={msg.id}>
                   {msg.sender.id === userId ? (
-                    <ChatMessageSender
-                      message={msg.text}
-                      sender={msg.sender}
-                      time={DateTime.fromISO(msg.date, { zone: "utc" })
-                        .toLocal()
-                        .toFormat("yyyy.MM.dd HH:mm:ss")}
-                      attachs={msg.attachs}
-                    />
+                    <>
+                      <ChatMessageSender
+                        message={msg.text}
+                        sender={msg.sender}
+                        time={DateTime.fromISO(msg.date, { zone: "utc" })
+                          .toLocal()
+                          .toFormat("yyyy.MM.dd HH:mm:ss")}
+                        attachs={msg.attachs}
+                        onClick
+                      />
+                      {/* <ButtonCustom
+                        onClick={}
+                        title="перевести"
+                      /> */}
+                    </>
                   ) : msg.sender.role === "system" ? (
                     <>
                       {isAdmin() ? (
