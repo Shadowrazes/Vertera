@@ -7,6 +7,8 @@ import { DateTime } from "luxon";
 
 import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../apollo/queries";
 
+import TitleH2 from "./title";
+import ButtonCustom from "./button";
 import Loader from "../pages/loading";
 
 import "../css/table.css";
