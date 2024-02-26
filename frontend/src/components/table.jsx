@@ -233,7 +233,7 @@ function TableTickets() {
 
   return (
     <>
-      {/* {!loading && (
+      {!loading && (
         <>
           <TitleH2
             title={get_translation("INTERFACE_MY_APPEALS")}
@@ -454,8 +454,8 @@ function TableTickets() {
             className={"table__button"}
           />
         </>
-      )} */}
-      <Table className="table__table">
+      )}
+      {/* <Table className="table__table">
         {tickets.map((ticket) => (
           <tr key={ticket.id}>
             {isAdmin() && (
@@ -594,7 +594,7 @@ function TableTickets() {
             </td>
           </tr>
         ))}
-      </Table>
+      </Table> */}
     </>
   );
 }
