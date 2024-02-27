@@ -576,19 +576,11 @@ function FormComponent() {
                 onChange={handleTicketTitleChange}
               />
             </Form.Group>
-            {/* <Form.Group controlId="TextareaForm">
-              <Form.Control
-                as="textarea"
-                placeholder="Текст обращения"
-                rows={3}
-                value={textareaValue}
-                onChange={handleTextareaChange}
-              />
-            </Form.Group> */}
             <Form.Group className="custom-editor">
               <Editor
                 editorState={editorState}
                 onEditorStateChange={handleEditorChange}
+                stripPastedStyles
                 toolbarStyle={{
                   border: "1px solid #dee2e6",
                   borderRadius: "6px 6px 0 0",

@@ -1805,7 +1805,8 @@ function Chat() {
             <span
               className={
                 currentStatus == "В процессе" ||
-                (currentStatus == "На уточнении" &&
+                currentStatus == "На уточнении" ||
+                (currentStatus == "Новый" &&
                   messagesQuery.at(-1).sender.id !==
                     data.clientQuery.ticket.helper.id)
                   ? "chat__counter-work"
@@ -1813,7 +1814,8 @@ function Chat() {
               }
             >
               {currentStatus == "В процессе" ||
-              (currentStatus == "На уточнении" &&
+              currentStatus == "На уточнении" ||
+              (currentStatus == "Новый" &&
                 messagesQuery.at(-1).sender.id !==
                   data.clientQuery.ticket.helper.id)
                 ? "Запущен"
@@ -1953,7 +1955,7 @@ function Chat() {
                             : "Скрыть историю"
                         }
                         onClick={handleHideComponent}
-                        className={"alltickets__btn single"}
+                        className={"alltickets__btn-outlined single"}
                       />
                     </a>
                   </>
@@ -1977,7 +1979,7 @@ function Chat() {
                                 : "Скрыть историю"
                             }
                             onClick={handleHideComponent}
-                            className={"alltickets__btn single"}
+                            className={"alltickets__btn-outlined single"}
                           />
                         </a>
                       </>
@@ -2028,7 +2030,7 @@ function Chat() {
                               : "Скрыть историю"
                           }
                           onClick={handleHideComponent}
-                          className={"alltickets__btn single"}
+                          className={"alltickets__btn-outlined single"}
                         />
                       </a>
                     </>
@@ -2132,7 +2134,7 @@ function Chat() {
                         : "Скрыть историю"
                     }
                     onClick={handleHideComponent}
-                    className={"alltickets__btn"}
+                    className={"alltickets__btn-outlined"}
                   />
                 )}
               </Col>
