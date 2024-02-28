@@ -17,7 +17,7 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 
-import { LOGIN } from "../apollo/queries";
+import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
 import { TRANSLATE } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
@@ -26,7 +26,7 @@ import "../css/header.css";
 
 import get_translation from "../helpers/translation";
 
-function Header({ user }) {
+async function Header({ user }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -113,6 +113,7 @@ function Header({ user }) {
   };
 
   const { data, refetch } = useQuery(LOGIN);
+  const { data: dataOuter, refetch: refetchOuter } = useQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -157,6 +158,7 @@ function Header({ user }) {
 
     setIsLoad(true);
     setIsError(false);
+
     try {
       const { data: loginData } = await refetch(loginVariables);
       if (loginData) {
@@ -167,7 +169,6 @@ function Header({ user }) {
             name: loginData.login.user.name,
             surname: loginData.login.user.surname,
             role: loginData.login.user.role,
-            login: loginVariables.login,
             token: loginData.login.token,
           })
         );
@@ -198,7 +199,6 @@ function Header({ user }) {
           name: data.login.user.name,
           surname: data.login.user.surname,
           role: data.login.user.role,
-          login: loginVariables.login,
           token: data.login.token,
         })
       );
@@ -236,6 +236,49 @@ function Header({ user }) {
   if (urlString.includes("/external/authorization")) {
     const url = new URL(urlString);
     const sessionKey = url.searchParams.get("session_key");
+    console.log(sessionKey);
+    // if (user) {
+    //   localStorage.removeItem("user");
+    //   document.location.href = "/";
+    // }
+
+    // setIsLoad(true);
+    // setIsError(false);
+
+    // try {
+    //   const loginDataPromise = refetch(loginVariables);
+
+    //   loginDataPromise.then((response) => {
+    //     const loginData = response.data;
+
+    //     if (loginData) {
+    //       localStorage.setItem(
+    //         "user",
+    //         JSON.stringify({
+    //           id: loginData.login.user.id,
+    //           name: loginData.login.user.name,
+    //           surname: loginData.login.user.surname,
+    //           role: loginData.login.user.role,
+    //           token: loginData.login.token,
+    //         })
+    //       );
+    //       setUserName(loginData.login.user.name);
+    //       setUserSurname(loginData.login.user.surname);
+    //       console.log(userName);
+    //       document.location.href = "/all-tickets";
+    //     }
+    //   });
+
+    //   await loginDataPromise;
+    // } catch (error) {
+    //   setTimeout(() => {
+    //     setIsError(true);
+    //   }, 1000);
+    // } finally {
+    //   setTimeout(() => {
+    //     setIsLoad(false);
+    //   }, 1000);
+    // }
   }
 
   const popover = (

@@ -1637,6 +1637,7 @@ function Chat() {
                     onEditorStateChange={(newEditorState) =>
                       handleSplitEditorChange(newEditorState, input.id)
                     }
+                    stripPastedStyles
                     toolbarStyle={{
                       border: "1px solid #dee2e6",
                       borderRadius: "6px 6px 0 0",
@@ -1843,6 +1844,7 @@ function Chat() {
                   <Editor
                     editorState={editorState}
                     onEditorStateChange={handleEditorChange}
+                    stripPastedStyles
                     toolbarStyle={{
                       border: "1px solid #dee2e6",
                       borderRadius: "6px 6px 0 0",
@@ -2064,6 +2066,7 @@ function Chat() {
                   <Editor
                     editorState={editorState}
                     onEditorStateChange={handleEditorChange}
+                    stripPastedStyles
                     toolbarStyle={{
                       border: "1px solid #dee2e6",
                       borderRadius: "6px 6px 0 0",
