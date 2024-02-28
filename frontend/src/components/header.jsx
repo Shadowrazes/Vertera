@@ -26,7 +26,7 @@ import "../css/header.css";
 
 import get_translation from "../helpers/translation";
 
-async function Header({ user }) {
+function Header({ user }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -113,7 +113,7 @@ async function Header({ user }) {
   };
 
   const { data, refetch } = useQuery(LOGIN);
-  const { data: dataOuter, refetch: refetchOuter } = useQuery(LOGIN);
+  const { data: dataOuter, refetch: refetchOuter } = useQuery(LOGIN_OUTER);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -158,7 +158,6 @@ async function Header({ user }) {
 
     setIsLoad(true);
     setIsError(false);
-
     try {
       const { data: loginData } = await refetch(loginVariables);
       if (loginData) {
@@ -218,6 +217,50 @@ async function Header({ user }) {
   }, [language]);
 
   useEffect(() => {
+    const urlString = window.location.href;
+
+    if (urlString.includes("/external/authorization")) {
+      const url = new URL(urlString);
+      const sessionKey = url.searchParams.get("session_key");
+
+      console.log(sessionKey);
+
+      if (sessionKey) {
+        if (user) {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+
+        try {
+          const { data: loginData } = refetchOuter(sessionKey);
+          if (loginData) {
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                id: loginData.login.user.id,
+                name: loginData.login.user.name,
+                surname: loginData.login.user.surname,
+                role: loginData.login.user.role,
+                token: loginData.login.token,
+              })
+            );
+            setUserName(loginData.login.user.name);
+            setUserSurname(loginData.login.user.surname);
+            console.log(userName);
+            document.location.href = "/all-tickets";
+          }
+        } catch (error) {
+          setTimeout(() => {
+            setIsError(true);
+          }, 1000);
+        } finally {
+          setTimeout(() => {
+            setIsLoad(false);
+          }, 1000);
+        }
+      }
+    }
+
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
         handleCloseOverlay();
@@ -230,56 +273,6 @@ async function Header({ user }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [ref]);
-
-  const urlString = window.location.href;
-
-  if (urlString.includes("/external/authorization")) {
-    const url = new URL(urlString);
-    const sessionKey = url.searchParams.get("session_key");
-    console.log(sessionKey);
-    if (user) {
-      localStorage.removeItem("user");
-      document.location.href = "/";
-    }
-
-    setIsLoad(true);
-    setIsError(false);
-
-    try {
-      const loginDataPromise = refetchOuter(sessionKey);
-
-      loginDataPromise.then((response) => {
-        const loginData = response.data;
-
-        if (loginData) {
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              id: loginData.login.user.id,
-              name: loginData.login.user.name,
-              surname: loginData.login.user.surname,
-              role: loginData.login.user.role,
-              token: loginData.login.token,
-            })
-          );
-          setUserName(loginData.login.user.name);
-          setUserSurname(loginData.login.user.surname);
-          console.log(userName);
-          document.location.href = "/all-tickets";
-        }
-      });
-
-      await loginDataPromise;
-    } catch (error) {
-      setTimeout(() => {
-        setIsError(true);
-      }, 1000);
-    } finally {
-      setTimeout(() => {
-        setIsLoad(false);
-      }, 1000);
-    }
-  }
 
   const popover = (
     <Popover id="popover-basic">
