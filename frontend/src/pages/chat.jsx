@@ -134,13 +134,6 @@ function Chat() {
     return user.role === "helper" || user.role === "system";
   };
 
-  // const { loading, error, data } = useQuery(MESSAGES_CHAT, {
-  //   variables: {
-  //     token: user.token,
-  //     link: itemId,
-  //   },
-  // });
-
   const adminRequest = () => {
     return useQuery(MESSAGES_CHAT, {
       variables: {
@@ -317,7 +310,7 @@ function Chat() {
     useMutation(ADD_MESSAGE, {
       refetchQueries: [
         {
-          query: MESSAGES_CHAT,
+          query: isAdmin() ? MESSAGES_CHAT : MESSAGES_CHAT_CLIENT,
           variables: { token: user.token, link: itemId },
         },
       ],
@@ -1465,7 +1458,7 @@ function Chat() {
               </Tab>
             </Tabs>
 
-            <div className="edit-curator__column chat__edit-button">
+            <div className=" chat__edit-button">
               {isErrorVisibleEdit && (
                 <span className="form__error">{errorMsgEdit()}</span>
               )}
@@ -1765,14 +1758,21 @@ function Chat() {
               msg.text !== "" && (
                 <div key={msg.id}>
                   {msg.sender.id === userId ? (
-                    <ChatMessageSender
-                      message={msg.text}
-                      sender={msg.sender}
-                      time={DateTime.fromISO(msg.date, { zone: "utc" })
-                        .toLocal()
-                        .toFormat("yyyy.MM.dd HH:mm:ss")}
-                      attachs={msg.attachs}
-                    />
+                    <>
+                      <ChatMessageSender
+                        message={msg.text}
+                        sender={msg.sender}
+                        time={DateTime.fromISO(msg.date, { zone: "utc" })
+                          .toLocal()
+                          .toFormat("yyyy.MM.dd HH:mm:ss")}
+                        attachs={msg.attachs}
+                        onClick
+                      />
+                      {/* <ButtonCustom
+                        onClick={}
+                        title="перевести"
+                      /> */}
+                    </>
                   ) : msg.sender.role === "system" ? (
                     <>
                       {isAdmin() ? (
@@ -1805,7 +1805,8 @@ function Chat() {
             <span
               className={
                 currentStatus == "В процессе" ||
-                (currentStatus == "На уточнении" &&
+                currentStatus == "На уточнении" ||
+                (currentStatus == "Новый" &&
                   messagesQuery.at(-1).sender.id !==
                     data.clientQuery.ticket.helper.id)
                   ? "chat__counter-work"
@@ -1813,7 +1814,8 @@ function Chat() {
               }
             >
               {currentStatus == "В процессе" ||
-              (currentStatus == "На уточнении" &&
+              currentStatus == "На уточнении" ||
+              (currentStatus == "Новый" &&
                 messagesQuery.at(-1).sender.id !==
                   data.clientQuery.ticket.helper.id)
                 ? "Запущен"
@@ -1953,7 +1955,7 @@ function Chat() {
                             : "Скрыть историю"
                         }
                         onClick={handleHideComponent}
-                        className={"alltickets__btn single"}
+                        className={"alltickets__btn-outlined single"}
                       />
                     </a>
                   </>
@@ -1977,7 +1979,7 @@ function Chat() {
                                 : "Скрыть историю"
                             }
                             onClick={handleHideComponent}
-                            className={"alltickets__btn single"}
+                            className={"alltickets__btn-outlined single"}
                           />
                         </a>
                       </>
@@ -2028,7 +2030,7 @@ function Chat() {
                               : "Скрыть историю"
                           }
                           onClick={handleHideComponent}
-                          className={"alltickets__btn single"}
+                          className={"alltickets__btn-outlined single"}
                         />
                       </a>
                     </>
@@ -2132,7 +2134,7 @@ function Chat() {
                         : "Скрыть историю"
                     }
                     onClick={handleHideComponent}
-                    className={"alltickets__btn"}
+                    className={"alltickets__btn-outlined"}
                   />
                 )}
               </Col>

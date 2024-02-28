@@ -1,3 +1,13 @@
 .themes__dropdown {
     margin-bottom: 50px;
 }
+
+@media screen and (max-width: 1200px) {
+    .themes__dropdown-wrapper .dropdown button {
+        width: 416px !important;
+    }
+
+    .subthemes__dropdown-wrapper .dropdown button {
+        width: 416px !important;
+    }
+}

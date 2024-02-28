@@ -159,6 +159,13 @@ function FormComponent() {
       }
     }
 
+    const handleAuthHelperButton = () => {
+      let headerButton = document.querySelector(".header__button");
+      if (headerButton) {
+        headerButton.click();
+      }
+    };
+
     return (
       <>
         {userId == 999 ||
@@ -168,8 +175,12 @@ function FormComponent() {
             <div className="auth">
               <h2>Необходимо авторизироваться</h2>
               <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fvticket.yasanyabeats.ru%2F">
-                <ButtonCustom title="Авторизироваться" />
+                <ButtonCustom title="Авторизироваться как партнер" />
               </a>
+              <ButtonCustom
+                title="Авторизироваться как куратор"
+                onClick={handleAuthHelperButton}
+              />
             </div>
           </>
         ) : (
@@ -565,19 +576,11 @@ function FormComponent() {
                 onChange={handleTicketTitleChange}
               />
             </Form.Group>
-            {/* <Form.Group controlId="TextareaForm">
-              <Form.Control
-                as="textarea"
-                placeholder="Текст обращения"
-                rows={3}
-                value={textareaValue}
-                onChange={handleTextareaChange}
-              />
-            </Form.Group> */}
             <Form.Group className="custom-editor">
               <Editor
                 editorState={editorState}
                 onEditorStateChange={handleEditorChange}
+                stripPastedStyles
                 toolbarStyle={{
                   border: "1px solid #dee2e6",
                   borderRadius: "6px 6px 0 0",

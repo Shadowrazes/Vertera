@@ -75,9 +75,7 @@ function AddSubtheme() {
       setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/subthemes");
   }, [data, dataDepartmentList, location.state]);
 
   const [addSubtheme] = useMutation(ADD_SUBTHEME);
@@ -221,46 +219,46 @@ function AddSubtheme() {
       {isAdmin() ? (
         <>
           <BackTitle title="Добавить подтему" linkPrev={linkPrev} />
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem || "Выберите подразделение"}
-            className="add-theme__dropdown"
-          >
-            {dataQuery.map((unit, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                href="#"
+          <Row className="add-curator__row">
+            <Col className="add-curator__column add-subtheme__column">
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedItem || "Выберите подразделение"}
+                className="add-theme__dropdown"
               >
-                {unit.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
-
-          {selectedUnit && (
-            <DropdownButton
-              id="dropdown-custom-1"
-              title={selectedTheme || "Тип обращения"}
-              className="add-theme__dropdown"
-            >
-              {dataQuery
-                .find((unit) => unit.name.stroke === selectedUnit)
-                ?.themes.map((theme) => (
+                {dataQuery.map((unit, index) => (
                   <Dropdown.Item
-                    key={theme.id}
-                    onClick={() =>
-                      handleThemeClick(theme.name.stroke, theme.id)
-                    }
+                    key={index}
+                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
                     href="#"
                   >
-                    {theme.name.stroke}
+                    {unit.name.stroke}
                   </Dropdown.Item>
                 ))}
-            </DropdownButton>
-          )}
+              </DropdownButton>
 
-          <Row className="add-curator__row">
-            <Col className="add-curator__column">
+              {selectedUnit && (
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={selectedTheme || "Тип обращения"}
+                  className="add-theme__dropdown"
+                >
+                  {dataQuery
+                    .find((unit) => unit.name.stroke === selectedUnit)
+                    ?.themes.map((theme) => (
+                      <Dropdown.Item
+                        key={theme.id}
+                        onClick={() =>
+                          handleThemeClick(theme.name.stroke, theme.id)
+                        }
+                        href="#"
+                      >
+                        {theme.name.stroke}
+                      </Dropdown.Item>
+                    ))}
+                </DropdownButton>
+              )}
+
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"

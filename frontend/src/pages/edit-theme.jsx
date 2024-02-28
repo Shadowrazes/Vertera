@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   Form,
+  Row,
   Col,
   Dropdown,
   DropdownButton,
@@ -82,9 +83,7 @@ function EditTheme() {
       // console.log(data.theme.unit.id);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/themes");
 
     refetch();
   }, [data, dataTheme, location.state]);
@@ -252,64 +251,67 @@ function EditTheme() {
             title={`Редактировать тему #${themeId}`}
             linkPrev={linkPrev}
           />
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem}
-            className="add-theme__dropdown"
-          >
-            {dataQuery.map((unit, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                href="#"
+          <Row>
+            <Col className="edit-curator__column edit-theme__column">
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedItem}
+                className="add-theme__dropdown"
               >
-                {unit.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
-          <Col className="edit-curator__column">
-            <Form.Group controlId="NameForm">
-              <Form.Label className="edit-curator__field-label">
-                Название темы
-              </Form.Label>
-              <Form.Control
-                type="text"
-                className="add-currator__input add-theme__dropdown"
-                value={nameValue}
-                onChange={handleOnChangeName}
-              />
-              <Form.Label className="edit-curator__field-label">
-                Порядок
-              </Form.Label>
-              <Form.Control
-                type="number"
-                className="add-currator__input"
-                value={orderNum}
-                onChange={handleOnChangeOrderNum}
-                min={0}
-              />
-            </Form.Group>
+                {dataQuery.map((unit, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                    href="#"
+                  >
+                    {unit.name.stroke}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
 
-            <div className="edit-curator__column">
-              {isErrorVisible && (
-                <span className="form__error">{errorMsg()}</span>
-              )}
-              <div className="edit-curator__btn-row">
-                <ButtonCustom
-                  title="Применить"
-                  className={"add-curator__btn edit-curator__btn"}
-                  onClick={handleEditTheme}
+              <Form.Group controlId="NameForm">
+                <Form.Label className="edit-curator__field-label">
+                  Название темы
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input add-theme__dropdown"
+                  value={nameValue}
+                  onChange={handleOnChangeName}
                 />
-                <ButtonCustom
-                  title="Удалить тему"
-                  className={
-                    "add-curator__btn edit-curator__btn alltickets__button-two"
-                  }
-                  onClick={handleDeleteTheme}
+                <Form.Label className="edit-curator__field-label">
+                  Порядок
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  className="add-currator__input edit-theme__input-order"
+                  value={orderNum}
+                  onChange={handleOnChangeOrderNum}
+                  min={0}
                 />
+              </Form.Group>
+
+              <div className="edit-curator__column">
+                {isErrorVisible && (
+                  <span className="form__error">{errorMsg()}</span>
+                )}
+                <div className="edit-curator__btn-row">
+                  <ButtonCustom
+                    title="Применить"
+                    className={"add-curator__btn edit-curator__btn"}
+                    onClick={handleEditTheme}
+                  />
+                  <ButtonCustom
+                    title="Удалить тему"
+                    className={
+                      "add-curator__btn edit-curator__btn alltickets__button-two"
+                    }
+                    onClick={handleDeleteTheme}
+                  />
+                </div>
               </div>
-            </div>
-          </Col>
+            </Col>
+          </Row>
 
           <Modal show={show} onHide={handleCloseLeave}>
             <Modal.Header closeButton>

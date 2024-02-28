@@ -82,6 +82,10 @@
     width: 100%;
   }
 
+  .chat-message-sender__text {
+    font-size: 17px;
+  }
+
   .chat-message-sender__box {
     width: 100%;
     padding: 20px;

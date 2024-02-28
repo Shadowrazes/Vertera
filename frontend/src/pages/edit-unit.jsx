@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { Form, Col, Modal, Button } from "react-bootstrap";
+import { Form, Row, Col, Modal, Button } from "react-bootstrap";
 
 import { UNIT } from "../apollo/queries";
 import { EDIT_UNIT, DELETE_UNIT } from "../apollo/mutations";
@@ -53,9 +53,7 @@ function EditUnit() {
       // console.log(data.helperQuery.unit.name.stroke);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/units");
 
     refetch();
   }, [data, location.state]);
@@ -199,49 +197,51 @@ function EditUnit() {
             title={`Редактировать раздел #${unitId}`}
             linkPrev={linkPrev}
           />
-          <Col className="edit-curator__column">
-            <Form.Group controlId="NameForm">
-              <Form.Label className="edit-curator__field-label">
-                Название раздела
-              </Form.Label>
-              <Form.Control
-                type="text"
-                className="add-currator__input add-theme__dropdown"
-                value={nameValue}
-                onChange={handleOnChangeName}
-              />
-              <Form.Label className="edit-curator__field-label">
-                Порядок
-              </Form.Label>
-              <Form.Control
-                type="number"
-                className="add-currator__input"
-                value={orderNum}
-                onChange={handleOnChangeOrderNum}
-                min={0}
-              />
-            </Form.Group>
+          <Row>
+            <Col className="edit-unit__column">
+              <Form.Group controlId="NameForm">
+                <Form.Label className="edit-curator__field-label">
+                  Название раздела
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input add-theme__dropdown"
+                  value={nameValue}
+                  onChange={handleOnChangeName}
+                />
+                <Form.Label className="edit-curator__field-label">
+                  Порядок
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  className="add-curator__input edit-unit__input-order"
+                  value={orderNum}
+                  onChange={handleOnChangeOrderNum}
+                  min={0}
+                />
+              </Form.Group>
 
-            <div className="edit-curator__column">
-              {isErrorVisible && (
-                <span className="form__error">{errorMsg()}</span>
-              )}
-              <div className="edit-curator__btn-row">
-                <ButtonCustom
-                  title="Применить"
-                  className={"add-curator__btn edit-curator__btn"}
-                  onClick={handleEditUnit}
-                />
-                <ButtonCustom
-                  title="Удалить раздел"
-                  className={
-                    "add-curator__btn edit-curator__btn alltickets__button-two"
-                  }
-                  onClick={handleDeleteUnit}
-                />
+              <div className="edit-unit__column">
+                {isErrorVisible && (
+                  <span className="form__error">{errorMsg()}</span>
+                )}
+                <div className="edit-curator__btn-row">
+                  <ButtonCustom
+                    title="Применить"
+                    className={"add-curator__btn edit-curator__btn"}
+                    onClick={handleEditUnit}
+                  />
+                  <ButtonCustom
+                    title="Удалить раздел"
+                    className={
+                      "add-curator__btn edit-curator__btn alltickets__button-two"
+                    }
+                    onClick={handleDeleteUnit}
+                  />
+                </div>
               </div>
-            </div>
-          </Col>
+            </Col>
+          </Row>
 
           <Modal show={show} onHide={handleCloseLeave}>
             <Modal.Header closeButton>

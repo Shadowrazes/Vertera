@@ -120,41 +120,43 @@ function Subthemes() {
       {isAdmin() ? (
         <>
           <TitleH2 title="Подтемы" className="title__heading" />
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem || "Выберите подразделение"}
-            className="themes__dropdown"
-          >
-            {dataQuery.map((unit, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => handleUnitClick(unit.name.stroke)}
-                href="#"
-              >
-                {unit.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
-
-          {selectedUnit && (
+          <div className="subthemes__dropdown-wrapper">
             <DropdownButton
               id="dropdown-custom-1"
-              title={selectedTheme || "Тип обращения"}
+              title={selectedItem || "Выберите подразделение"}
               className="themes__dropdown"
             >
-              {dataQuery
-                .find((unit) => unit.name.stroke === selectedUnit)
-                ?.themes.map((theme) => (
-                  <Dropdown.Item
-                    key={theme.id}
-                    onClick={() => handleThemeClick(theme.name.stroke)}
-                    href="#"
-                  >
-                    {theme.name.stroke}
-                  </Dropdown.Item>
-                ))}
+              {dataQuery.map((unit, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => handleUnitClick(unit.name.stroke)}
+                  href="#"
+                >
+                  {unit.name.stroke}
+                </Dropdown.Item>
+              ))}
             </DropdownButton>
-          )}
+
+            {selectedUnit && (
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedTheme || "Тип обращения"}
+                className="themes__dropdown"
+              >
+                {dataQuery
+                  .find((unit) => unit.name.stroke === selectedUnit)
+                  ?.themes.map((theme) => (
+                    <Dropdown.Item
+                      key={theme.id}
+                      onClick={() => handleThemeClick(theme.name.stroke)}
+                      href="#"
+                    >
+                      {theme.name.stroke}
+                    </Dropdown.Item>
+                  ))}
+              </DropdownButton>
+            )}
+          </div>
 
           <div className="table__wrapper">
             <Table className="table__table" hover>

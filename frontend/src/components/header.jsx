@@ -231,6 +231,13 @@ function Header({ user }) {
     };
   }, [ref]);
 
+  const urlString = window.location.href;
+
+  if (urlString.includes("/external/authorization")) {
+    const url = new URL(urlString);
+    const sessionKey = url.searchParams.get("session_key");
+  }
+
   const popover = (
     <Popover id="popover-basic">
       <Popover.Body>

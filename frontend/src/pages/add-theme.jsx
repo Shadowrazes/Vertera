@@ -58,9 +58,7 @@ function AddTheme() {
       setData(data.clientQuery.allThemeTree);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/themes");
   }, [data, location.state]);
 
   const [addTheme] = useMutation(ADD_THEME);
@@ -173,24 +171,24 @@ function AddTheme() {
       {isAdmin() ? (
         <>
           <BackTitle title="Добавить тему" linkPrev={linkPrev} />
-          <DropdownButton
-            id="dropdown-custom-1"
-            title={selectedItem || "Выберите подразделение"}
-            className="add-theme__dropdown"
-          >
-            {dataQuery.map((unit, index) => (
-              <Dropdown.Item
-                key={index}
-                onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                href="#"
-              >
-                {unit.name.stroke}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
-
           <Row className="add-curator__row">
-            <Col className="add-curator__column">
+            <Col className="add-curator__column add-theme__column">
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={selectedItem || "Выберите подразделение"}
+                className="add-theme__dropdown"
+              >
+                {dataQuery.map((unit, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                    href="#"
+                  >
+                    {unit.name.stroke}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"

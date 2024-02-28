@@ -24,6 +24,10 @@
     gap: 20px;
 }
 
+.rs-input {
+    font-size: 16px;
+}
+
 .edit-curator__btn-row {
     display: flex;
     gap: 20px;
@@ -33,7 +37,23 @@
     width: 200px !important;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1200px) {
+    .edit-curator__column .dropdown button {
+        width: 100% !important;
+    }
+
+    .edit-curator__column .add-curator__multiselect {
+        width: 100% !important;
+    }
+
+    .edit-curator__column .add-currator__input {
+        width: 100% !important;
+    }
+
+    .edit-curator__column .add-curator__date-picker {
+        width: 100% !important;
+    }
+
     .edit-curator__btn-row {
         display: flex;
         flex-direction: column;
@@ -41,6 +61,12 @@
         margin-top: 20px;
     }
 
+    .edit-curator__column .add-curator__btn {
+        width: 100% !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
     .add-curator__btn {
         width: 100% !important;
     }

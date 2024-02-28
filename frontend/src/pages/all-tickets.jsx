@@ -229,13 +229,13 @@ function allTickets() {
   });
 
   const adminRequest = () => {
-    console.log(2);
-    console.log(helperIdsFilter);
+    // console.log(2);
+    // console.log(helperIdsFilter);
     let _helperIdsFilter = helperIdsFilter;
     if (isAdmin()) {
       _helperIdsFilter = null;
     }
-    console.log(_helperIdsFilter);
+    // console.log(_helperIdsFilter);
     return useQuery(TABLE_TICKETS, {
       variables: {
         token: user.token,
@@ -602,7 +602,7 @@ function allTickets() {
   };
 
   const handlePeriodClick = (period) => {
-    const formattedDate = period.map((originalDate) => {
+    const formattedDate = period?.map((originalDate) => {
       const year = originalDate.getFullYear();
       const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
       const day = ("0" + originalDate.getDate()).slice(-2);
