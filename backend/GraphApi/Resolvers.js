@@ -35,7 +35,7 @@ export const resolvers = {
             return await User.Login(login, password);
         },
         loginOuter: async (_, args) => {
-            return await User.LoginOuter(args.userFields, args.clientFields);
+            return await User.LoginOuter(args.sessionKey);
         },
         clientQuery: async (_, args, context) => {
             context.user = await Access(User.RoleClient, args.token);

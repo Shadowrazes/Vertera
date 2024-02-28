@@ -2,6 +2,7 @@ import Entity from "./Entity.js";
 import Translitter from "../Utils/Translitter.js";
 import Errors from "../Utils/Errors.js";
 import md5 from 'md5';
+import axios from 'axios';
 
 class Translation extends Entity {
     static TableName = 'translations';
@@ -14,6 +15,36 @@ class Translation extends Entity {
     static InnerTypes = [
         'ticketStatus', 'subTheme', 'theme', 'unit', 'department', 'jobTitle', 'country'
     ];
+
+    static async GetAutoTranslation(stroke, lang) {
+        const apiKey = "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";
+        const model = "gpt-3.5-turbo";
+
+        const prompt = `Переведи этот текст на ${lang} язык: "${stroke}"`;
+
+        const requestData = {
+            model,
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: prompt },
+            ],
+        };
+
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+        };
+
+        axios.post("https://api.openai.com/v1/chat/completions", requestData, {
+            headers,
+        }).then((response) => {
+            const generatedText = response.data.choices[0].message.content;
+            console.log(1);
+            console.log(generatedText);
+        }).catch((error) => {
+            console.error("Ошибка при запросе к OpenAI API:", error.message);
+        });
+    }
 
     static async GetByCode(lang, code) {
         const sql = `

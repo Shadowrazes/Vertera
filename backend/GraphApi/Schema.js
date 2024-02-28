@@ -10,7 +10,7 @@ export const typeDefs = `
 
     type Query {
         login(login: String!, password: String!): LoginInfo!
-        loginOuter(userFields: UserInsert!, clientFields: ClientInsert!): LoginInfo!
+        loginOuter(sessionKey: String!): LoginInfo!
 
         clientQuery(token: String!): ClientQuery!
         helperQuery(token: String!): HelperQuery!

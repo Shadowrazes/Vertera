@@ -3,6 +3,7 @@ import Account from "../Utils/Account.js"
 import Token from "../Utils/Token.js"
 import Errors from "../Utils/Errors.js";
 import Client from "./Client.js";
+import axios from 'axios';
 
 class User extends Entity {
     static TableName = 'users';
@@ -29,7 +30,7 @@ class User extends Entity {
     static async Login(login, password) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.LoginField} = ?`;
         const userResult = await super.Request(sql, [login]);
-        
+
         if (userResult.length == 0) throw new Error(Errors.IncorrectLogin);
 
         if (!userResult[0].isActive) throw new Error(Errors.UserDeactivated);
@@ -45,22 +46,60 @@ class User extends Entity {
         return { token, user: userResult[0] };
     }
 
-    static async LoginOuter(userFields, clientFields) {
-        let existingClient = await Client.GetByOuterId(clientFields.outerId);
-        let userId = -1;
-        
-        if (!existingClient){
-            userId = await Client.TransInsert(userFields, clientFields);
-        }
-        else{
-            userId = existingClient.id;
-            const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
+    static async LoginOuter(sessionKey) {
+        let response = undefined;
+
+        let headers = {
+            'X-App-Token': 'b6f2a80e-1c0f-4298-969b-431592d6f9f9',
+            'Content-Type': 'application/json'
+        };
+
+        let graphql = {
+            query: `mutation userLogin { User { Login(UserLoginByOneTimeTokenInput: {token: \"${sessionKey}\"} ) { isSuccessful accessToken } } }`,
+            variables: {}
+        };
+
+        try {
+            response = await axios.post("https://backend.boss.vertera.org/graphql/partner", graphql, { headers });
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
         }
 
-        const token = await Token.Generate({ userId });
-        const user = await this.GetById(userId);
+        headers = {
+            'X-App-Token': 'b6f2a80e-1c0f-4298-969b-431592d6f9f9',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${response}`
+        };
 
-        return { token, user };
+        graphql = JSON.stringify({
+            query: "query {\r\n  UserGroup {\r\n    User {\r\n      user {\r\n        ... on User {\r\n          firstName\r\n          lastName\r\n          middleName\r\n          idRef\r\n          emails {\r\n            email\r\n            isMain\r\n            isConfirmed\r\n          }\r\n          phones {\r\n            phone\r\n            isMain\r\n            isConfirmed\r\n          }\r\n          country{code}\r\n          parents {\r\n            referrer {\r\n              ... on UserReferrerForUser {\r\n                idRef\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n      errors {\r\n        __typename\r\n      }\r\n    }\r\n  }\r\n}",
+            variables: {}
+        });
+
+        try {
+            response = await axios.post('https://backend.boss.vertera.org/graphql/partner', graphql, { headers });
+            console.log(response.data);
+        }
+        catch (error) {
+            console.error(error);
+        }
+
+        // let existingClient = await Client.GetByOuterId(clientFields.outerId);
+        // let userId = -1;
+
+        // if (!existingClient) {
+        //     userId = await Client.TransInsert(userFields, clientFields);
+        // }
+        // else {
+        //     userId = existingClient.id;
+        //     const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
+        // }
+
+        // const token = await Token.Generate({ userId });
+        // const user = await this.GetById(userId);
+
+        // return { token, user };
     }
 
     static ValidateRoleAccess(level, userRole) {
