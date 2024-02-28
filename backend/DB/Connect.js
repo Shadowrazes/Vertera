@@ -5,9 +5,9 @@ const isBuild = process.argv[2] === 'build';
 const Pool = MySQL.createPool({
     connectionLimit: 100,
     host: 'localhost',
-    user: !isBuild ? 'root' : 'mysqladmin',
-    password: !isBuild ? 'cdbyjhsk' : 'H2Zx8xhQOYlsCjjv',
-    database: 'vertera',
+    user: !isBuild ? 'root' : 'help_vertera',
+    password: !isBuild ? 'cdbyjhsk' : 'EcIEYu2E29eWTjxB',
+    database: !isBuild ? 'vertera' : 'help_vertera',
     namedPlaceholders: true
 }).promise();
 
