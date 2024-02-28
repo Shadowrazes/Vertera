@@ -61,15 +61,19 @@ class User extends Entity {
 
         try {
             response = await axios.post("https://backend.boss.vertera.org/graphql/partner", graphql, { headers });
+            console.log(1);
             console.log(response.data);
+            console.log(response.data.data.User.accessToken);
         } catch (error) {
             console.error(error);
         }
 
+        if(response.data.data.User.accessToken == undefined) throw new Error(Errors.IncorrectLogin);
+
         headers = {
             'X-App-Token': 'b6f2a80e-1c0f-4298-969b-431592d6f9f9',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${response}`
+            'Authorization': `Bearer ${response.data.data.User.accessToken}`
         };
 
         graphql = JSON.stringify({
