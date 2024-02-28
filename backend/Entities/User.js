@@ -63,17 +63,17 @@ class User extends Entity {
             response = await axios.post("https://backend.boss.vertera.org/graphql/partner", graphql, { headers });
             console.log(1);
             console.log(response.data);
-            console.log(response.data.data.User.accessToken);
+            console.log(response.data.data.User.Login.accessToken);
         } catch (error) {
             console.error(error);
         }
 
-        if(response.data.data.User.accessToken == undefined) throw new Error(Errors.IncorrectLogin);
+        if(response.data.data.User.Login.accessToken == undefined) throw new Error(Errors.IncorrectLogin);
 
         headers = {
             'X-App-Token': 'b6f2a80e-1c0f-4298-969b-431592d6f9f9',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${response.data.data.User.accessToken}`
+            'Authorization': `Bearer ${response.data.data.User.Login.accessToken}`
         };
 
         graphql = JSON.stringify({
@@ -84,26 +84,46 @@ class User extends Entity {
         try {
             response = await axios.post('https://backend.boss.vertera.org/graphql/partner', graphql, { headers });
             console.log(response.data);
+            console.log(response.data.data.UserGroup.User);
         }
         catch (error) {
             console.error(error);
         }
 
-        // let existingClient = await Client.GetByOuterId(clientFields.outerId);
-        // let userId = -1;
+        const user = response.data.data.UserGroup.User.user;
 
-        // if (!existingClient) {
-        //     userId = await Client.TransInsert(userFields, clientFields);
-        // }
-        // else {
-        //     userId = existingClient.id;
-        //     const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
-        // }
+        let clientFields = {
+            outerId: user.idRef,
+            email: user.emails[0].email,
+            idRef: user.parents.referrer.idRef
+        };
 
-        // const token = await Token.Generate({ userId });
-        // const user = await this.GetById(userId);
+        let userFields = {
+            name: user.firstName,
+            surname: user.lastName,
+            patronymic: user.middleName,
+            countryId: 1,
+            phone: user.phones[0].phone
+        };
 
-        // return { token, user };
+        console.log(clientFields);
+        console.log(userFields);
+
+        let existingClient = await Client.GetByOuterId(clientFields.outerId);
+        let userId = -1;
+
+        if (!existingClient) {
+            userId = await Client.TransInsert(userFields, clientFields);
+        }
+        else {
+            userId = existingClient.id;
+            const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
+        }
+
+        const token = await Token.Generate({ userId });
+        const curUser = await this.GetById(userId);
+
+        return { token, user: curUser };
     }
 
     static ValidateRoleAccess(level, userRole) {
