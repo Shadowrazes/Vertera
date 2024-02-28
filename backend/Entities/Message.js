@@ -99,7 +99,7 @@ class Message extends Entity {
 
                 if (curTicket.clientId != curClient.id) throw new Error(Errors.IncorrectMsgReciever);
 
-                const dialogLink = `https://vticket.yasanyabeats.ru/dialog/${curTicket.link}/`
+                const dialogLink = `https://help.vertera.org/dialog/${curTicket.link}/`
                 const emailText = `На ваше обращение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
                 EmailSender.Notify(curClient.email, emailText);
             }

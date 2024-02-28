@@ -14,7 +14,7 @@ import Errors from "../Utils/Errors.js";
 import md5 from "md5";
 
 const isBuild = process.argv[2] === 'build';
-const baseUrl = isBuild ? 'https://vticket.yasanyabeats.ru' : 'http://localhost:5173';
+const baseUrl = isBuild ? 'https://help.vertera.org' : 'http://localhost:5173';
 
 class Ticket extends Entity {
     static TableName = 'tickets';

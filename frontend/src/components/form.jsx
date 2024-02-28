@@ -116,7 +116,7 @@ function FormComponent() {
 
           const response = await fetch(
             isBuild
-              ? "https://vticket.yasanyabeats.ru:4444/upload"
+              ? "https://help.vertera.org:4444/upload"
               : "http://localhost:4444/upload",
             requestOptions
           );
@@ -174,7 +174,7 @@ function FormComponent() {
           <>
             <div className="auth">
               <h2>Необходимо авторизироваться</h2>
-              <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fvticket.yasanyabeats.ru%2F">
+              <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F">
                 <ButtonCustom title="Авторизироваться как партнер" />
               </a>
               <ButtonCustom

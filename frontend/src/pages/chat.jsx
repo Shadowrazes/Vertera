@@ -448,7 +448,7 @@ function Chat() {
 
           const response = await fetch(
             isBuild
-              ? "https://vticket.yasanyabeats.ru:4444/upload"
+              ? "https://help.vertera.org:4444/upload"
               : "http://localhost:4444/upload",
             requestOptions
           );
