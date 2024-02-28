@@ -125,7 +125,7 @@ function Chat() {
   let userId = null;
 
   if (user === null) {
-    userId = 999;
+    window.location.href = "/";
   } else {
     userId = user.id;
   }

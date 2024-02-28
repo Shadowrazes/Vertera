@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import {
   Modal,
   Button,
@@ -113,7 +113,10 @@ function Header({ user }) {
   };
 
   const { data, refetch } = useQuery(LOGIN);
-  const { data: dataOuter, refetch: refetchOuter } = useQuery(LOGIN_OUTER);
+  const [
+    loginOuter,
+    { data: dataOuter, loading: loadingOuter, error: errorOuter },
+  ] = useLazyQuery(LOGIN_OUTER);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -231,29 +234,38 @@ function Header({ user }) {
           document.location.href = "/";
         }
 
-        try {
-          const { data: loginData } = refetchOuter(sessionKey);
+        loginOuter({
+          variables: { sessionKey },
+        });
+
+        if (dataOuter) {
+          const loginData = dataOuter.login;
+
           if (loginData) {
             localStorage.setItem(
               "user",
               JSON.stringify({
-                id: loginData.login.user.id,
-                name: loginData.login.user.name,
-                surname: loginData.login.user.surname,
-                role: loginData.login.user.role,
-                token: loginData.login.token,
+                id: loginData.user.id,
+                name: loginData.user.name,
+                surname: loginData.user.surname,
+                role: loginData.user.role,
+                token: loginData.token,
               })
             );
-            setUserName(loginData.login.user.name);
-            setUserSurname(loginData.login.user.surname);
+            setUserName(loginData.user.name);
+            setUserSurname(loginData.user.surname);
             console.log(userName);
             document.location.href = "/all-tickets";
           }
-        } catch (error) {
+        }
+
+        if (errorOuter) {
           setTimeout(() => {
             setIsError(true);
           }, 1000);
-        } finally {
+        }
+
+        if (!loadingOuter) {
           setTimeout(() => {
             setIsLoad(false);
           }, 1000);
@@ -272,7 +284,7 @@ function Header({ user }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref]);
+  }, [ref, dataOuter]);
 
   const popover = (
     <Popover id="popover-basic">
