@@ -73,6 +73,14 @@ class Translation extends Entity {
         return result;
     }
 
+    static async GetListFull() {
+        const sql = `
+            SELECT * FROM ${this.TableName}
+        `;
+        const result = await super.Request(sql);
+        return result;
+    }
+
     static async Insert(fields) {
         // одинаковые переводы элементов интерфейса в разных частях сайта?
         if (!this.OuterTypes.includes(fields.type)) throw new Error(Errors.ForbiddenTranslationType);

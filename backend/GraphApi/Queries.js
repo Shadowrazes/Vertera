@@ -49,6 +49,8 @@ export const Queries = `
     type AdminQuery {
         class: String!
 
+        translationListFull: [TranslationFull]
+
         jobTitleList: [HelperJobTitle]
     }
 `;

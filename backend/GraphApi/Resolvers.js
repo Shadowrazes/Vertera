@@ -136,6 +136,9 @@ export const resolvers = {
         jobTitleList: async (_, args) => {
             return await HelperJobTitle.GetList();
         },
+        translationListFull: async (_, args) => {
+            return await Translation.GetListFull();
+        },
     },
     Mutation: {
         clientMutation: async (_, args, context) => {

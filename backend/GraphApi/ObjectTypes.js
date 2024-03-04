@@ -99,6 +99,19 @@ export const ObjectTypes = `
         stroke: String
     }
 
+    type TranslationFull {
+        type: String!
+        code: String!
+        ru: String
+        en: String
+        es: String
+        cs: String
+        bg: String
+        de: String
+        hu: String
+        kk: String
+    }
+
     type Unit {
         id: Int!
         name(lang: String!): Translation!
