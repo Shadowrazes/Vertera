@@ -97,17 +97,17 @@ function allTickets() {
   let userId = null;
 
   if (user === null) {
-    userId = <></>;
+    window.location.href = "/";
   } else {
     userId = user.id;
   }
 
   const isAdmin = () => {
-    return user.role === "system";
+    return user?.role === "system";
   };
 
   const isHelper = () => {
-    return user.role === "helper" || user.role === "system";
+    return user?.role === "helper" || user?.role === "system";
   };
 
   const [fastFilterStr, setFastFilterStr] = useState(isAdmin() ? "all" : "my");
@@ -209,22 +209,22 @@ function allTickets() {
 
   const { data: themeData } = useQuery(THEME_LIST, {
     variables: {
-      token: user.token,
+      token: user?.token,
     },
   });
   const { data: dataCurators } = useQuery(CURATORS_LIST, {
     variables: {
-      token: user.token,
+      token: user?.token,
     },
   });
   const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
     variables: {
-      token: user.token,
+      token: user?.token,
     },
   });
   const { data: dataStatusList } = useQuery(STATUS_LIST, {
     variables: {
-      token: user.token,
+      token: user?.token,
     },
   });
 
@@ -238,7 +238,7 @@ function allTickets() {
     // console.log(_helperIdsFilter);
     return useQuery(TABLE_TICKETS, {
       variables: {
-        token: user.token,
+        token: user?.token,
         filters: {
           helperIds: _helperIdsFilter,
           limit: itemsPerPage,
@@ -254,7 +254,7 @@ function allTickets() {
   const clientRequest = () => {
     return useQuery(TABLE_TICKETS_USER, {
       variables: {
-        token: user.token,
+        token: user?.token,
         clientId: userId,
         filters: {
           limit: itemsPerPage,

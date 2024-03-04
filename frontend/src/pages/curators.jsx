@@ -24,7 +24,7 @@ function Curators() {
   let userId = null;
 
   if (user === null) {
-    return <></>;
+    window.location.href = "/";
   } else {
     userId = user.id;
   }

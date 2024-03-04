@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import {
   Modal,
   Button,
@@ -17,7 +17,7 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 
-import { LOGIN } from "../apollo/queries";
+import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
 import { TRANSLATE } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
@@ -113,6 +113,10 @@ function Header({ user }) {
   };
 
   const { data, refetch } = useQuery(LOGIN);
+  const [
+    loginOuter,
+    { data: dataOuter, loading: loadingOuter, error: errorOuter },
+  ] = useLazyQuery(LOGIN_OUTER);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -167,7 +171,6 @@ function Header({ user }) {
             name: loginData.login.user.name,
             surname: loginData.login.user.surname,
             role: loginData.login.user.role,
-            login: loginVariables.login,
             token: loginData.login.token,
           })
         );
@@ -198,7 +201,6 @@ function Header({ user }) {
           name: data.login.user.name,
           surname: data.login.user.surname,
           role: data.login.user.role,
-          login: loginVariables.login,
           token: data.login.token,
         })
       );
@@ -218,6 +220,59 @@ function Header({ user }) {
   }, [language]);
 
   useEffect(() => {
+    const urlString = window.location.href;
+
+    if (urlString.includes("/external/authorization")) {
+      const url = new URL(urlString);
+      const sessionKey = url.searchParams.get("session_key");
+
+      console.log(sessionKey);
+
+      if (sessionKey) {
+        if (user) {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        }
+
+        loginOuter({
+          variables: { sessionKey },
+        });
+
+        if (dataOuter) {
+          const loginData = dataOuter.login;
+
+          if (loginData) {
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                id: loginData.user.id,
+                name: loginData.user.name,
+                surname: loginData.user.surname,
+                role: loginData.user.role,
+                token: loginData.token,
+              })
+            );
+            setUserName(loginData.user.name);
+            setUserSurname(loginData.user.surname);
+            console.log(userName);
+            document.location.href = "/all-tickets";
+          }
+        }
+
+        if (errorOuter) {
+          setTimeout(() => {
+            setIsError(true);
+          }, 1000);
+        }
+
+        if (!loadingOuter) {
+          setTimeout(() => {
+            setIsLoad(false);
+          }, 1000);
+        }
+      }
+    }
+
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
         handleCloseOverlay();
@@ -229,14 +284,7 @@ function Header({ user }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref]);
-
-  const urlString = window.location.href;
-
-  if (urlString.includes("/external/authorization")) {
-    const url = new URL(urlString);
-    const sessionKey = url.searchParams.get("session_key");
-  }
+  }, [ref, dataOuter]);
 
   const popover = (
     <Popover id="popover-basic">

@@ -316,6 +316,21 @@ export const LOGIN = gql`
   }
 `;
 
+export const LOGIN_OUTER = gql`
+  query ($sessionKey: String!) {
+    loginOuter(sessionKey: $sessionKey) {
+      token
+      user {
+        id
+        name
+        surname
+        patronymic
+        role
+      }
+    }
+  }
+`;
+
 export const TRANSLATE = gql`
   query ($token: String!, $lang: String!) {
     clientQuery(token: $token) {

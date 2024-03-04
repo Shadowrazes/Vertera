@@ -60,6 +60,10 @@ function EditCurator() {
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
+  if (user === null) {
+    window.location.href = "/";
+  }
+
   const isAdmin = () => {
     return user.role === "system";
   };
