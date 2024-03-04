@@ -32,7 +32,7 @@ export const Mutations = `
         addDepartment(fields: DepartmentInsert!): String!
 
         updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
-        updateTranslation(fields: TranslationUpdate!): UpdateInfo!
+        updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
         updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!

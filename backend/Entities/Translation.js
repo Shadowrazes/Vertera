@@ -111,13 +111,16 @@ class Translation extends Entity {
 
     // Cascade updating translation & dependent tables
     static async Update(fields) {
-        const sql = `
-            UPDATE ${this.TableName} 
-            SET ${fields.lang} = ?
-            WHERE ${this.CodeField} = ?
-        `;
+        let result = undefined;
+        for (const field of fields) {
+            const sql = `
+                UPDATE ${this.TableName} 
+                SET ${field.lang} = ?
+                WHERE ${this.CodeField} = ?
+            `;
 
-        const result = await super.Request(sql, [fields.stroke, fields.code]);
+            result = await super.Request(sql, [field.stroke, field.code]);
+        }
 
         return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
