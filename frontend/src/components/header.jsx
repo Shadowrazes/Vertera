@@ -237,7 +237,7 @@ function Header({ user }) {
       if (sessionKey) {
         if (user) {
           localStorage.removeItem("user");
-          document.location.href = "/";
+          // document.location.href = "/";
         }
 
         loginOuter({
@@ -278,7 +278,9 @@ function Header({ user }) {
         }
       }
     }
+  }, [user, loginOuter]);
 
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
         handleCloseOverlay();
