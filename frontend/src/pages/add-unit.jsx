@@ -80,8 +80,7 @@ function addUnit() {
     try {
       const result = await addUnit({
         variables: {
-          // token: user.token,
-          token: "123",
+          token: user.token,
           stroke: nameValue.trim(),
           lang: "ru",
           orderNum: parseInt(orderNum),
