@@ -20,7 +20,7 @@ import {
 import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
 import { TRANSLATE } from "../apollo/queries";
 
-import Loader from "./loading";
+import Loader from "../pages/loading";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
