@@ -20,6 +20,8 @@ import {
 import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
 import { TRANSLATE } from "../apollo/queries";
 
+import Loader from "./loading";
+
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
 import "../css/header.css";
@@ -259,7 +261,7 @@ function Header({ user }) {
             setUserName(loginData.user.name);
             setUserSurname(loginData.user.surname);
             console.log(userName);
-            document.location.href = "/all-tickets";
+            document.location.href = "/";
           }
         }
 
