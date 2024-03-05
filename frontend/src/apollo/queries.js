@@ -614,6 +614,7 @@ export const TRANSLATION_LIST = gql`
   query ($token: String!) {
     adminQuery(token: $token) {
       translationListFull {
+        id
         code
         ru
         en

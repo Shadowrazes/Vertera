@@ -15,8 +15,7 @@ import "../css/translation.css";
 function Translation() {
   const [dataQuery, setData] = useState([]);
 
-  const [translationsValues, setTranslationsValues] = useState([]);
-  const [translationRuValue, setTranslationRuValue] = useState(null);
+  const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -70,44 +69,21 @@ function Translation() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  const handleRuTranslation = (e, translationIndex) => {
+  const handleTranslation = (e, translationIndex, code, lang) => {
     const { value } = e.target;
-    setTranslationRuValue(value);
 
-    const _translationIndex = translationsValues.findIndex(
-      (translation) => translation.id === translationIndex
-    );
+    const updatedTranslationsCopy = [...updatedTranslations];
 
-    if (_translationIndex !== -1) {
-      setTranslationsValues((prevTranslations) => {
-        const newTranslations = [...prevTranslations];
-        newTranslations[translationIndex] = {
-          ...newTranslations[translationIndex],
-          ru: value,
-        };
-        return newTranslations;
-      });
-    } else {
-      const newTranslation = {
-        id: translationsValues.length + 1,
-        code: "",
-        ru: value,
-        en: "",
-        es: "",
-        cs: "",
-        bg: "",
-        de: "",
-        hu: "",
-        kk: "",
-      };
+    updatedTranslationsCopy[translationIndex] = {
+      lang: lang,
+      stroke: value,
+      code: code,
+    };
 
-      setTranslationsValues((prevTranslations) => [
-        ...prevTranslations,
-        newTranslation,
-      ]);
-    }
-    console.log(translationsValues.map((trans) => trans));
+    setUpdatedTranslations(updatedTranslationsCopy);
   };
+
+  console.log(updatedTranslations.map((trans) => trans));
 
   const handleUpdateTranslation = async () => {
     try {
@@ -147,7 +123,7 @@ function Translation() {
                 </thead>
                 <tbody>
                   {dataQuery.map((translation, index) => (
-                    <tr key={index}>
+                    <tr key={translation.id}>
                       <td>
                         <Form.Control
                           type="text"
@@ -160,58 +136,111 @@ function Translation() {
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.ru || translationRuValue}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.ru ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
-                          onChange={(e) => handleRuTranslation(e, index)}
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "ru")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.en}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.en ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "en")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.es}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.es ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "es")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.cs}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.cs ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "cs")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.bg}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.bg ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "bg")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.hu}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.de ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "de")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.kk}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.hu ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) =>
+                            handleTranslation(e, index, translation.code, "hu")
+                          }
                         />
                       </td>
                       <td>
                         <Form.Control
                           type="text"
-                          value={translation.en}
+                          value={
+                            updatedTranslations[index]?.stroke ||
+                            translation?.kk ||
+                            undefined
+                          }
                           className="add-currator__input add-theme__dropdown"
+                          onChange={(e) => handleTranslation(e, index, "kk")}
                         />
                       </td>
                     </tr>
