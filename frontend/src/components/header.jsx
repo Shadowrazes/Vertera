@@ -118,6 +118,10 @@ function Header({ user }) {
     { data: dataOuter, loading: loadingOuter, error: errorOuter },
   ] = useLazyQuery(LOGIN_OUTER);
 
+  if (loadingOuter) {
+    return <Loader />;
+  }
+
   const handleClose = () => {
     setShowLoginModal(false);
     setShowLogoutModal(false);
