@@ -609,3 +609,21 @@ export const STATUS_LIST = gql`
     }
   }
 `;
+
+export const TRANSLATION_LIST = gql`
+  query ($token: String!) {
+    adminQuery(token: $token) {
+      translationListFull {
+        code
+        ru
+        en
+        es
+        hu
+        cs
+        kk
+        bg
+        de
+      }
+    }
+  }
+`;

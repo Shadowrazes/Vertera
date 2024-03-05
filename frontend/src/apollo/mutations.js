@@ -388,3 +388,13 @@ export const SPLIT_TICKET = gql`
     }
   }
 `;
+
+export const UPDATE_TRANSLATION = gql`
+  mutation ($token: String!, $translationUpdate: [TranslationUpdate!]!) {
+    adminMutation(token: $token) {
+      updateTranslation(fields: $translationUpdate) {
+        changed
+      }
+    }
+  }
+`;

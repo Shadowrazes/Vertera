@@ -19,7 +19,7 @@ import AddSubtheme from "./pages/add-subtheme";
 import EditSubtheme from "./pages/edit-subtheme";
 import Stats from "./pages/stats";
 import OuterAuth from "./pages/outer-auth";
-import YourComponent from "./components/translater";
+import Translation from "./pages/translation";
 import NotFoundPage from "./pages/not-found-page";
 
 import "./App.css";
@@ -65,7 +65,7 @@ function App() {
           />
           <Route path="/stats" element={<Stats />} />
           <Route path="/external/authorization" element={<OuterAuth />} />
-          <Route path="/xdd" element={<YourComponent />} />
+          <Route path="/translation" element={<Translation />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
