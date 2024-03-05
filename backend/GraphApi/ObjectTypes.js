@@ -100,6 +100,7 @@ export const ObjectTypes = `
     }
 
     type TranslationFull {
+        id: Int!
         type: String!
         code: String!
         ru: String
