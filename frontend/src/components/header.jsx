@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery, useLazyQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import {
   Modal,
   Button,
@@ -17,10 +17,8 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 
-import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
+import { LOGIN } from "../apollo/queries";
 import { TRANSLATE } from "../apollo/queries";
-
-import Loader from "../pages/loading";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
@@ -115,14 +113,6 @@ function Header({ user }) {
   };
 
   const { data, refetch } = useQuery(LOGIN);
-  const [
-    loginOuter,
-    { data: dataOuter, loading: loadingOuter, error: errorOuter },
-  ] = useLazyQuery(LOGIN_OUTER);
-
-  if (loadingOuter) {
-    return <Loader />;
-  }
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -226,61 +216,6 @@ function Header({ user }) {
   }, [language]);
 
   useEffect(() => {
-    const urlString = window.location.href;
-
-    if (urlString.includes("/external/authorization")) {
-      const url = new URL(urlString);
-      const sessionKey = url.searchParams.get("session_key");
-
-      console.log(sessionKey);
-
-      if (sessionKey) {
-        if (user) {
-          localStorage.removeItem("user");
-          // document.location.href = "/";
-        }
-
-        loginOuter({
-          variables: { sessionKey },
-        });
-
-        if (dataOuter) {
-          const loginData = dataOuter.login;
-
-          if (loginData) {
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                id: loginData.user.id,
-                name: loginData.user.name,
-                surname: loginData.user.surname,
-                role: loginData.user.role,
-                token: loginData.token,
-              })
-            );
-            setUserName(loginData.user.name);
-            setUserSurname(loginData.user.surname);
-            console.log(userName);
-            document.location.href = "/";
-          }
-        }
-
-        if (errorOuter) {
-          setTimeout(() => {
-            setIsError(true);
-          }, 1000);
-        }
-
-        if (!loadingOuter) {
-          setTimeout(() => {
-            setIsLoad(false);
-          }, 1000);
-        }
-      }
-    }
-  }, [user, loginOuter]);
-
-  useEffect(() => {
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
         handleCloseOverlay();
@@ -292,7 +227,7 @@ function Header({ user }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref, dataOuter]);
+  }, [ref]);
 
   const popover = (
     <Popover id="popover-basic">
