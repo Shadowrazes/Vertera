@@ -11,6 +11,7 @@ export const typeDefs = `
     type Query {
         login(login: String!, password: String!): LoginInfo!
         loginOuter(sessionKey: String!): LoginInfo!
+        translationList(lang: String!): [Translation]
 
         clientQuery(token: String!): ClientQuery!
         helperQuery(token: String!): HelperQuery!

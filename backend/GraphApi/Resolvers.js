@@ -37,6 +37,9 @@ export const resolvers = {
         loginOuter: async (_, args) => {
             return await User.LoginOuter(args.sessionKey);
         },
+        translationList: async (_, args) => {
+            return await Translation.GetList(args.lang);
+        },
         clientQuery: async (_, args, context) => {
             context.user = await Access(User.RoleClient, args.token);
             return {class: 'client'};
@@ -83,9 +86,6 @@ export const resolvers = {
         },
         countryList: async (_, args) => {
             return await Country.GetList();
-        },
-        translationList: async (_, args) => {
-            return await Translation.GetList(args.lang);
         },
         translationListByType: async (_, args) => {
             return await Translation.GetListByType(args.lang, args.type);

@@ -17,7 +17,6 @@ export const Queries = `
 
         countryList: [Country]
 
-        translationList(lang: String!): [Translation]
         translationListByType(lang: String!, type: String!): [Translation]
     }
 
