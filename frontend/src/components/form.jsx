@@ -159,13 +159,6 @@ function FormComponent() {
       }
     }
 
-    const handleAuthHelperButton = () => {
-      let headerButton = document.querySelector(".header__button");
-      if (headerButton) {
-        headerButton.click();
-      }
-    };
-
     return (
       <>
         {userId == 999 ||
@@ -177,10 +170,6 @@ function FormComponent() {
               <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F">
                 <ButtonCustom title="Авторизироваться как партнер" />
               </a>
-              <ButtonCustom
-                title="Авторизироваться как куратор"
-                onClick={handleAuthHelperButton}
-              />
             </div>
           </>
         ) : (

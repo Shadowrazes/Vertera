@@ -48,9 +48,16 @@ function Header({ user }) {
   });
 
   useEffect(() => {
-    if (languageData?.clientQuery?.translationList) {
+    if (language === null) {
+      setLanguage("ru");
+      localStorage.setItem("language", "RU");
+    }
+  }, [language]);
+
+  useEffect(() => {
+    if (languageData?.translationList) {
       let translateList = {};
-      languageData.clientQuery.translationList.map((translate) => {
+      languageData.translationList.map((translate) => {
         translateList[translate.code] = translate.stroke;
       });
       localStorage.setItem("translation", JSON.stringify(translateList));
@@ -125,11 +132,18 @@ function Header({ user }) {
   };
 
   const handleShow = () => {
+    if (location.pathname === "/" && !user) {
+      window.location.href =
+        "https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F";
+      return;
+    }
+
     if (user) {
       setShowLogoutModal(true);
     } else {
       setShowLoginModal(true);
     }
+
     setShowMenu(false);
   };
 
@@ -207,13 +221,6 @@ function Header({ user }) {
     }
     refetch();
   }, [data, loginVariables]);
-
-  useEffect(() => {
-    if (language === null) {
-      setLanguage("ru");
-      localStorage.setItem("language", "RU");
-    }
-  }, [language]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -347,6 +354,9 @@ function Header({ user }) {
                   </Nav.Link>
                   <Nav.Link href="/themes">
                     {get_translation("INTERFACE_THEMES")}
+                  </Nav.Link>
+                  <Nav.Link href="/translation">
+                    {get_translation("INTERFACE_TRANSLATION")}
                   </Nav.Link>
                 </>
               )}

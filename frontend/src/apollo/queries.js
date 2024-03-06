@@ -332,13 +332,11 @@ export const LOGIN_OUTER = gql`
 `;
 
 export const TRANSLATE = gql`
-  query ($token: String!, $lang: String!) {
-    clientQuery(token: $token) {
-      translationList(lang: $lang) {
-        type
-        code
-        stroke
-      }
+  query ($lang: String!) {
+    translationList(lang: $lang) {
+      type
+      code
+      stroke
     }
   }
 `;

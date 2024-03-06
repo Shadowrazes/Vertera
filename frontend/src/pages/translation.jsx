@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { Table, Form, Row, Col, Modal, Button } from "react-bootstrap";
+import { Table, Form, Modal, Button } from "react-bootstrap";
 
 import { TRANSLATION_LIST } from "../apollo/queries";
 import { UPDATE_TRANSLATION } from "../apollo/mutations";
@@ -17,6 +17,8 @@ function Translation() {
 
   const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
+  const [show, setShow] = useState(false);
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
@@ -27,7 +29,7 @@ function Translation() {
     return user.role === "system";
   };
 
-  const { loading, error, data, refetch } = useQuery(TRANSLATION_LIST, {
+  const { loading, error, data } = useQuery(TRANSLATION_LIST, {
     variables: {
       token: user.token,
     },
@@ -37,8 +39,6 @@ function Translation() {
     if (data && data.adminQuery.translationListFull) {
       setData(data.adminQuery.translationListFull);
     }
-
-    refetch();
   }, [data]);
 
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION);
@@ -75,29 +75,73 @@ function Translation() {
     const updatedTranslationsCopy = [...updatedTranslations];
 
     updatedTranslationsCopy[translationIndex] = {
-      lang: lang,
-      stroke: value,
+      ...updatedTranslationsCopy[translationIndex],
+      [lang]: value,
       code: code,
     };
 
     setUpdatedTranslations(updatedTranslationsCopy);
   };
 
-  console.log(updatedTranslations.map((trans) => trans));
-
   const handleUpdateTranslation = async () => {
+    if (newTranslatons.length === 0) {
+      return;
+    }
+
+    let newTranslatons = updatedTranslations
+      .filter((updatedTranslation) => updatedTranslation)
+      .map(({ code, ru, en, es, cs, bg, de, hu, kk }) => {
+        const result = [];
+        if (ru !== undefined) {
+          result.push({ lang: "ru", stroke: ru, code: code });
+        }
+        if (en !== undefined) {
+          result.push({ lang: "en", stroke: en, code: code });
+        }
+        if (es !== undefined) {
+          result.push({ lang: "es", stroke: es, code: code });
+        }
+        if (cs !== undefined) {
+          result.push({ lang: "cs", stroke: cs, code: code });
+        }
+        if (bg !== undefined) {
+          result.push({ lang: "bg", stroke: bg, code: code });
+        }
+        if (de !== undefined) {
+          result.push({ lang: "de", stroke: de, code: code });
+        }
+        if (hu !== undefined) {
+          result.push({ lang: "hu", stroke: hu, code: code });
+        }
+        if (kk !== undefined) {
+          result.push({ lang: "kk", stroke: en, code: code });
+        }
+        return result;
+      })
+      .flat();
+
     try {
       const result = await updateTranslation({
         variables: {
           token: user.token,
+          translationUpdate: newTranslatons,
         },
       });
 
       console.log("Перевод успешно обновлен:", result);
-      // handleShow();
+      handleShow();
     } catch (error) {
       console.error("Ошибка при обновлении перевода:", error);
     }
+  };
+
+  const handleShow = () => {
+    setShow(true);
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    window.location.reload();
   };
 
   return (
@@ -106,7 +150,10 @@ function Translation() {
         <>
           <TitleH2 title="Переводы" className="title__heading" />
           <div className="translation__wrapper">
-            <div className="table__wrapper" style={{ overflowX: "auto" }}>
+            <div
+              className="table__wrapper"
+              style={{ overflowX: "auto", marginBottom: "20px" }}
+            >
               <Table className="table__table" hover>
                 <thead>
                   <tr>
@@ -129,7 +176,7 @@ function Translation() {
                           type="text"
                           placeholder="Строковый код"
                           value={translation.code}
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input translation__readonly-input"
                           readOnly
                         />
                       </td>
@@ -137,11 +184,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.ru ||
-                            undefined
+                            updatedTranslations[index]?.ru ??
+                            translation?.ru ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "ru")
                           }
@@ -151,11 +198,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.en ||
-                            undefined
+                            updatedTranslations[index]?.en ??
+                            translation?.en ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "en")
                           }
@@ -165,11 +212,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.es ||
-                            undefined
+                            updatedTranslations[index]?.es ??
+                            translation?.es ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "es")
                           }
@@ -179,11 +226,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.cs ||
-                            undefined
+                            updatedTranslations[index]?.cs ??
+                            translation?.cs ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "cs")
                           }
@@ -193,11 +240,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.bg ||
-                            undefined
+                            updatedTranslations[index]?.bg ??
+                            translation?.bg ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "bg")
                           }
@@ -207,11 +254,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.de ||
-                            undefined
+                            updatedTranslations[index]?.de ??
+                            translation?.de ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "de")
                           }
@@ -221,11 +268,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.hu ||
-                            undefined
+                            updatedTranslations[index]?.hu ??
+                            translation?.hu ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) =>
                             handleTranslation(e, index, translation.code, "hu")
                           }
@@ -235,11 +282,11 @@ function Translation() {
                         <Form.Control
                           type="text"
                           value={
-                            updatedTranslations[index]?.stroke ||
-                            translation?.kk ||
-                            undefined
+                            updatedTranslations[index]?.kk ??
+                            translation?.kk ??
+                            ""
                           }
-                          className="add-currator__input add-theme__dropdown"
+                          className="add-currator__input"
                           onChange={(e) => handleTranslation(e, index, "kk")}
                         />
                       </td>
@@ -250,6 +297,20 @@ function Translation() {
             </div>
             <ButtonCustom title="Сохранить" onClick={handleUpdateTranslation} />
           </div>
+
+          <Modal show={show}>
+            <Modal.Header closeButton>
+              <Modal.Title>Переводы обновлены</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Таблица переводов успешно обновлена</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </>
       ) : (
         <NotFoundPage />
