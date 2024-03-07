@@ -695,7 +695,7 @@ function allTickets() {
           offset: offset,
           orderBy: orderBy,
           orderDir: orderDir,
-          outerId: selectedOuterId,
+          outerId: numberIdFilterValue,
           lang: "ru",
         },
       };
