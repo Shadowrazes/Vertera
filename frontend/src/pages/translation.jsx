@@ -84,10 +84,6 @@ function Translation() {
   };
 
   const handleUpdateTranslation = async () => {
-    if (newTranslatons.length === 0) {
-      return;
-    }
-
     let newTranslatons = updatedTranslations
       .filter((updatedTranslation) => updatedTranslation)
       .map(({ code, ru, en, es, cs, bg, de, hu, kk }) => {
@@ -119,6 +115,10 @@ function Translation() {
         return result;
       })
       .flat();
+
+    if (newTranslatons.length === 0) {
+      return;
+    }
 
     try {
       const result = await updateTranslation({
