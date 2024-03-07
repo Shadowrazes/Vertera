@@ -298,7 +298,7 @@ function Translation() {
             <ButtonCustom title="Сохранить" onClick={handleUpdateTranslation} />
           </div>
 
-          <Modal show={show}>
+          <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>Переводы обновлены</Modal.Title>
             </Modal.Header>
