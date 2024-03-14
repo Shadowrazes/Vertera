@@ -213,7 +213,11 @@ function TableTickets() {
         }
       }
     }
-    return <>{userId == null ? <></> : <h2>Что-то пошло не так</h2>}</>;
+    return (
+      <>
+        {userId == null ? <></> : <h2>{get_translation("INTERFACE_ERROR")}</h2>}
+      </>
+    );
   }
 
   const getStatusColor = (status) => {

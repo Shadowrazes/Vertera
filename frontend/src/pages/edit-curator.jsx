@@ -59,6 +59,7 @@ function EditCurator() {
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -83,6 +84,7 @@ function EditCurator() {
   const { data: dataJobTitleList } = useQuery(JOB_TITLE_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
   const { data: dataCountryList } = useQuery(COUNTRY_LIST, {

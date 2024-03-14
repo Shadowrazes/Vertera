@@ -236,18 +236,6 @@ function Header({ user }) {
     };
   }, [ref]);
 
-  const popover = (
-    <Popover id="popover-basic">
-      <Popover.Body>
-        <ul>
-          <li>Все обращения</li>
-          <li>Все кураторы</li>
-          <li>Выйти</li>
-        </ul>
-      </Popover.Body>
-    </Popover>
-  );
-
   return (
     <>
       <section className="header">
@@ -373,17 +361,17 @@ function Header({ user }) {
       {/* Попап авторизации */}
       <Modal show={showLoginModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
+          <Modal.Title>{get_translation("INTERFACE_AUTH_HEADER")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form id="">
             <Form.Group controlId="formPlaintextEmail">
               <Form.Label column sm="2">
-                Логин
+                {get_translation("INTERFACE_LOGIN")}
               </Form.Label>
               <Col sm="12">
                 <Form.Control
-                  placeholder="Логин"
+                  placeholder={get_translation("INTERFACE_LOGIN")}
                   name="login"
                   onChange={handleInput}
                 />
@@ -392,12 +380,12 @@ function Header({ user }) {
 
             <Form.Group controlId="formPlaintextPassword" className="mt-2">
               <Form.Label column sm="2">
-                Пароль
+                {get_translation("INTERFACE_PASSWORD")}
               </Form.Label>
               <Col sm="12">
                 <Form.Control
                   type="password"
-                  placeholder="Пароль"
+                  placeholder={get_translation("INTERFACE_PASSWORD")}
                   name="password"
                   onChange={handleInput}
                 />
@@ -407,13 +395,13 @@ function Header({ user }) {
 
           {isError && (
             <Alert variant="danger" className="mt-3">
-              Неверный логин или пароль
+              {get_translation("INTERFACE_ERROR_AUTH")}
             </Alert>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" id="loginCancel" onClick={handleClose}>
-            Отмена
+            {get_translation("INTERFACE_CANCEL")}
           </Button>
           <Button
             variant="primary"
@@ -421,7 +409,11 @@ function Header({ user }) {
             id="loginSubmit"
             onClick={handleSubmit}
           >
-            {isLoad ? <Spinner animation="border" size="sm" /> : "Войти"}
+            {isLoad ? (
+              <Spinner animation="border" size="sm" />
+            ) : (
+              get_translation("INTERFACE_LOG_IN")
+            )}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -429,11 +421,11 @@ function Header({ user }) {
       {/* Попап выхода */}
       <Modal show={showLogoutModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Авторизация в системе VERTERA</Modal.Title>
+          <Modal.Title>{get_translation("INTERFACE_AUTH_HEADER")}</Modal.Title>
         </Modal.Header>
         <Modal.Footer>
           <Button variant="secondary" id="loginCancel" onClick={handleClose}>
-            Отмена
+            {get_translation("INTERFACE_CANCEL")}
           </Button>
           <Button
             variant="primary"

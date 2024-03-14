@@ -27,6 +27,8 @@ import NotFoundPage from "./not-found-page";
 
 import "../css/add-curator.css";
 
+import get_translation from "../helpers/translation";
+
 function AddCurator() {
   const [departmentList, setDepartmentList] = useState([]);
   const [jobTitleList, setJobTitleList] = useState([]);
@@ -52,6 +54,7 @@ function AddCurator() {
   const [passwordValue, setPasswordValue] = useState("");
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -84,6 +87,7 @@ function AddCurator() {
   } = useQuery(JOB_TITLE_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 
@@ -136,7 +140,7 @@ function AddCurator() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   if (loadingCountryList) {
@@ -144,7 +148,7 @@ function AddCurator() {
   }
 
   if (errorCountryList) {
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   if (loadingJobTitleList) {
@@ -152,7 +156,7 @@ function AddCurator() {
   }
 
   if (errorJobTitleList) {
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleNameChange = (e) => {
@@ -211,27 +215,27 @@ function AddCurator() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Введите имя";
+      error = get_translation("INTERFACE_ENTER_NAME");
     } else if (surnameValue.trim() == "") {
-      error = "Введите Фамилию";
+      error = get_translation("INTERFACE_ENTER_SURNAME");
     } else if (phoneValue.trim() == "") {
-      error = "Введите номер телефона";
+      error = get_translation("INTERFACE_ENTER_PHONE");
     } else if (selectedDate == null) {
-      error = "Выберите дату рождения";
+      error = get_translation("INTERFACE_CHOOSE_DATE_OF_BIRTH");
     } else if (selectedCountryId == null) {
-      error = "Выберите страну";
+      error = get_translation("INTERFACE_CHOOSE_COUNTRY");
     } else if (loginValue.trim() == "") {
-      error = "Укажите логин";
+      error = get_translation("INTERFACE_ENTER_LOGIN");
     } else if (passwordValue.trim() == "") {
-      error = "Укажите пароль";
+      error = get_translation("INTERFACE_ENTER_PASSWORD");
     } else if (passwordValue.trim().length < 6) {
-      error = "Плохой пароль";
+      error = get_translation("INTERFACE_BAD_PASSWORD");
     } else if (selectedDepartmentsId == []) {
-      error = "Выберите департамент";
+      error = get_translation("INTERFACE_SELECT_DEPARTMENT");
     } else if (selectedJobTitleId == null) {
-      error = "Выберите должность";
+      error = get_translation("INTERFACE_SELECT_JOB_TITLE");
     } else {
-      error = "Ошибка при добавлении куратора";
+      error = get_translation("INTERFACE_ERROR_ADD_CURATOR");
     }
 
     return error;
@@ -330,13 +334,16 @@ function AddCurator() {
     <>
       {isAdmin() ? (
         <>
-          <BackTitle title="Добавить куратора" linkPrev={linkPrev} />
+          <BackTitle
+            title={get_translation("INTERFACE_ADD_CURATOR")}
+            linkPrev={linkPrev}
+          />
           <Row className="add-curator__row">
             <Col className="add-curator__column">
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Имя"
+                  placeholder={get_translation("INTERFACE_NAME")}
                   value={nameValue}
                   className="add-currator__input"
                   onChange={handleNameChange}
@@ -346,7 +353,7 @@ function AddCurator() {
               <Form.Group controlId="SurNameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Фамилия"
+                  placeholder={get_translation("INTERFACE_SURNAME")}
                   value={surnameValue}
                   className="add-currator__input"
                   onChange={handleSurnameChange}
@@ -356,7 +363,7 @@ function AddCurator() {
               <Form.Group controlId="PatronymicForm">
                 <Form.Control
                   type="text"
-                  placeholder="Отчество (при наличии)"
+                  placeholder={get_translation("INTERFACE_PATRONYMIC_PRESENCE")}
                   value={patronymicValue}
                   className="add-currator__input"
                   onChange={handlePatronymicChange}
@@ -366,7 +373,7 @@ function AddCurator() {
               <Form.Group controlId="PhoneForm">
                 <Form.Control
                   type="phone"
-                  placeholder="Номер телефона"
+                  placeholder={get_translation("INTERFACE_PHONE")}
                   value={phoneValue}
                   className="add-currator__input"
                   onChange={handlePhoneChange}
@@ -375,7 +382,7 @@ function AddCurator() {
 
               <DatePicker
                 id="DatePicker"
-                placeholder="Дата рождения"
+                placeholder={get_translation("INTERFACE_DATA_OF_BIRTH")}
                 className="add-curator__date-picker"
                 locale={{
                   sunday: "Вс",
@@ -397,7 +404,7 @@ function AddCurator() {
             <Col className="add-curator__column">
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedCountry || "Страна"}
+                title={selectedCountry || get_translation("INTERFACE_COUNTRY")}
               >
                 {countryList.map((country, index) => (
                   <Dropdown.Item
@@ -415,7 +422,7 @@ function AddCurator() {
               <Form.Group controlId="LoginForm">
                 <Form.Control
                   type="text"
-                  placeholder="Логин"
+                  placeholder={get_translation("INTERFACE_LOGIN")}
                   value={loginValue}
                   className="add-currator__input"
                   onChange={handleLoginChange}
@@ -425,7 +432,7 @@ function AddCurator() {
               <Form.Group controlId="PasswordForm">
                 <Form.Control
                   type="text"
-                  placeholder="Пароль"
+                  placeholder={get_translation("INTERFACE_PASSWORD")}
                   value={passwordValue}
                   className="add-currator__input"
                   onChange={handlePasswordChange}
@@ -437,13 +444,13 @@ function AddCurator() {
                 onChange={(e) => handleDepartmentsOnChange(e.value)}
                 options={newDepartmentList}
                 optionLabel="name"
-                placeholder="Выбрать департамент"
+                placeholder={get_translation("INTERFACE_SELECT_DEPARTMENT")}
                 className="add-curator__multiselect"
               />
 
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedJobTitle || "Должность"}
+                title={selectedJobTitle || get_translation("INTERFACE_JOB")}
               >
                 {jobTitleList.map((jobTitle, index) => (
                   <Dropdown.Item
@@ -461,21 +468,23 @@ function AddCurator() {
           </Row>
           {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
           <ButtonCustom
-            title="Применить"
+            title={get_translation("INTERFACE_APPLY")}
             className={"add-curator__btn"}
             onClick={handleAddCurator}
           />
 
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>Куратор создан</Modal.Title>
+              <Modal.Title>
+                {get_translation("INTERFACE_MESSAGE_ADD_CURATOR")}
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Новый куратор успешно добавлен</p>
+              <p>{get_translation("INTERFACE_MESSAGE_ADD_CURATOR_FULL")}</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
-                Закрыть
+                {get_translation("INTERFACE_CLOSE")}
               </Button>
             </Modal.Footer>
           </Modal>

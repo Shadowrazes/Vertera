@@ -443,11 +443,11 @@ export const CURATORS_LIST = gql`
 `;
 
 export const JOB_TITLE_LIST = gql`
-  query ($token: String!) {
+  query ($token: String!, $lang: String!) {
     adminQuery(token: $token) {
       jobTitleList {
         id
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
       }

@@ -123,7 +123,10 @@ function allTickets() {
   const pageNumbers = [];
   // const itemsPerPage = 8;
 
-  const reactions = ["Понравилось", "Не понравилось"];
+  const reactions = [
+    get_translation("INTERFACE_LIKE"),
+    get_translation("INTERFACE_DISLIKE"),
+  ];
   const outerIdSelect = ["Партнер", "Структура"];
   const itemsPerPageArray = [25, 50, 100];
 
@@ -190,12 +193,12 @@ function allTickets() {
     } else {
       const variables = {
         filters: {
-          unitIds: selectedUnitId,
-          themeIds: selectedThemeId,
-          subThemeIds: selectedSubThemeId,
-          dateBefore: selectedDateBefore,
-          dateAfter: selectedDateAfter,
-          reaction: queryReaction,
+          unitIds: null,
+          themeIds: null,
+          subThemeIds: null,
+          dateBefore: null,
+          dateAfter: null,
+          reaction: null,
           limit: itemsPerPage,
           offset: offset,
           orderBy: orderBy,
@@ -422,7 +425,7 @@ function allTickets() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const columns = [
@@ -639,10 +642,10 @@ function allTickets() {
     setSelectedReaction(reaction);
 
     switch (reaction) {
-      case "Понравилось":
+      case get_translation("INTERFACE_LIKE"):
         setQueryReaction(1);
         break;
-      case "Не понравилось":
+      case get_translation("INTERFACE_DISLIKE"):
         setQueryReaction(0);
         break;
       default:
@@ -835,7 +838,7 @@ function allTickets() {
           <div className="alltickets__nav-info">
             {!isHelper() && (
               <ButtonCustom
-                title="Написать обращение"
+                title={get_translation("INTERFACE_CREATE_TICKET")}
                 onClick={handleCreateTicket}
                 className={"alltickets__btn"}
               />
@@ -1016,7 +1019,8 @@ function allTickets() {
                             isHelper()
                               ? selectedReaction ||
                                 get_translation("INTERFACE_REACTIONS")
-                              : selectedReaction || "Мои реакции"
+                              : selectedReaction ||
+                                get_translation("INTERFACE_MY_REACTIONS")
                           }
                         >
                           {reactions.map((reaction, index) => (
@@ -1088,7 +1092,10 @@ function allTickets() {
                           <div className="alltickets__days-ago-label">ID</div>
                           <DropdownButton
                             id="dropdown-custom-1"
-                            title={selectedOuterId || "Партнер/Стр-ра"}
+                            title={
+                              selectedOuterId ||
+                              get_translation("INTERFACE_PARTNER_STRUCTURE")
+                            }
                           >
                             {outerIdSelect.map((outerId, index) => (
                               <Dropdown.Item
@@ -1232,7 +1239,8 @@ function allTickets() {
                             isHelper()
                               ? selectedReaction ||
                                 get_translation("INTERFACE_REACTIONS")
-                              : selectedReaction || "Мои реакции"
+                              : selectedReaction ||
+                                get_translation("INTERFACE_MY_REACTIONS")
                           }
                         >
                           {reactions.map((reaction, index) => (
@@ -1301,7 +1309,9 @@ function allTickets() {
                   fastFilterStr === "in-process" ? "primary" : "outline-primary"
                 }
               >
-                {get_translation("INTERFACE_IN_PROCESS")}
+                {get_translation(
+                  "TICKETSTATUS_B9C8AB323A26E59E41F56A62E1B4E5D1"
+                )}
               </Button>
               <Button
                 onClick={handleFastFilter.bind(null, "clarification")}
@@ -1311,7 +1321,9 @@ function allTickets() {
                     : "outline-primary"
                 }
               >
-                {get_translation("INTERFACE_ON_CLARIFICATION")}
+                {get_translation(
+                  "TICKETSTATUS_08F55006CF2D6B8E04B9A6A6929DAD22"
+                )}
               </Button>
             </ButtonGroup>
           )}
@@ -1525,7 +1537,9 @@ function allTickets() {
 
             <DropdownButton
               id="dropdown-custom-1"
-              title={itemsPerPage || "Количество строк"}
+              title={
+                itemsPerPage || get_translation("INTERFACE_NUMBER_OF_LINES")
+              }
               className="alltickets__amount"
             >
               {itemsPerPageArray.map((amount, index) => (
@@ -1551,7 +1565,7 @@ function allTickets() {
                 }
                 disabled={currentPage === 1}
               >
-                Предыдущая
+                {get_translation("INTERFACE_PREVIOUS")}
               </button>
             )}
             {pageNumbers.map((number) => (
@@ -1580,7 +1594,7 @@ function allTickets() {
                   currentPage === Math.ceil(ticketsAmount / itemsPerPage)
                 }
               >
-                Следующая
+                {get_translation("INTERFACE_NEXT")}
               </button>
             )}
           </ul>
@@ -1589,10 +1603,10 @@ function allTickets() {
       {dataAmount == 0 && !isHelper() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">
-            У вас нет тикетов, чтобы создать обращение нажмите на кнопку
+            {get_translation("INTERFACE_NO_TICKETS")}
           </span>
           <ButtonCustom
-            title="Создать новое обращение"
+            title={get_translation("INTERFACE_TICKET_CREATOR")}
             onClick={goToCreateTicket}
           />
         </div>

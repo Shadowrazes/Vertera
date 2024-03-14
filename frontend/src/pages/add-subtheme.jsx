@@ -20,6 +20,8 @@ import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
 import NotFoundPage from "./not-found-page";
 
+import get_translation from "../helpers/translation";
+
 function AddSubtheme() {
   const [dataQuery, setData] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
@@ -107,7 +109,7 @@ function AddSubtheme() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -141,15 +143,15 @@ function AddSubtheme() {
     let error = "";
 
     if (selectedUnit == null) {
-      error = "Выберите название раздела";
+      error = get_translation("INTERFACE_SELECT_UNIT");
     } else if (selectedTheme == null) {
-      error = "Выберите подтему";
+      error = get_translation("INTERFACE_SELECT_THEME");
     } else if (nameValue.trim() == "") {
-      error = "Укажите название подтемы";
+      error = get_translation("INTERFACE_ENTER_SUBTHEME_TITLE");
     } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
+      error = get_translation("INTERFACE_ERROR_NEGATIVE_SORT");
     } else {
-      error = "Ошибка при добавлении раздела";
+      error = get_translation("INTERFACE_ERROR_ADD_SUBTHEME");
     }
 
     return error;
@@ -222,12 +224,15 @@ function AddSubtheme() {
     <>
       {isAdmin() ? (
         <>
-          <BackTitle title="Добавить подтему" linkPrev={linkPrev} />
+          <BackTitle
+            title={get_translation("INTERFACE_ADD_SUBTHEME")}
+            linkPrev={linkPrev}
+          />
           <Row className="add-curator__row">
             <Col className="add-curator__column add-subtheme__column">
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedItem || "Выберите подразделение"}
+                title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
                 className="add-theme__dropdown"
               >
                 {dataQuery.map((unit, index) => (
@@ -244,7 +249,9 @@ function AddSubtheme() {
               {selectedUnit && (
                 <DropdownButton
                   id="dropdown-custom-1"
-                  title={selectedTheme || "Тип обращения"}
+                  title={
+                    selectedTheme || get_translation("INTERFACE_SELECT_THEME")
+                  }
                   className="add-theme__dropdown"
                 >
                   {dataQuery
@@ -266,7 +273,7 @@ function AddSubtheme() {
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Название подтемы"
+                  placeholder={get_translation("INTERFACE_SUBTHEME_TITLE")}
                   value={nameValue}
                   className="add-currator__input"
                   onChange={handleNameChange}
@@ -278,18 +285,18 @@ function AddSubtheme() {
                 onChange={(e) => handleDepartmentsOnChange(e.value)}
                 options={newDepartmentList}
                 optionLabel="name"
-                placeholder="Выбрать департамент"
+                placeholder={get_translation("INTERFACE_SELECT_DEPARTMENT")}
                 className="add-curator__multiselect"
               />
 
               <div>
                 <Form.Label className="edit-curator__field-label">
-                  Порядок
+                  {get_translation("INTERFACE_ORDER")}
                 </Form.Label>
                 <Form.Control
                   type="number"
                   className="add-currator__input"
-                  placeholder="Порядок"
+                  placeholder={get_translation("INTERFACE_ORDER")}
                   value={orderNum}
                   onChange={handleOrderNumChange}
                   min={0}
@@ -301,7 +308,7 @@ function AddSubtheme() {
               )}
 
               <ButtonCustom
-                title="Применить"
+                title={get_translation("INTERFACE_APPLY")}
                 className={"add-curator__btn"}
                 onClick={handleAddSubtheme}
               />
@@ -310,14 +317,18 @@ function AddSubtheme() {
 
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>Подтема создана</Modal.Title>
+              <Modal.Title>
+                {get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION")}
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Новая подтема успешно создана</p>
+              <p>
+                {get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION_FULL")}
+              </p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
-                Закрыть
+                {get_translation("INTERFACE_CLOSE")}
               </Button>
             </Modal.Footer>
           </Modal>

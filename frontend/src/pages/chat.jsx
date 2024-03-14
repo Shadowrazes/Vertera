@@ -28,7 +28,7 @@ import {
 import {
   ADD_MESSAGE,
   UPDATE_TICKET,
-  UPDATE_STATUS,
+  UPDATE_REACTION,
   EDIT_TICKET,
   SPLIT_TICKET,
 } from "../apollo/mutations";
@@ -321,7 +321,7 @@ function Chat() {
     { loading: loaderUpdateStatus, error: errorUpdateStatus },
   ] = useMutation(UPDATE_TICKET);
 
-  const [updateStatus] = useMutation(UPDATE_STATUS);
+  const [updateReaction] = useMutation(UPDATE_REACTION);
 
   const [editTicket, { loading: loadingEditTicket }] = useMutation(EDIT_TICKET);
 
@@ -669,7 +669,7 @@ function Chat() {
 
   const handleLike = (e) => {
     e.preventDefault();
-    updateTicket({
+    updateReaction({
       variables: {
         token: user.token,
         id: ticketId,
@@ -682,7 +682,7 @@ function Chat() {
 
   const handleDislike = (e) => {
     e.preventDefault();
-    updateTicket({
+    updateReaction({
       variables: {
         token: user.token,
         id: ticketId,

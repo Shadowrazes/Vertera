@@ -166,14 +166,16 @@ function FormComponent() {
           "Response not successful: Received status code 500" ? (
           <>
             <div className="auth">
-              <h2>Необходимо авторизироваться</h2>
+              <h2>{get_translation("INTERFACE_MUST_AUTH")}</h2>
               <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F">
-                <ButtonCustom title="Авторизироваться как партнер" />
+                <ButtonCustom
+                  title={get_translation("INTERFACE_PARTNER_AUTH")}
+                />
               </a>
             </div>
           </>
         ) : (
-          <h2>Что-то пошло не так</h2>
+          <h2>{get_translation("INTERFACE_ERROR")}</h2>
         )}
       </>
     );
@@ -264,19 +266,19 @@ function FormComponent() {
     let error = "";
 
     if (isFilesSizeExceeded) {
-      error = "Максимальный размер файла - 10 Мб";
+      error = get_translation("INTERFACE_ERROR_MAX_FILE_SIZE");
     } else if (isFilesLimitExceeded) {
-      error = "Вы можете загружать до 5 файлов";
+      error = get_translation("INTERFACE_ERROR_FILES_LIMIT");
     } else if (selectedUnitId == null) {
-      error = "Выберите подразделение";
+      error = get_translation("INTERFACE_SELECT_UNIT");
     } else if (selectedThemeId == null) {
-      error = "Выберите тип обращения";
+      error = get_translation("INTERFACE_SELECT_THEME");
     } else if (selectedSubThemeId == null) {
-      error = "Выберите подтему";
+      error = get_translation("INTERFACE_SELECT_SUBTHEME");
     } else if (textareaValue.trim() == "<p></p>") {
-      error = "Опишите ситуацию";
+      error = get_translation("INTERFACE_DESCRIBE_SITUATION");
     } else if (ticketTitleValue.trim() == "") {
-      error = "Укажите тему вышей проблемы";
+      error = get_translation("INTERFACE_DESCRIBE_TITLE");
     }
 
     return error;
@@ -376,7 +378,7 @@ function FormComponent() {
 
   const handleAddFileInput = () => {
     if (fileInputs.length >= 5) {
-      alert("Вы можете загрузить не более 5 файлов");
+      alert(get_translation("INTERFACE_ERROR_FILES_LIMIT"));
       return;
     }
     setFileInputs(
@@ -559,7 +561,7 @@ function FormComponent() {
             <Form.Group controlId="TicketTitleForm">
               <Form.Control
                 type="text"
-                placeholder="Тема обращения"
+                placeholder={get_translation("INTERFACE_TICKET_TITLE")}
                 className="form__input"
                 value={ticketTitleValue}
                 onChange={handleTicketTitleChange}
@@ -605,7 +607,7 @@ function FormComponent() {
                       variant="outline-danger"
                       onClick={() => handleRemoveFileInput(fileInput.id)}
                     >
-                      Удалить
+                      {get_translation("INTERFACE_DELETE")}
                     </Button>
                   )}
                 </Form.Group>
@@ -636,17 +638,16 @@ function FormComponent() {
 
       <Modal show={show}>
         <Modal.Header closeButton>
-          <Modal.Title>Ваше обращение создано</Modal.Title>
+          <Modal.Title>
+            {get_translation("INTERFACE_MESSAGE_CREATION_TICKET")}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>
-            Ваше обращение в техподдержку VERTERA принято в обработку. В
-            ближайшее время вы получите ответ.
-          </p>
+          <p>{get_translation("INTERFACE_MESSAGE_CREATION_TICKET_FULL")}</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Закрыть
+            {get_translation("INTERFACE_CLOSE")}
           </Button>
         </Modal.Footer>
       </Modal>

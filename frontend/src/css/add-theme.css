@@ -7,6 +7,10 @@
   flex-direction: column;
 }
 
+.add-subtheme__column .add-theme__dropdown {
+  margin: 0;
+}
+
 @media screen and (max-width: 1200px) {
   .add-theme__column .add-theme__dropdown {
     width: 416px !important;
@@ -26,10 +30,6 @@
 
   .add-subtheme__column .dropdown button {
     width: 416px !important;
-  }
-
-  .add-subtheme__column .add-theme__dropdown {
-    margin: 0;
   }
 
   .add-subtheme__column .add-curator__multiselect {

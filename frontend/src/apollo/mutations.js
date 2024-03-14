@@ -72,7 +72,7 @@ export const UPDATE_TICKET = gql`
   }
 `;
 
-export const UPDATE_STATUS = gql`
+export const UPDATE_REACTION = gql`
   mutation ($token: String!, $id: Int!, $reaction: Int) {
     clientMutation(token: $token) {
       updateTicketByClient(id: $id, fields: { reaction: $reaction }) {
