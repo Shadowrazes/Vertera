@@ -26,12 +26,14 @@ function TableTickets() {
   const [orderDir, setOrderDir] = useState("DESC");
 
   const columns = [
+    "id",
     "subTheme.theme.unit.name.stroke",
     "date",
     "subTheme.theme.name.stroke",
     "lastMessage.text",
   ];
   const columnsName = [
+    "ID",
     get_translation("INTERFACE_CHAPTER"),
     get_translation("INTERFACE_DATE"),
     get_translation("INTERFACE_THEME"),
@@ -138,18 +140,22 @@ function TableTickets() {
 
     switch (index) {
       case 0:
-        _orderBy = "unitStroke";
+        _orderBy = "id";
         break;
 
       case 1:
-        _orderBy = "date";
+        _orderBy = "unitStroke";
         break;
 
       case 2:
-        _orderBy = "themeStroke";
+        _orderBy = "date";
         break;
 
       case 3:
+        _orderBy = "themeStroke";
+        break;
+
+      case 4:
         _orderBy = "lastMsgDate";
         break;
 
@@ -250,44 +256,46 @@ function TableTickets() {
               {get_translation("INTERFACE_SORT")}:
             </span>
             {columns.map((column, index) => (
-              <div className="table__sort-wrapper">
-                <span
-                  key={column}
-                  onClick={() => {
-                    handleSorts(index);
-                  }}
-                  className={
-                    selectedSort === index
-                      ? "table__sort table__sort-active"
-                      : "table__sort"
-                  }
-                >
-                  {columnsName[index]}
-                  {selectedSort === index && (
-                    <span className="table__sort-arrow">
-                      <svg
-                        className={
-                          orderDir == "DESC"
-                            ? "table__sort-arrow-svg-rotated"
-                            : "table__sort-arrow-svg"
-                        }
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="7"
-                        height="10"
-                        viewBox="0 0 7 10"
-                        fill="none"
-                      >
-                        <path
-                          d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                          stroke="#00AB97"
-                          strokeWidth="0.8"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </span>
-                  )}
-                </span>
-              </div>
+              <>
+                {isAdmin() || index !== 0 ? (
+                  <span
+                    key={column}
+                    onClick={() => {
+                      handleSorts(index);
+                    }}
+                    className={
+                      selectedSort === index
+                        ? "table__sort table__sort-active"
+                        : "table__sort"
+                    }
+                  >
+                    {columnsName[index]}
+                    {selectedSort === index && (
+                      <span className="table__sort-arrow">
+                        <svg
+                          className={
+                            orderDir == "DESC"
+                              ? "table__sort-arrow-svg-rotated"
+                              : "table__sort-arrow-svg"
+                          }
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="7"
+                          height="10"
+                          viewBox="0 0 7 10"
+                          fill="none"
+                        >
+                          <path
+                            d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                            stroke="#00AB97"
+                            strokeWidth="0.8"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </span>
+                ) : null}
+              </>
             ))}
           </div>
           <div className="table__wrapper">
@@ -298,7 +306,12 @@ function TableTickets() {
                   <th>{get_translation("INTERFACE_CHAPTER")}</th>
                   <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
                   <th>{get_translation("INTERFACE_THEME")}</th>
-                  {isAdmin() && <th>{get_translation("INTERFACE_CURATOR")}</th>}
+                  {isAdmin() && (
+                    <>
+                      <th>ID партнера</th>
+                      <th>{get_translation("INTERFACE_CURATOR")}</th>
+                    </>
+                  )}
                   <th>{get_translation("INTERFACE_LAST_MSG")}</th>
                   <th>{get_translation("INTERFACE_MSG")}</th>
                   <th>{get_translation("INTERFACE_STATUS")}</th>
@@ -382,18 +395,32 @@ function TableTickets() {
                       </Link>
                     </td>
                     {isAdmin() && (
-                      <td className="d-md-table-cell">
-                        <Link
-                          to={`/dialog/${ticket.link}`}
-                          state={{
-                            status: ticket.status.name.stroke,
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
-                        </Link>
-                      </td>
+                      <>
+                        <td>
+                          <Link
+                            to={`/dialog/${ticket.link}`}
+                            state={{
+                              status: ticket.status.name.stroke,
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            {ticket.client.id}
+                          </Link>
+                        </td>
+                        <td className="d-md-table-cell">
+                          <Link
+                            to={`/dialog/${ticket.link}`}
+                            state={{
+                              status: ticket.status.name.stroke,
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                          </Link>
+                        </td>
+                      </>
                     )}
                     <td className="d-md-table-cell">
                       <Link

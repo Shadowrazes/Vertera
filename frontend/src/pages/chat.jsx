@@ -586,6 +586,37 @@ function Chat() {
     }
   };
 
+  const handleOpen = async () => {
+    if (loaderUpdateStatus) {
+      return <Loader />;
+    }
+    if (errorUpdateStatus) {
+      return <h2>Что-то пошло не так</h2>;
+    }
+
+    try {
+      setIsLoadingClose(true);
+
+      await updateTicket({
+        variables: {
+          token: user.token,
+          id: ticketId,
+          fields: {
+            statusId: 3,
+          },
+        },
+      });
+      // setTicketStatus("Закрыт");
+      setCurrentStatus("В процессе");
+      // console.log(ticketStatus);
+      setIsLoadingClose(false);
+    } catch (error) {
+      console.error("Ошибка при открытии заявки:", error);
+
+      setIsLoadingClose(false);
+    }
+  };
+
   const handleInProgress = async () => {
     if (loaderUpdateStatus) {
       return <Loader />;
@@ -1302,6 +1333,16 @@ function Chat() {
                     onClick={handleSplitTicket}
                   />
                 </a>
+              )}
+
+              {currentStatus === "Закрыт" && isAdmin() && (
+                <>
+                  <ButtonCustom
+                    title="Открыть тикет"
+                    className="chat-input__button-close"
+                    onClick={handleOpen}
+                  />
+                </>
               )}
             </div>
           </>

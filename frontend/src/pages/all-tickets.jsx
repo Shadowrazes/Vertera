@@ -429,6 +429,7 @@ function allTickets() {
   }
 
   const columns = [
+    "id",
     "subTheme.theme.unit.name.stroke",
     "date",
     "subTheme.theme.name.stroke",
@@ -436,6 +437,7 @@ function allTickets() {
   ];
 
   const columnsName = [
+    "ID",
     get_translation("INTERFACE_CHAPTER"),
     get_translation("INTERFACE_DATE"),
     get_translation("INTERFACE_THEME"),
@@ -456,18 +458,22 @@ function allTickets() {
 
     switch (index) {
       case 0:
-        _orderBy = "unitStroke";
+        _orderBy = "id";
         break;
 
       case 1:
-        _orderBy = "date";
+        _orderBy = "unitStroke";
         break;
 
       case 2:
-        _orderBy = "themeStroke";
+        _orderBy = "date";
         break;
 
       case 3:
+        _orderBy = "themeStroke";
+        break;
+
+      case 4:
         _orderBy = "lastMsgDate";
         break;
 
@@ -712,6 +718,7 @@ function allTickets() {
           dateBefore: selectedDateBefore,
           dateAfter: selectedDateAfter,
           reaction: queryReaction,
+          words: wordsFilterValue,
           limit: itemsPerPage,
           offset: offset,
           orderBy: orderBy,
@@ -1333,42 +1340,46 @@ function allTickets() {
               {get_translation("INTERFACE_SORT")}:
             </span>
             {columns.map((column, index) => (
-              <span
-                key={column}
-                onClick={() => {
-                  handleSorts(index);
-                }}
-                className={
-                  selectedSort === index
-                    ? "table__sort table__sort-active"
-                    : "table__sort"
-                }
-              >
-                {columnsName[index]}
-                {selectedSort === index && (
-                  <span className="table__sort-arrow">
-                    <svg
-                      className={
-                        orderDir == "DESC"
-                          ? "table__sort-arrow-svg-rotated"
-                          : "table__sort-arrow-svg"
-                      }
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="7"
-                      height="10"
-                      viewBox="0 0 7 10"
-                      fill="none"
-                    >
-                      <path
-                        d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                        stroke="#00AB97"
-                        strokeWidth="0.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
+              <>
+                {isHelper() || index !== 0 ? (
+                  <span
+                    key={column}
+                    onClick={() => {
+                      handleSorts(index);
+                    }}
+                    className={
+                      selectedSort === index
+                        ? "table__sort table__sort-active"
+                        : "table__sort"
+                    }
+                  >
+                    {columnsName[index]}
+                    {selectedSort === index && (
+                      <span className="table__sort-arrow">
+                        <svg
+                          className={
+                            orderDir == "DESC"
+                              ? "table__sort-arrow-svg-rotated"
+                              : "table__sort-arrow-svg"
+                          }
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="7"
+                          height="10"
+                          viewBox="0 0 7 10"
+                          fill="none"
+                        >
+                          <path
+                            d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                            stroke="#00AB97"
+                            strokeWidth="0.8"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
+                ) : null}
+              </>
             ))}
           </div>
 
@@ -1381,7 +1392,10 @@ function allTickets() {
                   <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
                   <th>{get_translation("INTERFACE_THEME")}</th>
                   {isHelper() && (
-                    <th>{get_translation("INTERFACE_CURATOR")}</th>
+                    <>
+                      <th>ID партнера</th>
+                      <th>{get_translation("INTERFACE_CURATOR")}</th>
+                    </>
                   )}
                   <th>{get_translation("INTERFACE_LAST_MSG")}</th>
                   <th>{get_translation("INTERFACE_MSG")}</th>
@@ -1463,18 +1477,32 @@ function allTickets() {
                       </Link>
                     </td>
                     {isHelper() && (
-                      <td>
-                        <Link
-                          to={`/dialog/${ticket.link}`}
-                          state={{
-                            status: ticket.status.name.stroke,
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
-                        </Link>
-                      </td>
+                      <>
+                        <td>
+                          <Link
+                            to={`/dialog/${ticket.link}`}
+                            state={{
+                              status: ticket.status.name.stroke,
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            {ticket.client.id}
+                          </Link>
+                        </td>
+                        <td>
+                          <Link
+                            to={`/dialog/${ticket.link}`}
+                            state={{
+                              status: ticket.status.name.stroke,
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                          </Link>
+                        </td>
+                      </>
                     )}
                     <td>
                       <Link

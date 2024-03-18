@@ -203,6 +203,10 @@
   background: #f8f9fa;
 }
 
+.alltickets__days-ago .alltickets__days-ago-input {
+  box-shadow: none;
+}
+
 .filter-buttonGroup button {
   font-size: 16px;
 }
@@ -220,8 +224,8 @@
 }
 
 .alltickets__btn-outlined {
-  border: 1px solid #00AB97 !important;
-  color: #00AB97 !important;
+  border: 1px solid #00ab97 !important;
+  color: #00ab97 !important;
   background-color: white !important;
 }
 
