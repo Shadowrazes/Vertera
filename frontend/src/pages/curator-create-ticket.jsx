@@ -475,7 +475,7 @@ function CuratorCreateTicket() {
               filter
             />
 
-            <Form.Group className="mb-3 fileInputForm">
+            <Form.Group className="mb-3 fileInputForm fileIdInput">
               <Form.Control
                 type="file"
                 accept=".txt"
