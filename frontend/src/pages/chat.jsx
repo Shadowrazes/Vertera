@@ -4,33 +4,33 @@ import draftToHtml from "draftjs-to-html";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import {
-  Button,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Form,
-  Modal,
-  Row,
-  Tab,
-  Table,
-  Tabs,
-  ToggleButton,
-  ToggleButtonGroup,
+	Button,
+	Col,
+	Dropdown,
+	DropdownButton,
+	Form,
+	Modal,
+	Row,
+	Tab,
+	Table,
+	Tabs,
+	ToggleButton,
+	ToggleButtonGroup,
 } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
-  ADD_MESSAGE,
-  EDIT_TICKET,
-  SPLIT_TICKET,
-  UPDATE_REACTION,
-  UPDATE_TICKET,
+	ADD_MESSAGE,
+	EDIT_TICKET,
+	SPLIT_TICKET,
+	UPDATE_REACTION,
+	UPDATE_TICKET,
 } from "../apollo/mutations";
 import {
-  CURATORS_LIST,
-  MESSAGES_CHAT,
-  MESSAGES_CHAT_CLIENT,
-  THEME_LIST,
+	CURATORS_LIST,
+	MESSAGES_CHAT,
+	MESSAGES_CHAT_CLIENT,
+	THEME_LIST,
 } from "../apollo/queries";
 
 import { Editor } from "react-draft-wysiwyg";
@@ -217,23 +217,6 @@ function Chat() {
   const toggleFormVisibility = () => {
     setIsFormVisible((prev) => !prev);
   };
-
-  useEffect(() => {
-    function handleScroll() {
-      const block = document.querySelector(".chat-input__container");
-      const blockOffset = block.getBoundingClientRect().top + window.scrollY;
-      const windowHeight = window.innerHeight;
-      const scrollPosition = window.scrollY;
-
-      setIsSticky(scrollPosition + windowHeight >= blockOffset);
-    }
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   useEffect(() => {
     if (isAdmin()) {
@@ -1811,13 +1794,6 @@ function Chat() {
                   >
                     {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
                   </button>
-                  {/* <a className="alltickets__link">
-                    <ButtonCustom
-                      title={isFormVisible ? "Скрыть" : "Открыть"}
-                      onClick={toggleFormVisibility}
-                      className={"alltickets__btn-outlined single"}
-                    />
-                  </a> */}
                   {isFormVisible && (
                     <Row className="chat-input__row">
                       <Col className="chat-input__row">
