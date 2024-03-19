@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const TABLE_TICKETS = gql`
-  query ($token: String!, $filters: TicketFilter!) {
+  query ($token: String!, $filters: TicketFilter!, $lang: String!) {
     helperQuery(token: $token) {
       ticketList(filters: $filters) {
         count
@@ -21,15 +21,15 @@ export const TABLE_TICKETS = gql`
             }
           }
           subTheme {
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
             theme {
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
               unit {
-                name(lang: "ru") {
+                name(lang: $lang) {
                   stroke
                 }
               }
@@ -38,7 +38,7 @@ export const TABLE_TICKETS = gql`
           date
           subTheme {
             theme {
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
             }

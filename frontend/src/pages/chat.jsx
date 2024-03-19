@@ -282,12 +282,12 @@ function Chat() {
         const inputs = Array.from({ length: newTicketsCount }, (_, index) => ({
           id: index + 1,
           title: "",
-          unit: null,
-          unitId: null,
-          theme: null,
-          themeId: null,
-          subtheme: null,
-          subthemeId: null,
+          unit: data.clientQuery.ticket.subTheme.theme.unit.name.stroke,
+          unitId: data.clientQuery.ticket.subTheme.theme.unit.id,
+          theme: data.clientQuery.ticket.subTheme.theme.name.stroke,
+          themeId: data.clientQuery.ticket.subTheme.theme.id,
+          subtheme: data.clientQuery.ticket.subTheme.name.stroke,
+          subthemeId: data.clientQuery.ticket.subTheme.id,
           editorContent: EditorState.createEmpty(),
           text: "",
         }));
