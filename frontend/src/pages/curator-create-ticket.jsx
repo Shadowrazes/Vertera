@@ -383,6 +383,10 @@ function CuratorCreateTicket() {
     setIsVisible(false);
   };
 
+  const handleFileIdInput = (e) => {
+    const files = e.target.files;
+  };
+
   const newCuratorList = dataQueryCurators.map((curator) => ({
     name: `${curator.user.surname} ${curator.user.name} ${
       curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
@@ -474,8 +478,8 @@ function CuratorCreateTicket() {
             <Form.Group className="mb-3 fileInputForm">
               <Form.Control
                 type="file"
-                accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                onChange={handleFileChange}
+                accept=".txt"
+                onChange={handleFileIdInput}
               />
             </Form.Group>
           </Col>
