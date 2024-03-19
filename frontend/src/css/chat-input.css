@@ -1,4 +1,4 @@
-.chat-messages__container .alltickets__container {
+.alltickets__container .chat-messages__containe {
   margin: 0px;
 }
 
@@ -130,17 +130,32 @@
   left: 0;
   right: 0; */
   display: flex;
-  justify-content: center;
+  justify-content: start;
+  margin-bottom: 20px;
+
   /* width: 100%;
   padding: 50px 0;
   box-shadow: 0px 0px 24px 0px rgba(0, 0, 0, 0.14);
   background: #ffffff; */
+  /* position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%; */
 }
 
 .chat-input__form {
-  display: flex;
-  justify-content: center;
-  width: 670px;
+  // width: 670px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: white;
+  display: block;
+  padding: 10px;
+  margin-bottom: 1px !important;
+  padding-bottom: 10px;
+  // margin: 0 auto;
 }
 
 .chat-input__row {
@@ -342,4 +357,34 @@
   .chat__helper-buttons .chat-input__button-close {
     width: 100% !important;
   }
+}
+
+.toggle-button {
+  background-color: #00ab97;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 5px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.toggle-button-active {
+  background-color: #00ab97;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 5px;
+  margin-right: calc(100% - 150px);
+}
+
+.toggle-button:hover {
+  background-color: #008c7d;
 }
