@@ -207,12 +207,11 @@ function Stats() {
       })
       .map((userData) => {
         return {
-          name:
-            userData?.helper?.user?.name +
-            " " +
-            userData?.helper?.user?.surname +
-            " " +
-            userData?.helper?.user?.patronymic,
+          name: `${userData.helper.user.surname} ${userData.helper.user.name} ${
+            userData.helper.user.patronymic
+              ? ` ${userData.helper.user.patronymic}`
+              : ""
+          }`,
           value: getTimeStr(userData?.stats?.avgReplyTime),
         };
       });
