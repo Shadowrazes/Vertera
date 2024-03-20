@@ -44,9 +44,15 @@ export const InputsUpdate = `
     }
 
     input CountryUpdate {
-        code: String!
-        stroke: String!
         lang: String!
+        code: String
+        stroke: String
+        langIds: [Int]
+    }
+
+    input LangUpdate {
+        name: String
+        code: String
     }
 
     input TicketStatusUpdate {

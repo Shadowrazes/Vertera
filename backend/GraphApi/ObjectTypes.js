@@ -14,6 +14,13 @@ export const ObjectTypes = `
         id: Int!
         code: String!
         name(lang: String!): Translation!
+        langs: [Lang]!
+    }
+
+    type Lang{
+        id: Int!
+        name: String!
+        code: String!
     }
 
     type Client {

@@ -16,6 +16,22 @@ class Translation extends Entity {
         'ticketStatus', 'subTheme', 'theme', 'unit', 'department', 'jobTitle', 'country'
     ];
 
+    static transformTranslations(obj) {
+        const newObj = { ...obj };
+        const translations = [];
+    
+        Object.keys(newObj).forEach(key => {
+            if (key !== 'id' && key !== 'type' && key !== 'code' && newObj[key]) {
+                translations.push({ code: key, stroke: newObj[key] });
+                newObj[key] = null;
+            }
+        });
+    
+        newObj.translations = translations;
+    
+        return newObj;
+    }
+
     static async GetAutoTranslation(stroke, lang) {
         const apiKey = "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";
         const model = "gpt-3.5-turbo";
@@ -81,6 +97,33 @@ class Translation extends Entity {
         return result;
     }
 
+    static async AddLang(conn, langCode) {
+        const sql = `
+            ALTER TABLE ${this.TableName}
+            ADD COLUMN ?? VARCHAR(512) NULL DEFAULT NULL
+        `;
+        const result = await super.TransRequest(conn, sql, [langCode]);
+        return result;
+    }
+
+    static async RenameLang(conn, langCodeOld, langCodeNew) {
+        const sql = `
+            ALTER TABLE ${this.TableName}
+            CHANGE COLUMN ?? ?? VARCHAR(512) NULL DEFAULT NULL
+        `;
+        const result = await super.TransRequest(conn, sql, [langCodeOld, langCodeNew]);
+        return result;
+    }
+
+    static async DropLang(conn, langCode) {
+        const sql = `
+            ALTER TABLE ${this.TableName}
+            DROP COLUMN ??
+        `;
+        const result = await super.TransRequest(conn, sql, [langCode]);
+        return result;
+    }
+
     static async Insert(fields) {
         // одинаковые переводы элементов интерфейса в разных частях сайта?
         if (!this.OuterTypes.includes(fields.type)) throw new Error(Errors.ForbiddenTranslationType);
@@ -88,10 +131,10 @@ class Translation extends Entity {
         const code = Translitter.Transform(fields.type + ' ' + md5(new Date().toISOString()));
         const sql = `
             INSERT INTO ${this.TableName} 
-            SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${fields.type}'
+            SET ${fields.lang} = ?, ${this.CodeField} = ?, ${this.TypeField} = ?
         `;
 
-        const result = await super.Request(sql, [fields.stroke]);
+        const result = await super.Request(sql, [fields.stroke, code, fields.type]);
         return code;
     }
 
@@ -102,10 +145,10 @@ class Translation extends Entity {
         const code = Translitter.Transform(type + ' ' + md5(new Date().toISOString()));
         const sql = `
             INSERT INTO ${this.TableName} 
-            SET ${fields.lang} = ?, ${this.CodeField} = '${code}', ${this.TypeField} = '${type}'
+            SET ${fields.lang} = ?, ${this.CodeField} = ?, ${this.TypeField} = ?
         `;
 
-        const result = await super.TransRequest(conn, sql, [fields.stroke]);
+        const result = await super.TransRequest(conn, sql, [fields.stroke, code, type]);
         return code;
     }
 
@@ -141,8 +184,10 @@ class Translation extends Entity {
         return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
     }
 
-    static async Delete(code) {
-
+    static async TransDelete(conn, code) {
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.CodeField} = ?`;
+        const result = await super.TransRequest(conn, sql, [code]);
+        return result.affectedRows;
     }
 }
 

@@ -19,6 +19,8 @@ import TicketStatus from '../Entities/TicketStatus.js';
 import HelperJobTitle from '../Entities/HelperJobTitle.js'
 import Translation from "../Entities/Translation.js";
 import TicketLog from '../Entities/TicketLog.js';
+import CountryLangs from '../Entities/CountryLangs.js';
+import Langs from '../Entities/Langs.js';
 import Errors from '../Utils/Errors.js';
 
 Entity.Pool = Pool;
@@ -86,6 +88,9 @@ export const resolvers = {
         },
         countryList: async (_, args) => {
             return await Country.GetList();
+        },
+        langList: async (_, args) => {
+            return await Langs.GetList();
         },
         translationListByType: async (_, args) => {
             return await Translation.GetListByType(args.lang, args.type);
@@ -193,6 +198,9 @@ export const resolvers = {
         addCountry: async (_, args) => {
             return await Country.TransInsert(args.fields);
         },
+        addLang: async (_, args) => {
+            return await Langs.TransInsert(args.fields);
+        },
         addJobTitle: async (_, args) => {
             return await HelperJobTitle.TransInsert(args.fields);
         },
@@ -229,6 +237,9 @@ export const resolvers = {
         updateCountry: async (_, args) => {
             return await Country.TransUpdate(args.id, args.fields);
         },
+        updateLang: async (_, args) => {
+            return await Langs.TransUpdate(args.id, args.fields);
+        },
         updateTicketStatus: async (_, args) => {
             return await TicketStatus.TransUpdate(args.id, args.fields);
         },
@@ -258,6 +269,12 @@ export const resolvers = {
         },
         deleteDepartment: async (_, { id }) => {
             return await Department.DeleteCascade(id);
+        },
+        deleteCountry: async (_, { id }) => {
+            return await Country.DeleteCascade(id);
+        },
+        deleteLang: async (_, { id }) => {
+            return await Langs.TransDelete(id);
         },
     },
     User: {
@@ -382,6 +399,9 @@ export const resolvers = {
     Country: {
         name: async (parent, args) => {
             return await Translation.GetByCode(args.lang, parent.nameCode);
+        },
+        langs: async (parent, args) => {
+            return await CountryLangs.GetListByCountryId(parent.id);
         },
     },
     DateTime: new GraphQLScalarType({

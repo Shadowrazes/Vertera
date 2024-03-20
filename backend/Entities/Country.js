@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
+import CountryLangs from "./CountryLangs.js";
 
 class Country extends Entity {
     static TableName = 'countries';
@@ -27,15 +28,50 @@ class Country extends Entity {
             const sql = `INSERT INTO ${this.TableName} SET ?`;
             const insertFields = { nameCode };
             const result = await super.TransRequest(conn, sql, [insertFields]);
+
+            const langResult = await CountryLangs.TransInsert(conn, result.insertId, fields.langIds);
+
             return nameCode;
         });
     }
 
     static async TransUpdate(id, fields) {
         return await super.Transaction(async (conn) => {
-            const row = await this.GetById(id);
-            const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
-            return translationResult;
+            if (super.ArgsSize(fields) < 2) throw new Error(Errors.EmptyArgsFields);
+
+            let result = undefined;
+
+            const curCountry = await this.GetById(id);
+
+            if(fields.langIds){
+                const delResult = await CountryLangs.TransDeleteByCountry(conn, id, fields.langIds);
+                result = await CountryLangs.TransInsert(conn, id, fields.langIds);
+            }
+
+            if(fields.stroke){
+                result = await Translation.TransUpdate(conn, fields, curCountry.nameCode);
+            }
+
+            const updateFields = {};
+            if (fields.code) updateFields.code = fields.code;
+            if (!super.IsArgsEmpty(updateFields)) {
+                const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+                result = await super.TransRequest(conn, sql, [updateFields, id]);
+            }
+
+            return result;
+        });
+    }
+
+    static async DeleteCascade(id) {
+        return await super.Transaction(async (conn) => {
+            const curCountry = await this.GetById(id);
+            const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [id]);
+
+            const translationResult = await Translation.TransDelete(conn, curCountry.nameCode);
+
+            return result.affectedRows;
         });
     }
 }
