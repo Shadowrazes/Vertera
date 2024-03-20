@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { Translater } from "../api/translater";
 import { franc } from "franc";
+import { Translater } from "../api/translater";
 
 import "../css/chat-message-sender.css";
 
@@ -68,6 +68,7 @@ function ChatMessage({ message, sender, time, attachs }) {
   };
 
   useEffect(() => {
+    console.log("time = ", time);
     const fetchData = async () => {
       if (languageCode.hasOwnProperty(franc(message))) {
         if ((languageCode[franc(message)][0] || franc(message)) !== language) {
@@ -129,8 +130,7 @@ function ChatMessage({ message, sender, time, attachs }) {
                         rel="noopener noreferrer"
                         href={
                           isBuild
-                            ? "https://help.vertera.org:4444" +
-                              attach.path
+                            ? "https://help.vertera.org:4444" + attach.path
                             : "http://localhost:4444" + attach.path
                         }
                       >

@@ -270,7 +270,12 @@
 }
 
 .chat__table-log {
-  margin: 30px auto;
+  margin: 30px auto 30px auto;
+  width: 60%;
+}
+
+.chat__table-log-new {
+  margin: 30px auto 150px auto;
   width: 60%;
 }
 

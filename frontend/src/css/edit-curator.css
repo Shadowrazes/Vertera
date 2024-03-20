@@ -1,73 +1,97 @@
 .edit-curator__row {
-    display: flex;
+  display: flex;
 }
 
 .edit-curator__column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .edit-curator__field-label {
-    font-family: 'TT Norms Pro', sans-serif;
-    font-size: 20px;
+  font-family: "TT Norms Pro", sans-serif;
+  font-size: 20px;
 }
 
 .edit-curator__field-column {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .edit-curator__column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .rs-input {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .edit-curator__btn-row {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .edit-curator__btn {
-    width: 200px !important;
+  width: 200px !important;
+}
+
+.edit-curator__checkbox-block {
+  display: flex;
+  gap: 20px;
+  aligng-items: center;
+  justify-content: start;
+}
+
+.edit-curator__form_Check {
+  display: flex;
+  align-items: center;
+}
+
+#custom-switch {
+  width: 60px;
+  height: 30px;
+}
+
+#custom-switch:checked {
+  width: 60px;
+  height: 30px;
+  background-color: #00ab97;
+  border-color: #00ab97;
 }
 
 @media screen and (max-width: 1200px) {
-    .edit-curator__column .dropdown button {
-        width: 100% !important;
-    }
+  .edit-curator__column .dropdown button {
+    width: 100% !important;
+  }
 
-    .edit-curator__column .add-curator__multiselect {
-        width: 100% !important;
-    }
+  .edit-curator__column .add-curator__multiselect {
+    width: 100% !important;
+  }
 
-    .edit-curator__column .add-currator__input {
-        width: 100% !important;
-    }
+  .edit-curator__column .add-currator__input {
+    width: 100% !important;
+  }
 
-    .edit-curator__column .add-curator__date-picker {
-        width: 100% !important;
-    }
+  .edit-curator__column .add-curator__date-picker {
+    width: 100% !important;
+  }
 
-    .edit-curator__btn-row {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        margin-top: 20px;
-    }
+  .edit-curator__btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
 
-    .edit-curator__column .add-curator__btn {
-        width: 100% !important;
-    }
+  .edit-curator__column .add-curator__btn {
+    width: 100% !important;
+  }
 }
 
 @media screen and (max-width: 768px) {
-    .add-curator__btn {
-        width: 100% !important;
-    }
+  .add-curator__btn {
+    width: 100% !important;
+  }
 }
