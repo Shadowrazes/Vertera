@@ -4,33 +4,33 @@ import draftToHtml from "draftjs-to-html";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import {
-	Button,
-	Col,
-	Dropdown,
-	DropdownButton,
-	Form,
-	Modal,
-	Row,
-	Tab,
-	Table,
-	Tabs,
-	ToggleButton,
-	ToggleButtonGroup,
+  Button,
+  Col,
+  Dropdown,
+  DropdownButton,
+  Form,
+  Modal,
+  Row,
+  Tab,
+  Table,
+  Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
-	ADD_MESSAGE,
-	EDIT_TICKET,
-	SPLIT_TICKET,
-	UPDATE_REACTION,
-	UPDATE_TICKET,
+  ADD_MESSAGE,
+  EDIT_TICKET,
+  SPLIT_TICKET,
+  UPDATE_REACTION,
+  UPDATE_TICKET,
 } from "../apollo/mutations";
 import {
-	CURATORS_LIST,
-	MESSAGES_CHAT,
-	MESSAGES_CHAT_CLIENT,
-	THEME_LIST,
+  CURATORS_LIST,
+  MESSAGES_CHAT,
+  MESSAGES_CHAT_CLIENT,
+  THEME_LIST,
 } from "../apollo/queries";
 
 import { Editor } from "react-draft-wysiwyg";
@@ -2019,14 +2019,6 @@ function Chat() {
                   <Row className="chat-input__row">
                     <Col className="chat-input__row">
                       <Form.Group className="custom-editor">
-                        {/* <Form.Control
-                    as="textarea"
-                    placeholder="Текст сообщения"
-                    rows={3}
-                    value={message}
-                    onChange={handleChange}
-                    className="chat-input__textarea"
-                  /> */}
                         <Editor
                           editorState={editorState}
                           onEditorStateChange={handleEditorChange}
@@ -2127,10 +2119,6 @@ function Chat() {
                         attachs={msg.attachs}
                         onClick
                       />
-                      {/* <ButtonCustom
-                        onClick={}
-                        title="перевести"
-                      /> */}
                     </>
                   ) : msg.sender.role === "system" ? (
                     <>
