@@ -16,20 +16,21 @@ class Translation extends Entity {
         'ticketStatus', 'subTheme', 'theme', 'unit', 'department', 'jobTitle', 'country'
     ];
 
-    static transformTranslations(obj) {
-        const newObj = { ...obj };
-        const translations = [];
+    static TransformTranslations(translations) {
+        for (let i = 0; i < translations.length; i++) {
+            const translation = translations[i];
+            const newObj = { id: translation.id, type: translation.type, code: translation.code };
+            const newObjTranslations = [];
     
-        Object.keys(newObj).forEach(key => {
-            if (key !== 'id' && key !== 'type' && key !== 'code' && newObj[key]) {
-                translations.push({ code: key, stroke: newObj[key] });
-                newObj[key] = null;
-            }
-        });
+            Object.keys(translation).forEach(key => {
+                if (key !== 'id' && key !== 'type' && key !== 'code') {
+                    newObjTranslations.push({ lang: key, stroke: translation[key] });
+                }
+            });
     
-        newObj.translations = translations;
-    
-        return newObj;
+            newObj.translations = newObjTranslations;
+            translations[i] = newObj;
+        }
     }
 
     static async GetAutoTranslation(stroke, lang) {
@@ -93,7 +94,8 @@ class Translation extends Entity {
         const sql = `
             SELECT * FROM ${this.TableName}
         `;
-        const result = await super.Request(sql);
+        let result = await super.Request(sql);
+        this.TransformTranslations(result);
         return result;
     }
 
