@@ -12,37 +12,38 @@ import draftToHtml from "draftjs-to-html";
 import { EditorState, convertToRaw } from "draft-js";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { THEME_LIST } from "../apollo/queries";
+import { THEME_LIST, CURATORS_LIST } from "../apollo/queries";
 import { ADD_TICKET } from "../apollo/mutations";
 
 import { Editor } from "react-draft-wysiwyg";
+import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
-import TitleH2 from "./title";
+import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 
 import "../css/form.css";
 
 import get_translation from "../helpers/translation";
 
-function FormComponent() {
+function CuratorCreateTicket() {
   const [dataQuery, setData] = useState([]);
+  const [dataQueryCurators, setDataQueryCurators] = useState([]);
 
   const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [textareaValue, setTextareaValue] = useState("");
+  const [selectedCurators, setSelectedCurators] = useState([]);
+  const [selectedCuratorsId, setSelectedCuratorsId] = useState([]);
 
   const [ticketTitleValue, setTicketTitleValue] = useState("");
 
-  const [selectedUnitId, setSelectedUnitId] = useState(null);
-  const [selectedThemeId, setSelectedThemeId] = useState(null);
-  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
-
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
-
-  const [show, setShow] = useState(false);
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -54,13 +55,10 @@ function FormComponent() {
   );
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const isBuild = import.meta.env.DEV !== "build";
 
   const isAdmin = () => {
     return user?.role === "helper" || user?.role === "system";
   };
-
-  let userId = user ? user.id : 999;
 
   const [fileInputs, setFileInputs] = useState([
     {
@@ -73,16 +71,21 @@ function FormComponent() {
       token: user?.token,
     },
   });
+  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+    variables: {
+      token: user?.token,
+    },
+  });
 
   useEffect(() => {
-    if (isAdmin()) {
-      document.location.href = "/all-tickets";
-    }
-
     if (data && data.clientQuery.allThemeTree) {
       setData(data.clientQuery.allThemeTree);
     }
-  }, [data]);
+
+    if (dataCurators && dataCurators.helperQuery.helperList) {
+      setDataQueryCurators(dataCurators.helperQuery.helperList);
+    }
+  }, [data, dataQueryCurators]);
 
   const [addTicket] = useMutation(ADD_TICKET);
 
@@ -158,32 +161,11 @@ function FormComponent() {
         }
       }
     }
-
     return (
       <>
-        {userId == 999 ||
-        error.networkError.message ==
-          "Response not successful: Received status code 500" ? (
-          <>
-            <div className="auth">
-              <h2>{get_translation("INTERFACE_MUST_AUTH")}</h2>
-              <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F">
-                <ButtonCustom
-                  title={get_translation("INTERFACE_PARTNER_AUTH")}
-                />
-              </a>
-            </div>
-          </>
-        ) : (
-          <h2>{get_translation("INTERFACE_ERROR")}</h2>
-        )}
+        <h2>{get_translation("INTERFACE_ERROR")}</h2>
       </>
     );
-  }
-
-  if ((user.role && user.role === "helper") || user.role === "system") {
-    // console.log(132);
-    return <></>;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -242,6 +224,11 @@ function FormComponent() {
     // console.log(subThemeId);
 
     setIsVisible(false);
+  };
+
+  const handleCuratorsOnChange = (curators) => {
+    setSelectedCurators(curators);
+    setSelectedCuratorsId(curators.map((curator) => curator.id));
   };
 
   const handleEditorChange = (newEditorState) => {
@@ -396,14 +383,16 @@ function FormComponent() {
     setIsVisible(false);
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleFileIdInput = (e) => {
+    const files = e.target.files;
   };
 
-  const handleClose = () => {
-    setShow(false);
-    window.location.reload();
-  };
+  const newCuratorList = dataQueryCurators.map((curator) => ({
+    name: `${curator.user.surname} ${curator.user.name} ${
+      curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+    }`,
+    id: curator.id,
+  }));
 
   return (
     <>
@@ -475,6 +464,24 @@ function FormComponent() {
                   ))}
               </DropdownButton>
             )}
+            <MultiSelect
+              value={selectedCurators}
+              onChange={(e) => handleCuratorsOnChange(e.value)}
+              options={newCuratorList}
+              optionLabel="name"
+              className="add-curator__multiselect"
+              placeholder={get_translation("INTERFACE_CURATOR")}
+              emptyMessage="Нет доступных опций"
+              filter
+            />
+
+            <Form.Group className="mb-3 fileInputForm fileIdInput">
+              <Form.Control
+                type="file"
+                accept=".txt"
+                onChange={handleFileIdInput}
+              />
+            </Form.Group>
           </Col>
 
           <Col className="form__column">
@@ -555,24 +562,8 @@ function FormComponent() {
           </Col>
         </Row>
       </Form>
-
-      <Modal show={show}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {get_translation("INTERFACE_MESSAGE_CREATION_TICKET")}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>{get_translation("INTERFACE_MESSAGE_CREATION_TICKET_FULL")}</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            {get_translation("INTERFACE_CLOSE")}
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 }
 
-export default FormComponent;
+export default CuratorCreateTicket;

@@ -93,6 +93,7 @@ function allTickets() {
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   let userId = null;
 
@@ -188,6 +189,7 @@ function allTickets() {
           statusIds: null,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     } else {
@@ -205,6 +207,7 @@ function allTickets() {
           orderDir: orderDir,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     }
@@ -250,6 +253,7 @@ function allTickets() {
           orderDir: "DESC",
           lang: "ru",
         },
+        lang: language,
       },
     });
   };
@@ -266,6 +270,7 @@ function allTickets() {
           orderDir: "DESC",
           lang: "ru",
         },
+        lang: language,
       },
     });
   };
@@ -313,6 +318,7 @@ function allTickets() {
           statusIds: helperStatusFilter,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     } else {
@@ -330,6 +336,7 @@ function allTickets() {
           orderDir: orderDir,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     }
@@ -509,6 +516,7 @@ function allTickets() {
           statusIds: helperStatusFilter,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     } else {
@@ -526,6 +534,7 @@ function allTickets() {
           orderDir: _orderDir,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     }
@@ -683,6 +692,8 @@ function allTickets() {
       let helperIds;
       if (selectedCuratorsId.length === 0) {
         helperIds = user.id;
+      } else if (user.id === 0) {
+        helperIds = undefined;
       } else {
         helperIds = selectedCuratorsId;
       }
@@ -707,6 +718,7 @@ function allTickets() {
           outerId: parseInt(numberIdFilterValue),
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     } else {
@@ -725,6 +737,7 @@ function allTickets() {
           orderDir: orderDir,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     }
@@ -774,6 +787,7 @@ function allTickets() {
           statusIds: fastFilterStatus,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     } else {
@@ -791,9 +805,18 @@ function allTickets() {
           orderDir: orderDir,
           lang: "ru",
         },
+        lang: language,
       };
       await refetch(variables);
     }
+  };
+
+  const handleUnitStroke = (unit) => {
+    const words = unit.split(/[ /]/);
+    const firstLetters = words.map((word) => word.charAt(0).toUpperCase());
+    const result = firstLetters.join("");
+
+    return result;
   };
 
   const getStatusColor = (status) => {
@@ -1428,12 +1451,9 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {`${
-                          ticket.subTheme.theme.unit.name.stroke ===
-                          "Партнерам/Клиентам"
-                            ? "ПК"
-                            : "ДО"
-                        } | ${ticket.subTheme.theme.name.stroke} ${
+                        {`${handleUnitStroke(
+                          ticket.subTheme.theme.unit.name.stroke
+                        )} | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
                             ? ""
                             : `| ${ticket.subTheme.name.stroke}`

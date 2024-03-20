@@ -82,6 +82,10 @@
   border-radius: 6px;
 }
 
+.p-multiselect-empty-message {
+  margin-left: 15px;
+}
+
 .dropdown-menu {
   width: 416px !important;
 }

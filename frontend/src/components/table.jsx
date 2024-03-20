@@ -41,6 +41,7 @@ function TableTickets() {
   ];
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
   let userId = null;
 
   if (user?.id === null) {
@@ -67,6 +68,7 @@ function TableTickets() {
           orderDir: "DESC",
           lang: "ru",
         },
+        lang: language,
       },
     });
   };
@@ -83,6 +85,7 @@ function TableTickets() {
           orderDir: "DESC",
           lang: "ru",
         },
+        lang: language,
       },
     });
   };
@@ -181,6 +184,7 @@ function TableTickets() {
           orderDir: _orderDir,
           lang: "ru",
         },
+        lang: language,
       };
 
       await refetch(variables);
@@ -193,6 +197,7 @@ function TableTickets() {
           orderDir: _orderDir,
           lang: "ru",
         },
+        lang: language,
       };
 
       await refetch(variables);
@@ -225,6 +230,14 @@ function TableTickets() {
       </>
     );
   }
+
+  const handleUnitStroke = (unit) => {
+    const words = unit.split(/[ /]/);
+    const firstLetters = words.map((word) => word.charAt(0).toUpperCase());
+    const result = firstLetters.join("");
+
+    return result;
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -346,12 +359,9 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {`${
-                          ticket.subTheme.theme.unit.name.stroke ===
-                          "Партнерам/Клиентам"
-                            ? "ПК"
-                            : "ДО"
-                        } | ${ticket.subTheme.theme.name.stroke} ${
+                        {`${handleUnitStroke(
+                          ticket.subTheme.theme.unit.name.stroke
+                        )} | ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
                             ? ""
                             : `| ${ticket.subTheme.name.stroke}`
