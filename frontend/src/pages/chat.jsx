@@ -2129,10 +2129,6 @@ function Chat() {
                         attachs={msg.attachs}
                         onClick
                       />
-                      {/* <ButtonCustom
-                        onClick={}
-                        title="перевести"
-                      /> */}
                     </>
                   ) : msg.sender.role === "system" ? (
                     <>

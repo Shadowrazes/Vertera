@@ -25,6 +25,7 @@ export const Mutations = `
         addTranslation(fields: TranslationInsert!): String!
         addTicketStatus(fields: TicketStatusInsert!): String!
         addCountry(fields: CountryInsert!): String!
+        addLang(fields: LangInsert!): String!
         addJobTitle(fields: HelperJobTitleInsert!): String!
         addSubTheme(fields: SubThemeInsert!): String!
         addTheme(fields: ThemeInsert!): String!
@@ -38,6 +39,7 @@ export const Mutations = `
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
         updateCountry(id: Int!, fields: CountryUpdate!): UpdateInfo!
+        updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
         updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
         updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
 
@@ -48,5 +50,7 @@ export const Mutations = `
         deleteSubTheme(id: Int!) : Int!
         deleteThemeDepartment(id: Int!) : Int!
         deleteDepartment(id: Int!) : Int!
+        deleteCountry(id: Int!) : Int!
+        deleteLang(id: Int!) : Int!
     }
 `;

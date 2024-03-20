@@ -16,6 +16,7 @@ export const Queries = `
         allThemeTree: [Unit]
 
         countryList: [Country]
+        langList: [Lang]
 
         translationListByType(lang: String!, type: String!): [Translation]
     }

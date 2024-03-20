@@ -78,11 +78,17 @@ export const InputsInsert = `
         code: String!
         lang: String!
         stroke: String!
+        langIds: [Int]!
     }
 
     input TranslationInsert {
         type: String!
         lang: String!
         stroke: String!
+    }
+
+    input LangInsert {
+        name: String!
+        code: String!
     }
 `;

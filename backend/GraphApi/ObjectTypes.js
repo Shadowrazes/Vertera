@@ -14,6 +14,13 @@ export const ObjectTypes = `
         id: Int!
         code: String!
         name(lang: String!): Translation!
+        langs: [Lang]!
+    }
+
+    type Lang{
+        id: Int!
+        name: String!
+        code: String!
     }
 
     type Client {
@@ -99,18 +106,16 @@ export const ObjectTypes = `
         stroke: String
     }
 
-    type TranslationFull {
+    type TranslationFull{
         id: Int!
         type: String!
         code: String!
-        ru: String
-        en: String
-        es: String
-        cs: String
-        bg: String
-        de: String
-        hu: String
-        kk: String
+        translations: [TranslationFullItem]!
+    }
+
+    type TranslationFullItem {
+        lang: String!
+        stroke: String
     }
 
     type Unit {
