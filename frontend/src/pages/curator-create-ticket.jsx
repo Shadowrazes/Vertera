@@ -6,6 +6,10 @@ import {
   Button,
   DropdownButton,
   Dropdown,
+  ToggleButton,
+  ToggleButtonGroup,
+  Alert,
+  Spinner,
   Modal,
 } from "react-bootstrap";
 import draftToHtml from "draftjs-to-html";
@@ -22,6 +26,7 @@ import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 
 import "../css/form.css";
+import "../css/curator-create-ticket.css";
 
 import get_translation from "../helpers/translation";
 
@@ -39,13 +44,22 @@ function CuratorCreateTicket() {
   const [textareaValue, setTextareaValue] = useState("");
   const [selectedCurators, setSelectedCurators] = useState([]);
   const [selectedCuratorsId, setSelectedCuratorsId] = useState([]);
+  const [selectedValue, setSelectedValue] = useState(1);
 
   const [ticketTitleValue, setTicketTitleValue] = useState("");
 
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
-
   const [isVisible, setIsVisible] = useState(false);
+  const [isButtonsVisible, setIsButtonsVisible] = useState(true);
+  const [isCuratorsDropdownVisible, setIsCuratorsDropdownVisible] =
+    useState(false);
+  const [isIdFileInputVisible, setIsIdFileInputVisible] = useState(false);
+  const [isShowSpinner, setIsShowSpinner] = useState(false);
+  const [isShowInfo, setIsShowInfo] = useState(false);
+
+  const [successfulImports, setSuccessfulImports] = useState(null);
+  const [failedImports, setFailedImports] = useState(null);
 
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
@@ -231,6 +245,26 @@ function CuratorCreateTicket() {
     setSelectedCuratorsId(curators.map((curator) => curator.id));
   };
 
+  const handleCuratorsDropdown = () => {
+    setIsButtonsVisible(false);
+    setIsCuratorsDropdownVisible(true);
+  };
+
+  const handleIdFileInput = () => {
+    setIsButtonsVisible(false);
+    setIsIdFileInputVisible(true);
+  };
+
+  const handleCloseClick = () => {
+    setIsButtonsVisible(true);
+    setIsCuratorsDropdownVisible(false);
+    setIsIdFileInputVisible(false);
+    setIsShowSpinner(false);
+    setIsShowInfo(false);
+    setSuccessfulImports(null);
+    setFailedImports(null);
+  };
+
   const handleEditorChange = (newEditorState) => {
     setEditorState(newEditorState);
   };
@@ -278,11 +312,11 @@ function CuratorCreateTicket() {
           variables: {
             token: user.token,
             title: ticketTitleValue,
-            clientId: userId,
+            clientId: user.id,
             unitId: selectedUnitId,
             themeId: selectedThemeId,
             subThemeId: selectedSubThemeId,
-            senderId: userId,
+            senderId: user.id,
             recieverId: 1,
             ticketId: 1,
             text: getContent(),
@@ -322,7 +356,14 @@ function CuratorCreateTicket() {
       return;
     }
 
-    addTicketWithFiles();
+    if (selectedValue === 1) {
+      addTicketWithFiles();
+    } else if (selectedValue === 2) {
+    }
+  };
+
+  const handleToggleChange = (value) => {
+    setSelectedValue(value);
   };
 
   const handleAddFileInput = () => {
@@ -383,8 +424,55 @@ function CuratorCreateTicket() {
     setIsVisible(false);
   };
 
-  const handleFileIdInput = (e) => {
-    const files = e.target.files;
+  const handleIdFileInputOnChange = (e) => {
+    const file = e.target.files;
+
+    let isFileSizeExceeded = false;
+
+    const fileSizeInMB = file.size / (1024 * 1024);
+    const maxFileSize = 10;
+
+    if (fileSizeInMB > maxFileSize) {
+      isFileSizeExceeded = true;
+    }
+
+    if (isFileSizeExceeded) {
+      e.target.value = null;
+      setIsFilesSizeExceeded(true);
+      console.log("Размер файла не должен превышать 10 МБ");
+      alert("Размер файла не должен превышать 10 МБ");
+      return;
+    }
+
+    showSpinner();
+
+    const idFileInput = document.querySelector(".idFileInput");
+
+    if (idFileInput) {
+      const file = idFileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        const contents = event.target.result;
+        const result = contents.split(/\s+/);
+        setSuccessfulImports(result.filter((item) => !isNaN(item)).length);
+        setFailedImports(result.filter((item) => isNaN(item)).length);
+      };
+      reader.readAsText(file);
+    }
+
+    setTimeout(hideSpinner, 1000);
+
+    setIsFilesLimitExceeded(false);
+  };
+
+  const showSpinner = () => {
+    setIsShowSpinner(true);
+  };
+
+  const hideSpinner = () => {
+    setIsShowSpinner(false);
+    setIsShowInfo(true);
   };
 
   const newCuratorList = dataQueryCurators.map((curator) => ({
@@ -464,24 +552,91 @@ function CuratorCreateTicket() {
                   ))}
               </DropdownButton>
             )}
-            <MultiSelect
-              value={selectedCurators}
-              onChange={(e) => handleCuratorsOnChange(e.value)}
-              options={newCuratorList}
-              optionLabel="name"
-              className="add-curator__multiselect"
-              placeholder={get_translation("INTERFACE_CURATOR")}
-              emptyMessage="Нет доступных опций"
-              filter
-            />
+            <div className="curator-create-ticket__reciever-label">
+              {(isCuratorsDropdownVisible || isIdFileInputVisible) && (
+                <a onClick={handleCloseClick}>
+                  <div className="chat__edit-close"></div>
+                </a>
+              )}
+              <Form.Label className="edit-curator__field-label">
+                Получатели
+              </Form.Label>
+            </div>
+            {isButtonsVisible && (
+              <div className="chat__helper-buttons">
+                <ButtonCustom
+                  title="Выбрать куратора"
+                  className="chat-input__button-close"
+                  onClick={handleCuratorsDropdown}
+                />
+                <ButtonCustom
+                  title="Вставить список"
+                  className="chat-input__button-close"
+                  onClick={handleIdFileInput}
+                />
+              </div>
+            )}
+            {isCuratorsDropdownVisible && (
+              <>
+                <MultiSelect
+                  value={selectedCurators}
+                  onChange={(e) => handleCuratorsOnChange(e.value)}
+                  options={newCuratorList}
+                  optionLabel="name"
+                  className="add-curator__multiselect"
+                  placeholder={get_translation("INTERFACE_CURATOR")}
+                  emptyMessage="Нет доступных опций"
+                  filter
+                />
+              </>
+            )}
+            {isIdFileInputVisible && (
+              <>
+                <Form.Group className="mb-3 fileInputForm fileIdInput">
+                  <Form.Control
+                    type="file"
+                    accept=".txt"
+                    onChange={handleIdFileInputOnChange}
+                    className="idFileInput"
+                  />
+                </Form.Group>
+                {isShowSpinner && <Spinner animation="border" />}
+                {isShowInfo && (
+                  <>
+                    {failedImports === null && (
+                      <Alert
+                        variant="success"
+                        className="curator-create-ticket__alert"
+                      >
+                        Успешный импорт <br /> <br />
+                        Импортировано {successfulImports} записей
+                      </Alert>
+                    )}
 
-            <Form.Group className="mb-3 fileInputForm fileIdInput">
-              <Form.Control
-                type="file"
-                accept=".txt"
-                onChange={handleFileIdInput}
-              />
-            </Form.Group>
+                    {failedImports !== null && (
+                      <Alert
+                        variant="warning"
+                        className="curator-create-ticket__alert"
+                      >
+                        Застично успешный импорт <br /> <br />
+                        Импортировано {successfulImports} записей <br />
+                        Не удалось импортировать {failedImports} записей <br />
+                      </Alert>
+                    )}
+
+                    {successfulImports === null && failedImports === null && (
+                      <Alert
+                        variant="danger"
+                        className="curator-create-ticket__alert"
+                      >
+                        Фатальная ошибка <br /> <br />
+                        Не удалось загрузить файл
+                      </Alert>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </Col>
 
           <Col className="form__column">
@@ -548,6 +703,21 @@ function CuratorCreateTicket() {
                 {get_translation("INTERFACE_ADD_FILE")}
               </Button>
             </div>
+
+            <ToggleButtonGroup
+              type="radio"
+              name="options"
+              defaultValue={1}
+              value={selectedValue}
+              onChange={handleToggleChange}
+            >
+              <ToggleButton id="tbg-radio-1" value={1}>
+                Создать обращение
+              </ToggleButton>
+              <ToggleButton id="tbg-radio-2" value={2}>
+                Создать уведомление
+              </ToggleButton>
+            </ToggleButtonGroup>
 
             {isVisible && <span className="form__error">{errorMsg()}</span>}
 
