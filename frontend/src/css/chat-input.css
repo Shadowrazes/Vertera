@@ -300,6 +300,10 @@
   color: white !important;
 }
 
+.sendId_field {
+  margin-bottom: 20px;
+}
+
 @media screen and (max-width: 1200px) {
   .edit-subtheme__field .dropdown button {
     width: 416px !important;

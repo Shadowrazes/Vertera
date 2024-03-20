@@ -119,6 +119,9 @@ function Chat() {
 
   const [isFormVisible, setIsFormVisible] = useState(true);
 
+  const [isSendTicketToCuratorOpen, setIsSendTicketToCuratorOpen] =
+    useState(false);
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -1173,6 +1176,7 @@ function Chat() {
     setIsVisibleCuratorsChat(false);
     setIsVisibleSplit(false);
     setisVisibleSplitFields(false);
+    setIsSendTicketToCuratorOpen(false);
   };
 
   const handleShow = () => {
@@ -1254,6 +1258,15 @@ function Chat() {
       goToAllTickets();
     } catch (error) {
       console.error("Ошибка при завершении диалога с куратором:", error);
+    }
+  };
+
+  const handleSendTicketToCurator = () => {
+    setIsSendTicketToCuratorOpen((prev) => !prev);
+    setIsVisibleHelperButtons(false);
+
+    {
+      /* запрос на сервер */
     }
   };
 
@@ -1349,6 +1362,16 @@ function Chat() {
                     onClick={handleOpen}
                   />
                 </>
+              )}
+
+              {isAdmin() && (
+                <a className="alltickets__link">
+                  <ButtonCustom
+                    title="Отправить наставнику"
+                    className="chat-input__button-close"
+                    onClick={handleSendTicketToCurator}
+                  />
+                </a>
               )}
             </div>
           </>
@@ -1513,6 +1536,51 @@ function Chat() {
                 title="Применить изменения"
                 className={"add-curator__btn"}
                 onClick={handleEditTicket}
+              />
+            </div>
+          </>
+        )}
+
+        {isSendTicketToCuratorOpen && (
+          <>
+            <Tabs
+              defaultActiveKey="theme"
+              id="justify-tab-example"
+              className="mb-3 edit-ticket__tabs"
+              justify
+            >
+              <Tab
+                className="chat__tab-wrapper"
+                eventKey="theme"
+                title="Отправить тикет наставнику"
+              >
+                <a onClick={handleEditCloseClick}>
+                  <div className="chat__edit-close"></div>
+                </a>
+
+                <div className="sendId_field">
+                  <div className="edit-subtheme__field">
+                    <Form.Control
+                      type="text"
+                      placeholder={"Введите id наставника"}
+                      className="add-currator__input"
+                      //   value={nameValue}
+                      //   onChange={handleNameChange}
+                    />
+                  </div>
+                </div>
+              </Tab>
+            </Tabs>
+
+            <div className=" chat__edit-button">
+              {isErrorVisibleEdit && (
+                <span className="form__error">{errorMsgEdit()}</span>
+              )}
+              <ButtonCustom
+                title="Отправить"
+                className={"add-curator__btn"}
+                // отправка тикета куратору
+                // onClick={}
               />
             </div>
           </>
