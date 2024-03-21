@@ -96,16 +96,16 @@ class Message extends Entity {
             };
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
-            if (reciever.role == User.RoleClient) {
-                const curClient = await Client.GetById(reciever.id);
+            if (curTicket) {
+                const curUser = await User.GetById(reciever.id);
 
-                if (curTicket.initiatorId != curClient.id && curTicket.recipientId != curClient.id){
+                if (curTicket.initiatorId != curUser.id && curTicket.recipientId != curUser.id){
                     throw new Error(Errors.IncorrectMsgReciever);
                 }
 
                 const dialogLink = `https://help.vertera.org/dialog/${curTicket.link}/`
-                const emailText = `На ваше обращение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
-                EmailSender.Notify(curClient.email, emailText);
+                const emailText = `Новое сообщение в обращении.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
+                EmailSender.Notify(curUser.email, emailText);
             }
 
             return result.insertId;

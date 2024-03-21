@@ -7,11 +7,11 @@ export const InputsInsert = `
         login: String
         password: String
         phone: String
+        outerId: Int
+        email: String
     }
 
     input ClientInsert {
-        outerId: Int!
-        email: String!
         idRef: Int!
     }
 

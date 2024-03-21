@@ -7,6 +7,8 @@ export const ObjectTypes = `
         role: String!
         country: Country!
         isActive: Boolean!
+        outerId: Int
+        email: String
         phone: String
     }
 
@@ -25,8 +27,6 @@ export const ObjectTypes = `
 
     type Client {
         id: Int!
-        outerId: Int!
-        email: String!
         idRef: Int!
         user: User!
     }

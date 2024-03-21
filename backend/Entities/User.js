@@ -8,10 +8,13 @@ import axios from 'axios';
 class User extends Entity {
     static TableName = 'users';
     static PrimaryField = 'id';
+    static OuterIdField = 'outerId';
     static NameField = 'name';
     static SurnameField = 'surname';
     static PatronymicField = 'patronymic';
+    static EmailField = 'email';
     static RoleField = 'role';
+    static PhoneField = 'phone';
     static CountryIdField = 'countryId';
     static LoginField = 'login';
     static PasswordField = 'password';
@@ -93,8 +96,6 @@ class User extends Entity {
         const user = response.data.data.UserGroup.User.user;
 
         let clientFields = {
-            outerId: user.idRef,
-            email: user.emails[0].email,
             idRef: user.parents.referrer.idRef
         };
 
@@ -103,19 +104,22 @@ class User extends Entity {
             surname: user.lastName,
             patronymic: user.middleName,
             countryId: 1,
-            phone: user.phones[0].phone
+            phone: user.phones[0].phone,
+            outerId: user.idRef,
+            email: user.emails[0].email
         };
 
         console.log(clientFields);
         console.log(userFields);
 
-        let existingClient = await Client.GetByOuterId(clientFields.outerId);
+        let existingClient = await this.GetByOuterId(userFields.outerId);
         let userId = -1;
 
         if (!existingClient) {
             userId = await Client.TransInsert(userFields, clientFields);
         }
         else {
+            if (existingClient.role )
             userId = existingClient.id;
             const existingClientUpd = await Client.TransUpdate(userId, userFields, clientFields);
         }
@@ -144,6 +148,12 @@ class User extends Entity {
         const user = await this.GetById(userId);
         if (user.length == 0) throw new Error(Errors.InvalidToken);
         return user;
+    }
+
+    static async GetByOuterId(outerId) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.OuterIdField} = ?`;
+        const result = await super.Request(sql, [outerId]);
+        return result[0];
     }
 
     static async GetById(id) {

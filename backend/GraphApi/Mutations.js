@@ -16,41 +16,47 @@ export const Mutations = `
         
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
+
+        addTicketMass(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!, idsOuter: Boolean!, ids: [Int]!): [TicketInsertInfo]!
+                      
+        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
+        updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
+
+        addSubTheme(fields: SubThemeInsert!): String!
+        addTheme(fields: ThemeInsert!): String!
+        addUnit(fields: UnitInsert!): String!
+        updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
+        updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
+        updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
+        deleteUnit(id: Int!) : Int!
+        deleteTheme(id: Int!) : Int!
+        deleteSubTheme(id: Int!) : Int!
+
+        addCountry(fields: CountryInsert!): String!
+        addLang(fields: LangInsert!): String!
+        addTranslation(fields: TranslationInsert!): String!
+        updateCountry(id: Int!, fields: CountryUpdate!): UpdateInfo!
+        updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
+        updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
+        deleteCountry(id: Int!) : Int!
+        deleteLang(id: Int!) : Int!
     }
 
     type AdminMutation {
         class: String!
 
         addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
-        addTranslation(fields: TranslationInsert!): String!
         addTicketStatus(fields: TicketStatusInsert!): String!
-        addCountry(fields: CountryInsert!): String!
-        addLang(fields: LangInsert!): String!
         addJobTitle(fields: HelperJobTitleInsert!): String!
-        addSubTheme(fields: SubThemeInsert!): String!
-        addTheme(fields: ThemeInsert!): String!
-        addUnit(fields: UnitInsert!): String!
         addDepartment(fields: DepartmentInsert!): String!
 
-        updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
-        updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
-        updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
-        updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
-        updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
-        updateCountry(id: Int!, fields: CountryUpdate!): UpdateInfo!
-        updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
         updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
         updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
 
         deleteTicket(id: Int!): Int!
         deleteUser(id: Int!) : Int!
-        deleteUnit(id: Int!) : Int!
-        deleteTheme(id: Int!) : Int!
-        deleteSubTheme(id: Int!) : Int!
         deleteThemeDepartment(id: Int!) : Int!
         deleteDepartment(id: Int!) : Int!
-        deleteCountry(id: Int!) : Int!
-        deleteLang(id: Int!) : Int!
     }
 `;

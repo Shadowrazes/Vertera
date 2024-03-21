@@ -51,9 +51,14 @@ class Unit extends Entity {
 
     // Cascade deleting Unit & Themes & SubThemes & SubTheme to department link
     static async DeleteCascade(id) {
-        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]);
-        return result.affectedRows;
+        return await super.Transaction(async (conn) => {
+            const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [id]);
+
+            const translationResult = await Translation.ClearUnused(conn);
+
+            return result.affectedRows;
+        });
     }
 }
 

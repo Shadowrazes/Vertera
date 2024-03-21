@@ -50,9 +50,15 @@ class Department extends Entity {
 
     // Cascade deleting Department & SubTheme to department link
     static async DeleteCascade(id) {
-        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]);
-        return result.affectedRows;
+        return await super.Transaction(async (conn) => {
+            const curDepartment = await this.GetById(id);
+            const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [id]);
+
+            const translationResult = await Translation.TransDelete(conn, curDepartment.nameCode);
+
+            return result.affectedRows;
+        });
     }
 }
 

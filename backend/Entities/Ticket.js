@@ -139,11 +139,16 @@ class Ticket extends Entity {
         JOIN    ${Message.TableName} 
                 ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
 
-        WHERE   1=1 ${clientId ? `AND ${this.InitiatorIdField} = ${clientId}` : ``}
+        WHERE   1=1 
         `;
 
         let fields = [];
 
+        if (clientId) {
+            sql += ` AND (${this.InitiatorIdField} = ? OR ${this.RecipientIdField} = ?)`;
+            fields.push(clientId);
+            fields.push(clientId);
+        }
         if (filter.words && filter.words.length > 0) {
             sql += ` 
                 AND ${this.TableName}.${this.PrimaryField} IN (
@@ -235,9 +240,9 @@ class Ticket extends Entity {
         }
         if (filter.outerId) {
             const outerIdSubQuery = `
-                SELECT ${Client.PrimaryField} 
-                FROM ${Client.TableName} 
-                WHERE ${Client.OuterIdField} IN (?)
+                SELECT ${User.PrimaryField} 
+                FROM ${User.TableName} 
+                WHERE ${User.OuterIdField} IN (?)
             `;
 
             sql += ` 
@@ -292,6 +297,32 @@ class Ticket extends Entity {
             const closeTicketUpd = await this.TransUpdate(parentId, { statusId: this.StatusIdClosed }, undefined, systemInitiator, conn);
 
             return 0;
+        });
+    }
+
+    static async TransInsertMass(args) {
+        return await super.Transaction(async (conn) => {
+            let insertResults = [];
+            let insertArgs =  {
+                ticketFields: args.ticketFields, 
+                messageFields: args.messageFields,
+                notification: args.notification
+            };
+
+            for(let recipientId of args.ids) {
+                if (!args.idsOuter){
+                    insertArgs.ticketFields.recipientId = recipientId;
+                }
+                else {
+                    const user = await User.GetByOuterId(recipientId);
+                    insertArgs.ticketFields.recipientId = user.id;
+                }
+
+                const insertRes = await this.TransInsert(insertArgs, conn);
+                insertResults.push(insertRes);
+            }
+
+            return insertResults;
         });
     }
 

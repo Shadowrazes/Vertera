@@ -37,6 +37,18 @@ class TicketStatus extends Entity {
             return translationResult;
         });
     }
+
+    static async DeleteCascade(id) {
+        return await super.Transaction(async (conn) => {
+            const curTicketStatus = await this.GetById(id);
+            const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [id]);
+
+            const translationResult = await Translation.TransDelete(conn, curTicketStatus.nameCode);
+
+            return result.affectedRows;
+        });
+    }
 }
 
 export default TicketStatus;

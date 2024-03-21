@@ -26,10 +26,11 @@ export const InputsUpdate = `
         password: String
         isActive: Boolean
         phone: String
+        email: String
     }
 
     input ClientUpdate {
-        email: String
+        idRef: Int!
     }
 
     input HelperUpdate {

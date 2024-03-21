@@ -181,28 +181,20 @@ export const resolvers = {
         },
     },
     HelperMutation: {
+        addTicketMass: async (_, args) => {
+            return await Ticket.TransInsertMass(args);
+        },
         updateTicket: async (_, args, context) => {
             return await Ticket.TransUpdate(args.id, args.fields, args.departmentId, context.user);
         },
         splitTicket: async (_, args, context) => {
             return await Ticket.Split(args.id, args.argsList, context.user);
         },
-    },
-    AdminMutation: {
         addHelperUser: async (_, args) => {
             return await Helper.TransInsert(args.userFields, args.helperFields);
         },
-        addTicketStatus: async (_, args) => {
-            return await TicketStatus.TransInsert(args.fields);
-        },
-        addCountry: async (_, args) => {
-            return await Country.TransInsert(args.fields);
-        },
-        addLang: async (_, args) => {
-            return await Langs.TransInsert(args.fields);
-        },
-        addJobTitle: async (_, args) => {
-            return await HelperJobTitle.TransInsert(args.fields);
+        updateHelperUser: async (_, args) => {
+            return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
         addSubTheme: async (_, args) => {
             return await SubTheme.TransInsert(args.fields);
@@ -213,15 +205,6 @@ export const resolvers = {
         addUnit: async (_, args) => {
             return await Unit.TransInsert(args.fields);
         },
-        addDepartment: async (_, args) => {
-            return await Department.TransInsert(args.fields);
-        },
-        addTranslation: async (_, args) => {
-            return await Translation.Insert(args.fields);
-        },
-        updateHelperUser: async (_, args) => {
-            return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
-        },
         updateSubTheme: async (_, args) => {
             return await SubTheme.TransUpdate(args.id, args.fields);
         },
@@ -230,30 +213,6 @@ export const resolvers = {
         },
         updateUnit: async (_, args) => {
             return await Unit.TransUpdate(args.id, args.fields);
-        },
-        updateDepartment: async (_, args) => {
-            return await Department.TransUpdate(args.id, args.fields);
-        },
-        updateCountry: async (_, args) => {
-            return await Country.TransUpdate(args.id, args.fields);
-        },
-        updateLang: async (_, args) => {
-            return await Langs.TransUpdate(args.id, args.fields);
-        },
-        updateTicketStatus: async (_, args) => {
-            return await TicketStatus.TransUpdate(args.id, args.fields);
-        },
-        updateHelperJobTitle: async (_, args) => {
-            return await HelperJobTitle.TransUpdate(args.id, args.fields);
-        },
-        updateTranslation: async (_, args) => {
-            return await Translation.Update(args.fields);
-        },
-        deleteTicket: async (_, { id }) => {
-            return await Ticket.DeleteCascade(id);
-        },
-        deleteUser: async (_, { id }) => {
-            return await User.DeleteCascade(id);
         },
         deleteUnit: async (_, { id }) => {
             return await Unit.DeleteCascade(id);
@@ -264,17 +223,61 @@ export const resolvers = {
         deleteSubTheme: async (_, { id }) => {
             return await SubTheme.DeleteCascade(id);
         },
-        deleteThemeDepartment: async (_, { id }) => {
-            return await ThemeDepartment.DeleteCascade(id);
+        addCountry: async (_, args) => {
+            return await Country.TransInsert(args.fields);
         },
-        deleteDepartment: async (_, { id }) => {
-            return await Department.DeleteCascade(id);
+        addLang: async (_, args) => {
+            return await Langs.TransInsert(args.fields);
+        },
+        addTranslation: async (_, args) => {
+            return await Translation.Insert(args.fields);
+        },
+        updateCountry: async (_, args) => {
+            return await Country.TransUpdate(args.id, args.fields);
+        },
+        updateLang: async (_, args) => {
+            return await Langs.TransUpdate(args.id, args.fields);
+        },
+        updateTranslation: async (_, args) => {
+            return await Translation.Update(args.fields);
         },
         deleteCountry: async (_, { id }) => {
             return await Country.DeleteCascade(id);
         },
         deleteLang: async (_, { id }) => {
             return await Langs.TransDelete(id);
+        },
+    },
+    AdminMutation: {
+        addTicketStatus: async (_, args) => {
+            return await TicketStatus.TransInsert(args.fields);
+        },
+        addJobTitle: async (_, args) => {
+            return await HelperJobTitle.TransInsert(args.fields);
+        },
+        addDepartment: async (_, args) => {
+            return await Department.TransInsert(args.fields);
+        },
+        updateDepartment: async (_, args) => {
+            return await Department.TransUpdate(args.id, args.fields);
+        },
+        updateTicketStatus: async (_, args) => {
+            return await TicketStatus.TransUpdate(args.id, args.fields);
+        },
+        updateHelperJobTitle: async (_, args) => {
+            return await HelperJobTitle.TransUpdate(args.id, args.fields);
+        },
+        deleteTicket: async (_, { id }) => {
+            return await Ticket.DeleteCascade(id);
+        },
+        deleteUser: async (_, { id }) => {
+            return await User.DeleteCascade(id);
+        },
+        deleteThemeDepartment: async (_, { id }) => {
+            return await ThemeDepartment.DeleteCascade(id);
+        },
+        deleteDepartment: async (_, { id }) => {
+            return await Department.DeleteCascade(id);
         },
     },
     User: {

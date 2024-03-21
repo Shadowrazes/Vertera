@@ -3,6 +3,13 @@ import Translitter from "../Utils/Translitter.js";
 import Errors from "../Utils/Errors.js";
 import md5 from 'md5';
 import axios from 'axios';
+import Unit from "./Unit.js";
+import Theme from "./Theme.js";
+import SubTheme from "./SubTheme.js";
+import TicketStatus from "./TicketStatus.js";
+import Department from "./Department.js";
+import HelperJobTitle from "./HelperJobTitle.js";
+import Country from "./Country.js";
 
 class Translation extends Entity {
     static TableName = 'translations';
@@ -189,6 +196,24 @@ class Translation extends Entity {
     static async TransDelete(conn, code) {
         const sql = `DELETE FROM ${this.TableName} WHERE ${this.CodeField} = ?`;
         const result = await super.TransRequest(conn, sql, [code]);
+        return result.affectedRows;
+    }
+
+    static async ClearUnused(conn) {
+        const sql = `
+            DELETE FROM ${this.TableName} 
+            WHERE ${this.TypeField} NOT IN (?) AND ${this.CodeField} NOT IN (
+                SELECT ${Unit.NameCodeField} FROM ${Unit.TableName}
+                UNION SELECT ${Theme.NameCodeField} FROM ${Theme.TableName}
+                UNION SELECT ${SubTheme.NameCodeField} FROM ${SubTheme.TableName}
+                UNION SELECT ${TicketStatus.NameCodeField} FROM ${TicketStatus.TableName}
+                UNION SELECT ${Department.NameCodeField} FROM ${Department.TableName}
+                UNION SELECT ${HelperJobTitle.NameCodeField} FROM ${HelperJobTitle.TableName}
+                UNION SELECT ${Country.NameCodeField} FROM ${Country.TableName}
+            )
+        `;
+        const result = await super.TransRequest(conn, sql, [OuterTypes]);
+
         return result.affectedRows;
     }
 }
