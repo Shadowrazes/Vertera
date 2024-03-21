@@ -356,7 +356,7 @@ export const EDIT_TICKET = gql`
   mutation (
     $token: String!
     $id: Int!
-    $helperId: Int
+    $recipientId: Int
     $assistantId: Int
     $unitId: Int
     $themeId: Int
@@ -367,7 +367,7 @@ export const EDIT_TICKET = gql`
       updateTicket(
         id: $id
         fields: {
-          helperId: $helperId
+          recipientId: $recipientId
           unitId: $unitId
           themeId: $themeId
           subThemeId: $subThtmeId

@@ -291,7 +291,7 @@ function FormComponent() {
           variables: {
             token: user.token,
             title: ticketTitleValue,
-            clientId: userId,
+            initiatorId: userId,
             unitId: selectedUnitId,
             themeId: selectedThemeId,
             subThemeId: selectedSubThemeId,

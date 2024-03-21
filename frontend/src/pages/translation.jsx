@@ -69,54 +69,64 @@ function Translation() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  const handleTranslation = (e, translationIndex, code, lang) => {
+  const handleTranslation = (e, indexRow, indexColumn, code, lang) => {
     const { value } = e.target;
 
     const updatedTranslationsCopy = [...updatedTranslations];
 
-    updatedTranslationsCopy[translationIndex] = {
-      ...updatedTranslationsCopy[translationIndex],
-      [lang]: value,
-      code: code,
-    };
+    const currentTranslation = updatedTranslationsCopy.find(
+      (translation) => translation.code === code && translation.lang === lang
+    );
+
+    if (currentTranslation) {
+      currentTranslation.stroke = value;
+    } else {
+      updatedTranslationsCopy.push({
+        code: code,
+        lang: lang,
+        stroke: value,
+      });
+    }
+
+    console.log(updatedTranslationsCopy);
 
     setUpdatedTranslations(updatedTranslationsCopy);
   };
 
   const handleUpdateTranslation = async () => {
-    let newTranslatons = updatedTranslations
-      .filter((updatedTranslation) => updatedTranslation)
-      .map(({ code, ru, en, es, cs, bg, de, hu, kk }) => {
-        const result = [];
-        if (ru !== undefined) {
-          result.push({ lang: "ru", stroke: ru, code: code });
-        }
-        if (en !== undefined) {
-          result.push({ lang: "en", stroke: en, code: code });
-        }
-        if (es !== undefined) {
-          result.push({ lang: "es", stroke: es, code: code });
-        }
-        if (cs !== undefined) {
-          result.push({ lang: "cs", stroke: cs, code: code });
-        }
-        if (bg !== undefined) {
-          result.push({ lang: "bg", stroke: bg, code: code });
-        }
-        if (de !== undefined) {
-          result.push({ lang: "de", stroke: de, code: code });
-        }
-        if (hu !== undefined) {
-          result.push({ lang: "hu", stroke: hu, code: code });
-        }
-        if (kk !== undefined) {
-          result.push({ lang: "kk", stroke: en, code: code });
-        }
-        return result;
-      })
-      .flat();
+    // let newTranslatons = updatedTranslations
+    //   .filter((updatedTranslation) => updatedTranslation)
+    //   .map(({ code, ru, en, es, cs, bg, de, hu, kk }) => {
+    //     const result = [];
+    //     if (ru !== undefined) {
+    //       result.push({ lang: "ru", stroke: ru, code: code });
+    //     }
+    //     if (en !== undefined) {
+    //       result.push({ lang: "en", stroke: en, code: code });
+    //     }
+    //     if (es !== undefined) {
+    //       result.push({ lang: "es", stroke: es, code: code });
+    //     }
+    //     if (cs !== undefined) {
+    //       result.push({ lang: "cs", stroke: cs, code: code });
+    //     }
+    //     if (bg !== undefined) {
+    //       result.push({ lang: "bg", stroke: bg, code: code });
+    //     }
+    //     if (de !== undefined) {
+    //       result.push({ lang: "de", stroke: de, code: code });
+    //     }
+    //     if (hu !== undefined) {
+    //       result.push({ lang: "hu", stroke: hu, code: code });
+    //     }
+    //     if (kk !== undefined) {
+    //       result.push({ lang: "kk", stroke: en, code: code });
+    //     }
+    //     return result;
+    //   })
+    //   .flat();
 
-    if (newTranslatons.length === 0) {
+    if (updatedTranslations.length === 0) {
       return;
     }
 
@@ -124,7 +134,7 @@ function Translation() {
       const result = await updateTranslation({
         variables: {
           token: user.token,
-          translationUpdate: newTranslatons,
+          translationUpdate: updatedTranslations,
         },
       });
 
@@ -169,127 +179,45 @@ function Translation() {
                   </tr>
                 </thead>
                 <tbody>
-                  {dataQuery.map((translation, index) => (
-                    <tr key={translation.id}>
+                  {dataQuery.map((translationsData, indexRow) => (
+                    <tr key={translationsData.id}>
                       <td>
                         <Form.Control
                           type="text"
                           placeholder="Строковый код"
-                          value={translation.code}
+                          value={translationsData.code}
                           className="add-currator__input translation__readonly-input"
                           readOnly
                         />
                       </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.ru ??
-                            translation?.ru ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "ru")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.en ??
-                            translation?.en ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "en")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.es ??
-                            translation?.es ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "es")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.cs ??
-                            translation?.cs ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "cs")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.bg ??
-                            translation?.bg ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "bg")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.de ??
-                            translation?.de ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "de")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.hu ??
-                            translation?.hu ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) =>
-                            handleTranslation(e, index, translation.code, "hu")
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Form.Control
-                          type="text"
-                          value={
-                            updatedTranslations[index]?.kk ??
-                            translation?.kk ??
-                            ""
-                          }
-                          className="add-currator__input"
-                          onChange={(e) => handleTranslation(e, index, "kk")}
-                        />
-                      </td>
+                      {translationsData.translations.map(
+                        (translationStroke, indexColumn) => (
+                          <td key={indexColumn}>
+                            <Form.Control
+                              type="text"
+                              value={
+                                updatedTranslations.find(
+                                  (item) =>
+                                    item?.code === translationsData?.code &&
+                                    item?.lang === translationStroke?.lang
+                                )?.stroke ??
+                                translationStroke?.stroke ??
+                                ""
+                              }
+                              className="add-currator__input"
+                              onChange={(e) =>
+                                handleTranslation(
+                                  e,
+                                  indexRow,
+                                  indexColumn,
+                                  translationsData.code,
+                                  translationStroke.lang
+                                )
+                              }
+                            />
+                          </td>
+                        )
+                      )}
                     </tr>
                   ))}
                 </tbody>

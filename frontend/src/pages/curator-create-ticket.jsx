@@ -312,7 +312,7 @@ function CuratorCreateTicket() {
           variables: {
             token: user.token,
             title: ticketTitleValue,
-            clientId: user.id,
+            initiatorId: user.id,
             unitId: selectedUnitId,
             themeId: selectedThemeId,
             subThemeId: selectedSubThemeId,

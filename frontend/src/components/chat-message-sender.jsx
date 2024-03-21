@@ -7,7 +7,9 @@ import "../css/chat-message-sender.css";
 
 function ChatMessage({ message, sender, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
+
   let isVisible;
+
   const isBuild = import.meta.env.DEV !== "build";
 
   const [language, setLanguage] = useState(localStorage.getItem("language"));
@@ -58,29 +60,29 @@ function ChatMessage({ message, sender, time, attachs }) {
   };
 
   const handleTranslate = async (text, lang) => {
-    try {
-      const translatedText = await Translater(text, lang);
-      setTranslatedText(translatedText);
-      // console.log(translatedText);
-    } catch (error) {
-      console.error("Error during translation:", error.message);
-    }
+    // try {
+    //   const translatedText = await Translater(text, lang);
+    //   setTranslatedText(translatedText);
+    //   // console.log(translatedText);
+    // } catch (error) {
+    //   console.error("Error during translation:", error.message);
+    // }
   };
 
   useEffect(() => {
-    console.log("time = ", time);
+    // console.log("time = ", time);
     const fetchData = async () => {
       if (languageCode.hasOwnProperty(franc(message))) {
         if ((languageCode[franc(message)][0] || franc(message)) !== language) {
           handleTranslate(message, languageCodeQuery[language]);
           // console.log("franc ", franc(message));
-          console.log("orig", franc(message));
-          console.log("selected", languageCodeQuery[language]);
+          // console.log("orig", franc(message));
+          // console.log("selected", languageCodeQuery[language]);
         }
       } else {
         handleTranslate(message, languageCodeQuery[language]);
-        console.log("orig", franc(message));
-        console.log("selected", languageCodeQuery[language]);
+        // console.log("orig", franc(message));
+        // console.log("selected", languageCodeQuery[language]);
       }
     };
     fetchData();
