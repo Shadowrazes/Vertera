@@ -38,7 +38,15 @@ export const ObjectTypes = `
         departments: [Department]!
         startWorkDate: DateTime!
         stats: HelperStats!
+        permissions: HelperPermissions!
         user: User!
+    }
+
+    type HelperPermissions {
+        sendMsg: Boolean!
+        helperEdit: Boolean!
+        themeEdit: Boolean!
+        translationEdit: Boolean!
     }
 
     type HelperStats {

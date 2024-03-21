@@ -21,6 +21,7 @@ import Translation from "../Entities/Translation.js";
 import TicketLog from '../Entities/TicketLog.js';
 import CountryLangs from '../Entities/CountryLangs.js';
 import Langs from '../Entities/Langs.js';
+import HelperPermission from '../Entities/HelperPermission.js';
 import Errors from '../Utils/Errors.js';
 
 Entity.Pool = Pool;
@@ -305,6 +306,10 @@ export const resolvers = {
         stats: async (parent, args, context) => {
             if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
             return await Helper.GetStatsById(parent.id);
+        },
+        permissions: async (parent, args, context) => {
+            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
+            return await HelperPermission.GetById(parent.id);
         },
     },
     HelperJobTitle: {

@@ -37,6 +37,14 @@ export const InputsUpdate = `
         jobTitleId: Int
         birthday: DateTime
         departmentIds: [Int]
+        permissions: HelperPermissionsUpdate
+    }
+
+    input HelperPermissionsUpdate {
+        sendMsg: Boolean!
+        helperEdit: Boolean!
+        themeEdit: Boolean!
+        translationEdit: Boolean!
     }
 
     input TranslationUpdate {

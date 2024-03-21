@@ -4,6 +4,7 @@ import Ticket from "./Ticket.js";
 import Message from "./Message.js";
 import HelperDepartment from "./HelperDepartment.js";
 import ThemeDepartment from "./ThemeDepartment.js";
+import HelperPermission from "./HelperPermission.js";
 import Errors from "../Utils/Errors.js";
 
 class Helper extends Entity {
@@ -180,6 +181,7 @@ class Helper extends Entity {
             const result = await super.TransRequest(conn, sql, [fields]);
 
             const helperDepartmentResult = await HelperDepartment.TransInsert(conn, id, helperFields.departmentIds);
+            const helperPermissionResult = await HelperPermission.TransInsert(conn, id);
 
             return id;
         });
