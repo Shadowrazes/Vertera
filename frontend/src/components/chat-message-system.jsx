@@ -5,7 +5,10 @@ function ChatMessage({ message, time }) {
     <>
       <div className="chat-message-system__container">
         <div className="chat-message-system__box">
-          <div className="chat-message-system__text">{message}</div>
+          <div
+            dangerouslySetInnerHTML={{ __html: message }}
+            className="chat-message-system__text"
+          ></div>
           <span className="chat-message-system__time">{time}</span>
         </div>
       </div>

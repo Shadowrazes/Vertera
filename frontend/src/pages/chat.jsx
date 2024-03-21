@@ -119,6 +119,9 @@ function Chat() {
 
   const [isFormVisible, setIsFormVisible] = useState(true);
 
+  const [isSendTicketToCuratorOpen, setIsSendTicketToCuratorOpen] =
+    useState(false);
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -1173,6 +1176,7 @@ function Chat() {
     setIsVisibleCuratorsChat(false);
     setIsVisibleSplit(false);
     setisVisibleSplitFields(false);
+    setIsSendTicketToCuratorOpen(false);
   };
 
   const handleShow = () => {
@@ -1254,6 +1258,15 @@ function Chat() {
       goToAllTickets();
     } catch (error) {
       console.error("Ошибка при завершении диалога с куратором:", error);
+    }
+  };
+
+  const handleSendTicketToCurator = () => {
+    setIsSendTicketToCuratorOpen((prev) => !prev);
+    setIsVisibleHelperButtons(false);
+
+    {
+      /* запрос на сервер */
     }
   };
 
@@ -1349,6 +1362,16 @@ function Chat() {
                     onClick={handleOpen}
                   />
                 </>
+              )}
+
+              {isAdmin() && (
+                <a className="alltickets__link">
+                  <ButtonCustom
+                    title="Отправить наставнику"
+                    className="chat-input__button-close"
+                    onClick={handleSendTicketToCurator}
+                  />
+                </a>
               )}
             </div>
           </>
@@ -1513,6 +1536,51 @@ function Chat() {
                 title="Применить изменения"
                 className={"add-curator__btn"}
                 onClick={handleEditTicket}
+              />
+            </div>
+          </>
+        )}
+
+        {isSendTicketToCuratorOpen && (
+          <>
+            <Tabs
+              defaultActiveKey="theme"
+              id="justify-tab-example"
+              className="mb-3 edit-ticket__tabs"
+              justify
+            >
+              <Tab
+                className="chat__tab-wrapper"
+                eventKey="theme"
+                title="Отправить тикет наставнику"
+              >
+                <a onClick={handleEditCloseClick}>
+                  <div className="chat__edit-close"></div>
+                </a>
+
+                <div className="sendId_field">
+                  <div className="edit-subtheme__field">
+                    <Form.Control
+                      type="text"
+                      placeholder={"Введите id наставника"}
+                      className="add-currator__input"
+                      //   value={nameValue}
+                      //   onChange={handleNameChange}
+                    />
+                  </div>
+                </div>
+              </Tab>
+            </Tabs>
+
+            <div className=" chat__edit-button">
+              {isErrorVisibleEdit && (
+                <span className="form__error">{errorMsgEdit()}</span>
+              )}
+              <ButtonCustom
+                title="Отправить"
+                className={"add-curator__btn"}
+                // отправка тикета куратору
+                // onClick={}
               />
             </div>
           </>
@@ -1783,21 +1851,23 @@ function Chat() {
                 </tbody>
               </Table>
             </Col>
-            <div className="chat-input__container">
-              {isVisible && isAdmin() && currentStatus !== "Новый" ? (
-                <Form className="chat-input__form container" onSubmit={sendMsg}>
-                  <button
-                    className={
-                      isFormVisible ? "toggle-button-active" : "toggle-button"
-                    }
-                    onClick={toggleFormVisibility}
-                  >
-                    {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
-                  </button>
-                  {isFormVisible && (
-                    <Row className="chat-input__row">
-                      <Col className="chat-input__row">
-                        {/* <Form.Group controlId="TextareaForm">
+          </Row>
+        )}
+        <div className="chat-input__container">
+          {isVisible && isAdmin() && currentStatus !== "Новый" ? (
+            <Form className="chat-input__form container" onSubmit={sendMsg}>
+              <button
+                className={
+                  isFormVisible ? "toggle-button-active" : "toggle-button"
+                }
+                onClick={toggleFormVisibility}
+              >
+                {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
+              </button>
+              {isFormVisible && (
+                <Row className="chat-input__row">
+                  <Col className="chat-input__row">
+                    {/* <Form.Group controlId="TextareaForm">
                 <Form.Control
                   as="textarea"
                   placeholder="Текст сообщения"
@@ -1807,159 +1877,91 @@ function Chat() {
                   className="chat-input__textarea"
                 />
               </Form.Group> */}
-                        <Form.Group className="custom-editor">
-                          <Editor
-                            editorState={editorState}
-                            onEditorStateChange={handleEditorChange}
-                            stripPastedStyles
-                            toolbarStyle={{
-                              border: "1px solid #dee2e6",
-                              borderRadius: "6px 6px 0 0",
-                            }}
-                            editorStyle={{
-                              border: "1px solid #dee2e6",
-                              borderRadius: "0 0 6px 6px",
-                              padding: "10px",
-                              height: "150px",
-                            }}
-                            placeholder={"Введите здесь ваше сообщение"}
-                            toolbar={{
-                              options: [
-                                "inline",
-                                "list",
-                                "emoji",
-                                "remove",
-                                "history",
-                              ],
-                              inline: {
-                                options: [
-                                  "bold",
-                                  "italic",
-                                  "underline",
-                                  "strikethrough",
-                                ],
-                              },
-                              list: {
-                                options: ["unordered", "ordered"],
-                              },
-                            }}
+                    <Form.Group className="custom-editor">
+                      <Editor
+                        editorState={editorState}
+                        onEditorStateChange={handleEditorChange}
+                        stripPastedStyles
+                        toolbarStyle={{
+                          border: "1px solid #dee2e6",
+                          borderRadius: "6px 6px 0 0",
+                        }}
+                        editorStyle={{
+                          border: "1px solid #dee2e6",
+                          borderRadius: "0 0 6px 6px",
+                          padding: "10px",
+                          height: "150px",
+                        }}
+                        placeholder={"Введите здесь ваше сообщение"}
+                        toolbar={{
+                          options: [
+                            "inline",
+                            "list",
+                            "emoji",
+                            "remove",
+                            "history",
+                          ],
+                          inline: {
+                            options: [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strikethrough",
+                            ],
+                          },
+                          list: {
+                            options: ["unordered", "ordered"],
+                          },
+                        }}
+                      />
+                    </Form.Group>
+                    <div className="file-inputs">
+                      {fileInputs.map((fileInput, index) => (
+                        <Form.Group key={index} className="mb-3 fileInputForm">
+                          <Form.Control
+                            type="file"
+                            accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                            onChange={handleFileChange}
                           />
-                        </Form.Group>
-                        <div className="file-inputs">
-                          {fileInputs.map((fileInput, index) => (
-                            <Form.Group
-                              key={index}
-                              className="mb-3 fileInputForm"
+                          {index > 0 && (
+                            <Button
+                              variant="outline-danger"
+                              onClick={() => handleRemoveFileInput(index)}
                             >
-                              <Form.Control
-                                type="file"
-                                accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                                onChange={handleFileChange}
-                              />
-                              {index > 0 && (
-                                <Button
-                                  variant="outline-danger"
-                                  onClick={() => handleRemoveFileInput(index)}
-                                >
-                                  Удалить
-                                </Button>
-                              )}
-                            </Form.Group>
-                          ))}
-
-                          <Button
-                            variant="outline-primary"
-                            id="AddFileButton"
-                            onClick={handleAddFileInput}
-                          >
-                            Добавить файл
-                          </Button>
-                        </div>
-
-                        {isVisibleError && (
-                          <span className="form__error">{errorMsg()}</span>
-                        )}
-                        {isAdmin() && currentStatus !== "На уточнении" && (
-                          <ToggleButtonGroup
-                            type="radio"
-                            name="options"
-                            defaultValue={1}
-                            value={selectedValue}
-                            onChange={handleToggleChange}
-                          >
-                            <ToggleButton id="tbg-radio-1" value={1}>
-                              Запретить писать клиенту
-                            </ToggleButton>
-                            <ToggleButton id="tbg-radio-2" value={2}>
-                              Разрешить писать клиенту
-                            </ToggleButton>
-                          </ToggleButtonGroup>
-                        )}
-                        <div
-                          className={
-                            currentStatus == "В процессе"
-                              ? "chat-input__button-row chat-input__button-row-gap"
-                              : "chat-input__button-row"
-                          }
-                        >
-                          <ButtonCustom
-                            title="Отправить"
-                            className={
-                              isAdmin()
-                                ? "chat-input__button-send single"
-                                : "chat-input__button-send single"
-                            }
-                            type="submit"
-                            onClick={handleSubmit}
-                          />
-                          {isAdmin() && currentStatus == "В процессе" ? (
-                            <ButtonCustom
-                              title="Закрыть заявку"
-                              className="chat-input__button-close"
-                              id="AddFileButton"
-                              onClick={handleShowWarning}
-                            />
-                          ) : (
-                            <></>
+                              Удалить
+                            </Button>
                           )}
-                        </div>
-                        {isAdmin() && currentStatus == "Новый" ? (
-                          <>
-                            <div className="chat-input__button-row">
-                              <ButtonCustom
-                                title="Начать работу"
-                                className="chat-input__button-send single"
-                                onClick={handleInProgress}
-                              />
-                            </div>
-                            {isAdmin() && (
-                              <>
-                                <a className="alltickets__link">
-                                  <ButtonCustom
-                                    title={
-                                      isVisibleFilters == false
-                                        ? "Показать историю"
-                                        : "Скрыть историю"
-                                    }
-                                    onClick={handleHideComponent}
-                                    className={
-                                      "alltickets__btn-outlined single"
-                                    }
-                                  />
-                                </a>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                      </Col>
-                    </Row>
-                  )}
-                </Form>
-              ) : (
-                <Form className="chat-input__form" onSubmit={sendMsg}>
-                  <Row className="chat-input__row">
+                        </Form.Group>
+                      ))}
+
+                      <Button
+                        variant="outline-primary"
+                        id="AddFileButton"
+                        onClick={handleAddFileInput}
+                      >
+                        Добавить файл
+                      </Button>
+                    </div>
+
+                    {isVisibleError && (
+                      <span className="form__error">{errorMsg()}</span>
+                    )}
+                    {isAdmin() && currentStatus !== "На уточнении" && (
+                      <ToggleButtonGroup
+                        type="radio"
+                        name="options"
+                        defaultValue={1}
+                        value={selectedValue}
+                        onChange={handleToggleChange}
+                      >
+                        <ToggleButton id="tbg-radio-1" value={1}>
+                          Запретить писать клиенту
+                        </ToggleButton>
+                        <ToggleButton id="tbg-radio-2" value={2}>
+                          Разрешить писать клиенту
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    )}
                     <div
                       className={
                         currentStatus == "В процессе"
@@ -1967,10 +1969,21 @@ function Chat() {
                           : "chat-input__button-row"
                       }
                     >
+                      <ButtonCustom
+                        title="Отправить"
+                        className={
+                          isAdmin()
+                            ? "chat-input__button-send single"
+                            : "chat-input__button-send single"
+                        }
+                        type="submit"
+                        onClick={handleSubmit}
+                      />
                       {isAdmin() && currentStatus == "В процессе" ? (
                         <ButtonCustom
                           title="Закрыть заявку"
                           className="chat-input__button-close"
+                          id="AddFileButton"
                           onClick={handleShowWarning}
                         />
                       ) : (
@@ -2005,104 +2018,169 @@ function Chat() {
                     ) : (
                       <></>
                     )}
-                  </Row>
-                </Form>
+                  </Col>
+                </Row>
               )}
-            </div>
-
-            <div className="chat-input__container">
-              {isVisible &&
-              !isAdmin() &&
-              (currentStatus === "Новый" ||
-                currentStatus === "Ожидает дополнения") ? (
-                <Form className="chat-input__form" onSubmit={sendMsg}>
-                  <Row className="chat-input__row">
-                    <Col className="chat-input__row">
-                      <Form.Group className="custom-editor">
-                        <Editor
-                          editorState={editorState}
-                          onEditorStateChange={handleEditorChange}
-                          stripPastedStyles
-                          toolbarStyle={{
-                            border: "1px solid #dee2e6",
-                            borderRadius: "6px 6px 0 0",
-                          }}
-                          editorStyle={{
-                            border: "1px solid #dee2e6",
-                            borderRadius: "0 0 6px 6px",
-                            padding: "10px",
-                            height: "150px",
-                          }}
-                          placeholder={"Введите здесь ваше сообщение"}
-                          toolbar={{
-                            options: [
-                              "inline",
-                              "list",
-                              "emoji",
-                              "remove",
-                              "history",
-                            ],
-                            inline: {
-                              options: [
-                                "bold",
-                                "italic",
-                                "underline",
-                                "strikethrough",
-                              ],
-                            },
-                            list: {
-                              options: ["unordered", "ordered"],
-                            },
-                          }}
-                        />
-                      </Form.Group>
-
-                      <div className="file-inputs">
-                        {fileInputs.map((fileInput, index) => (
-                          <Form.Group
-                            key={index}
-                            className="mb-3 fileInputForm"
-                          >
-                            <Form.Control
-                              type="file"
-                              accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                              onChange={handleFileChange}
-                            />
-                            {index > 0 && (
-                              <Button
-                                variant="outline-danger"
-                                onClick={() => handleRemoveFileInput(index)}
-                              >
-                                Удалить
-                              </Button>
-                            )}
-                          </Form.Group>
-                        ))}
-
-                        <Button
-                          variant="outline-primary"
-                          id="AddFileButton"
-                          onClick={handleAddFileInput}
-                        >
-                          Добавить файл
-                        </Button>
-                      </div>
-
+            </Form>
+          ) : (
+            <Form className="chat-input__form" onSubmit={sendMsg}>
+              <Row className="chat-input__row">
+                <div
+                  className={
+                    currentStatus == "В процессе"
+                      ? "chat-input__button-row chat-input__button-row-gap"
+                      : "chat-input__button-row"
+                  }
+                >
+                  {isAdmin() && currentStatus == "В процессе" ? (
+                    <ButtonCustom
+                      title="Закрыть заявку"
+                      className="chat-input__button-close"
+                      onClick={handleShowWarning}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                {isAdmin() && currentStatus == "Новый" ? (
+                  <>
+                    <div className="chat-input__button-row">
                       <ButtonCustom
-                        title="Отправить"
+                        title="Начать работу"
                         className="chat-input__button-send single"
-                        type="submit"
-                        onClick={handleSubmit}
+                        onClick={handleInProgress}
                       />
-                    </Col>
-                  </Row>
-                </Form>
-              ) : (
-                <></>
+                    </div>
+                    {isAdmin() && (
+                      <>
+                        <a className="alltickets__link">
+                          <ButtonCustom
+                            title={
+                              isVisibleFilters == false
+                                ? "Показать историю"
+                                : "Скрыть историю"
+                            }
+                            onClick={handleHideComponent}
+                            className={"alltickets__btn-outlined single"}
+                          />
+                        </a>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
+              </Row>
+            </Form>
+          )}
+        </div>
+
+        <div className="chat-input__container">
+          {isVisible &&
+          !isAdmin() &&
+          (currentStatus === "Новый" ||
+            currentStatus === "Ожидает дополнения") ? (
+            <Form className="chat-input__form container" onSubmit={sendMsg}>
+              <button
+                className={
+                  isFormVisible ? "toggle-button-active" : "toggle-button"
+                }
+                onClick={toggleFormVisibility}
+              >
+                {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
+              </button>
+              {isFormVisible && (
+                <Row className="chat-input__row">
+                  <Col className="chat-input__row">
+                    <Form.Group className="custom-editor">
+                      {/* <Form.Control
+                    as="textarea"
+                    placeholder="Текст сообщения"
+                    rows={3}
+                    value={message}
+                    onChange={handleChange}
+                    className="chat-input__textarea"
+                  /> */}
+                      <Editor
+                        editorState={editorState}
+                        onEditorStateChange={handleEditorChange}
+                        stripPastedStyles
+                        toolbarStyle={{
+                          border: "1px solid #dee2e6",
+                          borderRadius: "6px 6px 0 0",
+                        }}
+                        editorStyle={{
+                          border: "1px solid #dee2e6",
+                          borderRadius: "0 0 6px 6px",
+                          padding: "10px",
+                          height: "150px",
+                        }}
+                        placeholder={"Введите здесь ваше сообщение"}
+                        toolbar={{
+                          options: [
+                            "inline",
+                            "list",
+                            "emoji",
+                            "remove",
+                            "history",
+                          ],
+                          inline: {
+                            options: [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strikethrough",
+                            ],
+                          },
+                          list: {
+                            options: ["unordered", "ordered"],
+                          },
+                        }}
+                      />
+                    </Form.Group>
+
+                    <div className="file-inputs">
+                      {fileInputs.map((fileInput, index) => (
+                        <Form.Group key={index} className="mb-3 fileInputForm">
+                          <Form.Control
+                            type="file"
+                            accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                            onChange={handleFileChange}
+                          />
+                          {index > 0 && (
+                            <Button
+                              variant="outline-danger"
+                              onClick={() => handleRemoveFileInput(index)}
+                            >
+                              Удалить
+                            </Button>
+                          )}
+                        </Form.Group>
+                      ))}
+
+                      <Button
+                        variant="outline-primary"
+                        id="AddFileButton"
+                        onClick={handleAddFileInput}
+                      >
+                        Добавить файл
+                      </Button>
+                    </div>
+
+                    <ButtonCustom
+                      title="Отправить"
+                      className="chat-input__button-send single"
+                      type="submit"
+                      onClick={handleSubmit}
+                    />
+                  </Col>
+                </Row>
               )}
-            </div>
-          </Row>
-        )}
+            </Form>
+          ) : (
+            <></>
+          )}
+        </div>
         {!isHideMessages &&
           messagesQuery.map(
             (msg) =>
@@ -2115,7 +2193,7 @@ function Chat() {
                         sender={msg.sender}
                         time={DateTime.fromISO(msg.date, { zone: "utc" })
                           .toLocal()
-                          .toFormat(`yyyy.MM.dd   HH:mm:ss`)}
+                          .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
                         attachs={msg.attachs}
                         onClick
                       />
@@ -2127,7 +2205,7 @@ function Chat() {
                           message={msg.text}
                           time={DateTime.fromISO(msg.date, { zone: "utc" })
                             .toLocal()
-                            .toFormat(`yyyy.MM.dd   HH:mm:ss`)}
+                            .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
                         />
                       ) : (
                         <></>
@@ -2139,7 +2217,7 @@ function Chat() {
                       sender={msg.sender}
                       time={DateTime.fromISO(msg.date, { zone: "utc" })
                         .toLocal()
-                        .toFormat(`yyyy.MM.dd   HH:mm:ss`)}
+                        .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
                       attachs={msg.attachs}
                     />
                   )}
@@ -2189,7 +2267,13 @@ function Chat() {
       )}
       {isVisibleFilters && (
         <>
-          <div className="chat__table-log">
+          <div
+            className={
+              currentStatus == "Новый"
+                ? "chat__table-log-new"
+                : "chat__table-log"
+            }
+          >
             <Table className="table__table" hover>
               <thead>
                 <tr>
@@ -2207,7 +2291,7 @@ function Chat() {
                         zone: "utc",
                       })
                         .toLocal()
-                        .toFormat("yyyy.MM.dd HH:mm:ss")}
+                        .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
                     </td>
                     <td>{getFullName(log.initiator)}</td>
                     <td>

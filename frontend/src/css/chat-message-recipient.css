@@ -87,6 +87,7 @@
   margin-left: -20px;
   margin-right: -50px;
   text-align: right;
+  white-space: pre-wrap;
 }
 
 .chat-message-recipient__attachs-title {
@@ -115,7 +116,7 @@
 }
 
 .chat-message-recipient__attach::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   right: 0;
@@ -132,7 +133,7 @@
 }
 
 .chat-message-recipient__name {
-  font-family: 'TT Norms Pro', sans-serif;
+  font-family: "TT Norms Pro", sans-serif;
   font-weight: 400;
 }
 

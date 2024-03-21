@@ -1,37 +1,37 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
 import {
-  Form,
-  Row,
+  Button,
   Col,
   Dropdown,
   DropdownButton,
+  Form,
   Modal,
-  Button,
+  Row,
 } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-import {
-  HELPER,
-  DEPARTMENTS_LIST,
-  JOB_TITLE_LIST,
-  COUNTRY_LIST,
-} from "../apollo/queries";
 import {
   DELETE_USER,
-  EDIT_HELPER_USER,
   DISABLE_HELPER_USER,
+  EDIT_HELPER_USER,
 } from "../apollo/mutations";
+import {
+  COUNTRY_LIST,
+  DEPARTMENTS_LIST,
+  HELPER,
+  JOB_TITLE_LIST,
+} from "../apollo/queries";
 
-import { DatePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
+import { DatePicker } from "rsuite";
 import BackTitle from "../components/back-title";
-import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
+import Loader from "../pages/loading";
 import NotFoundPage from "./not-found-page";
 
-import "../css/edit-curator.css";
 import "../css/dropdown.css";
+import "../css/edit-curator.css";
 
 function EditCurator() {
   const { curatorId } = useParams();
@@ -52,6 +52,12 @@ function EditCurator() {
   const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCountryId, setSelectedCountryId] = useState(null);
+
+  // права доступа
+  const [selectedAcessCurators, setSelectedAcessCurators] = useState(false);
+  const [selectedAcessThemes, setSelectedAcessThemes] = useState(false);
+  const [selectedAcessTransfers, setSelectedAcessTransfers] = useState(false);
+  const [selectedAcessToAnswers, setSelectedAcessToAnswers] = useState(false);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -218,6 +224,22 @@ function EditCurator() {
     setIsErrorVisible(false);
   };
 
+  const handleOnChangeAcessCurators = (e) => {
+    setSelectedAcessCurators(e.target.checked);
+  };
+
+  const handleOnChangeAcessThemes = (e) => {
+    setSelectedAcessThemes(e.target.checked);
+  };
+
+  const handleOnChangeAcessTransfers = (e) => {
+    setSelectedAcessTransfers(e.target.checked);
+  };
+
+  const handleOnChangeAcessAnswers = (e) => {
+    setSelectedAcessToAnswers(e.target.checked);
+  };
+
   const handlePeriodClick = (originalDate) => {
     const year = originalDate.getFullYear();
     const month = ("0" + (originalDate.getMonth() + 1)).slice(-2);
@@ -309,6 +331,12 @@ function EditCurator() {
             countryId: selectedCountryId,
             departmentId: selectedDepartmentsId,
             jobTitleId: selectedJobTitleId,
+            // acess: {
+            //   acessCurators: selectedAcessCurators,
+            //   acessThemes: selectedAcessThemes,
+            //   acessTransfers: selectedAcessTransfers,
+            //   acessToAnswer: selectedAcessToAnswers
+            // },
           },
         });
       } else {
@@ -323,6 +351,12 @@ function EditCurator() {
             countryId: selectedCountryId,
             departmentId: selectedDepartmentsId,
             jobTitleId: selectedJobTitleId,
+            // acess: {
+            //   acessCurators: selectedAcessCurators,
+            //   acessThemes: selectedAcessThemes,
+            //   acessTransfers: selectedAcessTransfers,
+            //   acessToAnswer: selectedAcessToAnswers
+            // },
           },
         });
       }
@@ -458,6 +492,71 @@ function EditCurator() {
                   value={birthdayValue}
                   onChange={(date) => setBirthdayValue(date)}
                 />
+              </Form.Group>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="CountryForm"
+              >
+                <div className="edit-curator__checkbox-block">
+                  <Form.Check
+                    className=""
+                    type="switch"
+                    id="custom-switch"
+                    value={selectedAcessCurators}
+                    onChange={handleOnChangeAcessCurators}
+                  />
+                  <span className="edit-curator__field-label">
+                    Редактирование кураторов
+                  </span>
+                </div>
+              </Form.Group>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="CountryForm"
+              >
+                <div className="edit-curator__checkbox-block">
+                  <Form.Check
+                    type="switch"
+                    id="custom-switch"
+                    value={selectedAcessThemes}
+                    onChange={handleOnChangeAcessThemes}
+                  />
+                  <span className="edit-curator__field-label">
+                    Редактирование тем
+                  </span>
+                </div>
+              </Form.Group>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="CountryForm"
+              >
+                <div className="edit-curator__checkbox-block">
+                  <Form.Check
+                    type="switch"
+                    id="custom-switch"
+                    value={selectedAcessTransfers}
+                    onChange={handleOnChangeAcessTransfers}
+                  />
+                  <span className="edit-curator__field-label">
+                    Редактирование переводов
+                  </span>
+                </div>
+              </Form.Group>
+              <Form.Group
+                className="edit-curator__field-column"
+                controlId="CountryForm"
+              >
+                <div className="edit-curator__checkbox-block">
+                  <Form.Check
+                    type="switch"
+                    id="custom-switch"
+                    value={selectedAcessToAnswers}
+                    onChange={handleOnChangeAcessAnswers}
+                  />
+                  <span className="edit-curator__field-label">
+                    Возможность отвечать на обращения
+                  </span>
+                </div>
               </Form.Group>
             </Col>
 

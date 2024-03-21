@@ -5,7 +5,7 @@ export const Translater = async (textToTranslate, lang) => {
   const model = "gpt-3.5-turbo";
   const base_url = "https://api.proxyapi.ru/openai/v1";
 
-  const prompt = `Переведи этот текст на ${lang} язык: ${textToTranslate}`;
+  const prompt = `Переведи этот текст без лишних слов на ${lang} язык: ${textToTranslate}`;
 
   const requestData = {
     model,
