@@ -67,9 +67,8 @@ export const ObjectTypes = `
 
     type Ticket {
         id: Int!
-        helperId: Int!
-        client: Client!
-        helper: Helper!
+        initiator: User!
+        recipient: User!
         assistant: Helper
         status: TicketStatus!
         date: DateTime!
@@ -178,7 +177,7 @@ export const ObjectTypes = `
 
     type TicketInsertInfo {
         id: Int!
-        clientId: Int!
+        initiatorId: Int!
         link: String!
     }
 

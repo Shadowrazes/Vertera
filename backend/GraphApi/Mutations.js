@@ -3,7 +3,7 @@ export const Mutations = `
         class: String!
 
         addClientUser(userFields: UserInsert!, clientFields: ClientInsert!): Int!
-        addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!): TicketInsertInfo!
+        addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!): TicketInsertInfo!
         addMessage(fields: MessageInsert!): Int!
 
         updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!

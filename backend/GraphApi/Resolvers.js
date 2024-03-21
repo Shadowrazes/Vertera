@@ -62,7 +62,7 @@ export const resolvers = {
         ticket: async (_, { link }, context) => {
             const isHelper = User.ValidateRoleAccess(User.RoleHelper, context.user.role);
             const reqTicket = await Ticket.GetByLink(link);
-            const isOwner = reqTicket.clientId == context.user.id;
+            const isOwner = reqTicket.initiatorId == context.user.id || reqTicket.recipientId == context.user.id;
 
             if(!isHelper && !isOwner) throw new Error(Errors.AccessForbidden);
 
@@ -310,11 +310,11 @@ export const resolvers = {
         },
     },
     Ticket: {
-        client: async (parent, args) => {
-            return await Client.GetById(parent.clientId);
+        initiator: async (parent, args) => {
+            return await User.GetById(parent.initiatorId);
         },
-        helper: async (parent, args) => {
-            return await Helper.GetById(parent.helperId);
+        recipient: async (parent, args) => {
+            return await User.GetById(parent.recipientId);
         },
         assistant: async (parent, args, context) => {
             if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);

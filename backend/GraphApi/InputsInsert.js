@@ -23,7 +23,8 @@ export const InputsInsert = `
 
     input TicketInsert {
         title: String!
-        clientId: Int!
+        initiatorId: Int!
+        recipientId: Int
         unitId: Int!
         themeId: Int!
         subThemeId: Int!

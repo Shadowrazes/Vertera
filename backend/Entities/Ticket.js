@@ -19,8 +19,8 @@ const baseUrl = isBuild ? 'https://help.vertera.org' : 'http://localhost:5173';
 class Ticket extends Entity {
     static TableName = 'tickets';
     static PrimaryField = 'id';
-    static ClientIdField = 'clientId';
-    static HelperIdField = 'helperId';
+    static InitiatorIdField = 'initiatorId';
+    static RecipientIdField = 'recipientId';
     static AssistantIdField = 'assistantId';
     static StatusIdField = 'statusId';
     static DateField = 'date';
@@ -36,6 +36,7 @@ class Ticket extends Entity {
     static StatusIdInProgress = 3;
     static StatusIdOnRevision = 4;
     static StatusIdOnExtension = 5;
+    static StatusIdNotification = 6;
 
     static ReactionMarkLike = 1;
     static ReactionMarkDislike = 0;
@@ -119,8 +120,8 @@ class Ticket extends Entity {
         }
 
         let sql = `
-        SELECT  ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.ClientIdField}, 
-                ${this.TableName}.${this.HelperIdField}, ${this.TableName}.${this.StatusIdField}, 
+        SELECT  ${this.TableName}.${this.PrimaryField}, ${this.TableName}.${this.InitiatorIdField}, 
+                ${this.TableName}.${this.RecipientIdField}, ${this.TableName}.${this.StatusIdField}, 
                 ${this.TableName}.${this.DateField}, ${this.TableName}.${this.UnitField}, 
                 ${this.TableName}.${this.ThemeField}, ${this.TableName}.${this.SubThemeField},
                 ${this.TableName}.${this.ReactionField}, ${this.TableName}.${this.LinkField},
@@ -138,7 +139,7 @@ class Ticket extends Entity {
         JOIN    ${Message.TableName} 
                 ON ${this.TableName}.${this.PrimaryField} = ${Message.TableName}.${Message.TicketIdField}
 
-        WHERE   1=1 ${clientId ? `AND ${this.ClientIdField} = ${clientId}` : ``}
+        WHERE   1=1 ${clientId ? `AND ${this.InitiatorIdField} = ${clientId}` : ``}
         `;
 
         let fields = [];
@@ -166,33 +167,50 @@ class Ticket extends Entity {
             fields.push(filter.subThemeIds);
         }
         if (filter.helperIds && filter.helperIds.length > 0) {
-            sql += ` AND (${this.HelperIdField} IN (?) OR ${this.AssistantIdField} IN (?))`;
+            sql += ` AND (
+                ${this.InitiatorIdField} IN (?) OR 
+                ${this.RecipientIdField} IN (?) OR 
+                ${this.AssistantIdField} IN (?)
+            )`;
+            fields.push(filter.helperIds);
             fields.push(filter.helperIds);
             fields.push(filter.helperIds);
         }
         if (filter.helperCountryIds && filter.helperCountryIds.length > 0) {
+            const countryHelperIdsSubQuery = `
+                SELECT ${User.PrimaryField} 
+                FROM ${User.TableName} 
+                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'helper'
+            `;
+
             sql += ` 
-                AND ${this.HelperIdField} IN (
-                    SELECT ${User.PrimaryField} 
-                    FROM ${User.TableName} 
-                    WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'helper'
+                AND (
+                    ${this.InitiatorIdField} IN (${countryHelperIdsSubQuery}) OR
+                    ${this.RecipientIdField} IN (${countryHelperIdsSubQuery})
                 )
             `;
             fields.push(filter.helperCountryIds);
+            fields.push(filter.helperCountryIds);
         }
         if (filter.clientCountryIds && filter.clientCountryIds.length > 0) {
+            const countryClientIdsSubQuery = `
+                SELECT ${User.PrimaryField} 
+                FROM ${User.TableName} 
+                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'client'
+            `;
+
             sql += ` 
-                AND ${this.ClientIdField} IN (
-                    SELECT ${User.PrimaryField} 
-                    FROM ${User.TableName} 
-                    WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'client'
+                AND (
+                    ${this.InitiatorIdField} IN (${countryClientIdsSubQuery}) OR
+                    ${this.RecipientIdField} IN (${countryClientIdsSubQuery})
                 )
             `;
+            fields.push(filter.clientCountryIds);
             fields.push(filter.clientCountryIds);
         }
         if (filter.replyed != undefined) {
             sql += ` 
-            AND ${this.ClientIdField} = (
+            AND ${this.InitiatorIdField} = (
                 SELECT ${Message.SenderIdField}
                 FROM ${Message.TableName}
                 WHERE ${Message.DateField} = (
@@ -216,13 +234,19 @@ class Ticket extends Entity {
             fields.push(filter.reaction);
         }
         if (filter.outerId) {
+            const outerIdSubQuery = `
+                SELECT ${Client.PrimaryField} 
+                FROM ${Client.TableName} 
+                WHERE ${Client.OuterIdField} IN (?)
+            `;
+
             sql += ` 
-                AND ${this.ClientIdField} IN (
-                    SELECT ${Client.PrimaryField} 
-                    FROM ${Client.TableName} 
-                    WHERE ${Client.OuterIdField} IN (?)
+                AND (
+                    ${this.InitiatorIdField} IN (${outerIdSubQuery}) OR
+                    ${this.RecipientIdField} IN (${outerIdSubQuery})
                 )
             `;
+            fields.push(filter.outerId);
             fields.push(filter.outerId);
         }
         
@@ -243,8 +267,10 @@ class Ticket extends Entity {
         return await super.Transaction(async (conn) => {
             const curTicket = await this.GetById(parentId);
 
+            if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
+
             const msgSysFields = {
-                senderId: User.AdminId, recieverId: curTicket.clientId, type: Message.TypeSystem,
+                senderId: User.AdminId, recieverId: curTicket.initiatorId, type: Message.TypeSystem,
                 readed: 0, ticketId: parentId, text: `Обращение разделено на ${argsList.length} новых`
             };
             const msgSysResult = await Message.TransInsert(msgSysFields, conn);
@@ -274,20 +300,26 @@ class Ticket extends Entity {
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
-            const helperId = await Helper.GetMostFreeHelper(ticketFields.subThemeId);
-            const ticketLink = md5(new Date().toISOString() + ticketFields.clientId);
+            const autoHelperAssign = ticketFields.recipientId == undefined && !args.notification;
+
+            if(autoHelperAssign){
+                const helperId = await Helper.GetMostFreeHelper(ticketFields.subThemeId);
+                ticketFields.recipientId = helperId;
+            }
+
+            const ticketLink = md5(new Date().toISOString() + ticketFields.initiatorId);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            ticketFields.helperId = helperId;
             ticketFields.link = ticketLink;
             ticketFields.date = new Date();
-            ticketFields.statusId = this.StatusIdOpened;
+            ticketFields.statusId = args.notification ? this.StatusIdNotification : this.StatusIdOpened;
+
             const result = await super.TransRequest(conn, sql, [ticketFields]);
 
             //
             const createTicketLogFields = {
                 type: TicketLog.TypeCreate, ticketId: result.insertId,
-                info: 'Создал', initiatorId: ticketFields.clientId
+                info: 'Создал', initiatorId: ticketFields.initiatorId
             };
             if (args.split) {
                 createTicketLogFields.type = TicketLog.TypeSplitCreate;
@@ -297,7 +329,7 @@ class Ticket extends Entity {
                 const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
 
                 const msgSysFields = {
-                    senderId: User.AdminId, recieverId: ticketFields.clientId, type: Message.TypeSystem,
+                    senderId: User.AdminId, recieverId: ticketFields.initiatorId, type: Message.TypeSystem,
                     readed: 0, ticketId: result.insertId, text: `Обращение создано разделением`
                 };
                 const msgSysResult = await Message.TransInsert(msgSysFields, conn);
@@ -306,25 +338,29 @@ class Ticket extends Entity {
                 const createTicketLogRes = await TicketLog.TransInsert(conn, createTicketLogFields);
             }
 
-            const helperAssignLogFields = {
-                type: TicketLog.TypeHelperAssign, ticketId: result.insertId,
-                info: `Назначен куратор`, initiatorId: User.AdminId
+            const recipientChangeLogFields = {
+                type: TicketLog.TypeRecipientChange, ticketId: result.insertId,
+                info: `Назначен адресат`, 
+                initiatorId: (autoHelperAssign ? User.AdminId : ticketFields.initiatorId)
             };
-            const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
+            const recipientChangeLogRes = await TicketLog.TransInsert(conn, recipientChangeLogFields);
             //  //
 
-            messageFields.recieverId = helperId;
+            messageFields.recieverId = ticketFields.recipientId ;
             messageFields.ticketId = result.insertId;
             messageFields.type = Message.TypeDefault;
             const messageResult = await Message.TransInsert(messageFields, conn);
 
-            const userResult = await User.GetById(ticketFields.clientId);
-            const clientResult = await Client.GetById(ticketFields.clientId);
-            const dialogLink = baseUrl + `/dialog/${ticketLink}/`
-            const emailText = `Здравствуйте, ${userResult.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
-            EmailSender.Notify(clientResult.email, emailText);
+            const dialogLink = baseUrl + `/dialog/${ticketLink}/`;
+            const curInitiator = await User.GetById(ticketFields.initiatorId);
 
-            return { id: result.insertId, clientId: ticketFields.clientId, link: dialogLink };
+            if(curInitiator.role == User.RoleClient){
+                const clientResult = await Client.GetById(ticketFields.initiatorId);
+                const emailText = `Здравствуйте, ${curInitiator.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
+                EmailSender.Notify(clientResult.email, emailText);
+            }
+
+            return { id: result.insertId, initiatorId: ticketFields.initiatorId, link: dialogLink };
         };
 
         if (!conn) {
@@ -339,6 +375,9 @@ class Ticket extends Entity {
 
     static async TransUpdate(id, fields, departmentId, initiator, conn) {
         const transFunc = async (conn) => {
+            const curTicket = await this.GetById(id);
+            if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
+
             if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
 
             if (fields.statusId) {
@@ -353,7 +392,6 @@ class Ticket extends Entity {
                 const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
             }
 
-            const curTicket = await this.GetById(id);
             if(fields.assistantId){
                 let assistantConnLogFields = {
                     type: TicketLog.TypeAssistantConn, ticketId: id,
@@ -404,14 +442,24 @@ class Ticket extends Entity {
                 const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
             }
 
-            if (fields.helperId) {
-                const helperAssignLogFields = {
-                    type: TicketLog.TypeHelperAssign, ticketId: id,
-                    info: `Изменил куратора`, initiatorId: initiator.id
+            if (fields.initiatorId) {
+                const initiatorChangeLogFields = {
+                    type: TicketLog.TypeInitiatorChange, ticketId: id,
+                    info: `Изменил создателя`, initiatorId: initiator.id
                 };
-                const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
+                const initiatorChangeLogRes = await TicketLog.TransInsert(conn, initiatorChangeLogFields);
             }
-            else if (departmentId) {
+
+            if (fields.recipientId) {
+                const recipientChangeLogFields = {
+                    type: TicketLog.TypeRecipientChange, ticketId: id,
+                    info: `Изменил адресата`, initiatorId: initiator.id
+                };
+                const recipientChangeLogRes = await TicketLog.TransInsert(conn, recipientChangeLogFields);
+            }
+
+
+            if (departmentId && !fields.recipientId) {
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
                 const changeDepLogFields = {
@@ -429,7 +477,7 @@ class Ticket extends Entity {
                 }
 
                 if (needNewHelper) {
-                    fields.helperId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
+                    fields.recipientId = await Helper.GetMostFreeHelper(fields.subThemeId, departmentId);
 
                     const helperAssignLogFields = {
                         type: TicketLog.TypeHelperAssign, ticketId: id,

@@ -38,7 +38,7 @@ class Helper extends Entity {
                 IFNULL(SUM(${Ticket.ReactionField} = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
                 COUNT(CASE WHEN ${Ticket.ReactionField} IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
-            WHERE ${Ticket.HelperIdField} = ?
+            WHERE ${Ticket.RecipientIdField} = ?
         `;
 
         let fields = [helperId];
@@ -147,11 +147,11 @@ class Helper extends Entity {
                 IFNULL(${Ticket.TableName}.${ticketCountAS}, 0) AS ${ticketCountAS}
             FROM ${this.TableName}
             LEFT JOIN (
-                SELECT ${Ticket.HelperIdField}, COUNT(*) AS ${ticketCountAS}
+                SELECT ${Ticket.RecipientIdField}, COUNT(*) AS ${ticketCountAS}
                 FROM ${Ticket.TableName} WHERE ${Ticket.StatusIdField} NOT IN (?)
-                GROUP BY ${Ticket.HelperIdField}
+                GROUP BY ${Ticket.RecipientIdField}
             ) AS ${Ticket.TableName} 
-            ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.HelperIdField} 
+            ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.RecipientIdField} 
             WHERE ${this.PrimaryField} IN ( 
                 SELECT ${HelperDepartment.HelperIdField}  
                 FROM ${HelperDepartment.TableName} 

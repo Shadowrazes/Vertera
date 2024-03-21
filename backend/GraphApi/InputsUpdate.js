@@ -1,6 +1,7 @@
 export const InputsUpdate = `
     input TicketUpdate {
-        helperId: Int
+        initiatorId: Int
+        recipientId: Int
         assistantId: Int
         statusId: Int
         unitId: Int

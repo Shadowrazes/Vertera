@@ -13,6 +13,7 @@ class Errors {
     static IncorrectMsgReciever = 'Incorrect msg reciever';
     static MsgSendForbidden = 'Msg forbidden';
     static MsgInClosedTicket = 'Ticket closed';
+    static UpdateOfNotificationTicket = 'Changes forbidden';
     static ForbiddenTranslationType = 'This type of translation is forbidden';
     static TranslationInsertLangNoRu = 'Insert is possible only by ru lang';
     static TranslationRenamingLangNoRu = 'Renaming is possible only by ru lang';

@@ -19,6 +19,8 @@ class TicketLog extends Entity{
     static TypeClientReaction = 'clientReaction';
     static TypeThemeChange = 'themeChange';
     static TypeAssistantConn = 'assistantConn';
+    static TypeInitiatorChange = 'initiatorChange';
+    static TypeRecipientChange = 'recipientChange';
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;

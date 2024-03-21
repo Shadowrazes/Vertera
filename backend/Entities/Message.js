@@ -49,7 +49,9 @@ class Message extends Entity {
     static async TransInsert(args, conn) {
         const transFunc = async (conn) => {
             const curTicket = await Ticket.GetById(args.ticketId);
+            
             if (curTicket && curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
+            if (curTicket && curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 
             const sender = await User.GetById(args.senderId);
             if (curTicket && sender.role == User.RoleClient && !this.ClientAllowedStatusIds.includes(curTicket.statusId)) {
@@ -58,8 +60,8 @@ class Message extends Entity {
 
             if(curTicket){
                 const allowedSenderIds = [
-                    curTicket.clientId,
-                    curTicket.helperId,
+                    curTicket.initiatorId,
+                    curTicket.recipientId,
                     curTicket.assistantId,
                     User.AdminId
                 ];
@@ -94,10 +96,12 @@ class Message extends Entity {
             };
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
-            if (sender.role == User.RoleHelper && reciever.role != User.RoleHelper) {
-                const curClient = await Client.GetById(args.recieverId);
+            if (reciever.role == User.RoleClient) {
+                const curClient = await Client.GetById(reciever.id);
 
-                if (curTicket.clientId != curClient.id) throw new Error(Errors.IncorrectMsgReciever);
+                if (curTicket.initiatorId != curClient.id && curTicket.recipientId != curClient.id){
+                    throw new Error(Errors.IncorrectMsgReciever);
+                }
 
                 const dialogLink = `https://help.vertera.org/dialog/${curTicket.link}/`
                 const emailText = `На ваше обращение дан ответ.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
