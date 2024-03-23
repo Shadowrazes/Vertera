@@ -116,6 +116,7 @@ function Chat() {
   const [showWarning, setShowWarning] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showCuratorChat, setShowCuratorChat] = useState(false);
+  const [showEditTicketError, setShowEditTicketErorr] = useState(false);
 
   const [isFormVisible, setIsFormVisible] = useState(true);
 
@@ -231,8 +232,8 @@ function Chat() {
       setTicketId(data.clientQuery.ticket.id);
       setMessagesQuery([...data.clientQuery.ticket.messages].reverse());
       setCurrentStatus(data.clientQuery.ticket.status.name.stroke);
-      setHelperId(data.clientQuery.ticket.helper.id);
-      setClientId(data.clientQuery.ticket.client.id);
+      setHelperId(data.clientQuery.ticket.recipient.id);
+      setClientId(data.clientQuery.ticket.initiator.id);
       setSelectedUnitEdit(
         data.clientQuery.ticket.subTheme.theme.unit.name.stroke
       );
@@ -242,15 +243,15 @@ function Chat() {
       setSelectedSubThemeEdit(data.clientQuery.ticket.subTheme.name.stroke);
       setSelectedSubThemeIdEdit(data.clientQuery.ticket.subTheme.id);
       setSelectedCurator(
-        `${data.clientQuery.ticket.helper.user.surname} ${
-          data.clientQuery.ticket.helper.user.name
+        `${data.clientQuery.ticket.recipient.surname} ${
+          data.clientQuery.ticket.recipient.name
         } ${
-          data.clientQuery.ticket.helper.user.patronymic
-            ? ` ${data.clientQuery.ticket.helper.user.patronymic}`
+          data.clientQuery.ticket.recipient.patronymic
+            ? ` ${data.clientQuery.ticket.recipient.patronymic}`
             : ""
         }`
       );
-      setSelectedCuratorId(data.clientQuery.ticket.helper.id);
+      setSelectedCuratorId(data.clientQuery.ticket.recipient.id);
       setSelectedDepartmentsId(
         data.clientQuery.ticket.subTheme.departments.map(
           (department) => department.id
@@ -420,7 +421,7 @@ function Chat() {
       error = "Максимальный размер файла - 10 Мб";
     } else if (isFilesLimitExceeded) {
       error = "Вы можете загружать до 5 файлов";
-    } else if (textareaValue.trim() == "<p></p>") {
+    } else if (textareaValue.trim() == "<p></p>\n") {
       error = "Введите текст сообщения";
     }
 
@@ -488,7 +489,9 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    if (message.trim() == "") {
+    console.log();
+
+    if (message == "<p></p>") {
       return;
     }
 
@@ -658,12 +661,13 @@ function Chat() {
         await editTicket({
           variables: {
             id: parseInt(itemId),
-            helperId: userId,
+            recipientId: userId,
           },
         });
         window.location.reload();
       }
     } catch (error) {
+      showEditTicketError();
       console.error("Ошибка при смене куратора:", error);
     }
   };
@@ -972,7 +976,7 @@ function Chat() {
           argsList: inputValues.map((input) => ({
             ticketFields: {
               title: input.title,
-              clientId: clientId,
+              initiatorId: clientId,
               unitId: input.unitId,
               themeId: input.themeId,
               subThemeId: input.subthemeId,
@@ -990,6 +994,7 @@ function Chat() {
       handleShowModal();
       console.log("Тикет успешно разделен:", result);
     } catch (error) {
+      handleShowEditTicketError();
       console.error("Ошибка при разделении тикета:", error);
     }
   };
@@ -1017,15 +1022,15 @@ function Chat() {
     setSelectedSubThemeEdit(data.clientQuery.ticket.subTheme.name.stroke);
     setSelectedSubThemeIdEdit(data.clientQuery.ticket.subTheme.id);
     setSelectedCurator(
-      `${data.clientQuery.ticket.helper.user.surname} ${
-        data.clientQuery.ticket.helper.user.name
+      `${data.clientQuery.ticket.recipient.surname} ${
+        data.clientQuery.ticket.recipient.name
       } ${
-        data.clientQuery.ticket.helper.user.patronymic
-          ? ` ${data.clientQuery.ticket.helper.user.patronymic}`
+        data.clientQuery.ticket.recipient.patronymic
+          ? ` ${data.clientQuery.ticket.recipient.patronymic}`
           : ""
       }`
     );
-    setSelectedCuratorId(data.clientQuery.ticket.helper.id);
+    setSelectedCuratorId(data.clientQuery.ticket.recipient.id);
     setSelectedDepartmentsId(
       data.clientQuery.ticket.subTheme.departments.map(
         (department) => department.id
@@ -1155,7 +1160,7 @@ function Chat() {
         variables: {
           token: user.token,
           id: ticketId,
-          helperId: selectedCuratorId,
+          recipientId: selectedCuratorId,
           unitId: selectedUnitIdEdit,
           themeId: selectedThemeIdEdit,
           subThemeId: selectedSubThemeIdEdit,
@@ -1166,6 +1171,7 @@ function Chat() {
       console.log("Тикет успешно обновлен:", result);
       handleShow();
     } catch (error) {
+      handleShowEditTicketError();
       console.error("Ошибка при обновлении тикета:", error);
     }
   };
@@ -1236,6 +1242,7 @@ function Chat() {
       console.log("Куратор успешно добавлен:", result);
       handleShowAddCurator();
     } catch (error) {
+      handleShowEditTicketError();
       console.error("Ошибка при добавлении куратора:", error);
     }
   };
@@ -1259,6 +1266,14 @@ function Chat() {
     } catch (error) {
       console.error("Ошибка при завершении диалога с куратором:", error);
     }
+  };
+
+  const handleShowEditTicketError = () => {
+    setShowEditTicketErorr(true);
+  };
+
+  const handleHideEditTicketError = () => {
+    setShowEditTicketErorr(false);
   };
 
   const handleSendTicketToCurator = () => {
@@ -1298,84 +1313,86 @@ function Chat() {
           </div>
         )}
 
-        {isAdmin() && isVisibleHelperButtons && (
-          <>
-            <div className="chat__helper-buttons">
-              {isAdmin() &&
-                !isVisibleEdit &&
-                currentStatus !== "Закрыт" &&
-                user.id !== data.clientQuery.ticket.assistant?.id && (
+        {isAdmin() &&
+          isVisibleHelperButtons &&
+          currentStatus !== "Уведомление" && (
+            <>
+              <div className="chat__helper-buttons">
+                {isAdmin() &&
+                  !isVisibleEdit &&
+                  currentStatus !== "Закрыт" &&
+                  user.id !== data.clientQuery.ticket.assistant?.id && (
+                    <a className="alltickets__link">
+                      <ButtonCustom
+                        title="Изменить тикет"
+                        className="chat-input__button-close"
+                        onClick={handleEditTicketView}
+                      />
+                    </a>
+                  )}
+
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Новый" &&
+                  currentStatus !== "На уточнении" &&
+                  !isVisibleCuratorsChat && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Консультация с другим куратором"
+                          className="chat-input__button-close"
+                          onClick={handleCuratorsChat}
+                        />
+                      </a>
+                    </>
+                  )}
+
+                {isAdmin() &&
+                  currentStatus == "На уточнении" &&
+                  user.id == data.clientQuery.ticket.recipient.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Закончить диалог с куратором"
+                          className="chat-input__button-close"
+                          onClick={handleEndCuratorChat}
+                        />
+                      </a>
+                    </>
+                  )}
+
+                {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
                   <a className="alltickets__link">
                     <ButtonCustom
-                      title="Изменить тикет"
+                      title="Разделить тикет"
                       className="chat-input__button-close"
-                      onClick={handleEditTicketView}
+                      onClick={handleSplitTicket}
                     />
                   </a>
                 )}
 
-              {isAdmin() &&
-                currentStatus !== "Закрыт" &&
-                currentStatus !== "Новый" &&
-                currentStatus !== "На уточнении" &&
-                !isVisibleCuratorsChat && (
+                {currentStatus === "Закрыт" && isAdmin() && (
                   <>
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Консультация с другим куратором"
-                        className="chat-input__button-close"
-                        onClick={handleCuratorsChat}
-                      />
-                    </a>
+                    <ButtonCustom
+                      title="Открыть тикет"
+                      className="chat-input__button-close"
+                      onClick={handleOpen}
+                    />
                   </>
                 )}
 
-              {isAdmin() &&
-                currentStatus == "На уточнении" &&
-                user.id == data.clientQuery.ticket.helper.id && (
-                  <>
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Закончить диалог с куратором"
-                        className="chat-input__button-close"
-                        onClick={handleEndCuratorChat}
-                      />
-                    </a>
-                  </>
+                {isAdmin() && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Отправить наставнику"
+                      className="chat-input__button-close"
+                      onClick={handleSendTicketToCurator}
+                    />
+                  </a>
                 )}
-
-              {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
-                <a className="alltickets__link">
-                  <ButtonCustom
-                    title="Разделить тикет"
-                    className="chat-input__button-close"
-                    onClick={handleSplitTicket}
-                  />
-                </a>
-              )}
-
-              {currentStatus === "Закрыт" && isAdmin() && (
-                <>
-                  <ButtonCustom
-                    title="Открыть тикет"
-                    className="chat-input__button-close"
-                    onClick={handleOpen}
-                  />
-                </>
-              )}
-
-              {isAdmin() && (
-                <a className="alltickets__link">
-                  <ButtonCustom
-                    title="Отправить наставнику"
-                    className="chat-input__button-close"
-                    onClick={handleSendTicketToCurator}
-                  />
-                </a>
-              )}
-            </div>
-          </>
-        )}
+              </div>
+            </>
+          )}
 
         {isVisibleEditTicketView && (
           <>
@@ -1600,7 +1617,7 @@ function Chat() {
               >
                 {dataQueryCurators.map(
                   (curator, index) =>
-                    data.clientQuery.ticket.helper.id !== curator.id && (
+                    data.clientQuery.ticket.recipient.id !== curator.id && (
                       <Dropdown.Item
                         key={index}
                         onClick={() =>
@@ -1820,24 +1837,31 @@ function Chat() {
                       <b>Создатель обращения:</b>
                     </td>
                     <td>
-                      {getFullName(data?.clientQuery.ticket?.client?.user)} |{" "}
-                      <a
-                        href={
-                          "mailto:" + data?.clientQuery.ticket?.client?.email
-                        }
-                      >
-                        {data?.clientQuery.ticket?.client?.email}
-                      </a>
+                      {`${data.clientQuery.ticket.initiator.surname} ${
+                        data.clientQuery.ticket.initiator.name
+                      } ${
+                        data.clientQuery.ticket.initiator.patronymic
+                          ? ` ${data.clientQuery.ticket.initiator.patronymic}`
+                          : ""
+                      }`}
                     </td>
                   </tr>
-                  <tr>
-                    <td>
-                      <b>Текущий куратор:</b>
-                    </td>
-                    <td>
-                      {getFullName(data?.clientQuery.ticket?.helper?.user)}
-                    </td>
-                  </tr>
+                  {currentStatus !== "Уведомление" && (
+                    <tr>
+                      <td>
+                        <b>Текущий куратор:</b>
+                      </td>
+                      <td>
+                        {`${data.clientQuery.ticket.recipient.surname} ${
+                          data.clientQuery.ticket.recipient.name
+                        } ${
+                          data.clientQuery.ticket.recipient.patronymic
+                            ? ` ${data.clientQuery.ticket.recipient.patronymic}`
+                            : ""
+                        }`}
+                      </td>
+                    </tr>
+                  )}
                   {isAdmin() && currentStatus == "На уточнении" && (
                     <tr>
                       <td>
@@ -1854,29 +1878,23 @@ function Chat() {
           </Row>
         )}
         <div className="chat-input__container">
-          {isVisible && isAdmin() && currentStatus !== "Новый" ? (
+          {isVisible &&
+          isAdmin() &&
+          currentStatus !== "Новый" &&
+          currentStatus !== "Уведомление" ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
               <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
                 onClick={toggleFormVisibility}
+                type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
               </button>
               {isFormVisible && (
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">
-                    {/* <Form.Group controlId="TextareaForm">
-                <Form.Control
-                  as="textarea"
-                  placeholder="Текст сообщения"
-                  rows={3}
-                  value={message}
-                  onChange={handleChange}
-                  className="chat-input__textarea"
-                />
-              </Form.Group> */}
                     <Form.Group className="custom-editor">
                       <Editor
                         editorState={editorState}
@@ -2079,13 +2097,15 @@ function Chat() {
           {isVisible &&
           !isAdmin() &&
           (currentStatus === "Новый" ||
-            currentStatus === "Ожидает дополнения") ? (
+            (currentStatus === "Ожидает дополнения" &&
+              currentStatus !== "Уведомление")) ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
               <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
                 onClick={toggleFormVisibility}
+                type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
               </button>
@@ -2093,14 +2113,6 @@ function Chat() {
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">
                     <Form.Group className="custom-editor">
-                      {/* <Form.Control
-                    as="textarea"
-                    placeholder="Текст сообщения"
-                    rows={3}
-                    value={message}
-                    onChange={handleChange}
-                    className="chat-input__textarea"
-                  /> */}
                       <Editor
                         editorState={editorState}
                         onEditorStateChange={handleEditorChange}
@@ -2224,7 +2236,7 @@ function Chat() {
                 </div>
               )
           )}
-        {isAdmin() && (
+        {isAdmin() && currentStatus !== "Уведомление" && (
           <div className="chat__counter-wrapper">
             <span className="chat__counter-label">Счетчик:</span>
             <span
@@ -2233,7 +2245,7 @@ function Chat() {
                 currentStatus == "На уточнении" ||
                 (currentStatus == "Новый" &&
                   messagesQuery.at(-1).sender.id !==
-                    data.clientQuery.ticket.helper.id)
+                    data.clientQuery.ticket.recipient.id)
                   ? "chat__counter-work"
                   : "chat__counter-stop"
               }
@@ -2242,7 +2254,7 @@ function Chat() {
               currentStatus == "На уточнении" ||
               (currentStatus == "Новый" &&
                 messagesQuery.at(-1).sender.id !==
-                  data.clientQuery.ticket.helper.id)
+                  data.clientQuery.ticket.recipient.id)
                 ? "Запущен"
                 : "Остановлен"}
             </span>
@@ -2455,6 +2467,20 @@ function Chat() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showEditTicketError} onHide={handleHideEditTicketError}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ошибка при изменении тикета</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Во время изменения тикета произошла ошибка</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleHideEditTicketError}>
             Закрыть
           </Button>
         </Modal.Footer>

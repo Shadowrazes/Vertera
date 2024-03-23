@@ -9,16 +9,14 @@ export const TABLE_TICKETS = gql`
           id
           link
           title
-          client {
+          initiator {
             id
           }
-          helper {
+          recipient {
             id
-            user {
-              name
-              surname
-              patronymic
-            }
+            name
+            surname
+            patronymic
           }
           subTheme {
             name(lang: $lang) {
@@ -74,16 +72,14 @@ export const TABLE_TICKETS_USER = gql`
           id
           link
           title
-          client {
+          initiator {
             id
           }
-          helper {
+          recipient {
             id
-            user {
-              name
-              surname
-              patronymic
-            }
+            name
+            surname
+            patronymic
           }
           subTheme {
             name(lang: "ru") {
@@ -148,13 +144,11 @@ export const MESSAGES_CHAT = gql`
           }
           info
         }
-        helper {
+        recipient {
           id
-          user {
-            name
-            surname
-            patronymic
-          }
+          name
+          surname
+          patronymic
         }
         assistant {
           id
@@ -165,14 +159,11 @@ export const MESSAGES_CHAT = gql`
           }
         }
         reaction
-        client {
+        initiator {
           id
-          user {
-            name
-            surname
-            patronymic
-          }
-          email
+          name
+          surname
+          patronymic
         }
         messages {
           id
@@ -232,23 +223,18 @@ export const MESSAGES_CHAT_CLIENT = gql`
       ticket(link: $link) {
         id
         title
-        helper {
+        recipient {
           id
-          user {
-            name
-            surname
-            patronymic
-          }
+          name
+          surname
+          patronymic
         }
         reaction
-        client {
+        initiator {
           id
-          user {
-            name
-            surname
-            patronymic
-          }
-          email
+          name
+          surname
+          patronymic
         }
         messages {
           id
@@ -614,14 +600,10 @@ export const TRANSLATION_LIST = gql`
       translationListFull {
         id
         code
-        ru
-        en
-        es
-        hu
-        cs
-        kk
-        bg
-        de
+        translations {
+          lang
+          stroke
+        }
       }
     }
   }

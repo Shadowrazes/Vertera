@@ -10,7 +10,7 @@ import {
   ButtonGroup,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import { DateTime } from "luxon";
 
 import {
@@ -218,12 +218,12 @@ function allTickets() {
       token: user?.token,
     },
   });
-  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user?.token,
     },
   });
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+  const { getCuratorsList, data: dataCurators } = useQuery(CURATORS_LIST, {
     variables: {
       token: user?.token,
     },
@@ -262,7 +262,7 @@ function allTickets() {
     return useQuery(TABLE_TICKETS_USER, {
       variables: {
         token: user?.token,
-        clientId: userId,
+        clientId: user.id,
         filters: {
           limit: itemsPerPage,
           offset: 0,
@@ -1507,7 +1507,7 @@ function allTickets() {
                             }}
                             className="alltickets__link"
                           >
-                            {ticket.client.id}
+                            {ticket.initiator.id}
                           </Link>
                         </td>
                         <td>
@@ -1519,7 +1519,7 @@ function allTickets() {
                             }}
                             className="alltickets__link"
                           >
-                            {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
+                            {`${ticket.recipient.surname} ${ticket.recipient.name}`}
                           </Link>
                         </td>
                       </>
