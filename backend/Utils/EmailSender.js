@@ -7,16 +7,16 @@ class EmailSender {
         port: 465,
         secure: true,
         auth: {
-            user: 'hugehug@mail.ru',
-            pass: 'hqhP3c8WggxYeE18QrgS'
+            user: 'help@vertera.org',
+            pass: 'ertdfgcbc'
         }
     });
 
     static Notify(email, text) {
         const mailOptions = {
-            from: 'hugehug@mail.ru',
+            from: 'help@vertera.org',
             to: email,
-            subject: 'Поддержка VERTERA',
+            subject: 'VERTERA Help',
             text: text
         };
 

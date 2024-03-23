@@ -12,6 +12,7 @@ export const InputsUpdate = `
 
     input TicketClientUpdate {
         reaction: Int
+        assistantId: Int
     }
 
     input MessageUpdate {

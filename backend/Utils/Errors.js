@@ -11,6 +11,7 @@ class Errors {
     static RegistrationFailed = 'Registration error';
     static EmptyArgsFields = 'Empty fields';
     static IncorrectMsgReciever = 'Incorrect msg reciever';
+    static UserNotFOund = 'Incorrect user';
     static MsgSendForbidden = 'Msg forbidden';
     static MsgInClosedTicket = 'Ticket closed';
     static UpdateOfNotificationTicket = 'Changes forbidden';

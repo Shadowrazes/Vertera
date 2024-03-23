@@ -1,5 +1,6 @@
 import Entity from "./Entity.js";
 import User from "./User.js";
+import Errors from "../Utils/Errors.js";
 
 class HelperPermission extends Entity {
     static TableName = 'helper_permissions';
@@ -8,6 +9,17 @@ class HelperPermission extends Entity {
     static HelperEditField = 'helperEdit';
     static ThemeEditField = 'themeEdit';
     static TranslationEditField = 'translationEdit';
+
+    static async Validate(helperId, permName) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [helperId]);
+        const perms = result[0];
+        console.log(perms);
+
+        if(!perms[permName]) throw new Error(Errors.AccessForbidden);
+
+        return perms[permName];
+    }
 
     static async GetById(helperId) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;

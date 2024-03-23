@@ -191,12 +191,31 @@ export const resolvers = {
         splitTicket: async (_, args, context) => {
             return await Ticket.Split(args.id, args.argsList, context.user);
         },
+        redirectTicketToMentor: async (_, args, context) => {
+            return await Ticket.RedirectToMentor(args.id, args.mentorId, context.user);
+        },
+        helperObj: async (_, args, context) => {
+            await HelperPermission.Validate(context.user.id, HelperPermission.HelperEditField);
+            return {class: 'helperObj'};
+        },
+        themeObj: async (_, args, context) => {
+            await HelperPermission.Validate(context.user.id, HelperPermission.ThemeEditField);
+            return {class: 'themeObj'};
+        },
+        translationObj: async (_, args, context) => {
+            await HelperPermission.Validate(context.user.id, HelperPermission.TranslationEditField);
+            return {class: 'translationObj'};
+        },
+    },
+    HelperObjMutation: {
         addHelperUser: async (_, args) => {
             return await Helper.TransInsert(args.userFields, args.helperFields);
         },
         updateHelperUser: async (_, args) => {
             return await Helper.TransUpdate(args.id, args.userFields, args.helperFields);
         },
+    },
+    ThemeObjMutation: {
         addSubTheme: async (_, args) => {
             return await SubTheme.TransInsert(args.fields);
         },
@@ -224,6 +243,8 @@ export const resolvers = {
         deleteSubTheme: async (_, { id }) => {
             return await SubTheme.DeleteCascade(id);
         },
+    },
+    TranslationObjMutation: {
         addCountry: async (_, args) => {
             return await Country.TransInsert(args.fields);
         },

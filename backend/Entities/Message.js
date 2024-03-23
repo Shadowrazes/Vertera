@@ -46,33 +46,55 @@ class Message extends Entity {
         return result;
     }
 
+    static async CopyByTicket(ticketId) {
+        return 0;
+        return await super.Transaction(async (conn) => {
+            const curTicket = await Ticket.GetById(ticketId);
+            if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
+
+            const parentMessages = await this.GetListByTicket(ticketId);
+            
+            const firstMsg = parentMessages.shift();
+            const firstMsgAttachs = await Attachment.GetListByMsg(firstMsg.id);
+
+            firstMsgAttachs.forEach((item) => {
+                delete item.name;
+            });
+
+            return 0;
+        });
+    }
+
     static async TransInsert(args, conn) {
         const transFunc = async (conn) => {
-            const curTicket = await Ticket.GetById(args.ticketId);
+            let curTicket = await Ticket.GetById(args.ticketId);
+            const isFirstMsg = curTicket == undefined;
+
+            if(isFirstMsg){
+                curTicket = await Ticket.TransGetById(conn, args.ticketId);
+            }
             
-            if (curTicket && curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
-            if (curTicket && curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
+            if (curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
+            if (!isFirstMsg && curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 
             const sender = await User.GetById(args.senderId);
-            if (curTicket && sender.role == User.RoleClient && !this.ClientAllowedStatusIds.includes(curTicket.statusId)) {
+            if (sender.role == User.RoleClient && !this.ClientAllowedStatusIds.includes(curTicket.statusId)) {
                 throw new Error(Errors.MsgSendForbidden);
             }
 
-            if(curTicket){
-                const allowedSenderIds = [
-                    curTicket.initiatorId,
-                    curTicket.recipientId,
-                    curTicket.assistantId,
-                    User.AdminId
-                ];
-                if (!allowedSenderIds.includes(sender.id)) 
-                {
-                    throw new Error(Errors.MsgSendForbidden);
-                }
+            const allowedSenderIds = [
+                curTicket.initiatorId,
+                curTicket.recipientId,
+                curTicket.assistantId,
+                User.AdminId
+            ];
+            if (!allowedSenderIds.includes(sender.id)) 
+            {
+                throw new Error(Errors.MsgSendForbidden);
             }
 
             let visibility = this.VisibleByAll;
-            if (curTicket && curTicket.statusId == Ticket.StatusIdOnRevision && sender.role == User.RoleHelper){
+            if (curTicket.statusId == Ticket.StatusIdOnRevision && sender.role == User.RoleHelper){
                 visibility = this.VisibleByHelpers;
             }
 
@@ -96,16 +118,16 @@ class Message extends Entity {
             };
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
-            if (curTicket) {
-                const curUser = await User.GetById(reciever.id);
+            if (!isFirstMsg) {
+                const curReciever = await User.GetById(reciever.id);
 
-                if (curTicket.initiatorId != curUser.id && curTicket.recipientId != curUser.id){
+                if (curTicket.initiatorId != curReciever.id && curTicket.recipientId != curReciever.id){
                     throw new Error(Errors.IncorrectMsgReciever);
                 }
 
                 const dialogLink = `https://help.vertera.org/dialog/${curTicket.link}/`
                 const emailText = `Новое сообщение в обращении.\nУвидеть его вы можете по ссылке: ${dialogLink}`;
-                EmailSender.Notify(curUser.email, emailText);
+                EmailSender.Notify(curReciever.email, emailText);
             }
 
             return result.insertId;

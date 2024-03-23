@@ -1,4 +1,8 @@
+import { ObjectMutations } from "./ObjectMutations.js";
+
 export const Mutations = `
+    ${ObjectMutations}
+
     type ClientMutation {
         class: String!
 
@@ -16,36 +20,17 @@ export const Mutations = `
         
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
-
+        redirectTicketToMentor(id: Int!, mentorId: Int!): TicketInsertInfo!
         addTicketMass(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!, idsOuter: Boolean!, ids: [Int]!): [TicketInsertInfo]!
                       
-        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
-        updateHelperUser(id: Int!, userFields: UserUpdate!, helperFields: HelperUpdate!): UpdateInfo!
-
-        addSubTheme(fields: SubThemeInsert!): String!
-        addTheme(fields: ThemeInsert!): String!
-        addUnit(fields: UnitInsert!): String!
-        updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
-        updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
-        updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
-        deleteUnit(id: Int!) : Int!
-        deleteTheme(id: Int!) : Int!
-        deleteSubTheme(id: Int!) : Int!
-
-        addCountry(fields: CountryInsert!): String!
-        addLang(fields: LangInsert!): String!
-        addTranslation(fields: TranslationInsert!): String!
-        updateCountry(id: Int!, fields: CountryUpdate!): UpdateInfo!
-        updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
-        updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
-        deleteCountry(id: Int!) : Int!
-        deleteLang(id: Int!) : Int!
+        helperObj: HelperObjMutation!
+        themeObj: ThemeObjMutation!
+        translationObj: TranslationObjMutation!
     }
 
     type AdminMutation {
         class: String!
 
-        addHelperUser(userFields: UserInsert!, helperFields: HelperInsert!): Int!
         addTicketStatus(fields: TicketStatusInsert!): String!
         addJobTitle(fields: HelperJobTitleInsert!): String!
         addDepartment(fields: DepartmentInsert!): String!

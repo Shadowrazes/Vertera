@@ -37,6 +37,7 @@ class Ticket extends Entity {
     static StatusIdOnRevision = 4;
     static StatusIdOnExtension = 5;
     static StatusIdNotification = 6;
+    static StatusIdOnMentor = 7;
 
     static ReactionMarkLike = 1;
     static ReactionMarkDislike = 0;
@@ -45,6 +46,12 @@ class Ticket extends Entity {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [id]);
         return result[0];
+    }
+
+    static async TransGetById(conn, id) {
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.TransRequest(conn, {sql, nestTables: true}, [id]);
+        return result[0].tickets;
     }
 
     static async GetByLink(link) {
@@ -145,7 +152,12 @@ class Ticket extends Entity {
         let fields = [];
 
         if (clientId) {
-            sql += ` AND (${this.InitiatorIdField} = ? OR ${this.RecipientIdField} = ?)`;
+            sql += ` AND (
+                ${this.InitiatorIdField} = ? OR 
+                ${this.RecipientIdField} = ? OR
+                ${this.AssistantIdField} = ?
+            )`;
+            fields.push(clientId);
             fields.push(clientId);
             fields.push(clientId);
         }
@@ -287,7 +299,7 @@ class Ticket extends Entity {
             const splitLogRes = await TicketLog.TransInsert(conn, splitLogFields);
 
             for (let arg of argsList) {
-                arg.split = true;
+                arg.isSplit = true;
                 arg.initiator = initiator;
 
                 const insertRes = await this.TransInsert(arg, conn);
@@ -295,6 +307,26 @@ class Ticket extends Entity {
 
             const systemInitiator = await User.GetById(0);
             const closeTicketUpd = await this.TransUpdate(parentId, { statusId: this.StatusIdClosed }, undefined, systemInitiator, conn);
+
+            return 0;
+        });
+    }
+
+    static async RedirectToMentor(id, mentorOuterId, initiator) {
+        return await super.Transaction(async (conn) => {
+            const mentor = await User.GetByOuterId(mentorOuterId);
+            if (!mentor) throw new Error(Errors.UserNotFOund);
+
+            const curTicket = await this.GetById(id);
+            if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
+
+            const msgSysFields = {
+                senderId: User.AdminId, recieverId: curTicket.initiatorId, type: Message.TypeSystem,
+                readed: 0, ticketId: id, text: `Наставник подключен к диалогу, ожидайте ответа.`
+            };
+            const msgSysResult = await Message.TransInsert(msgSysFields, conn);
+
+            const assistantTicketUpd = await this.TransUpdate(id, { assistantId: mentor.id }, undefined, initiator, conn);
 
             return 0;
         });
@@ -311,9 +343,11 @@ class Ticket extends Entity {
 
             for(let recipientId of args.ids) {
                 if (!args.idsOuter){
+                    // Если переданы внутренние id
                     insertArgs.ticketFields.recipientId = recipientId;
                 }
                 else {
+                    // Если переданы внешние id из файла
                     const user = await User.GetByOuterId(recipientId);
                     insertArgs.ticketFields.recipientId = user.id;
                 }
@@ -331,6 +365,7 @@ class Ticket extends Entity {
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
 
+            // Надо подобрать хелпера, если адресат тикета не указан явно и тикет - не уведомление
             const autoHelperAssign = ticketFields.recipientId == undefined && !args.notification;
 
             if(autoHelperAssign){
@@ -352,7 +387,7 @@ class Ticket extends Entity {
                 type: TicketLog.TypeCreate, ticketId: result.insertId,
                 info: 'Создал', initiatorId: ticketFields.initiatorId
             };
-            if (args.split) {
+            if (args.isSplit) {
                 createTicketLogFields.type = TicketLog.TypeSplitCreate;
                 createTicketLogFields.info = 'Создал (сплит)';
                 createTicketLogFields.initiatorId = args.initiator.id;
@@ -385,6 +420,7 @@ class Ticket extends Entity {
             const dialogLink = baseUrl + `/dialog/${ticketLink}/`;
             const curInitiator = await User.GetById(ticketFields.initiatorId);
 
+            // Если тикет создал клиент, отправляет уведомление на почту
             if(curInitiator.role == User.RoleClient){
                 const clientResult = await Client.GetById(ticketFields.initiatorId);
                 const emailText = `Здравствуйте, ${curInitiator.name}! Ваше обращение в техподдержку VERTERA принято в обработку.\nВ ближайшее время вы получите ответ.\n\nОтслеживать статус обращения вы можете по ссылке: ${dialogLink}`;
@@ -407,6 +443,8 @@ class Ticket extends Entity {
     static async TransUpdate(id, fields, departmentId, initiator, conn) {
         const transFunc = async (conn) => {
             const curTicket = await this.GetById(id);
+
+            // Если тикет - уведомление, писать запрещено
             if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 
             if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
@@ -424,19 +462,27 @@ class Ticket extends Entity {
             }
 
             if(fields.assistantId){
+                const assistantUser = User.GetById(fields.assistantId);
+                const isHelperAssistant = assistantUser.role != User.RoleClient;
+
                 let assistantConnLogFields = {
                     type: TicketLog.TypeAssistantConn, ticketId: id,
                     info: 'Подключен к диалогу', initiatorId: fields.assistantId
                 };
+
                 let statusChangeLogFields = {
                     type: TicketLog.TypeStatusChange, ticketId: id,
-                    info: 'На уточнении', initiatorId: User.AdminId
+                    info: (isHelperAssistant ? 'На уточнении' : 'Направил наставнику'), 
+                    initiatorId: (isHelperAssistant ? User.AdminId : initiator.id)
                 };
 
                 if(fields.assistantId > 0){
+                    // Если клиент пытается сменить ассистента, а не отключиться
+                    if(initiator.role == User.RoleClient) throw new Error(Errors.AccessForbidden);
+
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
 
-                    fields.statusId = this.StatusIdOnRevision;
+                    fields.statusId = isHelperAssistant ? this.StatusIdOnRevision : this.StatusIdOnMentor;
                     const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
                 else {
@@ -489,7 +535,7 @@ class Ticket extends Entity {
                 const recipientChangeLogRes = await TicketLog.TransInsert(conn, recipientChangeLogFields);
             }
 
-
+            // Если хелпер меняется через выбор департамента
             if (departmentId && !fields.recipientId) {
                 const curDepartments = await ThemeDepartment.GetListBySubThemeId(curTicket.subThemeId);
 
@@ -500,6 +546,7 @@ class Ticket extends Entity {
                 const changeDepLogRes = await TicketLog.TransInsert(conn, changeDepLogFields);
 
                 let needNewHelper = true;
+                // Если текущий хелпер уже есть в новом департаменте, менять хелпера не надо
                 for (const department of curDepartments) {
                     if (departmentId == department.id) {
                         needNewHelper = false;
