@@ -79,6 +79,7 @@ export const InputsUpdate = `
     input SubThemeUpdate {
         themeId: Int
         orderNum: Int
+        visibility: Int
         stroke: String
         departmentIds: [Int]
         lang: String!
@@ -87,12 +88,14 @@ export const InputsUpdate = `
     input ThemeUpdate {
         unitId: Int
         orderNum: Int
+        visibility: Int
         stroke: String
         lang: String!
     }
 
     input UnitUpdate {
         orderNum: Int
+        visibility: Int
         stroke: String
         lang: String!
     }

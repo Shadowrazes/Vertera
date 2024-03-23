@@ -7,24 +7,41 @@ class Theme extends Entity {
     static NameCodeField = 'nameCode';
     static UnitIdField = 'unitId';
     static OrderField = 'orderNum';
-    static TranslationType = 'theme'
+    static VisibilityField = 'visibility';
+    static TranslationType = 'theme';
+    static Visibilitises = { client: 2, helper: 3, system: 4};
 
-    static async GetById(id) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+    static VisibleByClients = 1;
+    static VisibleByHelpers = 2;
+    static VisibleByAdmins = 3;
+
+    static ValidateVisibility(role) {
+        return this.Visibilitises[role];
+    }
+
+    static async GetById(id, initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.PrimaryField} = ? AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
+        `;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+    static async GetList(initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName}
+            WHERE ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
+            ORDER BY ${this.OrderField} ASC
+        `;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetListByUnit(unitId) {
+    static async GetListByUnit(unitId, initiator) {
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.UnitIdField} = ?
+            WHERE ${this.UnitIdField} = ? AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql, [unitId]);
@@ -36,7 +53,10 @@ class Theme extends Entity {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = { unitId: fields.unitId, nameCode, orderNum: fields.orderNum };
+            const insertFields = {
+                unitId: fields.unitId, visibility: fields.visibility,
+                nameCode, orderNum: fields.orderNum
+            };
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });
@@ -54,6 +74,7 @@ class Theme extends Entity {
             const updateFields = {};
             if (fields.unitId) updateFields.unitId = fields.unitId;
             if (fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if (fields.visibility) updateFields.visibility = fields.visibility;
             if (super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);

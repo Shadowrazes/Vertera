@@ -1,21 +1,30 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
+import Theme from "./Theme.js";
 
 class Unit extends Entity {
     static TableName = 'units';
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
     static OrderField = 'orderNum';
-    static TranslationType = 'unit'
+    static VisibilityField = 'visibility';
+    static TranslationType = 'unit';
 
-    static async GetById(id) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+    static async GetById(id, initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.PrimaryField} = ? AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+        `;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName} ORDER BY ${this.OrderField} ASC`;
+    static async GetList(initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+            ORDER BY ${this.OrderField} ASC
+        `;
         const result = await super.Request(sql);
         return result;
     }
@@ -25,7 +34,7 @@ class Unit extends Entity {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = { nameCode, orderNum: fields.orderNum };
+            const insertFields = { nameCode, visibility: fields.visibility, orderNum: fields.orderNum };
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });
@@ -42,6 +51,7 @@ class Unit extends Entity {
 
             const updateFields = {};
             if (fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if (fields.visibility) updateFields.visibility = fields.visibility;
             if (super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);

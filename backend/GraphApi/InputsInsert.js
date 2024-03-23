@@ -41,6 +41,7 @@ export const InputsInsert = `
     input SubThemeInsert {
         themeId: Int!
         orderNum: Int!
+        visibility: Int!
         stroke: String!
         lang: String!
         departmentIds: [Int]!
@@ -49,12 +50,14 @@ export const InputsInsert = `
     input ThemeInsert {
         unitId: Int!
         orderNum: Int!
+        visibility: Int!
         stroke: String!
         lang: String!
     }
 
     input UnitInsert {
         orderNum: Int!
+        visibility: Int!
         stroke: String!
         lang: String!
     }

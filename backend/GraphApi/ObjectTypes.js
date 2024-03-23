@@ -129,6 +129,7 @@ export const ObjectTypes = `
         id: Int!
         name(lang: String!): Translation!
         themes: [Theme]!
+        visibility: Int!
         orderNum: Int!
     }
 
@@ -137,6 +138,7 @@ export const ObjectTypes = `
         name(lang: String!): Translation!
         subThemes: [SubTheme]!
         unit: Unit!
+        visibility: Int!
         orderNum: Int!
     }
 
@@ -145,6 +147,7 @@ export const ObjectTypes = `
         name(lang: String!): Translation!
         theme: Theme!
         orderNum: Int!
+        visibility: Int!
         departments: [Department]!
     }
 

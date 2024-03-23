@@ -1,6 +1,7 @@
 import Entity from "./Entity.js";
 import Translation from "./Translation.js";
 import ThemeDepartment from "./ThemeDepartment.js";
+import Theme from "./Theme.js";
 
 class SubTheme extends Entity {
     static TableName = 'subthemes';
@@ -8,24 +9,32 @@ class SubTheme extends Entity {
     static NameCodeField = 'nameCode';
     static ThemeIdField = 'themeId';
     static OrderField = 'orderNum';
-    static TranslationType = 'subTheme'
+    static VisibilityField = 'visibility';
+    static TranslationType = 'subTheme';
 
-    static async GetById(id) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+    static async GetById(id, initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            WHERE ${this.PrimaryField} = ? AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+        `;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+    static async GetList(initiator) {
+        const sql = `
+            SELECT * FROM ${this.TableName}
+            WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+            ORDER BY ${this.OrderField} ASC
+        `;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetListByTheme(themeId) {
+    static async GetListByTheme(themeId, initiator) {
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.ThemeIdField} = ?
+            WHERE ${this.ThemeIdField} = ? AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql, [themeId]);
@@ -37,7 +46,10 @@ class SubTheme extends Entity {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = { themeId: fields.themeId, nameCode, orderNum: fields.orderNum };
+            const insertFields = {
+                themeId: fields.themeId, visibility: fields.visibility,
+                nameCode, orderNum: fields.orderNum
+            };
             const result = await super.TransRequest(conn, sql, [insertFields]);
 
             const themeDepartmentResult = await ThemeDepartment.TransInsert(conn, result.insertId, fields.departmentIds);
@@ -63,6 +75,7 @@ class SubTheme extends Entity {
             const updateFields = {};
             if (fields.themeId) updateFields.themeId = fields.themeId;
             if (fields.orderNum) updateFields.orderNum = fields.orderNum;
+            if (fields.visibility) updateFields.visibility = fields.visibility;
             if (super.IsArgsEmpty(updateFields)) return super.EmptyUpdateInfo;
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);

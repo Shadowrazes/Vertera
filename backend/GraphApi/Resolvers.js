@@ -84,8 +84,8 @@ export const resolvers = {
         attachmentList: async (_, { messageId }) => {
             return await Attachment.GetListByMsg(messageId);
         },
-        allThemeTree: async (_, args) => {
-            return await Unit.GetList();
+        allThemeTree: async (_, args, context) => {
+            return await Unit.GetList(context.user);
         },
         countryList: async (_, args) => {
             return await Country.GetList();
@@ -119,17 +119,17 @@ export const resolvers = {
         ticketList: async (_, args) => {
             return await Ticket.GetList(args.filters);
         },
-        subThemeList: async (_, args) => {
-            return await SubTheme.GetList();
+        subThemeList: async (_, args, context) => {
+            return await SubTheme.GetList(context.user);
         },
-        unit: async (_, { id }) => {
-            return await Unit.GetById(id);
+        unit: async (_, { id }, context) => {
+            return await Unit.GetById(id, context.user);
         },
-        theme: async (_, { id }) => {
-            return await Theme.GetById(id);
+        theme: async (_, { id }, context) => {
+            return await Theme.GetById(id, context.user);
         },
-        subTheme: async (_, { id }) => {
-            return await SubTheme.GetById(id);
+        subTheme: async (_, { id }, context) => {
+            return await SubTheme.GetById(id, context.user);
         },
         ticketStatusList: async (_, args) => {
             return await TicketStatus.GetList();
@@ -358,8 +358,8 @@ export const resolvers = {
         msgStats: async (parent, args) => {
             return await Ticket.GetMsgStats(parent.id);
         },
-        subTheme: async (parent, args) => {
-            return await SubTheme.GetById(parent.subThemeId);
+        subTheme: async (parent, args, context) => {
+            return await SubTheme.GetById(parent.subThemeId, context.user);
         },
         status: async (parent, args) => {
             return await TicketStatus.GetById(parent.statusId);
@@ -386,8 +386,8 @@ export const resolvers = {
         },
     },
     SubTheme: {
-        theme: async (parent, args) => {
-            return await Theme.GetById(parent.themeId);
+        theme: async (parent, args, context) => {
+            return await Theme.GetById(parent.themeId, context.user);
         },
         departments: async (parent, args) => {
             return await ThemeDepartment.GetListBySubThemeId(parent.id);
@@ -397,22 +397,22 @@ export const resolvers = {
         },
     },
     Theme: {
-        unit: async (parent, args) => {
-            return await Unit.GetById(parent.unitId);
+        unit: async (parent, args, context) => {
+            return await Unit.GetById(parent.unitId, context.user);
         },
         name: async (parent, args) => {
             return await Translation.GetByCode(args.lang, parent.nameCode);
         },
-        subThemes: async (parent, args) => {
-            return await SubTheme.GetListByTheme(parent.id);
+        subThemes: async (parent, args, context) => {
+            return await SubTheme.GetListByTheme(parent.id, context.user);
         },
     },
     Unit: {
         name: async (parent, args) => {
             return await Translation.GetByCode(args.lang, parent.nameCode);
         },
-        themes: async (parent, args) => {
-            return await Theme.GetListByUnit(parent.id);
+        themes: async (parent, args, context) => {
+            return await Theme.GetListByUnit(parent.id, context.user);
         },
     },
     TicketStatus: {
