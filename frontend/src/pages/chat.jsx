@@ -173,16 +173,6 @@ function Chat() {
   });
 
   const {
-    loading: loadingTheme,
-    error: errorTheme,
-    data: dataTheme,
-  } = useQuery(THEME_LIST, {
-    variables: {
-      token: user.token,
-    },
-  });
-
-  const {
     loading: loadingCurators,
     error: errorCurators,
     data: dataCurators,
@@ -338,9 +328,9 @@ function Chat() {
   const [splitTicket, { loading: loadingSplitTicket }] =
     useMutation(SPLIT_TICKET);
 
-  if (loading) {
-    return <Loader />;
-  }
+  // if (loading) {
+  //   return <Loader />;
+  // }
 
   if (error) {
     const networkError = error.networkError;
@@ -367,19 +357,19 @@ function Chat() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (loadingThemeList) {
-    return <Loader />;
-  }
+  // if (loadingThemeList) {
+  //   return <Loader />;
+  // }
 
   if (errorThemeList) {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  if (loadingTheme) {
+  if (loadingThemeList) {
     return <Loader />;
   }
 
-  if (errorTheme) {
+  if (errorThemeList) {
     return <h2>Что-то пошло не так</h2>;
   }
 
@@ -1306,7 +1296,7 @@ function Chat() {
         ) : (
           <div className="alltickets__container">
             <TicketTitle
-              title={`${data.clientQuery.ticket.title}`}
+              title={`${data?.clientQuery?.ticket.title}`}
               state="Закрыто"
               linkPrev={linkPrev}
             />
@@ -1321,7 +1311,7 @@ function Chat() {
                 {isAdmin() &&
                   !isVisibleEdit &&
                   currentStatus !== "Закрыт" &&
-                  user.id !== data.clientQuery.ticket.assistant?.id && (
+                  user.id !== data?.clientQuery?.ticket.assistant?.id && (
                     <a className="alltickets__link">
                       <ButtonCustom
                         title="Изменить тикет"

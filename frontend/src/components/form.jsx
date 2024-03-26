@@ -300,9 +300,10 @@ function FormComponent() {
             ticketId: 1,
             text: getContent(),
             attachPaths: filePaths,
+            notification: false,
           },
         }).then((data) => {
-          console.log(data.data.addTicket);
+          // console.log(data.data.addTicket);
           setIsVisible(false);
           handleShow();
           //resetState();
@@ -328,7 +329,7 @@ function FormComponent() {
       selectedThemeId == null ||
       selectedSubThemeId == null ||
       ticketTitleValue.trim() == "" ||
-      textareaValue.trim() == "<p></p>"
+      getContent() == "<p></p>"
     ) {
       // console.log("xdd");
       setIsVisible(true);
@@ -556,7 +557,7 @@ function FormComponent() {
         </Row>
       </Form>
 
-      <Modal show={show}>
+      <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>
             {get_translation("INTERFACE_MESSAGE_CREATION_TICKET")}
