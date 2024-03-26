@@ -500,7 +500,7 @@ function EditCurator() {
                 <div className="edit-curator__checkbox-block">
                   <Form.Check
                     className=""
-                    type="switch"
+                    type="checkbox"
                     id="custom-switch"
                     value={selectedAcessCurators}
                     onChange={handleOnChangeAcessCurators}
@@ -516,7 +516,7 @@ function EditCurator() {
               >
                 <div className="edit-curator__checkbox-block">
                   <Form.Check
-                    type="switch"
+                    type="checkbox"
                     id="custom-switch"
                     value={selectedAcessThemes}
                     onChange={handleOnChangeAcessThemes}
@@ -532,7 +532,7 @@ function EditCurator() {
               >
                 <div className="edit-curator__checkbox-block">
                   <Form.Check
-                    type="switch"
+                    type="checkbox"
                     id="custom-switch"
                     value={selectedAcessTransfers}
                     onChange={handleOnChangeAcessTransfers}
@@ -548,7 +548,7 @@ function EditCurator() {
               >
                 <div className="edit-curator__checkbox-block">
                   <Form.Check
-                    type="switch"
+                    type="checkbox"
                     id="custom-switch"
                     value={selectedAcessToAnswers}
                     onChange={handleOnChangeAcessAnswers}
