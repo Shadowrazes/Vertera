@@ -63,7 +63,7 @@
   right: 0;
   bottom: -3px;
   width: 100%;
-  border-bottom: 1px dashed red;
+  border-bottom: 1px dashed black;
 }
 
 .chat-message-sender__attach-icon {

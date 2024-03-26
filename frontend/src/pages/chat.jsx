@@ -1275,7 +1275,7 @@ function Chat() {
     }
   };
 
-  if (isLoadingClose || !data.clientQuery.ticket) {
+  if (isLoadingClose || !data?.clientQuery?.ticket) {
     refetch();
     return <Loader />;
   }
