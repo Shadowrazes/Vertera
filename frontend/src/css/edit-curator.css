@@ -50,13 +50,11 @@
 }
 
 #custom-switch {
-  width: 60px;
+  width: 30px;
   height: 30px;
 }
 
 #custom-switch:checked {
-  width: 60px;
-  height: 30px;
   background-color: #00ab97;
   border-color: #00ab97;
 }

@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 
 export const ADD_TICKET = gql`
-  mutation addTicket(
+  mutation (
     $token: String!
     $title: String!
-    $clientId: Int!
+    $initiatorId: Int!
+    $recipientId: Int
     $unitId: Int!
     $themeId: Int!
     $subThemeId: Int!
@@ -13,12 +14,14 @@ export const ADD_TICKET = gql`
     $ticketId: Int!
     $text: String!
     $attachPaths: [String]
+    $notification: Boolean!
   ) {
     clientMutation(token: $token) {
       addTicket(
         ticketFields: {
           title: $title
-          clientId: $clientId
+          initiatorId: $initiatorId
+          recipientId: $recipientId
           unitId: $unitId
           themeId: $themeId
           subThemeId: $subThemeId
@@ -30,9 +33,10 @@ export const ADD_TICKET = gql`
           text: $text
           attachPaths: $attachPaths
         }
+        notification: $notification
       ) {
         id
-        clientId
+        initiatorId
         link
       }
     }
@@ -394,6 +398,49 @@ export const UPDATE_TRANSLATION = gql`
     adminMutation(token: $token) {
       updateTranslation(fields: $translationUpdate) {
         changed
+      }
+    }
+  }
+`;
+
+export const CURATOR_ADD_TICKET = gql`
+  mutation (
+    $token: String!
+    $title: String!
+    $initiatorId: Int!
+    $recipientId: Int
+    $unitId: Int!
+    $themeId: Int!
+    $subThemeId: Int!
+    $senderId: Int!
+    $recieverId: Int!
+    $ticketId: Int!
+    $text: String!
+    $notification: Boolean!
+    $idsOuter: Boolean!
+    $ids: [Int]!
+  ) {
+    helperMutation(token: $token) {
+      addTicketMass(
+        ticketFields: {
+          title: $title
+          initiatorId: $initiatorId
+          recipientId: $recipientId
+          unitId: $unitId
+          themeId: $themeId
+          subThemeId: $subThemeId
+        }
+        messageFields: {
+          senderId: $senderId
+          recieverId: $recieverId
+          ticketId: $ticketId
+          text: $text
+        }
+        notification: $notification
+        idsOuter: $idsOuter
+        ids: $ids
+      ) {
+        id
       }
     }
   }

@@ -344,31 +344,31 @@ function allTickets() {
 
   useEffect(() => {
     if (isHelper()) {
-      if (data && data.helperQuery.ticketList.array) {
+      if (data && data.helperQuery.ticketList?.array) {
         setDataTableTickets(data.helperQuery.ticketList.array);
       }
 
-      if (data && data.helperQuery.ticketList.count) {
+      if (data && data.helperQuery.ticketList?.count) {
         setDataAmount(data.helperQuery.ticketList.count);
       }
 
-      if (dataCurators && dataCurators.helperQuery.helperList) {
+      if (dataCurators && dataCurators.helperQuery?.helperList) {
         setDataQueryCurators(dataCurators.helperQuery.helperList);
       }
 
-      if (dataCountryList && dataCountryList.clientQuery.countryList) {
+      if (dataCountryList && dataCountryList.clientQuery?.countryList) {
         setCountryList(dataCountryList.clientQuery.countryList);
       }
 
-      if (dataStatusList && dataStatusList.helperQuery.ticketStatusList) {
+      if (dataStatusList && dataStatusList.helperQuery?.ticketStatusList) {
         setStatusList(dataStatusList.helperQuery.ticketStatusList);
       }
     } else {
-      if (data && data.clientQuery.ticketListByClient.array) {
+      if (data && data.clientQuery.ticketListByClient?.array) {
         setDataTableTickets(data.clientQuery.ticketListByClient.array);
       }
 
-      if (data && data.clientQuery.ticketListByClient.count) {
+      if (data && data.clientQuery.ticketListByClient?.count) {
         setDataAmount(data.clientQuery.ticketListByClient.count);
       }
     }

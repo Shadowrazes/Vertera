@@ -102,19 +102,19 @@ function TableTickets() {
 
   useEffect(() => {
     if (isAdmin()) {
-      if (data && data.helperQuery.ticketList.array) {
+      if (data && data.helperQuery.ticketList?.array) {
         setData(data.helperQuery.ticketList.array);
       }
 
-      if (data && data.helperQuery.ticketList.count) {
+      if (data && data.helperQuery.ticketList?.count) {
         setDataAmount(data.helperQuery.ticketList.count);
       }
     } else {
-      if (data && data.clientQuery.ticketListByClient.array) {
+      if (data && data.clientQuery.ticketListByClient?.array) {
         setData(data.clientQuery.ticketListByClient.array);
       }
 
-      if (data && data.clientQuery.ticketListByClient.count) {
+      if (data && data.clientQuery.ticketListByClient?.count) {
         setDataAmount(data.clientQuery.ticketListByClient.count);
       }
     }

@@ -17,7 +17,7 @@ import { EditorState, convertToRaw } from "draft-js";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { THEME_LIST, CURATORS_LIST } from "../apollo/queries";
-import { ADD_TICKET } from "../apollo/mutations";
+import { ADD_TICKET, CURATOR_ADD_TICKET } from "../apollo/mutations";
 
 import { Editor } from "react-draft-wysiwyg";
 import { MultiSelect } from "primereact/multiselect";
@@ -44,10 +44,15 @@ function CuratorCreateTicket() {
   const [textareaValue, setTextareaValue] = useState("");
   const [selectedCurators, setSelectedCurators] = useState([]);
   const [selectedCuratorsId, setSelectedCuratorsId] = useState([]);
+  const [idInputs, setIdInputs] = useState([]);
   const [selectedValue, setSelectedValue] = useState(1);
+  const [isNotificaton, setIsNotification] = useState(false);
+  const [isOuterids, setIsOuterIds] = useState(false);
 
   const [ticketTitleValue, setTicketTitleValue] = useState("");
 
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
   const [isVisible, setIsVisible] = useState(false);
@@ -69,6 +74,7 @@ function CuratorCreateTicket() {
   );
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const isBuild = import.meta.env.DEV !== "build";
 
   const isAdmin = () => {
     return user?.role === "helper" || user?.role === "system";
@@ -99,9 +105,10 @@ function CuratorCreateTicket() {
     if (dataCurators && dataCurators.helperQuery.helperList) {
       setDataQueryCurators(dataCurators.helperQuery.helperList);
     }
-  }, [data, dataQueryCurators]);
+  }, [data, dataCurators]);
 
   const [addTicket] = useMutation(ADD_TICKET);
+  const [curatorAddTicket] = useMutation(CURATOR_ADD_TICKET);
 
   async function uploadFiles() {
     const fileInputs = document.querySelectorAll(".fileInputForm input");
@@ -263,6 +270,11 @@ function CuratorCreateTicket() {
     setIsShowInfo(false);
     setSuccessfulImports(null);
     setFailedImports(null);
+
+    setSelectedCurators([]);
+    setSelectedCuratorsId([]);
+    setIsOuterIds(false);
+    setIdInputs([]);
   };
 
   const handleEditorChange = (newEditorState) => {
@@ -275,7 +287,7 @@ function CuratorCreateTicket() {
 
     setTextareaValue(draftToHtml(rawContent));
 
-    console.log(draftToHtml(rawContent));
+    // console.log(draftToHtml(rawContent));
     return draftToHtml(rawContent);
   };
 
@@ -306,32 +318,102 @@ function CuratorCreateTicket() {
   };
 
   const addTicketWithFiles = () => {
-    uploadFiles()
-      .then((filePaths) => {
-        addTicket({
-          variables: {
-            token: user.token,
-            title: ticketTitleValue,
-            initiatorId: user.id,
-            unitId: selectedUnitId,
-            themeId: selectedThemeId,
-            subThemeId: selectedSubThemeId,
-            senderId: user.id,
-            recieverId: 1,
-            ticketId: 1,
-            text: getContent(),
-            attachPaths: filePaths,
-          },
-        }).then((data) => {
-          console.log(data.data.addTicket);
-          setIsVisible(false);
-          handleShow();
-          //resetState();
+    if (selectedCuratorsId.length !== 0) {
+      uploadFiles()
+        .then((filePaths) => {
+          curatorAddTicket({
+            variables: {
+              token: user.token,
+              title: ticketTitleValue,
+              initiatorId: user.id,
+              unitId: selectedUnitId,
+              themeId: selectedThemeId,
+              subThemeId: selectedSubThemeId,
+              senderId: user.id,
+              recieverId: 1,
+              ticketId: 1,
+              text: getContent(),
+              attachPaths: filePaths,
+              notification: isNotificaton,
+              idsOuter: isOuterids,
+              ids: selectedCuratorsId,
+            },
+          })
+            .then((data) => {
+              console.log(data.data.addTicket);
+              setIsVisible(false);
+              handleShowSuccess();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.error("Ошибка при загрузке файлов:", error);
         });
-      })
-      .catch((error) => {
-        console.error("Ошибка при загрузке файлов:", error);
-      });
+    } else if (idInputs.length !== 0) {
+      uploadFiles()
+        .then((filePaths) => {
+          curatorAddTicket({
+            variables: {
+              token: user.token,
+              title: ticketTitleValue,
+              initiatorId: user.id,
+              unitId: selectedUnitId,
+              themeId: selectedThemeId,
+              subThemeId: selectedSubThemeId,
+              senderId: user.id,
+              recieverId: 1,
+              ticketId: 1,
+              text: getContent(),
+              attachPaths: filePaths,
+              notification: isNotificaton,
+              idsOuter: isOuterids,
+              ids: idInputs,
+            },
+          })
+            .then((data) => {
+              console.log(data.data.addTicket);
+              handleShowSuccess();
+              setIsVisible(false);
+              // handleShow();
+            })
+            .catch((error) => {
+              console.log(error);
+              handleShowError();
+            });
+        })
+        .catch((error) => {
+          console.error("Ошибка при загрузке файлов:", error);
+        });
+    } else if (selectedCuratorsId.length == 0 && idInputs.length == 0) {
+      uploadFiles()
+        .then((filePaths) => {
+          addTicket({
+            variables: {
+              token: user.token,
+              title: ticketTitleValue,
+              initiatorId: user.id,
+              unitId: selectedUnitId,
+              themeId: selectedThemeId,
+              subThemeId: selectedSubThemeId,
+              senderId: user.id,
+              recieverId: 1,
+              ticketId: 1,
+              text: getContent(),
+              attachPaths: filePaths,
+              notification: isNotificaton,
+            },
+          }).then((data) => {
+            console.log(data.data.addTicket);
+            setIsVisible(false);
+            handleShowSuccess();
+          });
+        })
+        .catch((error) => {
+          console.error("Ошибка при загрузке файлов:", error);
+        });
+    }
   };
 
   const handleNewTicket = (e) => {
@@ -342,28 +424,34 @@ function CuratorCreateTicket() {
     // console.log(selectedThemeId);
     // console.log(selectedSubTheme);
     // console.log(selectedSubThemeId);
-    // console.log(textareaValue);
+    // console.log(getContent());
+    // console.log(isNotificaton);
+    console.log(selectedCuratorsId);
+    console.log(idInputs);
 
     if (
       selectedUnitId == null ||
       selectedThemeId == null ||
       selectedSubThemeId == null ||
       ticketTitleValue.trim() == "" ||
-      textareaValue.trim() == "<p></p>"
+      getContent() == "<p></p>"
     ) {
       // console.log("xdd");
       setIsVisible(true);
       return;
     }
 
-    if (selectedValue === 1) {
-      addTicketWithFiles();
-    } else if (selectedValue === 2) {
-    }
+    addTicketWithFiles();
   };
 
   const handleToggleChange = (value) => {
     setSelectedValue(value);
+
+    if (value === 1) {
+      setIsNotification(false);
+    } else if (value === 2) {
+      setIsNotification(true);
+    }
   };
 
   const handleAddFileInput = () => {
@@ -457,6 +545,15 @@ function CuratorCreateTicket() {
         const result = contents.split(/\s+/);
         setSuccessfulImports(result.filter((item) => !isNaN(item)).length);
         setFailedImports(result.filter((item) => isNaN(item)).length);
+
+        setIdInputs(
+          result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
+        );
+
+        if (result.filter((item) => !isNaN(item)).length !== null) {
+          setIsOuterIds(true);
+        }
+        // console.log(result.filter((item) => !isNaN(item)));
       };
       reader.readAsText(file);
     }
@@ -473,6 +570,23 @@ function CuratorCreateTicket() {
   const hideSpinner = () => {
     setIsShowSpinner(false);
     setIsShowInfo(true);
+  };
+
+  const handleShowSuccess = () => {
+    setShowSuccess(true);
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+    window.location.reload();
+  };
+
+  const handleShowError = () => {
+    setShowError(true);
+  };
+
+  const handleCloseError = () => {
+    setShowError(false);
   };
 
   const newCuratorList = dataQueryCurators.map((curator) => ({
@@ -592,7 +706,7 @@ function CuratorCreateTicket() {
             )}
             {isIdFileInputVisible && (
               <>
-                <Form.Group className="mb-3 fileInputForm fileIdInput">
+                <Form.Group className="mb-3 fileIdInput">
                   <Form.Control
                     type="file"
                     accept=".txt"
@@ -603,7 +717,7 @@ function CuratorCreateTicket() {
                 {isShowSpinner && <Spinner animation="border" />}
                 {isShowInfo && (
                   <>
-                    {failedImports === null && (
+                    {failedImports == 0 && (
                       <Alert
                         variant="success"
                         className="curator-create-ticket__alert"
@@ -613,7 +727,7 @@ function CuratorCreateTicket() {
                       </Alert>
                     )}
 
-                    {failedImports !== null && (
+                    {failedImports !== 0 && (
                       <Alert
                         variant="warning"
                         className="curator-create-ticket__alert"
@@ -732,6 +846,43 @@ function CuratorCreateTicket() {
           </Col>
         </Row>
       </Form>
+
+      <Modal show={showSuccess} onHide={handleCloseSuccess}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {isNotificaton ? "Уведомления " : "Обращения "}
+            созданы
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            {isNotificaton ? "Уведомления " : "Обращения "} успешно созданы и
+            отправлены получателям
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseSuccess}>
+            {get_translation("INTERFACE_CLOSE")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showError} onHide={handleCloseError}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {isNotificaton ? "Уведомления " : "Обращения "}
+            не были созданы
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Указаны не существующие ID пользователей</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseError}>
+            {get_translation("INTERFACE_CLOSE")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
