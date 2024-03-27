@@ -64,7 +64,12 @@ export const TABLE_TICKETS = gql`
 `;
 
 export const TABLE_TICKETS_USER = gql`
-  query ($token: String!, $clientId: Int!, $filters: TicketClientFilter!) {
+  query (
+    $token: String!
+    $clientId: Int!
+    $filters: TicketClientFilter!
+    $lang: String!
+  ) {
     clientQuery(token: $token) {
       ticketListByClient(clientId: $clientId, filters: $filters) {
         count
@@ -82,15 +87,15 @@ export const TABLE_TICKETS_USER = gql`
             patronymic
           }
           subTheme {
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
             theme {
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
               unit {
-                name(lang: "ru") {
+                name(lang: $lang) {
                   stroke
                 }
               }
@@ -99,7 +104,7 @@ export const TABLE_TICKETS_USER = gql`
           date
           subTheme {
             theme {
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
             }
@@ -116,7 +121,7 @@ export const TABLE_TICKETS_USER = gql`
             text
           }
           status {
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
           }

@@ -408,7 +408,6 @@ export const CURATOR_ADD_TICKET = gql`
     $token: String!
     $title: String!
     $initiatorId: Int!
-    $recipientId: Int
     $unitId: Int!
     $themeId: Int!
     $subThemeId: Int!
@@ -425,7 +424,6 @@ export const CURATOR_ADD_TICKET = gql`
         ticketFields: {
           title: $title
           initiatorId: $initiatorId
-          recipientId: $recipientId
           unitId: $unitId
           themeId: $themeId
           subThemeId: $subThemeId
@@ -439,9 +437,7 @@ export const CURATOR_ADD_TICKET = gql`
         notification: $notification
         idsOuter: $idsOuter
         ids: $ids
-      ) {
-        id
-      }
+      )
     }
   }
 `;
