@@ -26,7 +26,32 @@ class Helper extends Entity {
         return result;
     }
 
-    static async GetStatsById(helperId, dateAfter, dateBefore) {
+    static async GetListFiltered(filters) {
+        const sql = `
+            SELECT * FROM ${this.TableName} 
+            JOIN ${User.TableName} 
+            ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField}
+            WHERE ${this.TableName}.${this.PrimaryField} <> 0
+        `;
+
+        let fields = [];
+        if (filters.countryIds && filters.countryIds.length > 0) {
+            sql += ` AND ${User.CountryIdField} IN (?)`;
+            fields.push(filters.countryIds);
+        }
+        if (filters.departmentIds && filters.departmentIds.length > 0) {
+            sql += ` AND ${this.PrimaryField} IN (
+                SELECT DISTINCT ${HelperDepartment.HelperIdField} FROM ${HelperDepartment.TableName} 
+                WHERE ${HelperDepartment.DepartmentIdField} IN (?)
+            )`;
+            fields.push(filters.departmentIds);
+        }
+
+        const result = await super.Request(sql, fields);
+        return result;
+    }
+
+    static async GetStatsById(helperId, filters) {
         let sql = `
             SELECT 
                 COUNT(*) AS totalTickets,
@@ -35,70 +60,106 @@ class Helper extends Entity {
                 IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdInProgress}), 0) AS inProgressTickets,
                 IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOnRevision}), 0) AS onRevisionTickets,
                 IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOnExtension}), 0) AS onExtensionTickets,
+                IFNULL(SUM(${Ticket.StatusIdField} = ${Ticket.StatusIdOnMentor}), 0) AS onMentorTickets,
                 IFNULL(SUM(${Ticket.ReactionField} = ${Ticket.ReactionMarkLike}), 0) AS likes,
                 IFNULL(SUM(${Ticket.ReactionField} = ${Ticket.ReactionMarkDislike}), 0) AS dislikes,
                 COUNT(CASE WHEN ${Ticket.ReactionField} IS NULL THEN 1 ELSE NULL END) AS notRated
             FROM ${Ticket.TableName}
-            WHERE ${Ticket.RecipientIdField} = ?
+            WHERE ? IN (${Ticket.InitiatorIdField}, ${Ticket.RecipientIdField}, ${Ticket.AssistantIdField})
         `;
 
         let fields = [helperId];
-        if(dateAfter) {
-            sql += ` AND ${Ticket.DateField} >= ?`;
-            fields.push(dateAfter);
-        }
 
-        if(dateBefore) {
-            sql += ` AND ${Ticket.DateField} <= ?`;
-            fields.push(dateBefore);
+        if(filters.dateAfter && filters.dateBefore) {
+            sql += ` AND ${Ticket.DateField} BETWEEN ? AND ?`;
+            fields.push(filters.dateAfter, filters.dateBefore);
+        }
+        if(filters.unitIds){
+            sql += ` AND ${Ticket.UnitField} IN (?)`;
+            fields.push(filters.unitIds);
+        }
+        if(filters.themeIds){
+            sql += ` AND ${Ticket.ThemeField} IN (?)`;
+            fields.push(filters.themeIds);
+        }
+        if(filters.subthemeIds){
+            sql += ` AND ${Ticket.SubThemeField} IN (?)`;
+            fields.push(filters.subthemeIds);
         }
 
         const result = await super.Request(sql, fields);
 
         let stats = result[0];
 
+        const msgsAs1 = 'm1';
+        const msgsAs2 = 'm2';
+        const ticketsAs = `tics`;
+        const diffLimit = 200000;
+        const dateDiffSql = `ABS(TIMESTAMPDIFF(SECOND, ${msgsAs1}.${Message.DateField}, ${msgsAs2}.${Message.DateField}))`;
+
+        let ticketJoinSql = ``;
+        if (filters.unitIds || filters.themeIds || filters.subthemeIds) {
+            ticketJoinSql = ` 
+                JOIN ${Ticket.TableName} ${ticketsAs} 
+                ON ${msgsAs1}.${Message.TicketIdField} = ${ticketsAs}.${Ticket.PrimaryField}
+            `;
+        }
+
         let msgSql = `
-            SELECT  ${Message.SenderIdField}, ${Message.DateField}  
-            FROM    ${Message.TableName} 
-            WHERE   (${Message.SenderIdField} = ? OR ${Message.RecieverIdField} = ?)
+            SELECT  ${dateDiffSql} AS rTime, 
+                    ${msgsAs1}.${Message.PrimaryField} AS hMsgID,
+                    ${msgsAs2}.${Message.PrimaryField} AS cMsgID
+
+            FROM    ${Message.TableName} ${msgsAs1}
+
+            JOIN    ${Message.TableName} ${msgsAs2} 
+            ON      ${msgsAs1}.${Message.SenderIdField} = ${msgsAs2}.${Message.RecieverIdField} AND
+                    ${msgsAs1}.${Message.RecieverIdField} = ${msgsAs2}.${Message.SenderIdField} AND 
+                    ${msgsAs1}.${Message.TicketIdField} = ${msgsAs2}.${Message.TicketIdField}
+
+            ${ticketJoinSql}
+
+            WHERE   ${msgsAs1}.${Message.SenderIdField} = ?
+            AND     ${msgsAs1}.${Message.DateField} > ${msgsAs2}.${Message.DateField}
+            AND     ${dateDiffSql} < ${diffLimit}
         `;
 
-        let msgSqlFields = [helperId, helperId];
-        if(dateAfter) {
-            msgSql += ` AND ${Message.DateField} >= ?`;
-            msgSqlFields.push(dateAfter);
+        let msgSqlFields = [helperId];
+        if(filters.dateAfter && filters.dateBefore) {
+            msgSql += ` AND ${msgsAs2}.${Message.DateField} BETWEEN ? AND ?`;
+            msgSqlFields.push(filters.dateAfter, filters.dateBefore);
+        }
+        if(filters.unitIds){
+            msgSql += ` AND ${ticketsAs}.${Ticket.UnitField} IN (?)`;
+            msgSqlFields.push(filters.unitIds);
+        }
+        if(filters.themeIds){
+            msgSql += ` AND ${ticketsAs}.${Ticket.ThemeField} IN (?)`;
+            msgSqlFields.push(filters.themeIds);
+        }
+        if(filters.subthemeIds){
+            msgSql += ` AND ${ticketsAs}.${Ticket.SubThemeField} IN (?)`;
+            msgSqlFields.push(filters.subthemeIds);
         }
 
-        if(dateBefore) {
-            msgSql += ` AND ${Message.DateField} <= ?`;
-            msgSqlFields.push(dateBefore);
-        }
-
+        msgSql += `ORDER BY rTime`;
         const msgResult = await super.Request(msgSql, msgSqlFields);
 
-        // первое сообщение всегда от клиента
-        let clientMsg = msgResult[0];
-        let dateDiffs = [];
-        let skipToNextClient = false;
+        const seen = new Set();
+        const uqRes = [];
 
-        for (const curMsg of msgResult) {
-            if (skipToNextClient) {
-                if (curMsg.senderId != helperId) {
-                    clientMsg = curMsg;
-                    skipToNextClient = false;
-                }
-                continue;
-            }
-
-            if (curMsg.senderId == helperId) {
-                dateDiffs.push(curMsg.date - clientMsg.date);
-                skipToNextClient = true;
+        for (const obj of msgResult) {
+            if (!seen.has(obj.hMsgID) && !seen.has(obj.cMsgID)) {
+                seen.add(obj.hMsgID);
+                seen.add(obj.cMsgID);
+                uqRes.push(obj);
             }
         }
 
-        const avgTimeMilli = dateDiffs.reduce((sum, current) => sum + current, 0) / dateDiffs.length;
-        const avgTimeSecs = +((avgTimeMilli / 1000).toFixed(2));
-        stats.avgReplyTime = isNaN(avgTimeSecs) ? 60 * 60 : avgTimeSecs;
+        const timeSum = uqRes.reduce((total, item) => total + item.rTime, 0);
+
+        const avgTimeSecs = +((timeSum / uqRes.length).toFixed(2));
+        stats.avgReplyTime = isNaN(avgTimeSecs) ? -60 * 60 : avgTimeSecs;
         stats.fantasy = +((60 * 60 / stats.avgReplyTime + 0.5 * stats.likes + stats.totalTickets * 0.2).toFixed(3));
 
         return stats;
@@ -106,12 +167,12 @@ class Helper extends Entity {
 
     static async GetStatsList(filters) {
         let result = [];
-        const helpers = await this.GetList();
+        const helpers = await this.GetListFiltered(filters);
 
         for (const helper of helpers) {
             let helperStatData = {};
             helperStatData.helper = helper;
-            helperStatData.stats = await this.GetStatsById(helper.id, filters.dateAfter, filters.dateBefore);
+            helperStatData.stats = await this.GetStatsById(helper.id, filters);
             result.push(helperStatData);
         }
 

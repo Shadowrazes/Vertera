@@ -21,7 +21,7 @@ export const Mutations = `
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
         redirectTicketToMentor(id: Int!, mentorId: Int!): TicketInsertInfo!
-        addTicketMass(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!, idsOuter: Boolean!, ids: [Int]!): [TicketInsertInfo]!
+        addTicketMass(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!, idsOuter: Boolean!, ids: [Int]!): [Int]!
                       
         helperObj: HelperObjMutation!
         themeObj: ThemeObjMutation!

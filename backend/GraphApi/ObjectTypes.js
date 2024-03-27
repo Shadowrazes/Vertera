@@ -55,6 +55,7 @@ export const ObjectTypes = `
         inProgressTickets: Int!
         onRevisionTickets: Int!
         onExtensionTickets: Int!
+        onMentorTickets: Int!
         closedTickets: Int!
         avgReplyTime: Float!
         likes: Int!

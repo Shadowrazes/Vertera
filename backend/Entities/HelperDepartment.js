@@ -15,11 +15,12 @@ class HelperDepartment extends Entity {
 
     static async GetListByHelperId(helperId) {
         const sql = `
-        SELECT * FROM ${Department.TableName} 
-        WHERE ${Department.PrimaryField} IN (
-            SELECT ${this.DepartmentIdField} FROM ${this.TableName} 
-            WHERE ${this.HelperIdField} = ?
-        )`;
+            SELECT * FROM ${Department.TableName} 
+            WHERE ${Department.PrimaryField} IN (
+                SELECT ${this.DepartmentIdField} FROM ${this.TableName} 
+                WHERE ${this.HelperIdField} = ?
+            )
+        `;
 
         const result = await super.Request(sql, [helperId]);
         return result;

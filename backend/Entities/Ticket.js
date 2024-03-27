@@ -152,13 +152,11 @@ class Ticket extends Entity {
         let fields = [];
 
         if (clientId) {
-            sql += ` AND (
-                ${this.InitiatorIdField} = ? OR 
-                ${this.RecipientIdField} = ? OR
-                ${this.AssistantIdField} = ?
+            sql += ` AND ? IN (
+                ${this.InitiatorIdField}, 
+                ${this.RecipientIdField}, 
+                ${this.AssistantIdField}
             )`;
-            fields.push(clientId);
-            fields.push(clientId);
             fields.push(clientId);
         }
         if (filter.words && filter.words.length > 0) {
@@ -189,15 +187,13 @@ class Ticket extends Entity {
                 ${this.RecipientIdField} IN (?) OR 
                 ${this.AssistantIdField} IN (?)
             )`;
-            fields.push(filter.helperIds);
-            fields.push(filter.helperIds);
-            fields.push(filter.helperIds);
+            fields.push(filter.helperIds, filter.helperIds, filter.helperIds);
         }
         if (filter.helperCountryIds && filter.helperCountryIds.length > 0) {
             const countryHelperIdsSubQuery = `
                 SELECT ${User.PrimaryField} 
                 FROM ${User.TableName} 
-                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'helper'
+                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = ${User.RoleHelper}
             `;
 
             sql += ` 
@@ -206,8 +202,7 @@ class Ticket extends Entity {
                     ${this.RecipientIdField} IN (${countryHelperIdsSubQuery})
                 )
             `;
-            fields.push(filter.helperCountryIds);
-            fields.push(filter.helperCountryIds);
+            fields.push(filter.helperCountryIds, filter.helperCountryIds);
         }
         if (filter.clientCountryIds && filter.clientCountryIds.length > 0) {
             const countryClientIdsSubQuery = `
@@ -222,8 +217,7 @@ class Ticket extends Entity {
                     ${this.RecipientIdField} IN (${countryClientIdsSubQuery})
                 )
             `;
-            fields.push(filter.clientCountryIds);
-            fields.push(filter.clientCountryIds);
+            fields.push(filter.clientCountryIds, filter.clientCountryIds);
         }
         if (filter.replyed != undefined) {
             sql += ` 
@@ -242,9 +236,8 @@ class Ticket extends Entity {
             fields.push(filter.statusIds);
         }
         if (filter.dateAfter && filter.dateBefore) {
-            sql += ` AND ${this.TableName}.${this.DateField} >= ? AND ${this.TableName}.${this.DateField} <= ?`;
-            fields.push(filter.dateAfter);
-            fields.push(filter.dateBefore);
+            sql += ` AND ${this.TableName}.${this.DateField} BETWEEN ? AND ?`;
+            fields.push(filter.dateAfter, filter.dateBefore);
         }
         if (filter.reaction != undefined) {
             sql += ` AND ${this.ReactionField} = ?`;
@@ -334,7 +327,7 @@ class Ticket extends Entity {
 
     static async TransInsertMass(args) {
         return await super.Transaction(async (conn) => {
-            let insertResults = [];
+            let notInsertedIds = [];
             let insertArgs =  {
                 ticketFields: args.ticketFields, 
                 messageFields: args.messageFields,
@@ -342,21 +335,25 @@ class Ticket extends Entity {
             };
 
             for(let recipientId of args.ids) {
-                if (!args.idsOuter){
-                    // Если переданы внутренние id
-                    insertArgs.ticketFields.recipientId = recipientId;
+                try{
+                    if (!args.idsOuter){
+                        // Если переданы внутренние id
+                        insertArgs.ticketFields.recipientId = recipientId;
+                    }
+                    else {
+                        // Если переданы внешние id из файла
+                        const user = await User.GetByOuterId(recipientId);
+                        insertArgs.ticketFields.recipientId = user.id;
+                    }
+    
+                    const insertRes = await this.TransInsert(insertArgs, conn);
                 }
-                else {
-                    // Если переданы внешние id из файла
-                    const user = await User.GetByOuterId(recipientId);
-                    insertArgs.ticketFields.recipientId = user.id;
+                catch {
+                    notInsertedIds.push(recipientId);
                 }
-
-                const insertRes = await this.TransInsert(insertArgs, conn);
-                insertResults.push(insertRes);
             }
 
-            return insertResults;
+            return notInsertedIds;
         });
     }
 
@@ -364,6 +361,11 @@ class Ticket extends Entity {
         const transFunc = async (conn) => {
             const ticketFields = args.ticketFields;
             const messageFields = args.messageFields;
+
+            if(ticketFields.recipientId != undefined) {
+                const user = await User.GetById(ticketFields.recipientId);
+                if(!user) throw new Error(Errors.UserNotFOund);
+            }
 
             // Надо подобрать хелпера, если адресат тикета не указан явно и тикет - не уведомление
             const autoHelperAssign = ticketFields.recipientId == undefined && !args.notification;
