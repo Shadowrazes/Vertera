@@ -89,6 +89,9 @@ export const resolvers = {
         allThemeTree: async (_, args, context) => {
             return await Unit.GetList(context.user);
         },
+        country: async (_, args) => {
+            return await Country.GetById(args.id);
+        },
         countryList: async (_, args) => {
             return await Country.GetList();
         },
