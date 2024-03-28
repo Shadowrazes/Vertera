@@ -63,7 +63,9 @@ export const resolvers = {
         ticket: async (_, { link }, context) => {
             const isHelper = User.ValidateRoleAccess(User.RoleHelper, context.user.role);
             const reqTicket = await Ticket.GetByLink(link);
-            const isOwner = reqTicket.initiatorId == context.user.id || reqTicket.recipientId == context.user.id;
+            const isOwner = reqTicket.initiatorId == context.user.id || 
+                            reqTicket.recipientId == context.user.id ||
+                            reqTicket.assistantId == context.user.id ;
 
             if(!isHelper && !isOwner) throw new Error(Errors.AccessForbidden);
 
