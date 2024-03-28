@@ -689,13 +689,16 @@ function allTickets() {
 
     if (isHelper()) {
       // console.log(5);
+
       let helperIds;
       if (selectedCuratorsId.length === 0) {
         helperIds = user.id;
-      } else if (user.id === 0) {
-        helperIds = undefined;
       } else {
         helperIds = selectedCuratorsId;
+      }
+
+      if (user.id == 0) {
+        helperIds = undefined;
       }
 
       const variables = {
@@ -723,6 +726,7 @@ function allTickets() {
       await refetch(variables);
     } else {
       const variables = {
+        clientId: user.id,
         filters: {
           unitIds: selectedUnitId,
           themeIds: selectedThemeId,
@@ -730,7 +734,6 @@ function allTickets() {
           dateBefore: selectedDateBefore,
           dateAfter: selectedDateAfter,
           reaction: queryReaction,
-          words: wordsFilterValue,
           limit: itemsPerPage,
           offset: offset,
           orderBy: orderBy,
@@ -1283,17 +1286,6 @@ function allTickets() {
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
-                        <div className="alltickets__input-wrapper">
-                          <Form.Group controlId="wordsFilterForm">
-                            <Form.Control
-                              type="text"
-                              placeholder={get_translation("INTERFACE_REG_EXP")}
-                              className="add-currator__input"
-                              value={wordsFilterValue}
-                              onChange={handleWordsFilterValueChange}
-                            />
-                          </Form.Group>
-                        </div>
                       </div>
                     </Row>
                     <Row className="alltickets__button-row">

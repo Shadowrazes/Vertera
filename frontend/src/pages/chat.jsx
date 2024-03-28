@@ -212,6 +212,47 @@ function Chat() {
     setIsFormVisible((prev) => !prev);
   };
 
+  const handleThemeClickEdit = (theme, themeId) => {
+    setSelectedThemeEdit(theme);
+    setSelectedThemeIdEdit(themeId);
+
+    if (theme !== selectedThemeEdit) {
+      setSelectedSubThemeEdit(null);
+      setIsSubThemeDropdownVisibleEdit(true);
+
+      setSelectedCurator(null);
+      setSelectedCuratorId(null);
+
+      setIsErrorVisibleEdit(false);
+
+      switch ((selectedUnitId, themeId)) {
+        case (1, 14):
+          setSelectedSubThemeIdEdit(73);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 15):
+          setSelectedSubThemeIdEdit(74);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 16):
+          setSelectedSubThemeIdEdit(75);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 22):
+          setSelectedSubThemeIdEdit(102);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 23):
+          setSelectedSubThemeIdEdit(103);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        default:
+      }
+    }
+
+    // console.log(unitId);
+  };
+
   useEffect(() => {
     if (isAdmin()) {
       if (data && data.clientQuery.ticket) {
@@ -230,8 +271,11 @@ function Chat() {
       setSelectedUnitIdEdit(data.clientQuery.ticket.subTheme.theme.unit.id);
       setSelectedThemeEdit(data.clientQuery.ticket.subTheme.theme.name.stroke);
       setSelectedThemeIdEdit(data.clientQuery.ticket.subTheme.theme.id);
-      setSelectedSubThemeEdit(data.clientQuery.ticket.subTheme.name.stroke);
-      setSelectedSubThemeIdEdit(data.clientQuery.ticket.subTheme.id);
+      handleThemeClickEdit(
+        data.clientQuery.ticket.subTheme.theme.name.stroke,
+        data.clientQuery.ticket.subTheme.theme.id
+      );
+
       setSelectedCurator(
         `${data.clientQuery.ticket.recipient.surname} ${
           data.clientQuery.ticket.recipient.name
@@ -279,6 +323,13 @@ function Chat() {
       }
 
       if (newTicketsCount !== undefined) {
+        let _theme = data.clientQuery.ticket.subTheme.theme.name.stroke;
+        let _themeId = data.clientQuery.ticket.subTheme.theme.id;
+        // if (_subTheme === "none") {
+        //   _subTheme = null;
+        //   _subThemeId = null;
+        // }
+
         const inputs = Array.from({ length: newTicketsCount }, (_, index) => ({
           id: index + 1,
           title: "",
@@ -291,6 +342,7 @@ function Chat() {
           editorContent: EditorState.createEmpty(),
           text: "",
         }));
+        handleThemeClick(_theme, _themeId);
         setInputValues(inputs);
       }
     }
@@ -816,9 +868,11 @@ function Chat() {
   };
 
   const handleThemeClick = (theme, themeId) => {
+    let subtheme;
     let subthemeId;
 
     if (theme !== selectedTheme) {
+      subtheme = null;
       setIsSubThemeDropdownVisible(true);
 
       switch ((selectedUnitId, themeId)) {
@@ -848,7 +902,13 @@ function Chat() {
 
     const updatedInputValues = inputValues.map((input) =>
       input.id === currentIndex + 1
-        ? { ...input, theme: theme, themeId: themeId, subthemeId: subthemeId }
+        ? {
+            ...input,
+            theme: theme,
+            themeId: themeId,
+            subtheme: subtheme,
+            subthemeId: subthemeId,
+          }
         : input
     );
 
@@ -1041,47 +1101,6 @@ function Chat() {
       setSelectedCuratorId(null);
 
       setIsErrorVisibleEdit(false);
-    }
-
-    // console.log(unitId);
-  };
-
-  const handleThemeClickEdit = (theme, themeId) => {
-    setSelectedThemeEdit(theme);
-    setSelectedThemeIdEdit(themeId);
-
-    if (theme !== selectedThemeEdit) {
-      setSelectedSubThemeEdit(null);
-      setIsSubThemeDropdownVisibleEdit(true);
-
-      setSelectedCurator(null);
-      setSelectedCuratorId(null);
-
-      setIsErrorVisibleEdit(false);
-
-      switch ((selectedUnitId, themeId)) {
-        case (1, 14):
-          setSelectedSubThemeIdEdit(73);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 15):
-          setSelectedSubThemeIdEdit(74);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 16):
-          setSelectedSubThemeIdEdit(75);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 22):
-          setSelectedSubThemeIdEdit(102);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 23):
-          setSelectedSubThemeIdEdit(103);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        default:
-      }
     }
 
     // console.log(unitId);
@@ -1371,7 +1390,7 @@ function Chat() {
                   </>
                 )}
 
-                {isAdmin() && (
+                {isAdmin() && currentStatus === "Новый" && (
                   <a className="alltickets__link">
                     <ButtonCustom
                       title="Отправить наставнику"
@@ -1395,7 +1414,7 @@ function Chat() {
               <Tab
                 className="chat__tab-wrapper"
                 eventKey="theme"
-                title="Редактирова тему"
+                title="Редактировать тему"
               >
                 <a onClick={handleEditCloseClick}>
                   <div className="chat__edit-close"></div>
@@ -1550,34 +1569,22 @@ function Chat() {
 
         {isSendTicketToCuratorOpen && (
           <>
-            <Tabs
-              defaultActiveKey="theme"
-              id="justify-tab-example"
-              className="mb-3 edit-ticket__tabs"
-              justify
-            >
-              <Tab
-                className="chat__tab-wrapper"
-                eventKey="theme"
-                title="Отправить тикет наставнику"
-              >
-                <a onClick={handleEditCloseClick}>
-                  <div className="chat__edit-close"></div>
-                </a>
+            <a onClick={handleEditCloseClick}>
+              <div className="chat__edit-close"></div>
+            </a>
 
-                <div className="sendId_field">
-                  <div className="edit-subtheme__field">
-                    <Form.Control
-                      type="text"
-                      placeholder={"Введите id наставника"}
-                      className="add-currator__input"
-                      //   value={nameValue}
-                      //   onChange={handleNameChange}
-                    />
-                  </div>
-                </div>
-              </Tab>
-            </Tabs>
+            <div className="sendId_field">
+              <div className="edit-subtheme__field">
+                <Form.Control
+                  type="number"
+                  className="add-currator__input"
+                  placeholder="Введите ID наставника"
+                  // value={orderNum}
+                  // onChange={handleOnChangeOrderNum}
+                  min={0}
+                />
+              </div>
+            </div>
 
             <div className=" chat__edit-button">
               {isErrorVisibleEdit && (
@@ -1873,7 +1880,7 @@ function Chat() {
           currentStatus !== "Новый" &&
           currentStatus !== "Уведомление" ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
-              <button
+              {/* <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
@@ -1881,7 +1888,7 @@ function Chat() {
                 type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
-              </button>
+              </button> */}
               {isFormVisible && (
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">
@@ -2090,7 +2097,7 @@ function Chat() {
             (currentStatus === "Ожидает дополнения" &&
               currentStatus !== "Уведомление")) ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
-              <button
+              {/* <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
@@ -2098,7 +2105,7 @@ function Chat() {
                 type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
-              </button>
+              </button> */}
               {isFormVisible && (
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">

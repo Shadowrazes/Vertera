@@ -66,6 +66,8 @@ function CuratorCreateTicket() {
   const [successfulImports, setSuccessfulImports] = useState(null);
   const [failedImports, setFailedImports] = useState(null);
 
+  const [failedQueryImports, setFailedQueryImports] = useState(null);
+
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
@@ -279,20 +281,25 @@ function CuratorCreateTicket() {
 
   const handleEditorChange = (newEditorState) => {
     setEditorState(newEditorState);
+
+    setIsVisible(false);
   };
 
   const getContent = () => {
     const contentState = editorState.getCurrentContent();
     const rawContent = convertToRaw(contentState);
 
-    setTextareaValue(draftToHtml(rawContent));
+    // setTextareaValue(draftToHtml(rawContent));
 
     // console.log(draftToHtml(rawContent));
+
     return draftToHtml(rawContent);
   };
 
   const handleTicketTitleChange = (e) => {
     setTicketTitleValue(e.target.value);
+
+    setIsVisible(false);
   };
 
   const errorMsg = () => {
@@ -308,10 +315,12 @@ function CuratorCreateTicket() {
       error = get_translation("INTERFACE_SELECT_THEME");
     } else if (selectedSubThemeId == null) {
       error = get_translation("INTERFACE_SELECT_SUBTHEME");
-    } else if (textareaValue.trim() == "<p></p>") {
+    } else if (getContent() == "<p></p>" || getContent() == "<p></p>\n") {
       error = get_translation("INTERFACE_DESCRIBE_SITUATION");
     } else if (ticketTitleValue.trim() == "") {
       error = get_translation("INTERFACE_DESCRIBE_TITLE");
+    } else if (successfulImports === null && failedImports === null) {
+      error = "Невозможно отправить обращения";
     }
 
     return error;
@@ -340,7 +349,6 @@ function CuratorCreateTicket() {
             },
           })
             .then((data) => {
-              console.log(data.data.addTicket);
               setIsVisible(false);
               handleShowSuccess();
             })
@@ -351,7 +359,7 @@ function CuratorCreateTicket() {
         .catch((error) => {
           console.error("Ошибка при загрузке файлов:", error);
         });
-    } else if (idInputs.length !== 0) {
+    } else if (successfulImports > 0) {
       uploadFiles()
         .then((filePaths) => {
           curatorAddTicket({
@@ -373,8 +381,10 @@ function CuratorCreateTicket() {
             },
           })
             .then((data) => {
-              console.log(data.data.addTicket);
-              handleShowSuccess();
+              console.log(data.data.helperMutation.addTicketMass);
+              setFailedQueryImports(data.data.helperMutation.addTicketMass);
+              // handleShowSuccess();
+              handleShowError();
               setIsVisible(false);
               // handleShow();
             })
@@ -425,20 +435,28 @@ function CuratorCreateTicket() {
     // console.log(selectedSubTheme);
     // console.log(selectedSubThemeId);
     // console.log(getContent());
+    // console.log(getContent());
     // console.log(isNotificaton);
-    console.log(selectedCuratorsId);
-    console.log(idInputs);
+    // console.log(selectedCuratorsId);
+    // console.log(idInputs);
 
     if (
       selectedUnitId == null ||
       selectedThemeId == null ||
       selectedSubThemeId == null ||
       ticketTitleValue.trim() == "" ||
-      getContent() == "<p></p>"
+      getContent() == "<p></p>" ||
+      getContent() == "<p></p>\n"
     ) {
-      // console.log("xdd");
       setIsVisible(true);
       return;
+    }
+
+    if (isIdFileInputVisible) {
+      if (successfulImports === null && failedImports === null) {
+        setIsVisible(true);
+        return;
+      }
     }
 
     addTicketWithFiles();
@@ -543,17 +561,31 @@ function CuratorCreateTicket() {
       reader.onload = function (event) {
         const contents = event.target.result;
         const result = contents.split(/\s+/);
-        setSuccessfulImports(result.filter((item) => !isNaN(item)).length);
+
+        setSuccessfulImports(
+          result.filter((item) => item !== "" && !isNaN(item)).length
+        );
         setFailedImports(result.filter((item) => isNaN(item)).length);
+
+        if (
+          result.filter((item) => item !== "" && !isNaN(item)).length === 0 &&
+          result.filter((item) => isNaN(item)).length === 0
+        ) {
+          setSuccessfulImports(null);
+          setFailedImports(null);
+        }
 
         setIdInputs(
           result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
         );
 
+        // console.log(
+        //   result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
+        // );
+
         if (result.filter((item) => !isNaN(item)).length !== null) {
           setIsOuterIds(true);
         }
-        // console.log(result.filter((item) => !isNaN(item)));
       };
       reader.readAsText(file);
     }
@@ -587,6 +619,7 @@ function CuratorCreateTicket() {
 
   const handleCloseError = () => {
     setShowError(false);
+    window.location.reload();
   };
 
   const newCuratorList = dataQueryCurators.map((curator) => ({
@@ -727,7 +760,7 @@ function CuratorCreateTicket() {
                       </Alert>
                     )}
 
-                    {failedImports !== 0 && (
+                    {failedImports > 0 && (
                       <Alert
                         variant="warning"
                         className="curator-create-ticket__alert"
@@ -743,8 +776,7 @@ function CuratorCreateTicket() {
                         variant="danger"
                         className="curator-create-ticket__alert"
                       >
-                        Фатальная ошибка <br /> <br />
-                        Не удалось загрузить файл
+                        Записей в файле не найдено
                       </Alert>
                     )}
                   </>
@@ -871,11 +903,22 @@ function CuratorCreateTicket() {
         <Modal.Header closeButton>
           <Modal.Title>
             {isNotificaton ? "Уведомления " : "Обращения "}
-            не были созданы
+            были созданы частично
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Указаны не существующие ID пользователей</p>
+          <p>
+            Часть {isNotificaton ? " уведомлений " : " обращений "} успешно
+            отправлена. Следующие ID не удалось найти:
+          </p>
+          <ul className="failed-imports">
+            {failedQueryImports?.slice(0, 5).map((failedImport, index) => (
+              <li key={index}>{failedImport}</li>
+            ))}
+            {failedQueryImports?.length > 5 && (
+              <li>и еще {failedQueryImports.length - 5} записей</li>
+            )}
+          </ul>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseError}>
