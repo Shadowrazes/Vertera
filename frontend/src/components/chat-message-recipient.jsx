@@ -76,13 +76,13 @@ function ChatMessage({ message, sender, time, attachs }) {
         if ((languageCode[franc(message)][0] || franc(message)) !== language) {
           handleTranslate(message, languageCodeQuery[language]);
           // console.log("franc ", franc(message));
-          console.log("orig", franc(message));
-          console.log("selected", languageCodeQuery[language]);
+          // console.log("orig", franc(message));
+          // console.log("selected", languageCodeQuery[language]);
         }
       } else {
         handleTranslate(message, languageCodeQuery[language]);
-        console.log("orig", franc(message));
-        console.log("selected", languageCodeQuery[language]);
+        // console.log("orig", franc(message));
+        // console.log("selected", languageCodeQuery[language]);
       }
     };
     fetchData();
@@ -134,8 +134,7 @@ function ChatMessage({ message, sender, time, attachs }) {
                         rel="noopener noreferrer"
                         href={
                           isBuild
-                            ? "https://help.vertera.org:4444" +
-                              attach.path
+                            ? "https://help.vertera.org:4444" + attach.path
                             : "http://localhost:4444" + attach.path
                         }
                       >

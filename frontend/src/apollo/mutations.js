@@ -449,3 +449,13 @@ export const SEND_TO_MENTOR = gql`
     }
   }
 `;
+
+export const MENTOR_LEAVE = gql`
+  mutation ($token: String!, $id: Int!) {
+    clientMutation(token: $token) {
+      updateTicketByClient(id: $id, fields: { assistantId: -1 }) {
+        changed
+      }
+    }
+  }
+`;
