@@ -38,6 +38,7 @@ export const Mutations = `
         updateDepartment(id: Int!, fields: DepartmentUpdate!): UpdateInfo!
         updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
         updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
+        updateHelperPerms(id: Int!, fields: HelperPermissionsUpdate!): UpdateInfo!
 
         deleteTicket(id: Int!): Int!
         deleteUser(id: Int!) : Int!

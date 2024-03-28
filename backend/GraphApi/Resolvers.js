@@ -166,14 +166,23 @@ export const resolvers = {
         addClientUser: async (_, args) => {
             return await Client.TransInsert(args.userFields, args.clientFields);
         },
-        addTicket: async (_, args) => {
+        addTicket: async (_, args, context) => {
+            if(context.user.role != User.RoleClient){
+                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
+            }
             return await Ticket.TransInsert(args);
         },
-        addMessage: async (_, args) => {
+        addMessage: async (_, args, context) => {
+            if(context.user.role != User.RoleClient){
+                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
+            }
             args.fields.type = Message.TypeDefault;
             return await Message.TransInsert(args.fields);
         },
         updateMessage: async (_, args) => {
+            if(context.user.role != User.RoleClient){
+                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
+            }
             return await Message.TransUpdate(args.id, args.fields);
         },
         updateClientUser: async (_, args) => {
@@ -290,6 +299,9 @@ export const resolvers = {
         },
         updateHelperJobTitle: async (_, args) => {
             return await HelperJobTitle.TransUpdate(args.id, args.fields);
+        },
+        updateHelperPerms: async (_, args) => {
+            return await HelperPermission.TransUpdate(args.id, args.fields);
         },
         deleteTicket: async (_, { id }) => {
             return await Ticket.DeleteCascade(id);
