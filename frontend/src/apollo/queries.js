@@ -232,6 +232,12 @@ export const MESSAGES_CHAT_CLIENT = gql`
           surname
           patronymic
         }
+        assistant {
+          id
+          name
+          surname
+          patronymic
+        }
         reaction
         initiator {
           id
