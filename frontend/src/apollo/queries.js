@@ -491,9 +491,27 @@ export const COUNTRY_LIST = gql`
     clientQuery(token: $token) {
       countryList {
         id
+        code
         name(lang: "ru") {
           stroke
         }
+        langs {
+          id
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const LANGUAGE_LIST = gql`
+  query ($token: String!) {
+    clientQuery(token: $token) {
+      langList {
+        id
+        code
+        name
       }
     }
   }

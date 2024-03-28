@@ -21,6 +21,7 @@ import Stats from "./pages/stats";
 import Admin from "./pages/admin";
 import OuterAuth from "./pages/outer-auth";
 import Translation from "./pages/translation";
+import Countries from "./pages/countries";
 import CuratorCreateTicket from "./pages/curator-create-ticket";
 import NotFoundPage from "./pages/not-found-page";
 
@@ -69,6 +70,7 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/external/authorization" element={<OuterAuth />} />
           <Route path="/translation" element={<Translation />} />
+          <Route path="/countries" element={<Countries />} />
           <Route
             path="/curator-create-ticket"
             element={<CuratorCreateTicket />}
