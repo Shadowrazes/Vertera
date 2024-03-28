@@ -74,6 +74,7 @@ class Message extends Entity {
                 curTicket = await Ticket.TransGetById(conn, args.ticketId);
             }
             
+            // Если тикет - уведомление или закрыт, писать запрещено
             if (curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
             if (!isFirstMsg && curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 

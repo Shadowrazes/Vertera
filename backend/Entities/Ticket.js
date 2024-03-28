@@ -446,7 +446,6 @@ class Ticket extends Entity {
         const transFunc = async (conn) => {
             const curTicket = await this.GetById(id);
 
-            // Если тикет - уведомление, писать запрещено
             if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 
             if (super.IsArgsEmpty(fields) && !departmentId) throw new Error(Errors.EmptyArgsFields);
@@ -464,9 +463,6 @@ class Ticket extends Entity {
             }
 
             if(fields.assistantId){
-                const assistantUser = await User.GetById(fields.assistantId);
-                const isHelperAssistant = assistantUser.role != User.RoleClient;
-
                 let assistantConnLogFields = {
                     type: TicketLog.TypeAssistantConn, ticketId: id,
                     info: 'Подключен к диалогу', initiatorId: fields.assistantId
@@ -474,16 +470,19 @@ class Ticket extends Entity {
 
                 let statusChangeLogFields = {
                     type: TicketLog.TypeStatusChange, ticketId: id,
-                    info: (isHelperAssistant ? 'На уточнении' : 'Направил наставнику'), 
                     initiatorId: (isHelperAssistant ? User.AdminId : initiator.id)
                 };
 
                 if(fields.assistantId > 0){
+                    const assistantUser = await User.GetById(fields.assistantId);
+                    const isHelperAssistant = assistantUser.role != User.RoleClient;
+
                     // Если клиент пытается сменить ассистента, а не отключиться
                     if(initiator.role == User.RoleClient) throw new Error(Errors.AccessForbidden);
 
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
 
+                    statusChangeLogFields.info = isHelperAssistant ? 'На уточнении' : 'Направил наставнику';
                     fields.statusId = isHelperAssistant ? this.StatusIdOnRevision : this.StatusIdOnMentor;
                     const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
