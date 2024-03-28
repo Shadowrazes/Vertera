@@ -15,6 +15,7 @@ export const Queries = `
 
         allThemeTree: [Unit]
 
+        country(id: Int!): Country
         countryList: [Country]
         langList: [Lang]
 

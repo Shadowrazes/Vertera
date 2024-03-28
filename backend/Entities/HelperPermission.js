@@ -14,7 +14,6 @@ class HelperPermission extends Entity {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
         const result = await super.Request(sql, [helperId]);
         const perms = result[0];
-        console.log(perms);
 
         if(!perms[permName]) throw new Error(Errors.AccessForbidden);
 
@@ -39,13 +38,24 @@ class HelperPermission extends Entity {
         return helperId;
     }
 
-    static async TransUpdate(conn, helperId, permissions) {
-        const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
-        const result = await super.TransRequest(conn, sql, [permissions, helperId]);
+    static async TransUpdate(helperId, permissions, conn) {
+        const transFunc = async (conn) => {
+            const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [permissions, helperId]);
 
-        return {
-            affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus
+            return {
+                affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus
+            };
         };
+
+        if (!conn) {
+            return await super.Transaction(async (conn) => {
+                return await transFunc(conn);
+            });
+        }
+        else {
+            return await transFunc(conn);
+        }
     }
 }
 
