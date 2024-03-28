@@ -441,3 +441,11 @@ export const CURATOR_ADD_TICKET = gql`
     }
   }
 `;
+
+export const SEND_TO_MENTOR = gql`
+  mutation ($token: String!, $id: Int!, $mentorId: Int!) {
+    helperMutation(token: $token) {
+      redirectTicketToMentor(id: $id, mentorId: $mentorId)
+    }
+  }
+`;
