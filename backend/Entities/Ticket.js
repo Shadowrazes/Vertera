@@ -464,7 +464,7 @@ class Ticket extends Entity {
             }
 
             if(fields.assistantId){
-                const assistantUser = User.GetById(fields.assistantId);
+                const assistantUser = await User.GetById(fields.assistantId);
                 const isHelperAssistant = assistantUser.role != User.RoleClient;
 
                 let assistantConnLogFields = {
