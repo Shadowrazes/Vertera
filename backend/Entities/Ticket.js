@@ -470,7 +470,6 @@ class Ticket extends Entity {
 
                 let statusChangeLogFields = {
                     type: TicketLog.TypeStatusChange, ticketId: id,
-                    initiatorId: (isHelperAssistant ? User.AdminId : initiator.id)
                 };
 
                 if(fields.assistantId > 0){
@@ -482,8 +481,10 @@ class Ticket extends Entity {
 
                     const assistantConnLogRes = await TicketLog.TransInsert(conn, assistantConnLogFields);
 
+                    statusChangeLogFields.initiatorId = isHelperAssistant ? User.AdminId : initiator.id;
                     statusChangeLogFields.info = isHelperAssistant ? 'На уточнении' : 'Направил наставнику';
                     fields.statusId = isHelperAssistant ? this.StatusIdOnRevision : this.StatusIdOnMentor;
+
                     const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
                 else {
@@ -499,6 +500,7 @@ class Ticket extends Entity {
                     delete fields.assistantId;
 
                     fields.statusId = this.StatusIdInProgress;
+                    statusChangeLogFields.initiatorId = User.AdminId;
                     statusChangeLogFields.info = 'В работе';
                     const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
