@@ -212,6 +212,47 @@ function Chat() {
     setIsFormVisible((prev) => !prev);
   };
 
+  const handleThemeClickEdit = (theme, themeId) => {
+    setSelectedThemeEdit(theme);
+    setSelectedThemeIdEdit(themeId);
+
+    if (theme !== selectedThemeEdit) {
+      setSelectedSubThemeEdit(null);
+      setIsSubThemeDropdownVisibleEdit(true);
+
+      setSelectedCurator(null);
+      setSelectedCuratorId(null);
+
+      setIsErrorVisibleEdit(false);
+
+      switch ((selectedUnitId, themeId)) {
+        case (1, 14):
+          setSelectedSubThemeIdEdit(73);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 15):
+          setSelectedSubThemeIdEdit(74);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 16):
+          setSelectedSubThemeIdEdit(75);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 22):
+          setSelectedSubThemeIdEdit(102);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        case (2, 23):
+          setSelectedSubThemeIdEdit(103);
+          setIsSubThemeDropdownVisibleEdit(false);
+          break;
+        default:
+      }
+    }
+
+    // console.log(unitId);
+  };
+
   useEffect(() => {
     if (isAdmin()) {
       if (data && data.clientQuery.ticket) {
@@ -1065,47 +1106,6 @@ function Chat() {
     // console.log(unitId);
   };
 
-  const handleThemeClickEdit = (theme, themeId) => {
-    setSelectedThemeEdit(theme);
-    setSelectedThemeIdEdit(themeId);
-
-    if (theme !== selectedThemeEdit) {
-      setSelectedSubThemeEdit(null);
-      setIsSubThemeDropdownVisibleEdit(true);
-
-      setSelectedCurator(null);
-      setSelectedCuratorId(null);
-
-      setIsErrorVisibleEdit(false);
-
-      switch ((selectedUnitId, themeId)) {
-        case (1, 14):
-          setSelectedSubThemeIdEdit(73);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 15):
-          setSelectedSubThemeIdEdit(74);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 16):
-          setSelectedSubThemeIdEdit(75);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 22):
-          setSelectedSubThemeIdEdit(102);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        case (2, 23):
-          setSelectedSubThemeIdEdit(103);
-          setIsSubThemeDropdownVisibleEdit(false);
-          break;
-        default:
-      }
-    }
-
-    // console.log(unitId);
-  };
-
   const handleSubThemeClickEdit = (subTheme, subThemeId, departmentsId) => {
     setSelectedSubThemeEdit(subTheme);
     setSelectedSubThemeIdEdit(subThemeId);
@@ -1390,7 +1390,7 @@ function Chat() {
                   </>
                 )}
 
-                {isAdmin() && (
+                {isAdmin() && currentStatus === "Новый" && (
                   <a className="alltickets__link">
                     <ButtonCustom
                       title="Отправить наставнику"
@@ -1569,34 +1569,22 @@ function Chat() {
 
         {isSendTicketToCuratorOpen && (
           <>
-            <Tabs
-              defaultActiveKey="theme"
-              id="justify-tab-example"
-              className="mb-3 edit-ticket__tabs"
-              justify
-            >
-              <Tab
-                className="chat__tab-wrapper"
-                eventKey="theme"
-                title="Отправить тикет наставнику"
-              >
-                <a onClick={handleEditCloseClick}>
-                  <div className="chat__edit-close"></div>
-                </a>
+            <a onClick={handleEditCloseClick}>
+              <div className="chat__edit-close"></div>
+            </a>
 
-                <div className="sendId_field">
-                  <div className="edit-subtheme__field">
-                    <Form.Control
-                      type="text"
-                      placeholder={"Введите id наставника"}
-                      className="add-currator__input"
-                      //   value={nameValue}
-                      //   onChange={handleNameChange}
-                    />
-                  </div>
-                </div>
-              </Tab>
-            </Tabs>
+            <div className="sendId_field">
+              <div className="edit-subtheme__field">
+                <Form.Control
+                  type="number"
+                  className="add-currator__input"
+                  placeholder="Введите ID наставника"
+                  // value={orderNum}
+                  // onChange={handleOnChangeOrderNum}
+                  min={0}
+                />
+              </div>
+            </div>
 
             <div className=" chat__edit-button">
               {isErrorVisibleEdit && (
