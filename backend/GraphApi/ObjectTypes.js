@@ -78,7 +78,7 @@ export const ObjectTypes = `
         id: Int!
         initiator: User!
         recipient: User!
-        assistant: Helper
+        assistant: User
         status: TicketStatus!
         date: DateTime!
         title: String!

@@ -346,8 +346,8 @@ export const resolvers = {
             return await User.GetById(parent.recipientId);
         },
         assistant: async (parent, args, context) => {
-            if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
-            return await Helper.GetById(parent.assistantId);
+            // if(!User.ValidateRoleAccess(User.RoleHelper, context.user.role)) throw new Error(Errors.AccessForbidden);
+            return await User.GetById(parent.assistantId);
         },
         messages: async (parent, args, context) => {
             return await Message.GetListByTicket(parent.id, context.user);
