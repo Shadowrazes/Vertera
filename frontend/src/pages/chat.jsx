@@ -230,8 +230,11 @@ function Chat() {
       setSelectedUnitIdEdit(data.clientQuery.ticket.subTheme.theme.unit.id);
       setSelectedThemeEdit(data.clientQuery.ticket.subTheme.theme.name.stroke);
       setSelectedThemeIdEdit(data.clientQuery.ticket.subTheme.theme.id);
-      setSelectedSubThemeEdit(data.clientQuery.ticket.subTheme.name.stroke);
-      setSelectedSubThemeIdEdit(data.clientQuery.ticket.subTheme.id);
+      handleThemeClickEdit(
+        data.clientQuery.ticket.subTheme.theme.name.stroke,
+        data.clientQuery.ticket.subTheme.theme.id
+      );
+
       setSelectedCurator(
         `${data.clientQuery.ticket.recipient.surname} ${
           data.clientQuery.ticket.recipient.name
@@ -279,6 +282,13 @@ function Chat() {
       }
 
       if (newTicketsCount !== undefined) {
+        let _theme = data.clientQuery.ticket.subTheme.theme.name.stroke;
+        let _themeId = data.clientQuery.ticket.subTheme.theme.id;
+        // if (_subTheme === "none") {
+        //   _subTheme = null;
+        //   _subThemeId = null;
+        // }
+
         const inputs = Array.from({ length: newTicketsCount }, (_, index) => ({
           id: index + 1,
           title: "",
@@ -291,6 +301,7 @@ function Chat() {
           editorContent: EditorState.createEmpty(),
           text: "",
         }));
+        handleThemeClick(_theme, _themeId);
         setInputValues(inputs);
       }
     }
@@ -816,9 +827,11 @@ function Chat() {
   };
 
   const handleThemeClick = (theme, themeId) => {
+    let subtheme;
     let subthemeId;
 
     if (theme !== selectedTheme) {
+      subtheme = null;
       setIsSubThemeDropdownVisible(true);
 
       switch ((selectedUnitId, themeId)) {
@@ -848,7 +861,13 @@ function Chat() {
 
     const updatedInputValues = inputValues.map((input) =>
       input.id === currentIndex + 1
-        ? { ...input, theme: theme, themeId: themeId, subthemeId: subthemeId }
+        ? {
+            ...input,
+            theme: theme,
+            themeId: themeId,
+            subtheme: subtheme,
+            subthemeId: subthemeId,
+          }
         : input
     );
 
@@ -1395,7 +1414,7 @@ function Chat() {
               <Tab
                 className="chat__tab-wrapper"
                 eventKey="theme"
-                title="Редактирова тему"
+                title="Редактировать тему"
               >
                 <a onClick={handleEditCloseClick}>
                   <div className="chat__edit-close"></div>

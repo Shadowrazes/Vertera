@@ -304,6 +304,12 @@
   margin-bottom: 20px;
 }
 
+.chat__edit-button {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 @media screen and (max-width: 1200px) {
   .edit-subtheme__field .dropdown button {
     width: 416px !important;
