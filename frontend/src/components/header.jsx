@@ -331,9 +331,14 @@ function Header({ user }) {
                 {get_translation("INTERFACE_TICKETS")}
               </Nav.Link>
               {isHelper() && (
-                <Nav.Link href="/stats">
-                  {get_translation("INTERFACE_STATS")}
-                </Nav.Link>
+                <>
+                  <Nav.Link href="/stats">
+                    {get_translation("INTERFACE_STATS")}
+                  </Nav.Link>
+                  <Nav.Link href="/curator-create-ticket">
+                    Создать обращение
+                  </Nav.Link>
+                </>
               )}
               {isAdmin() && (
                 <>

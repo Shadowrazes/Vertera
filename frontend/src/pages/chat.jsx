@@ -1873,7 +1873,7 @@ function Chat() {
           currentStatus !== "Новый" &&
           currentStatus !== "Уведомление" ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
-              <button
+              {/* <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
@@ -1881,7 +1881,7 @@ function Chat() {
                 type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
-              </button>
+              </button> */}
               {isFormVisible && (
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">
@@ -2090,7 +2090,7 @@ function Chat() {
             (currentStatus === "Ожидает дополнения" &&
               currentStatus !== "Уведомление")) ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
-              <button
+              {/* <button
                 className={
                   isFormVisible ? "toggle-button-active" : "toggle-button"
                 }
@@ -2098,7 +2098,7 @@ function Chat() {
                 type="button"
               >
                 {isFormVisible ? "Скрыть" : "Написать новое сообщение"}
-              </button>
+              </button> */}
               {isFormVisible && (
                 <Row className="chat-input__row">
                   <Col className="chat-input__row">

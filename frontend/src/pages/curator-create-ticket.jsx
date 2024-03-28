@@ -383,7 +383,8 @@ function CuratorCreateTicket() {
             .then((data) => {
               console.log(data.data.helperMutation.addTicketMass);
               setFailedQueryImports(data.data.helperMutation.addTicketMass);
-              handleShowSuccess();
+              // handleShowSuccess();
+              handleShowError();
               setIsVisible(false);
               // handleShow();
             })
@@ -578,9 +579,9 @@ function CuratorCreateTicket() {
           result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
         );
 
-        console.log(
-          result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
-        );
+        // console.log(
+        //   result.filter((item) => !isNaN(item)).map((item) => parseInt(item))
+        // );
 
         if (result.filter((item) => !isNaN(item)).length !== null) {
           setIsOuterIds(true);
@@ -618,6 +619,7 @@ function CuratorCreateTicket() {
 
   const handleCloseError = () => {
     setShowError(false);
+    window.location.reload();
   };
 
   const newCuratorList = dataQueryCurators.map((curator) => ({
@@ -901,15 +903,21 @@ function CuratorCreateTicket() {
         <Modal.Header closeButton>
           <Modal.Title>
             {isNotificaton ? "Уведомления " : "Обращения "}
-            не были созданы
+            были созданы частично
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Указаны не существующие ID пользователей:</p>
+          <p>
+            Часть {isNotificaton ? " уведомлений " : " обращений "} успешно
+            отправлена. Следующие ID не удалось найти:
+          </p>
           <ul className="failed-imports">
-            {failedQueryImports?.map((failedImport) => (
-              <li>{failedImport}</li>
+            {failedQueryImports?.slice(0, 5).map((failedImport, index) => (
+              <li key={index}>{failedImport}</li>
             ))}
+            {failedQueryImports?.length > 5 && (
+              <li>и еще {failedQueryImports.length - 5} записей</li>
+            )}
           </ul>
         </Modal.Body>
         <Modal.Footer>

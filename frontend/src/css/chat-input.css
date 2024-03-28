@@ -29,7 +29,7 @@
 
 .chat__helper-buttons {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: 10px;
   margin-bottom: 20px;
 }
@@ -145,18 +145,17 @@
 
 .chat-input__form {
   /* width: 670px; */
-  position: fixed;
-  z-index: 1;
+  /* position: fixed; */
+  /* z-index: 1;
   bottom: 0;
   left: 0;
-  right: 0;
-  width: 100%;
+  right: 0; */
+  width: 85%;
   background: white;
   display: block;
   padding: 10px;
-  margin-bottom: 1px !important;
   padding-bottom: 10px;
-  /* margin: 0 auto; */
+  margin: 0 auto;
 }
 
 .chat-input__row {
@@ -323,6 +322,12 @@
   }
 }
 
+@media screen and (max-width: 991px) {
+  .chat__helper-buttons {
+    flex-direction: column;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .chat-messages__container .alltickets__container {
     margin: 0;
@@ -330,10 +335,6 @@
   }
 
   .chat-input__container {
-    width: 100%;
-  }
-
-  .chat-input__form {
     width: 100%;
   }
 
