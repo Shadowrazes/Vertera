@@ -459,3 +459,23 @@ export const MENTOR_LEAVE = gql`
     }
   }
 `;
+
+export const ADD_LANG = gql`
+  mutation ($token: String!, $code: String!, $name: String!) {
+    helperMutation(token: $token) {
+      translationObj {
+        addLang(fields: { code: $code, name: $name })
+      }
+    }
+  }
+`;
+
+export const DELETE_LANG = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      translationObj {
+        deleteLang(id: $id)
+      }
+    }
+  }
+`;

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Table, Tabs, Tab, Form, Col } from "react-bootstrap";
-import { useQuery } from "@apollo/client";
+import { Table, Tabs, Tab, Form, Modal, Button } from "react-bootstrap";
+import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
 import { COUNTRY_LIST, LANGUAGE_LIST } from "../apollo/queries";
+import { ADD_LANG, DELETE_LANG } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -11,6 +12,7 @@ import Loader from "../pages/loading";
 import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
+import DeleteIcon from "../assets/delete_icon.svg";
 import "../css/table.css";
 import "../css/edit-ticket.css";
 import "../css/translation.css";
@@ -20,7 +22,15 @@ function Countries() {
   const [countiesList, setCountiesList] = useState([]);
   const [langList, setLangList] = useState([]);
 
+  const [newCodeValue, setNewCodeValue] = useState("");
+  const [newNameValue, setNewNameValue] = useState("");
+  const [deleteId, setDeleteId] = useState(null);
+  const [queryError, setQueryError] = useState("");
+
   const [isAddLangVisible, setIsAddLangVisible] = useState(false);
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -67,6 +77,9 @@ function Countries() {
     refetch();
     refetchLangList();
   }, [data, dataLangList]);
+
+  const [addLang] = useMutation(ADD_LANG);
+  const [deleteLang] = useMutation(DELETE_LANG);
 
   if (loading) {
     return <Loader />;
@@ -120,6 +133,102 @@ function Countries() {
 
   const handleAddLangView = () => {
     setIsAddLangVisible(true);
+    setIsButtonVisible(false);
+  };
+
+  const handleCloseClick = () => {
+    setIsButtonVisible(true);
+    setIsAddLangVisible(false);
+    setIsErrorVisible(false);
+
+    setNewNameValue("");
+    setNewCodeValue("");
+    setQueryError("");
+  };
+
+  const handleNewName = (e) => {
+    setNewNameValue(e.target.value);
+    setIsErrorVisible(false);
+  };
+
+  const handleNewCode = (e) => {
+    setNewCodeValue(e.target.value);
+    setIsErrorVisible(false);
+  };
+
+  const errorMsg = () => {
+    let error = "";
+
+    if (newCodeValue.trim() == "") {
+      error = "Введите код языка";
+    } else if (newNameValue.trim() == "") {
+      error = "Введите название языка";
+    } else if (queryError == "Unsolvable") {
+      error = "Введен уже существующий код или название языка";
+    } else {
+      error = "Ошибка при добавлении языка";
+    }
+
+    return error;
+  };
+
+  const handleAddLang = async (e) => {
+    e.preventDefault();
+
+    if (
+      newCodeValue.trim() == "" ||
+      newNameValue.trim() == "" ||
+      queryError == "Unsolvable"
+    ) {
+      setIsErrorVisible(true);
+      return;
+    }
+
+    setIsErrorVisible(false);
+
+    try {
+      const result = await addLang({
+        variables: {
+          token: user.token,
+          code: newCodeValue.trim(),
+          name: newNameValue.trim(),
+        },
+      });
+      refetchLangList();
+      setNewCodeValue("");
+      setNewNameValue("");
+      console.log("Язык успешно добавлен:", result);
+    } catch (error) {
+      console.log(error.networkError.result.errors[0].message);
+      setQueryError(error.networkError.result.errors[0].message);
+      setIsErrorVisible(true);
+    }
+  };
+
+  const handleDeleteLang = async (e, id) => {
+    e.preventDefault();
+    setDeleteId(id);
+    setShowWarning(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowWarning(false);
+  };
+
+  const handleCloseWarning = async () => {
+    setShowWarning(false);
+    try {
+      const result = await deleteLang({
+        variables: {
+          token: user.token,
+          id: deleteId,
+        },
+      });
+      refetchLangList();
+      console.log("Язык успешно удален:", result);
+    } catch (error) {
+      console.log(error.networkError.result.errors[0].message);
+    }
   };
 
   return (
@@ -155,7 +264,11 @@ function Countries() {
                         <td>{country.id}</td>
                         <td>{country.code}</td>
                         <td>{country.name.stroke}</td>
-                        <td>{country.langs.map((lang) => lang.name)}</td>
+                        <td>
+                          {country.langs.map(
+                            (lang, index) => (index ? ", " : "") + lang.name
+                          )}
+                        </td>
                         <td>
                           <img src={EditIcon} alt="" />
                         </td>
@@ -178,6 +291,7 @@ function Countries() {
                       <th>ID</th>
                       <th>Код</th>
                       <th>Название</th>
+                      <th>Удалить</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -188,7 +302,7 @@ function Countries() {
                             type="text"
                             placeholder="ID"
                             value={lang.id}
-                            className="add-currator__input translation__readonly-input"
+                            className="countries__input countries__readonly-input"
                             readOnly
                           />
                         </td>
@@ -196,7 +310,7 @@ function Countries() {
                           <Form.Control
                             type="text"
                             value={lang.code}
-                            className="add-currator__input"
+                            className="countries__input"
                             //   onChange={}
                           />
                         </td>
@@ -204,8 +318,16 @@ function Countries() {
                           <Form.Control
                             type="text"
                             value={lang.name}
-                            className="add-currator__input"
+                            className="countries__input"
                             //   onChange={}
+                          />
+                        </td>
+                        <td>
+                          <img
+                            src={DeleteIcon}
+                            alt=""
+                            className="countries__delete-icon"
+                            onClick={(e) => handleDeleteLang(e, lang.id)}
                           />
                         </td>
                       </tr>
@@ -213,33 +335,69 @@ function Countries() {
                   </tbody>
                 </Table>
               </div>
-              <ButtonCustom
-                title="Добавить язык"
-                onClick={handleAddLangView}
-                className={"table__btn"}
-              />
+              {isButtonVisible && (
+                <div className="countries__lang-buttons">
+                  <ButtonCustom
+                    title="Применить изменения"
+                    // onClick={}
+                    className={"table__btn"}
+                  />
+                  <ButtonCustom
+                    title="Добавить язык"
+                    onClick={handleAddLangView}
+                    className={"table__btn"}
+                  />
+                </div>
+              )}
               {isAddLangVisible && (
                 <>
-                  <div className="countries__column">
-                    <Form.Control
-                      type="text"
-                      placeholder="Код"
-                      // value={}
-                      className="add-currator__input"
-                      //   onChange={}
-                    />
-                    <Form.Control
-                      type="text"
-                      placeholder="Название"
-                      // value={}
-                      className="add-currator__input"
-                      //   onChange={}
-                    />
+                  <div style={{ position: "relative" }}>
+                    <a onClick={handleCloseClick}>
+                      <div className="chat__edit-close"></div>
+                    </a>
+                    <div className="countries__column">
+                      <Form.Control
+                        type="text"
+                        placeholder="Код"
+                        value={newCodeValue}
+                        className="add-currator__input"
+                        onChange={handleNewCode}
+                      />
+                      <Form.Control
+                        type="text"
+                        placeholder="Название"
+                        value={newNameValue}
+                        className="add-currator__input"
+                        onChange={handleNewName}
+                      />
+                      {isErrorVisible && (
+                        <span className="form__error">{errorMsg()}</span>
+                      )}
+                      <ButtonCustom
+                        title="Добавить"
+                        onClick={handleAddLang}
+                        className={"table__btn"}
+                      />
+                    </div>
                   </div>
                 </>
               )}
             </Tab>
           </Tabs>
+
+          <Modal show={showWarning} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Предупреждение</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Вы уверены, что хотите удалить этот язык?</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseWarning}>
+                Удалить
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </>
       ) : (
         <NotFoundPage />
