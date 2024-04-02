@@ -864,20 +864,22 @@ function CuratorCreateTicket() {
               </Button>
             </div>
 
-            <ToggleButtonGroup
-              type="radio"
-              name="options"
-              defaultValue={1}
-              value={selectedValue}
-              onChange={handleToggleChange}
-            >
-              <ToggleButton id="tbg-radio-1" value={1}>
-                Создать обращение
-              </ToggleButton>
-              <ToggleButton id="tbg-radio-2" value={2}>
-                Создать уведомление
-              </ToggleButton>
-            </ToggleButtonGroup>
+            {isCuratorsDropdownVisible || isIdFileInputVisible ? (
+              <ToggleButtonGroup
+                type="radio"
+                name="options"
+                defaultValue={1}
+                value={selectedValue}
+                onChange={handleToggleChange}
+              >
+                <ToggleButton id="tbg-radio-1" value={1}>
+                  Создать обращение
+                </ToggleButton>
+                <ToggleButton id="tbg-radio-2" value={2}>
+                  Создать уведомление
+                </ToggleButton>
+              </ToggleButtonGroup>
+            ) : null}
 
             {isVisible && <span className="form__error">{errorMsg()}</span>}
 
