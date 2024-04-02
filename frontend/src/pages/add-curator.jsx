@@ -338,7 +338,7 @@ function AddCurator() {
             title={get_translation("INTERFACE_ADD_CURATOR")}
             linkPrev={linkPrev}
           />
-          <Row className="add-curator__row">
+          <Row className="add-curator__row" style={{ marginTop: "20px" }}>
             <Col className="add-curator__column">
               <Form.Group controlId="NameForm">
                 <Form.Control
@@ -466,12 +466,16 @@ function AddCurator() {
               </DropdownButton>
             </Col>
           </Row>
-          {isErrorVisible && <span className="form__error">{errorMsg()}</span>}
-          <ButtonCustom
-            title={get_translation("INTERFACE_APPLY")}
-            className={"add-curator__btn"}
-            onClick={handleAddCurator}
-          />
+          <div className="error__col">
+            {isErrorVisible && (
+              <span className="form__error">{errorMsg()}</span>
+            )}
+            <ButtonCustom
+              title={get_translation("INTERFACE_APPLY")}
+              className={"add-curator__btn"}
+              onClick={handleAddCurator}
+            />
+          </div>
 
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>

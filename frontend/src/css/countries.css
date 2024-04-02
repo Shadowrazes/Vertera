@@ -1,0 +1,24 @@
+.countries__column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.countries__input {
+    font-size: 16px !important;
+    border: 1px solid #8c8c8c !important;
+}
+
+.countries__readonly-input {
+    background: rgb(214, 214, 214) !important;
+}
+
+.countries__lang-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.countries__delete-icon {
+    cursor: pointer;
+}

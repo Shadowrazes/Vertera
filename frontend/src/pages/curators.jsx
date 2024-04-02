@@ -17,16 +17,9 @@ function Curators() {
   const [dataQuery, setData] = useState([]);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [userRole, setUserRole] = useState(
-    JSON.parse(localStorage.getItem("userRole"))?.role.role
-  );
-
-  let userId = null;
 
   if (user === null) {
     window.location.href = "/";
-  } else {
-    userId = user.id;
   }
 
   const isAdmin = () => {
