@@ -62,10 +62,10 @@ class Theme extends Entity {
         });
     }
 
-    static async TransUpdate(id, fields) {
+    static async TransUpdate(id, fields, initiator) {
         return await super.Transaction(async (conn) => {
             if (fields.stroke) {
-                const row = await this.GetById(id);
+                const row = await this.GetById(id, initiator);
                 const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
             }
 

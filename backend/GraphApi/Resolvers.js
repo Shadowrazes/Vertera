@@ -239,14 +239,14 @@ export const resolvers = {
         addUnit: async (_, args) => {
             return await Unit.TransInsert(args.fields);
         },
-        updateSubTheme: async (_, args) => {
-            return await SubTheme.TransUpdate(args.id, args.fields);
+        updateSubTheme: async (_, args, context) => {
+            return await SubTheme.TransUpdate(args.id, args.fields, context.user);
         },
-        updateTheme: async (_, args) => {
-            return await Theme.TransUpdate(args.id, args.fields);
+        updateTheme: async (_, args, context) => {
+            return await Theme.TransUpdate(args.id, args.fields, context.user);
         },
-        updateUnit: async (_, args) => {
-            return await Unit.TransUpdate(args.id, args.fields);
+        updateUnit: async (_, args, context) => {
+            return await Unit.TransUpdate(args.id, args.fields, context.user);
         },
         deleteUnit: async (_, { id }) => {
             return await Unit.DeleteCascade(id);
