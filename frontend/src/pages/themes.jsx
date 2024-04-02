@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import { Table, DropdownButton, Dropdown } from "react-bootstrap";
+import { Table, DropdownButton, Dropdown, Form } from "react-bootstrap";
 
 import { THEME_LIST } from "../apollo/queries";
 
@@ -17,6 +17,8 @@ function Theme() {
   const [dataQuery, setData] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const [showInactive, setShowInactive] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -89,26 +91,47 @@ function Theme() {
     // console.log(unitId);
   };
 
+  const handleIsActiveChange = () => {
+    setShowInactive(!showInactive);
+  };
+
   return (
     <>
       {isAdmin() ? (
         <>
           <TitleH2 title="Темы" className="title__heading" />
+          <div
+            className="edit-curator__checkbox-block"
+            style={{ marginBottom: "20px" }}
+          >
+            <Form.Check
+              type="checkbox"
+              id="custom-switch"
+              value={showInactive}
+              onChange={handleIsActiveChange}
+            />
+            <span className="edit-curator__field-label">
+              Отображать неактивные темы
+            </span>
+          </div>
           <div className="themes__dropdown-wrapper">
             <DropdownButton
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
               className="themes__dropdown"
             >
-              {dataQuery.map((unit, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => handleUnitClick(unit.name.stroke)}
-                  href="#"
-                >
-                  {unit.name.stroke}
-                </Dropdown.Item>
-              ))}
+              {dataQuery.map(
+                (unit, index) =>
+                  unit.visibility !== 3 && (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleUnitClick(unit.name.stroke)}
+                      href="#"
+                    >
+                      {unit.name.stroke}
+                    </Dropdown.Item>
+                  )
+              )}
             </DropdownButton>
           </div>
 
@@ -125,24 +148,27 @@ function Theme() {
               <tbody>
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.map((theme) => (
-                    <tr key={theme.id}>
-                      <td>{theme.orderNum}</td>
-                      <td>{theme.id}</td>
-                      <td>{theme.name.stroke}</td>
-                      <td>
-                        <Link
-                          to={`/edit-theme/${theme.id}`}
-                          state={{
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          <img src={EditIcon} alt="" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                  ?.themes.map(
+                    (theme) =>
+                      (showInactive || theme.visibility !== 3) && (
+                        <tr key={theme.id}>
+                          <td>{theme.orderNum}</td>
+                          <td>{theme.id}</td>
+                          <td>{theme.name.stroke}</td>
+                          <td>
+                            <Link
+                              to={`/edit-theme/${theme.id}`}
+                              state={{
+                                linkPrev: window.location.href,
+                              }}
+                              className="alltickets__link"
+                            >
+                              <img src={EditIcon} alt="" />
+                            </Link>
+                          </td>
+                        </tr>
+                      )
+                  )}
               </tbody>
             </Table>
           </div>

@@ -1500,17 +1500,20 @@ function Chat() {
                     title={selectedUnitEdit}
                     className="themes__dropdown"
                   >
-                    {dataQuery.map((unit, index) => (
-                      <Dropdown.Item
-                        key={index}
-                        onClick={() =>
-                          handleUnitClickEdit(unit.name.stroke, unit.id)
-                        }
-                        href="#"
-                      >
-                        {unit.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    {dataQuery.map(
+                      (unit, index) =>
+                        unit.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={() =>
+                              handleUnitClickEdit(unit.name.stroke, unit.id)
+                            }
+                            href="#"
+                          >
+                            {unit.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                   </DropdownButton>
                 </div>
 
@@ -1526,17 +1529,23 @@ function Chat() {
                     >
                       {dataQuery
                         .find((unit) => unit.name.stroke === selectedUnitEdit)
-                        ?.themes.map((theme) => (
-                          <Dropdown.Item
-                            key={theme.id}
-                            onClick={() =>
-                              handleThemeClickEdit(theme.name.stroke, theme.id)
-                            }
-                            href="#"
-                          >
-                            {theme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.themes.map(
+                          (theme) =>
+                            theme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={theme.id}
+                                onClick={() =>
+                                  handleThemeClickEdit(
+                                    theme.name.stroke,
+                                    theme.id
+                                  )
+                                }
+                                href="#"
+                              >
+                                {theme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   </div>
                 )}
@@ -1556,23 +1565,26 @@ function Chat() {
                         ?.themes.find(
                           (theme) => theme.name.stroke === selectedThemeEdit
                         )
-                        ?.subThemes.map((subTheme) => (
-                          <Dropdown.Item
-                            key={subTheme.id}
-                            onClick={() =>
-                              handleSubThemeClickEdit(
-                                subTheme.name.stroke,
-                                subTheme.id,
-                                subTheme.departments.map(
-                                  (department) => department.id
-                                )
-                              )
-                            }
-                            href="#"
-                          >
-                            {subTheme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.subThemes.map(
+                          (subTheme) =>
+                            subTheme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={subTheme.id}
+                                onClick={() =>
+                                  handleSubThemeClickEdit(
+                                    subTheme.name.stroke,
+                                    subTheme.id,
+                                    subTheme.departments.map(
+                                      (department) => department.id
+                                    )
+                                  )
+                                }
+                                href="#"
+                              >
+                                {subTheme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   </div>
                 )}
@@ -1600,26 +1612,29 @@ function Chat() {
                           selectedDepartmentsId.includes(department.id)
                         )
                       )
-                      .map((curator, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() =>
-                            handleCuratorClick(
-                              curator.user.name,
-                              curator.user.surname,
-                              curator.user.patronymic,
-                              curator.id
-                            )
-                          }
-                          href="#"
-                        >
-                          {`${curator.user.surname} ${curator.user.name} ${
-                            curator.user.patronymic
-                              ? ` ${curator.user.patronymic}`
-                              : ""
-                          }`}
-                        </Dropdown.Item>
-                      ))}
+                      .map(
+                        (curator, index) =>
+                          curator.user.isActive && (
+                            <Dropdown.Item
+                              key={index}
+                              onClick={() =>
+                                handleCuratorClick(
+                                  curator.user.name,
+                                  curator.user.surname,
+                                  curator.user.patronymic,
+                                  curator.id
+                                )
+                              }
+                              href="#"
+                            >
+                              {`${curator.user.surname} ${curator.user.name} ${
+                                curator.user.patronymic
+                                  ? ` ${curator.user.patronymic}`
+                                  : ""
+                              }`}
+                            </Dropdown.Item>
+                          )
+                      )}
                   </DropdownButton>
                 </div>
               </Tab>
@@ -1775,17 +1790,20 @@ function Chat() {
                     id="dropdown-custom-1"
                     title={input.unit || "Выберите подразделение"}
                   >
-                    {dataQuery.map((unit, index) => (
-                      <Dropdown.Item
-                        key={index}
-                        onClick={() =>
-                          handleUnitClick(unit.name.stroke, unit.id)
-                        }
-                        href="#"
-                      >
-                        {unit.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    {dataQuery.map(
+                      (unit, index) =>
+                        unit.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={() =>
+                              handleUnitClick(unit.name.stroke, unit.id)
+                            }
+                            href="#"
+                          >
+                            {unit.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                   </DropdownButton>
                   {input.unit && (
                     <DropdownButton
@@ -1794,17 +1812,20 @@ function Chat() {
                     >
                       {dataQuery
                         .find((unit) => unit.name.stroke === input.unit)
-                        ?.themes.map((theme) => (
-                          <Dropdown.Item
-                            key={theme.id}
-                            onClick={() =>
-                              handleThemeClick(theme.name.stroke, theme.id)
-                            }
-                            href="#"
-                          >
-                            {theme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.themes.map(
+                          (theme) =>
+                            theme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={theme.id}
+                                onClick={() =>
+                                  handleThemeClick(theme.name.stroke, theme.id)
+                                }
+                                href="#"
+                              >
+                                {theme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   )}
                   {isSubThemeDropdownVisible && input.theme && (
@@ -1817,20 +1838,23 @@ function Chat() {
                         ?.themes.find(
                           (theme) => theme.name.stroke === input.theme
                         )
-                        ?.subThemes.map((subTheme) => (
-                          <Dropdown.Item
-                            key={subTheme.id}
-                            onClick={() =>
-                              handleSubThemeClick(
-                                subTheme.name.stroke,
-                                subTheme.id
-                              )
-                            }
-                            href="#"
-                          >
-                            {subTheme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.subThemes.map(
+                          (subTheme) =>
+                            subTheme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={subTheme.id}
+                                onClick={() =>
+                                  handleSubThemeClick(
+                                    subTheme.name.stroke,
+                                    subTheme.id
+                                  )
+                                }
+                                href="#"
+                              >
+                                {subTheme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   )}
                   <Editor

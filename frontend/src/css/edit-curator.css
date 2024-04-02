@@ -40,7 +40,7 @@
 .edit-curator__checkbox-block {
   display: flex;
   gap: 20px;
-  aligng-items: center;
+  align-items: center;
   justify-content: start;
 }
 

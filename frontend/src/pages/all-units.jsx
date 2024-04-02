@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import { Table } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 
 import { THEME_LIST } from "../apollo/queries";
 
@@ -15,6 +15,8 @@ import "../css/units.css";
 
 function Units() {
   const [dataQuery, setData] = useState([]);
+
+  const [showInactive, setShowInactive] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -83,11 +85,29 @@ function Units() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  const handleIsActiveChange = () => {
+    setShowInactive(!showInactive);
+  };
+
   return (
     <>
       {isAdmin() ? (
         <>
           <TitleH2 title="Разделения" className="title__heading" />
+          <div
+            className="edit-curator__checkbox-block"
+            style={{ marginBottom: "20px" }}
+          >
+            <Form.Check
+              type="checkbox"
+              id="custom-switch"
+              value={showInactive}
+              onChange={handleIsActiveChange}
+            />
+            <span className="edit-curator__field-label">
+              Отображать неактивные разделы
+            </span>
+          </div>
           <div className="table__wrapper">
             <Table className="table__table" hover>
               <thead>
@@ -99,24 +119,27 @@ function Units() {
                 </tr>
               </thead>
               <tbody>
-                {units.map((unit) => (
-                  <tr key={unit.id}>
-                    <td>{unit.orderNum}</td>
-                    <td>{unit.id}</td>
-                    <td>{unit.name.stroke}</td>
-                    <td>
-                      <Link
-                        to={`/edit-unit/${unit.id}`}
-                        state={{
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        <img src={EditIcon} alt="" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {units.map(
+                  (unit) =>
+                    (showInactive || unit.visibility !== 3) && (
+                      <tr key={unit.id}>
+                        <td>{unit.orderNum}</td>
+                        <td>{unit.id}</td>
+                        <td>{unit.name.stroke}</td>
+                        <td>
+                          <Link
+                            to={`/edit-unit/${unit.id}`}
+                            state={{
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            <img src={EditIcon} alt="" />
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                )}
               </tbody>
             </Table>
           </div>

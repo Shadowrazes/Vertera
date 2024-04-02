@@ -194,6 +194,7 @@ function AddSubtheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           departmentIds: selectedDepartmentsId,
+          visibility: 1,
           orderNum: orderNum,
         },
       });
@@ -228,22 +229,27 @@ function AddSubtheme() {
             title={get_translation("INTERFACE_ADD_SUBTHEME")}
             linkPrev={linkPrev}
           />
-          <Row className="add-curator__row">
+          <Row className="add-curator__row" style={{ marginTop: "20px" }}>
             <Col className="add-curator__column add-subtheme__column">
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
                 className="add-theme__dropdown"
               >
-                {dataQuery.map((unit, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                    href="#"
-                  >
-                    {unit.name.stroke}
-                  </Dropdown.Item>
-                ))}
+                {dataQuery.map(
+                  (unit, index) =>
+                    unit.visibility !== 3 && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleUnitClick(unit.name.stroke, unit.id)
+                        }
+                        href="#"
+                      >
+                        {unit.name.stroke}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
 
               {selectedUnit && (
@@ -256,17 +262,20 @@ function AddSubtheme() {
                 >
                   {dataQuery
                     .find((unit) => unit.name.stroke === selectedUnit)
-                    ?.themes.map((theme) => (
-                      <Dropdown.Item
-                        key={theme.id}
-                        onClick={() =>
-                          handleThemeClick(theme.name.stroke, theme.id)
-                        }
-                        href="#"
-                      >
-                        {theme.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    ?.themes.map(
+                      (theme) =>
+                        theme.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={theme.id}
+                            onClick={() =>
+                              handleThemeClick(theme.name.stroke, theme.id)
+                            }
+                            href="#"
+                          >
+                            {theme.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                 </DropdownButton>
               )}
 
