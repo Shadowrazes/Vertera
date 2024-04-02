@@ -1378,101 +1378,99 @@ function Chat() {
           </div>
         )}
 
-        {(isAdmin() &&
+        {isAdmin() &&
           isVisibleHelperButtons &&
-          currentStatus !== "Уведомление") ||
-          (currentStatus == "У наставника" &&
-            user.id === data?.clientQuery?.ticket.assistant?.id && (
-              <>
-                <div className="chat__helper-buttons">
-                  {isAdmin() &&
-                    currentStatus !== "Закрыт" &&
-                    user.id !== data?.clientQuery?.ticket.assistant?.id && (
-                      <a className="alltickets__link">
-                        <ButtonCustom
-                          title="Изменить тикет"
-                          className="chat-input__button-close"
-                          onClick={handleEditTicketView}
-                        />
-                      </a>
-                    )}
-
-                  {isAdmin() &&
-                    currentStatus !== "Закрыт" &&
-                    currentStatus !== "Новый" &&
-                    currentStatus !== "На уточнении" &&
-                    currentStatus !== "У наставника" &&
-                    !isVisibleCuratorsChat && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Консультация с другим куратором"
-                            className="chat-input__button-close"
-                            onClick={handleCuratorsChat}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {isAdmin() &&
-                    currentStatus == "На уточнении" &&
-                    user.id == data.clientQuery.ticket.recipient.id && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Закончить диалог с куратором"
-                            className="chat-input__button-close"
-                            onClick={handleEndCuratorChat}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {currentStatus == "У наставника" &&
-                    user.id === data?.clientQuery?.ticket.assistant?.id && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Вопрос решен"
-                            className="chat-input__button-close"
-                            onClick={handleEndMentor}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+          currentStatus !== "Уведомление" && (
+            <>
+              <div className="chat__helper-buttons">
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  user.id !== data?.clientQuery?.ticket.assistant?.id && (
                     <a className="alltickets__link">
                       <ButtonCustom
-                        title="Разделить тикет"
+                        title="Изменить тикет"
                         className="chat-input__button-close"
-                        onClick={handleSplitTicket}
+                        onClick={handleEditTicketView}
                       />
                     </a>
                   )}
 
-                  {currentStatus === "Закрыт" && isAdmin() && (
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Новый" &&
+                  currentStatus !== "На уточнении" &&
+                  currentStatus !== "У наставника" &&
+                  !isVisibleCuratorsChat && (
                     <>
-                      <ButtonCustom
-                        title="Открыть тикет"
-                        className="chat-input__button-close"
-                        onClick={handleOpen}
-                      />
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Консультация с другим куратором"
+                          className="chat-input__button-close"
+                          onClick={handleCuratorsChat}
+                        />
+                      </a>
                     </>
                   )}
 
-                  {isAdmin() && currentStatus === "Новый" && (
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Отправить наставнику"
-                        className="chat-input__button-close"
-                        onClick={handleSendToMentor}
-                      />
-                    </a>
+                {isAdmin() &&
+                  currentStatus == "На уточнении" &&
+                  user.id == data.clientQuery.ticket.recipient.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Закончить диалог с куратором"
+                          className="chat-input__button-close"
+                          onClick={handleEndCuratorChat}
+                        />
+                      </a>
+                    </>
                   )}
-                </div>
-              </>
-            ))}
+
+                {currentStatus == "У наставника" &&
+                  user.id === data?.clientQuery?.ticket.assistant?.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Вопрос решен"
+                          className="chat-input__button-close"
+                          onClick={handleEndMentor}
+                        />
+                      </a>
+                    </>
+                  )}
+
+                {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Разделить тикет"
+                      className="chat-input__button-close"
+                      onClick={handleSplitTicket}
+                    />
+                  </a>
+                )}
+
+                {currentStatus === "Закрыт" && isAdmin() && (
+                  <>
+                    <ButtonCustom
+                      title="Открыть тикет"
+                      className="chat-input__button-close"
+                      onClick={handleOpen}
+                    />
+                  </>
+                )}
+
+                {isAdmin() && currentStatus === "Новый" && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Отправить наставнику"
+                      className="chat-input__button-close"
+                      onClick={handleSendToMentor}
+                    />
+                  </a>
+                )}
+              </div>
+            </>
+          )}
 
         {isVisibleEditTicketView && (
           <>
