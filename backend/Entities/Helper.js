@@ -271,9 +271,10 @@ class Helper extends Entity {
             if (!super.IsArgsEmpty(helperFields)) {
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 helperResult = await super.TransRequest(conn, sql, [helperFields, id]);
+                helperResult = { affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus };
             }
 
-            return { affected: helperResult.affectedRows, changed: helperResult.changedRows, warning: helperResult.warningStatus };
+            return helperResult;
         });
     }
 }
