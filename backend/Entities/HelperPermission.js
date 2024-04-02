@@ -33,7 +33,7 @@ class HelperPermission extends Entity {
     }
 
     static async TransInsert(conn, helperId) {
-        const sql = `INSERT INTO ${this.TableName} SET ?`;
+        const sql = `INSERT INTO ${this.TableName} SET helperId = ?`;
         const result = await super.TransRequest(conn, sql, [helperId]);
         return helperId;
     }
