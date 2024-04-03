@@ -4,7 +4,7 @@ import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { Form, Row, Col, Modal, Button } from "react-bootstrap";
 
 import { UNIT } from "../apollo/queries";
-import { EDIT_UNIT, DELETE_UNIT } from "../apollo/mutations";
+import { EDIT_UNIT, DELETE_UNIT, ACTIVATE_UNIT } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
@@ -17,11 +17,13 @@ function EditUnit() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [nameValue, setNameValue] = useState("");
+  const [visibility, setVisibility] = useState(null);
   const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -43,6 +45,8 @@ function EditUnit() {
 
   const [editUnit, { loading: loadingEditUnit }] = useMutation(EDIT_UNIT);
   const [deleteUnit, { loading: loadingDeleteUnit }] = useMutation(DELETE_UNIT);
+  const [activateUnit, { loading: loadingActivateUnit }] =
+    useMutation(ACTIVATE_UNIT);
 
   const navigate = useNavigate();
 
@@ -53,6 +57,7 @@ function EditUnit() {
   useEffect(() => {
     if (data && data.helperQuery.unit) {
       setNameValue(data.helperQuery.unit.name.stroke);
+      setVisibility(data.helperQuery.unit.visibility);
       setOrderNum(data.helperQuery.unit.orderNum);
       // console.log(data.helperQuery.unit.name.stroke);
     }
@@ -136,6 +141,7 @@ function EditUnit() {
           id: parseInt(unitId),
           stroke: nameValue.trim(),
           lang: "ru",
+          visibility: 1,
           orderNum: orderNum,
         },
       });
@@ -168,6 +174,24 @@ function EditUnit() {
       setShowTwo(true);
     } catch (error) {
       console.error("Ошибка удалении раздела:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
+  const handleActivateUnit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await activateUnit({
+        variables: {
+          token: user.token,
+          id: parseInt(unitId),
+        },
+      });
+      console.log("Раздел успешно активирован:", result);
+      setShowThree(true);
+    } catch (error) {
+      console.error("Ошибка активации раздела:", error);
       setIsErrorVisible(true);
     }
   };
@@ -235,13 +259,23 @@ function EditUnit() {
                     className={"add-curator__btn edit-curator__btn"}
                     onClick={handleEditUnit}
                   />
-                  <ButtonCustom
-                    title="Удалить раздел"
-                    className={
-                      "add-curator__btn edit-curator__btn alltickets__button-two"
-                    }
-                    onClick={handleDeleteUnit}
-                  />
+                  {visibility === 3 ? (
+                    <ButtonCustom
+                      title="Активировать раздел"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleActivateUnit}
+                    />
+                  ) : (
+                    <ButtonCustom
+                      title="Деактивировать раздел"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleDeleteUnit}
+                    />
+                  )}
                 </div>
               </div>
             </Col>
@@ -263,10 +297,24 @@ function EditUnit() {
 
           <Modal show={showTwo} onHide={handleCloseLeave}>
             <Modal.Header closeButton>
-              <Modal.Title>Раздел удален</Modal.Title>
+              <Modal.Title>Раздел деактивирован</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Раздел успешно удален</p>
+              <p>Раздел успешно деактивирован</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showThree} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Раздел активирован</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Раздел успешно активирован</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
@@ -281,8 +329,8 @@ function EditUnit() {
             </Modal.Header>
             <Modal.Body>
               <p>
-                Вы уверены, что хотите удалить этот раздел, а также все темы и
-                подтемы, соответствующие ему?
+                Вы уверены, что хотите деактивировать этот раздел, а также все
+                темы и подтемы, соответствующие ему?
               </p>
             </Modal.Body>
             <Modal.Footer>

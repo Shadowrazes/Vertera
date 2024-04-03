@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import { Table, DropdownButton, Dropdown } from "react-bootstrap";
+import { Table, DropdownButton, Dropdown, Form } from "react-bootstrap";
 
 import { THEME_LIST } from "../apollo/queries";
 
@@ -17,6 +17,8 @@ function Subthemes() {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
+
+  const [showInactive, setShowInactive] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -119,26 +121,47 @@ function Subthemes() {
     // }
   };
 
+  const handleIsActiveChange = () => {
+    setShowInactive(!showInactive);
+  };
+
   return (
     <>
       {isAdmin() ? (
         <>
           <TitleH2 title="Подтемы" className="title__heading" />
+          <div
+            className="edit-curator__checkbox-block"
+            style={{ marginBottom: "20px" }}
+          >
+            <Form.Check
+              type="checkbox"
+              id="custom-switch"
+              value={showInactive}
+              onChange={handleIsActiveChange}
+            />
+            <span className="edit-curator__field-label">
+              Отображать неактивные подтемы
+            </span>
+          </div>
           <div className="subthemes__dropdown-wrapper">
             <DropdownButton
               id="dropdown-custom-1"
               title={selectedItem || "Выберите подразделение"}
               className="themes__dropdown"
             >
-              {dataQuery.map((unit, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => handleUnitClick(unit.name.stroke)}
-                  href="#"
-                >
-                  {unit.name.stroke}
-                </Dropdown.Item>
-              ))}
+              {dataQuery.map(
+                (unit, index) =>
+                  unit.visibility !== 3 && (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleUnitClick(unit.name.stroke)}
+                      href="#"
+                    >
+                      {unit.name.stroke}
+                    </Dropdown.Item>
+                  )
+              )}
             </DropdownButton>
 
             {selectedUnit && (
@@ -149,15 +172,18 @@ function Subthemes() {
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.map((theme) => (
-                    <Dropdown.Item
-                      key={theme.id}
-                      onClick={() => handleThemeClick(theme.name.stroke)}
-                      href="#"
-                    >
-                      {theme.name.stroke}
-                    </Dropdown.Item>
-                  ))}
+                  ?.themes.map(
+                    (theme) =>
+                      theme.visibility !== 3 && (
+                        <Dropdown.Item
+                          key={theme.id}
+                          onClick={() => handleThemeClick(theme.name.stroke)}
+                          href="#"
+                        >
+                          {theme.name.stroke}
+                        </Dropdown.Item>
+                      )
+                  )}
               </DropdownButton>
             )}
           </div>
@@ -176,25 +202,28 @@ function Subthemes() {
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
                   ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-                  ?.subThemes.map((subTheme) => (
-                    <tr key={subTheme.id}>
-                      <td>{subTheme.orderNum}</td>
-                      <td>{subTheme.id}</td>
-                      <td>{subTheme.name.stroke}</td>
+                  ?.subThemes.map(
+                    (subTheme) =>
+                      (showInactive || subTheme.visibility !== 3) && (
+                        <tr key={subTheme.id}>
+                          <td>{subTheme.orderNum}</td>
+                          <td>{subTheme.id}</td>
+                          <td>{subTheme.name.stroke}</td>
 
-                      <td>
-                        <Link
-                          to={`/edit-subtheme/${subTheme.id}`}
-                          state={{
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          <img src={EditIcon} alt="" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                          <td>
+                            <Link
+                              to={`/edit-subtheme/${subTheme.id}`}
+                              state={{
+                                linkPrev: window.location.href,
+                              }}
+                              className="alltickets__link"
+                            >
+                              <img src={EditIcon} alt="" />
+                            </Link>
+                          </td>
+                        </tr>
+                      )
+                  )}
               </tbody>
             </Table>
           </div>

@@ -357,18 +357,21 @@ export const THEME_LIST = gql`
         name(lang: "ru") {
           stroke
         }
+        visibility
         orderNum
         themes {
           id
           name(lang: "ru") {
             stroke
           }
+          visibility
           orderNum
           subThemes {
             id
             name(lang: "ru") {
               stroke
             }
+            visibility
             orderNum
             departments {
               id
@@ -425,12 +428,19 @@ export const CURATORS_LIST = gql`
           name
           surname
           patronymic
+          isActive
         }
         departments {
           id
           name(lang: "ru") {
             stroke
           }
+        }
+        permissions {
+          sendMsg
+          helperEdit
+          themeEdit
+          translationEdit
         }
       }
     }
@@ -480,6 +490,13 @@ export const HELPER = gql`
               stroke
             }
           }
+          isActive
+        }
+        permissions {
+          sendMsg
+          helperEdit
+          themeEdit
+          translationEdit
         }
       }
     }
@@ -524,6 +541,7 @@ export const UNIT = gql`
         name(lang: "ru") {
           stroke
         }
+        visibility
         orderNum
       }
     }
@@ -537,6 +555,7 @@ export const THEME = gql`
         name(lang: "ru") {
           stroke
         }
+        visibility
         orderNum
         unit {
           id
@@ -557,6 +576,7 @@ export const SUBTHEME = gql`
           stroke
         }
         orderNum
+        visibility
         theme {
           id
           name(lang: "ru") {

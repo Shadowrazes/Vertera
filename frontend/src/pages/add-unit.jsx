@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Form, Row, Col, Modal, Button } from "react-bootstrap";
+import {
+  Form,
+  Row,
+  Col,
+  Modal,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 
 import { ADD_UNIT } from "../apollo/mutations";
 
@@ -18,6 +26,9 @@ function addUnit() {
 
   const [nameValue, setNameValue] = useState("");
   const [orderNum, setOrderNum] = useState(0);
+  const [selectedVisibility, setSelectedVisibility] = useState(null);
+
+  const visibilityItems = ["Все", "Куратор", "Админ"];
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -83,6 +94,7 @@ function addUnit() {
           token: user.token,
           stroke: nameValue.trim(),
           lang: "ru",
+          visibility: 1,
           orderNum: parseInt(orderNum),
         },
       });
@@ -117,6 +129,16 @@ function addUnit() {
     goToAllUnits();
   };
 
+  // const handleVisibilityClick = (visibility) => {
+  //   if (visibility === "Все") {
+  //     setSelectedVisibility(2);
+  //   } else if (visibility === "Куратор") {
+  //     setSelectedVisibility(3);
+  //   } else if (visibility === "Админ") {
+  //     setSelectedVisibility(4);
+  //   }
+  // };
+
   return (
     <>
       {isAdmin() ? (
@@ -143,6 +165,26 @@ function addUnit() {
                   onChange={handleOrderNumChange}
                   min={0}
                 />
+                {/* <Form.Label
+                  className="edit-curator__field-label"
+                  style={{ marginTop: "20px" }}
+                >
+                  Отображение
+                </Form.Label>
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={selectedVisibility || "Выберите для кого отображать"}
+                >
+                  {visibilityItems.map((item, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      // onClick={}
+                      href="#"
+                    >
+                      {item}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton> */}
               </Form.Group>
               {isErrorVisible && (
                 <span className="form__error">{errorMsg()}</span>

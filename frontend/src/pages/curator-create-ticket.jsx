@@ -622,12 +622,14 @@ function CuratorCreateTicket() {
     window.location.reload();
   };
 
-  const newCuratorList = dataQueryCurators.map((curator) => ({
-    name: `${curator.user.surname} ${curator.user.name} ${
-      curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-    }`,
-    id: curator.id,
-  }));
+  const newCuratorList = dataQueryCurators
+    .filter((curator) => curator.user.isActive == true)
+    .map((curator) => ({
+      name: `${curator.user.surname} ${curator.user.name} ${
+        curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+      }`,
+      id: curator.id,
+    }));
 
   return (
     <>
@@ -642,15 +644,18 @@ function CuratorCreateTicket() {
               id="dropdown-custom-1"
               title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
             >
-              {dataQuery.map((unit, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                  href="#"
-                >
-                  {unit.name.stroke}
-                </Dropdown.Item>
-              ))}
+              {dataQuery.map(
+                (unit, index) =>
+                  unit.visibility !== 3 && (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
+                      href="#"
+                    >
+                      {unit.name.stroke}
+                    </Dropdown.Item>
+                  )
+              )}
             </DropdownButton>
 
             {selectedUnit && (
@@ -662,17 +667,20 @@ function CuratorCreateTicket() {
               >
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.map((theme) => (
-                    <Dropdown.Item
-                      key={theme.id}
-                      onClick={() =>
-                        handleThemeClick(theme.name.stroke, theme.id)
-                      }
-                      href="#"
-                    >
-                      {theme.name.stroke}
-                    </Dropdown.Item>
-                  ))}
+                  ?.themes.map(
+                    (theme) =>
+                      theme.visibility !== 3 && (
+                        <Dropdown.Item
+                          key={theme.id}
+                          onClick={() =>
+                            handleThemeClick(theme.name.stroke, theme.id)
+                          }
+                          href="#"
+                        >
+                          {theme.name.stroke}
+                        </Dropdown.Item>
+                      )
+                  )}
               </DropdownButton>
             )}
 
@@ -686,17 +694,23 @@ function CuratorCreateTicket() {
                 {dataQuery
                   .find((unit) => unit.name.stroke === selectedUnit)
                   ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-                  ?.subThemes.map((subTheme) => (
-                    <Dropdown.Item
-                      key={subTheme.id}
-                      onClick={() =>
-                        handleSubThemeClick(subTheme.name.stroke, subTheme.id)
-                      }
-                      href="#"
-                    >
-                      {subTheme.name.stroke}
-                    </Dropdown.Item>
-                  ))}
+                  ?.subThemes.map(
+                    (subTheme) =>
+                      subTheme.visibility !== 3 && (
+                        <Dropdown.Item
+                          key={subTheme.id}
+                          onClick={() =>
+                            handleSubThemeClick(
+                              subTheme.name.stroke,
+                              subTheme.id
+                            )
+                          }
+                          href="#"
+                        >
+                          {subTheme.name.stroke}
+                        </Dropdown.Item>
+                      )
+                  )}
               </DropdownButton>
             )}
             <div className="curator-create-ticket__reciever-label">
@@ -850,20 +864,22 @@ function CuratorCreateTicket() {
               </Button>
             </div>
 
-            <ToggleButtonGroup
-              type="radio"
-              name="options"
-              defaultValue={1}
-              value={selectedValue}
-              onChange={handleToggleChange}
-            >
-              <ToggleButton id="tbg-radio-1" value={1}>
-                Создать обращение
-              </ToggleButton>
-              <ToggleButton id="tbg-radio-2" value={2}>
-                Создать уведомление
-              </ToggleButton>
-            </ToggleButtonGroup>
+            {isCuratorsDropdownVisible || isIdFileInputVisible ? (
+              <ToggleButtonGroup
+                type="radio"
+                name="options"
+                defaultValue={1}
+                value={selectedValue}
+                onChange={handleToggleChange}
+              >
+                <ToggleButton id="tbg-radio-1" value={1}>
+                  Создать обращение
+                </ToggleButton>
+                <ToggleButton id="tbg-radio-2" value={2}>
+                  Создать уведомление
+                </ToggleButton>
+              </ToggleButtonGroup>
+            ) : null}
 
             {isVisible && <span className="form__error">{errorMsg()}</span>}
 

@@ -128,23 +128,25 @@ export const ADD_HELPER_USER = gql`
     $birthday: DateTime!
     $departmentId: [Int]!
   ) {
-    adminMutation(token: $token) {
-      addHelperUser(
-        userFields: {
-          name: $name
-          surname: $surname
-          patronymic: $patronymic
-          countryId: $countryId
-          phone: $phone
-          login: $login
-          password: $password
-        }
-        helperFields: {
-          jobTitleId: $jobTitleId
-          birthday: $birthday
-          departmentIds: $departmentId
-        }
-      )
+    helperMutation(token: $token) {
+      helperObj {
+        addHelperUser(
+          userFields: {
+            name: $name
+            surname: $surname
+            patronymic: $patronymic
+            countryId: $countryId
+            phone: $phone
+            login: $login
+            password: $password
+          }
+          helperFields: {
+            jobTitleId: $jobTitleId
+            birthday: $birthday
+            departmentIds: $departmentId
+          }
+        )
+      }
     }
   }
 `;
@@ -184,13 +186,15 @@ export const EDIT_HELPER_USER = gql`
 
 export const DISABLE_HELPER_USER = gql`
   mutation ($token: String!, $id: Int!, $isActive: Boolean) {
-    adminMutation(token: $token) {
-      updateHelperUser(
-        id: $id
-        userFields: { isActive: $isActive }
-        helperFields: {}
-      ) {
-        changed
+    helperMutation(token: $token) {
+      helperObj {
+        updateHelperUser(
+          id: $id
+          userFields: { isActive: $isActive }
+          helperFields: {}
+        ) {
+          changed
+        }
       }
     }
   }
@@ -209,10 +213,20 @@ export const ADD_UNIT = gql`
     $token: String!
     $stroke: String!
     $lang: String!
+    $visibility: Int!
     $orderNum: Int!
   ) {
-    adminMutation(token: $token) {
-      addUnit(fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum })
+    helperMutation(token: $token) {
+      themeObj {
+        addUnit(
+          fields: {
+            stroke: $stroke
+            lang: $lang
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        )
+      }
     }
   }
 `;
@@ -223,14 +237,22 @@ export const EDIT_UNIT = gql`
     $id: Int!
     $stroke: String!
     $lang: String!
+    $visibility: Int!
     $orderNum: Int
   ) {
-    adminMutation(token: $token) {
-      updateUnit(
-        id: $id
-        fields: { stroke: $stroke, lang: $lang, orderNum: $orderNum }
-      ) {
-        changed
+    helperMutation(token: $token) {
+      themeObj {
+        updateUnit(
+          id: $id
+          fields: {
+            stroke: $stroke
+            lang: $lang
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        ) {
+          changed
+        }
       }
     }
   }
@@ -238,8 +260,24 @@ export const EDIT_UNIT = gql`
 
 export const DELETE_UNIT = gql`
   mutation ($token: String!, $id: Int!) {
-    adminMutation(token: $token) {
-      deleteUnit(id: $id)
+    helperMutation(token: $token) {
+      themeObj {
+        updateUnit(id: $id, fields: { visibility: 3, lang: "ru" }) {
+          changed
+        }
+      }
+    }
+  }
+`;
+
+export const ACTIVATE_UNIT = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      themeObj {
+        updateUnit(id: $id, fields: { visibility: 1, lang: "ru" }) {
+          changed
+        }
+      }
     }
   }
 `;
@@ -250,17 +288,21 @@ export const ADD_THEME = gql`
     $unitId: Int!
     $stroke: String!
     $lang: String!
+    $visibility: Int!
     $orderNum: Int!
   ) {
-    adminMutation(token: $token) {
-      addTheme(
-        fields: {
-          unitId: $unitId
-          stroke: $stroke
-          lang: $lang
-          orderNum: $orderNum
-        }
-      )
+    helperMutation(token: $token) {
+      themeObj {
+        addTheme(
+          fields: {
+            unitId: $unitId
+            stroke: $stroke
+            lang: $lang
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        )
+      }
     }
   }
 `;
@@ -272,19 +314,23 @@ export const EDIT_THEME = gql`
     $unitId: Int
     $stroke: String
     $lang: String!
+    $visibility: Int!
     $orderNum: Int
   ) {
-    adminMutation(token: $token) {
-      updateTheme(
-        id: $id
-        fields: {
-          unitId: $unitId
-          stroke: $stroke
-          lang: $lang
-          orderNum: $orderNum
+    helperMutation(token: $token) {
+      themeObj {
+        updateTheme(
+          id: $id
+          fields: {
+            unitId: $unitId
+            stroke: $stroke
+            lang: $lang
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        ) {
+          changed
         }
-      ) {
-        changed
       }
     }
   }
@@ -292,8 +338,24 @@ export const EDIT_THEME = gql`
 
 export const DELETE_THEME = gql`
   mutation ($token: String!, $id: Int!) {
-    adminMutation(token: $token) {
-      deleteTheme(id: $id)
+    helperMutation(token: $token) {
+      themeObj {
+        updateTheme(id: $id, fields: { visibility: 3, lang: "ru" }) {
+          changed
+        }
+      }
+    }
+  }
+`;
+
+export const ACTIVATE_THEME = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      themeObj {
+        updateTheme(id: $id, fields: { visibility: 1, lang: "ru" }) {
+          changed
+        }
+      }
     }
   }
 `;
@@ -305,18 +367,22 @@ export const ADD_SUBTHEME = gql`
     $stroke: String!
     $lang: String!
     $departmentIds: [Int]!
+    $visibility: Int!
     $orderNum: Int!
   ) {
-    adminMutation(token: $token) {
-      addSubTheme(
-        fields: {
-          themeId: $themeId
-          stroke: $stroke
-          lang: $lang
-          departmentIds: $departmentIds
-          orderNum: $orderNum
-        }
-      )
+    helperMutation(token: $token) {
+      themeObj {
+        addSubTheme(
+          fields: {
+            themeId: $themeId
+            stroke: $stroke
+            lang: $lang
+            departmentIds: $departmentIds
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        )
+      }
     }
   }
 `;
@@ -329,20 +395,24 @@ export const EDIT_SUBTHEME = gql`
     $stroke: String
     $lang: String!
     $departmentIds: [Int]
+    $visibility: Int!
     $orderNum: Int
   ) {
-    adminMutation(token: $token) {
-      updateSubTheme(
-        id: $id
-        fields: {
-          themeId: $themeId
-          stroke: $stroke
-          lang: $lang
-          departmentIds: $departmentIds
-          orderNum: $orderNum
+    helperMutation(token: $token) {
+      themeObj {
+        updateSubTheme(
+          id: $id
+          fields: {
+            themeId: $themeId
+            stroke: $stroke
+            lang: $lang
+            departmentIds: $departmentIds
+            visibility: $visibility
+            orderNum: $orderNum
+          }
+        ) {
+          changed
         }
-      ) {
-        changed
       }
     }
   }
@@ -350,8 +420,24 @@ export const EDIT_SUBTHEME = gql`
 
 export const DELETE_SUBTHEME = gql`
   mutation ($token: String!, $id: Int!) {
-    adminMutation(token: $token) {
-      deleteSubTheme(id: $id)
+    helperMutation(token: $token) {
+      themeObj {
+        updateSubTheme(id: $id, fields: { visibility: 3, lang: "ru" }) {
+          changed
+        }
+      }
+    }
+  }
+`;
+
+export const ACTIVATE_SUBTHEME = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      themeObj {
+        updateSubTheme(id: $id, fields: { visibility: 1, lang: "ru" }) {
+          changed
+        }
+      }
     }
   }
 `;

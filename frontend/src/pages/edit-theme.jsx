@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 
 import { THEME, THEME_LIST } from "../apollo/queries";
-import { EDIT_THEME, DELETE_THEME } from "../apollo/mutations";
+import { EDIT_THEME, DELETE_THEME, ACTIVATE_THEME } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
@@ -29,11 +29,13 @@ function EditTheme() {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
+  const [visibility, setVisibility] = useState(null);
   const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -65,6 +67,8 @@ function EditTheme() {
   const [editTheme, { loading: loadingEditTheme }] = useMutation(EDIT_THEME);
   const [deleteTheme, { loading: loadingDeleteTheme }] =
     useMutation(DELETE_THEME);
+  const [activateTheme, { loading: loadingActivateTheme }] =
+    useMutation(ACTIVATE_THEME);
 
   const navigate = useNavigate();
 
@@ -83,6 +87,7 @@ function EditTheme() {
       setSelectedUnit(data.helperQuery.theme.unit.name.stroke);
       setSelectedUnitId(data.helperQuery.theme.unit.id);
       setSelectedItem(data.helperQuery.theme.unit.name.stroke);
+      setVisibility(data.helperQuery.theme.visibility);
       setOrderNum(data.helperQuery.theme.orderNum);
       // console.log(data.theme.unit.id);
     }
@@ -190,6 +195,7 @@ function EditTheme() {
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
+          visibility: visibility,
           orderNum: orderNum,
         },
       });
@@ -226,6 +232,24 @@ function EditTheme() {
     }
   };
 
+  const handleActivateTheme = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await activateTheme({
+        variables: {
+          token: user.token,
+          id: parseInt(themeId),
+        },
+      });
+      console.log("Тема успешно активирована:", result);
+      setShowThree(true);
+    } catch (error) {
+      console.error("Ошибка активации темы:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
   const handleShow = () => {
     setShow(true);
   };
@@ -255,22 +279,27 @@ function EditTheme() {
             title={`Редактировать тему #${themeId}`}
             linkPrev={linkPrev}
           />
-          <Row>
+          <Row style={{ marginTop: "20px" }}>
             <Col className="edit-curator__column edit-theme__column">
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedItem}
                 className="add-theme__dropdown"
               >
-                {dataQuery.map((unit, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                    href="#"
-                  >
-                    {unit.name.stroke}
-                  </Dropdown.Item>
-                ))}
+                {dataQuery.map(
+                  (unit, index) =>
+                    unit.visibility !== 3 && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleUnitClick(unit.name.stroke, unit.id)
+                        }
+                        href="#"
+                      >
+                        {unit.name.stroke}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
 
               <Form.Group controlId="NameForm">
@@ -305,13 +334,23 @@ function EditTheme() {
                     className={"add-curator__btn edit-curator__btn"}
                     onClick={handleEditTheme}
                   />
-                  <ButtonCustom
-                    title="Удалить тему"
-                    className={
-                      "add-curator__btn edit-curator__btn alltickets__button-two"
-                    }
-                    onClick={handleDeleteTheme}
-                  />
+                  {visibility === 3 ? (
+                    <ButtonCustom
+                      title="Активировать тему"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleActivateTheme}
+                    />
+                  ) : (
+                    <ButtonCustom
+                      title="Деактивировать тему"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleDeleteTheme}
+                    />
+                  )}
                 </div>
               </div>
             </Col>
@@ -333,10 +372,24 @@ function EditTheme() {
 
           <Modal show={showTwo} onHide={handleCloseLeave}>
             <Modal.Header closeButton>
-              <Modal.Title>Тема удалена</Modal.Title>
+              <Modal.Title>Тема деактивирована</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Тема успешно удалена</p>
+              <p>Тема успешно деактивирована</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showThree} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Тема активирована</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Тема успешно активирована</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
@@ -351,8 +404,8 @@ function EditTheme() {
             </Modal.Header>
             <Modal.Body>
               <p>
-                Вы уверены, что хотите удалить эту тему, а также все подтемы,
-                соответствующие ей?
+                Вы уверены, что хотите деактивировать эту тему, а также все
+                подтемы, соответствующие ей?
               </p>
             </Modal.Body>
             <Modal.Footer>

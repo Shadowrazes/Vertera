@@ -52,6 +52,7 @@ function EditCurator() {
   const [selectedJobTitleId, setSelectedJobTitleId] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCountryId, setSelectedCountryId] = useState(null);
+  const [isActive, setIsActive] = useState(null);
 
   // права доступа
   const [selectedAcessCurators, setSelectedAcessCurators] = useState(false);
@@ -62,6 +63,7 @@ function EditCurator() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -126,6 +128,7 @@ function EditCurator() {
       setPatronymicValue(data.helperQuery.helper.user.patronymic);
       setSelectedCountry(data.helperQuery.helper.user.country.name.stroke);
       setSelectedCountryId(data.helperQuery.helper.user.country.id);
+      setIsActive(data.helperQuery.helper.user.isActive);
     }
 
     if (data && data.helperQuery.helper.departments) {
@@ -394,6 +397,25 @@ function EditCurator() {
     }
   };
 
+  const handleActivateCurator = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await disableHelperUser({
+        variables: {
+          token: user.token,
+          id: parseInt(curatorId),
+          isActive: true,
+        },
+      });
+      console.log("Куратор успешно активирован:", result);
+      setShowThree(true);
+    } catch (error) {
+      console.error("Ошибка активации куратора:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
   const handleShow = () => {
     setShow(true);
   };
@@ -632,13 +654,23 @@ function EditCurator() {
                     className={"add-curator__btn edit-curator__btn"}
                     onClick={handleEditCurator}
                   />
-                  <ButtonCustom
-                    title="Удалить куратора"
-                    className={
-                      "add-curator__btn edit-curator__btn alltickets__button-two"
-                    }
-                    onClick={handleDeleteCurator}
-                  />
+                  {isActive ? (
+                    <ButtonCustom
+                      title="Деактивировать куратора"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleDeleteCurator}
+                    />
+                  ) : (
+                    <ButtonCustom
+                      title="Активировать куратора"
+                      className={
+                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                      }
+                      onClick={handleActivateCurator}
+                    />
+                  )}
                 </div>
               </div>
             </Col>
@@ -660,10 +692,24 @@ function EditCurator() {
 
           <Modal show={showTwo} onHide={handleCloseLeave}>
             <Modal.Header closeButton>
-              <Modal.Title>Куратор удален</Modal.Title>
+              <Modal.Title>Куратор деактивирован</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Куратор успешно удален</p>
+              <p>Куратор успешно деактивирован</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showThree} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Куратор активирован</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Куратор успешно активирован</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
@@ -677,7 +723,7 @@ function EditCurator() {
               <Modal.Title>Предупреждение</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Вы уверены, что хотите удалить куратора?</p>
+              <p>Вы уверены, что хотите деактивировать куратора?</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>

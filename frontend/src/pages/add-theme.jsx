@@ -149,6 +149,7 @@ function AddTheme() {
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
+          visibility: 1,
           orderNum: orderNum,
         },
       });
@@ -175,22 +176,27 @@ function AddTheme() {
       {isAdmin() ? (
         <>
           <BackTitle title="Добавить тему" linkPrev={linkPrev} />
-          <Row className="add-curator__row">
+          <Row className="add-curator__row" style={{ marginTop: "20px" }}>
             <Col className="add-curator__column add-theme__column">
               <DropdownButton
                 id="dropdown-custom-1"
                 title={selectedItem || "Выберите подразделение"}
                 className="add-theme__dropdown"
               >
-                {dataQuery.map((unit, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                    href="#"
-                  >
-                    {unit.name.stroke}
-                  </Dropdown.Item>
-                ))}
+                {dataQuery.map(
+                  (unit, index) =>
+                    unit.visibility !== 3 && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleUnitClick(unit.name.stroke, unit.id)
+                        }
+                        href="#"
+                      >
+                        {unit.name.stroke}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
 
               <Form.Group controlId="NameForm">

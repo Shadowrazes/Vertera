@@ -11,7 +11,11 @@ import {
 } from "react-bootstrap";
 
 import { SUBTHEME, THEME_LIST, DEPARTMENTS_LIST } from "../apollo/queries";
-import { EDIT_SUBTHEME, DELETE_SUBTHEME } from "../apollo/mutations";
+import {
+  EDIT_SUBTHEME,
+  DELETE_SUBTHEME,
+  ACTIVATE_SUBTHEME,
+} from "../apollo/mutations";
 
 import { MultiSelect } from "primereact/multiselect";
 import BackTitle from "../components/back-title";
@@ -35,10 +39,12 @@ function EditSubtheme() {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
   const [orderNum, setOrderNum] = useState(0);
+  const [visibility, setVisibility] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -81,6 +87,9 @@ function EditSubtheme() {
   const [deleteSubtheme, { loading: loadingDeleteSubtheme }] =
     useMutation(DELETE_SUBTHEME);
 
+  const [activateSubtheme, { loading: loadingActivateSubtheme }] =
+    useMutation(ACTIVATE_SUBTHEME);
+
   const navigate = useNavigate();
 
   const goToAllSubthemes = () => {
@@ -99,6 +108,7 @@ function EditSubtheme() {
       setSelectedItem(data.helperQuery.subTheme.theme.unit.name.stroke);
       setSelectedTheme(data.helperQuery.subTheme.theme.name.stroke);
       setSelectedThemeId(data.helperQuery.subTheme.theme.id);
+      setVisibility(data.helperQuery.subTheme.visibility);
       setOrderNum(data.helperQuery.subTheme.orderNum);
       // console.log(data.subTheme.theme.unit.id);
     }
@@ -270,6 +280,7 @@ function EditSubtheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           departmentIds: selectedDepartmentsId,
+          visibility: visibility,
           orderNum: orderNum,
         },
       });
@@ -302,6 +313,24 @@ function EditSubtheme() {
       setShowTwo(true);
     } catch (error) {
       console.error("Ошибка удалении подтемы:", error);
+      setIsErrorVisible(true);
+    }
+  };
+
+  const handleActivateSubtheme = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await activateSubtheme({
+        variables: {
+          token: user.token,
+          id: parseInt(subthemeId),
+        },
+      });
+      console.log("Подтема успешно активирована:", result);
+      setShowThree(true);
+    } catch (error) {
+      console.error("Ошибка активации подтемы:", error);
       setIsErrorVisible(true);
     }
   };
@@ -351,15 +380,20 @@ function EditSubtheme() {
                 title={selectedItem}
                 className="add-theme__dropdown"
               >
-                {dataQuery.map((unit, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                    href="#"
-                  >
-                    {unit.name.stroke}
-                  </Dropdown.Item>
-                ))}
+                {dataQuery.map(
+                  (unit, index) =>
+                    unit.visibility !== 3 && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleUnitClick(unit.name.stroke, unit.id)
+                        }
+                        href="#"
+                      >
+                        {unit.name.stroke}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
             </div>
 
@@ -374,17 +408,20 @@ function EditSubtheme() {
                 >
                   {dataQuery
                     .find((unit) => unit.name.stroke === selectedUnit)
-                    ?.themes.map((theme) => (
-                      <Dropdown.Item
-                        key={theme.id}
-                        onClick={() =>
-                          handleThemeClick(theme.name.stroke, theme.id)
-                        }
-                        href="#"
-                      >
-                        {theme.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    ?.themes.map(
+                      (theme) =>
+                        theme.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={theme.id}
+                            onClick={() =>
+                              handleThemeClick(theme.name.stroke, theme.id)
+                            }
+                            href="#"
+                          >
+                            {theme.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                 </DropdownButton>
               </div>
             )}
@@ -439,13 +476,23 @@ function EditSubtheme() {
                   className={"add-curator__btn edit-curator__btn"}
                   onClick={handleEditSubtheme}
                 />
-                <ButtonCustom
-                  title="Удалить подтему"
-                  className={
-                    "add-curator__btn edit-curator__btn alltickets__button-two"
-                  }
-                  onClick={handleDeleteTheme}
-                />
+                {visibility === 3 ? (
+                  <ButtonCustom
+                    title="Активировать подтему"
+                    className={
+                      "add-curator__btn edit-curator__btn alltickets__button-two"
+                    }
+                    onClick={handleActivateSubtheme}
+                  />
+                ) : (
+                  <ButtonCustom
+                    title="Деактивировать подтему"
+                    className={
+                      "add-curator__btn edit-curator__btn alltickets__button-two"
+                    }
+                    onClick={handleDeleteTheme}
+                  />
+                )}
               </div>
             </div>
           </Col>
@@ -466,10 +513,24 @@ function EditSubtheme() {
 
           <Modal show={showTwo} onHide={handleCloseLeave}>
             <Modal.Header closeButton>
-              <Modal.Title>Подтема удалена</Modal.Title>
+              <Modal.Title>Подтема деактивирована</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Подтема успешно удалена</p>
+              <p>Подтема успешно деактивирована</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showThree} onHide={handleCloseLeave}>
+            <Modal.Header closeButton>
+              <Modal.Title>Подтема активирована</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Подтема успешно активирована</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
@@ -483,7 +544,7 @@ function EditSubtheme() {
               <Modal.Title>Предупреждение</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Вы уверены, что хотите удалить эту подтему?</p>
+              <p>Вы уверены, что хотите деактивировать эту подтему?</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>

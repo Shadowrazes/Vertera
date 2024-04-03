@@ -1378,101 +1378,99 @@ function Chat() {
           </div>
         )}
 
-        {(isAdmin() &&
+        {isAdmin() &&
           isVisibleHelperButtons &&
-          currentStatus !== "Уведомление") ||
-          (currentStatus == "У наставника" &&
-            user.id === data?.clientQuery?.ticket.assistant?.id && (
-              <>
-                <div className="chat__helper-buttons">
-                  {isAdmin() &&
-                    currentStatus !== "Закрыт" &&
-                    user.id !== data?.clientQuery?.ticket.assistant?.id && (
-                      <a className="alltickets__link">
-                        <ButtonCustom
-                          title="Изменить тикет"
-                          className="chat-input__button-close"
-                          onClick={handleEditTicketView}
-                        />
-                      </a>
-                    )}
-
-                  {isAdmin() &&
-                    currentStatus !== "Закрыт" &&
-                    currentStatus !== "Новый" &&
-                    currentStatus !== "На уточнении" &&
-                    currentStatus !== "У наставника" &&
-                    !isVisibleCuratorsChat && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Консультация с другим куратором"
-                            className="chat-input__button-close"
-                            onClick={handleCuratorsChat}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {isAdmin() &&
-                    currentStatus == "На уточнении" &&
-                    user.id == data.clientQuery.ticket.recipient.id && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Закончить диалог с куратором"
-                            className="chat-input__button-close"
-                            onClick={handleEndCuratorChat}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {currentStatus == "У наставника" &&
-                    user.id === data?.clientQuery?.ticket.assistant?.id && (
-                      <>
-                        <a className="alltickets__link">
-                          <ButtonCustom
-                            title="Вопрос решен"
-                            className="chat-input__button-close"
-                            onClick={handleEndMentor}
-                          />
-                        </a>
-                      </>
-                    )}
-
-                  {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+          currentStatus !== "Уведомление" && (
+            <>
+              <div className="chat__helper-buttons">
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  user.id !== data?.clientQuery?.ticket.assistant?.id && (
                     <a className="alltickets__link">
                       <ButtonCustom
-                        title="Разделить тикет"
+                        title="Изменить тикет"
                         className="chat-input__button-close"
-                        onClick={handleSplitTicket}
+                        onClick={handleEditTicketView}
                       />
                     </a>
                   )}
 
-                  {currentStatus === "Закрыт" && isAdmin() && (
+                {isAdmin() &&
+                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Новый" &&
+                  currentStatus !== "На уточнении" &&
+                  currentStatus !== "У наставника" &&
+                  !isVisibleCuratorsChat && (
                     <>
-                      <ButtonCustom
-                        title="Открыть тикет"
-                        className="chat-input__button-close"
-                        onClick={handleOpen}
-                      />
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Консультация с другим куратором"
+                          className="chat-input__button-close"
+                          onClick={handleCuratorsChat}
+                        />
+                      </a>
                     </>
                   )}
 
-                  {isAdmin() && currentStatus === "Новый" && (
-                    <a className="alltickets__link">
-                      <ButtonCustom
-                        title="Отправить наставнику"
-                        className="chat-input__button-close"
-                        onClick={handleSendToMentor}
-                      />
-                    </a>
+                {isAdmin() &&
+                  currentStatus == "На уточнении" &&
+                  user.id == data.clientQuery.ticket.recipient.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Закончить диалог с куратором"
+                          className="chat-input__button-close"
+                          onClick={handleEndCuratorChat}
+                        />
+                      </a>
+                    </>
                   )}
-                </div>
-              </>
-            ))}
+
+                {currentStatus == "У наставника" &&
+                  user.id === data?.clientQuery?.ticket.assistant?.id && (
+                    <>
+                      <a className="alltickets__link">
+                        <ButtonCustom
+                          title="Вопрос решен"
+                          className="chat-input__button-close"
+                          onClick={handleEndMentor}
+                        />
+                      </a>
+                    </>
+                  )}
+
+                {isAdmin() && currentStatus == "Новый" && !isVisibleSplit && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Разделить тикет"
+                      className="chat-input__button-close"
+                      onClick={handleSplitTicket}
+                    />
+                  </a>
+                )}
+
+                {currentStatus === "Закрыт" && isAdmin() && (
+                  <>
+                    <ButtonCustom
+                      title="Открыть тикет"
+                      className="chat-input__button-close"
+                      onClick={handleOpen}
+                    />
+                  </>
+                )}
+
+                {isAdmin() && currentStatus === "Новый" && (
+                  <a className="alltickets__link">
+                    <ButtonCustom
+                      title="Отправить наставнику"
+                      className="chat-input__button-close"
+                      onClick={handleSendToMentor}
+                    />
+                  </a>
+                )}
+              </div>
+            </>
+          )}
 
         {isVisibleEditTicketView && (
           <>
@@ -1500,17 +1498,20 @@ function Chat() {
                     title={selectedUnitEdit}
                     className="themes__dropdown"
                   >
-                    {dataQuery.map((unit, index) => (
-                      <Dropdown.Item
-                        key={index}
-                        onClick={() =>
-                          handleUnitClickEdit(unit.name.stroke, unit.id)
-                        }
-                        href="#"
-                      >
-                        {unit.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    {dataQuery.map(
+                      (unit, index) =>
+                        unit.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={() =>
+                              handleUnitClickEdit(unit.name.stroke, unit.id)
+                            }
+                            href="#"
+                          >
+                            {unit.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                   </DropdownButton>
                 </div>
 
@@ -1526,17 +1527,23 @@ function Chat() {
                     >
                       {dataQuery
                         .find((unit) => unit.name.stroke === selectedUnitEdit)
-                        ?.themes.map((theme) => (
-                          <Dropdown.Item
-                            key={theme.id}
-                            onClick={() =>
-                              handleThemeClickEdit(theme.name.stroke, theme.id)
-                            }
-                            href="#"
-                          >
-                            {theme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.themes.map(
+                          (theme) =>
+                            theme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={theme.id}
+                                onClick={() =>
+                                  handleThemeClickEdit(
+                                    theme.name.stroke,
+                                    theme.id
+                                  )
+                                }
+                                href="#"
+                              >
+                                {theme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   </div>
                 )}
@@ -1556,23 +1563,26 @@ function Chat() {
                         ?.themes.find(
                           (theme) => theme.name.stroke === selectedThemeEdit
                         )
-                        ?.subThemes.map((subTheme) => (
-                          <Dropdown.Item
-                            key={subTheme.id}
-                            onClick={() =>
-                              handleSubThemeClickEdit(
-                                subTheme.name.stroke,
-                                subTheme.id,
-                                subTheme.departments.map(
-                                  (department) => department.id
-                                )
-                              )
-                            }
-                            href="#"
-                          >
-                            {subTheme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.subThemes.map(
+                          (subTheme) =>
+                            subTheme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={subTheme.id}
+                                onClick={() =>
+                                  handleSubThemeClickEdit(
+                                    subTheme.name.stroke,
+                                    subTheme.id,
+                                    subTheme.departments.map(
+                                      (department) => department.id
+                                    )
+                                  )
+                                }
+                                href="#"
+                              >
+                                {subTheme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   </div>
                 )}
@@ -1600,26 +1610,29 @@ function Chat() {
                           selectedDepartmentsId.includes(department.id)
                         )
                       )
-                      .map((curator, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() =>
-                            handleCuratorClick(
-                              curator.user.name,
-                              curator.user.surname,
-                              curator.user.patronymic,
-                              curator.id
-                            )
-                          }
-                          href="#"
-                        >
-                          {`${curator.user.surname} ${curator.user.name} ${
-                            curator.user.patronymic
-                              ? ` ${curator.user.patronymic}`
-                              : ""
-                          }`}
-                        </Dropdown.Item>
-                      ))}
+                      .map(
+                        (curator, index) =>
+                          curator.user.isActive && (
+                            <Dropdown.Item
+                              key={index}
+                              onClick={() =>
+                                handleCuratorClick(
+                                  curator.user.name,
+                                  curator.user.surname,
+                                  curator.user.patronymic,
+                                  curator.id
+                                )
+                              }
+                              href="#"
+                            >
+                              {`${curator.user.surname} ${curator.user.name} ${
+                                curator.user.patronymic
+                                  ? ` ${curator.user.patronymic}`
+                                  : ""
+                              }`}
+                            </Dropdown.Item>
+                          )
+                      )}
                   </DropdownButton>
                 </div>
               </Tab>
@@ -1775,17 +1788,20 @@ function Chat() {
                     id="dropdown-custom-1"
                     title={input.unit || "Выберите подразделение"}
                   >
-                    {dataQuery.map((unit, index) => (
-                      <Dropdown.Item
-                        key={index}
-                        onClick={() =>
-                          handleUnitClick(unit.name.stroke, unit.id)
-                        }
-                        href="#"
-                      >
-                        {unit.name.stroke}
-                      </Dropdown.Item>
-                    ))}
+                    {dataQuery.map(
+                      (unit, index) =>
+                        unit.visibility !== 3 && (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={() =>
+                              handleUnitClick(unit.name.stroke, unit.id)
+                            }
+                            href="#"
+                          >
+                            {unit.name.stroke}
+                          </Dropdown.Item>
+                        )
+                    )}
                   </DropdownButton>
                   {input.unit && (
                     <DropdownButton
@@ -1794,17 +1810,20 @@ function Chat() {
                     >
                       {dataQuery
                         .find((unit) => unit.name.stroke === input.unit)
-                        ?.themes.map((theme) => (
-                          <Dropdown.Item
-                            key={theme.id}
-                            onClick={() =>
-                              handleThemeClick(theme.name.stroke, theme.id)
-                            }
-                            href="#"
-                          >
-                            {theme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.themes.map(
+                          (theme) =>
+                            theme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={theme.id}
+                                onClick={() =>
+                                  handleThemeClick(theme.name.stroke, theme.id)
+                                }
+                                href="#"
+                              >
+                                {theme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   )}
                   {isSubThemeDropdownVisible && input.theme && (
@@ -1817,20 +1836,23 @@ function Chat() {
                         ?.themes.find(
                           (theme) => theme.name.stroke === input.theme
                         )
-                        ?.subThemes.map((subTheme) => (
-                          <Dropdown.Item
-                            key={subTheme.id}
-                            onClick={() =>
-                              handleSubThemeClick(
-                                subTheme.name.stroke,
-                                subTheme.id
-                              )
-                            }
-                            href="#"
-                          >
-                            {subTheme.name.stroke}
-                          </Dropdown.Item>
-                        ))}
+                        ?.subThemes.map(
+                          (subTheme) =>
+                            subTheme.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={subTheme.id}
+                                onClick={() =>
+                                  handleSubThemeClick(
+                                    subTheme.name.stroke,
+                                    subTheme.id
+                                  )
+                                }
+                                href="#"
+                              >
+                                {subTheme.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
                     </DropdownButton>
                   )}
                   <Editor

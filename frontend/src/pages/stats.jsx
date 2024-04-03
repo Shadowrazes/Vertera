@@ -467,26 +467,29 @@ function Stats() {
                 title={selectedCurator || "Куратор"}
                 className="themes__dropdown"
               >
-                {dataQueryCurators.map((curator, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() =>
-                      handleCuratorClick(
-                        curator.user.name,
-                        curator.user.surname,
-                        curator.user.patronymic,
-                        index
-                      )
-                    }
-                    href="#"
-                  >
-                    {`${curator.user.surname} ${curator.user.name} ${
-                      curator.user.patronymic
-                        ? ` ${curator.user.patronymic}`
-                        : ""
-                    }`}
-                  </Dropdown.Item>
-                ))}
+                {dataQueryCurators.map(
+                  (curator, index) =>
+                    curator.user.isActive && (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() =>
+                          handleCuratorClick(
+                            curator.user.name,
+                            curator.user.surname,
+                            curator.user.patronymic,
+                            index
+                          )
+                        }
+                        href="#"
+                      >
+                        {`${curator.user.surname} ${curator.user.name} ${
+                          curator.user.patronymic
+                            ? ` ${curator.user.patronymic}`
+                            : ""
+                        }`}
+                      </Dropdown.Item>
+                    )
+                )}
               </DropdownButton>
             )}
             {selectedCurator != null && (

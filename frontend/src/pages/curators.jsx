@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -12,9 +12,12 @@ import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
 import "../css/table.css";
+import "../css/edit-curator.css";
 
 function Curators() {
   const [dataQuery, setData] = useState([]);
+
+  const [showInactive, setShowInactive] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -73,11 +76,29 @@ function Curators() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  const handleIsActiveChange = () => {
+    setShowInactive(!showInactive);
+  };
+
   return (
     <>
       {isAdmin() ? (
         <>
           <TitleH2 title="Все кураторы" className="title__heading" />
+          <div
+            className="edit-curator__checkbox-block"
+            style={{ marginBottom: "20px" }}
+          >
+            <Form.Check
+              type="checkbox"
+              id="custom-switch"
+              value={showInactive}
+              onChange={handleIsActiveChange}
+            />
+            <span className="edit-curator__field-label">
+              Отображать неактивных кураторов
+            </span>
+          </div>
           <div className="table__wrapper">
             <Table className="table__table" hover>
               <thead>
@@ -90,41 +111,42 @@ function Curators() {
                 </tr>
               </thead>
               <tbody>
-                {curators.map((curator) => (
-                  <tr key={curator.id}>
-                    <td>
-                      {`${curator.user.surname} ${curator.user.name} ${
-                        curator.user.patronymic
-                          ? ` ${curator.user.patronymic}`
-                          : ""
-                      }`}
-                    </td>
-                    <td>
-                      {curator.birthday.replace(
-                        /^(\d{4})-(\d{2})-(\d{2}).*/,
-                        "$3.$2.$1"
-                      )}
-                    </td>
-                    <td>{curator.id}</td>
-                    <td>
-                      {curator.startWorkDate.replace(
-                        /^(\d{4})-(\d{2})-(\d{2}).*/,
-                        "$3.$2.$1"
-                      )}
-                    </td>
-                    <td>
-                      <Link
-                        to={`/edit-curator/${curator.id}`}
-                        state={{
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        <img src={EditIcon} alt="" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {curators.map(
+                  (curator) =>
+                    (showInactive || curator.user.isActive) && (
+                      <tr key={curator.id}>
+                        <td>
+                          {`${curator.user.surname} ${curator.user.name} ${
+                            curator.user.patronymic
+                              ? ` ${curator.user.patronymic}`
+                              : ""
+                          }`}
+                        </td>
+                        <td>
+                          {curator.birthday.replace(
+                            /^(\d{4})-(\d{2})-(\d{2}).*/,
+                            "$3.$2.$1"
+                          )}
+                        </td>
+                        <td>{curator.id}</td>
+                        <td>
+                          {curator.startWorkDate.replace(
+                            /^(\d{4})-(\d{2})-(\d{2}).*/,
+                            "$3.$2.$1"
+                          )}
+                        </td>
+                        <td>
+                          <Link
+                            to={`/edit-curator/${curator.id}`}
+                            state={{ linkPrev: window.location.href }}
+                            className="alltickets__link"
+                          >
+                            <img src={EditIcon} alt="" />
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                )}
               </tbody>
             </Table>
           </div>

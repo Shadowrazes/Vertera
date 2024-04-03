@@ -83,6 +83,14 @@
   border-radius: 6px;
 }
 
+.p-checkbox {
+  display: inline-flex;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: bottom;
+  position: relative;
+}
+
 .p-multiselect-empty-message {
   margin-left: 15px;
 }
@@ -159,6 +167,10 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.add-unit__row {
+  margin-top: 20px !important;
 }
 
 @media screen and (max-width: 1200px) {

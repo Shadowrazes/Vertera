@@ -843,12 +843,14 @@ function allTickets() {
     location.href = "/";
   };
 
-  const newCuratorList = dataQueryCurators.map((curator) => ({
-    name: `${curator.user.surname} ${curator.user.name} ${
-      curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
-    }`,
-    id: curator.id,
-  }));
+  const newCuratorList = dataQueryCurators
+    .filter((curator) => curator.user.isActive == true)
+    .map((curator) => ({
+      name: `${curator.user.surname} ${curator.user.name} ${
+        curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
+      }`,
+      id: curator.id,
+    }));
 
   const newCountriesList = countryList.map((country) => ({
     name: country.name.stroke,
@@ -917,17 +919,20 @@ function allTickets() {
                             get_translation("INTERFACE_SELECT_UNIT")
                           }
                         >
-                          {dataTheme.map((unit, index) => (
-                            <Dropdown.Item
-                              key={index}
-                              onClick={() =>
-                                handleUnitClick(unit.name.stroke, unit.id)
-                              }
-                              href="#"
-                            >
-                              {unit.name.stroke}
-                            </Dropdown.Item>
-                          ))}
+                          {dataTheme.map(
+                            (unit, index) =>
+                              unit.visibility !== 3 && (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() =>
+                                    handleUnitClick(unit.name.stroke, unit.id)
+                                  }
+                                  href="#"
+                                >
+                                  {unit.name.stroke}
+                                </Dropdown.Item>
+                              )
+                          )}
                         </DropdownButton>
 
                         {selectedUnit && (
@@ -940,20 +945,23 @@ function allTickets() {
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.map((theme) => (
-                                <Dropdown.Item
-                                  key={theme.id}
-                                  onClick={() =>
-                                    handleThemeClick(
-                                      theme.name.stroke,
-                                      theme.id
-                                    )
-                                  }
-                                  href="#"
-                                >
-                                  {theme.name.stroke}
-                                </Dropdown.Item>
-                              ))}
+                              ?.themes.map(
+                                (theme) =>
+                                  theme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={theme.id}
+                                      onClick={() =>
+                                        handleThemeClick(
+                                          theme.name.stroke,
+                                          theme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {theme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
                           </DropdownButton>
                         )}
 
@@ -970,20 +978,23 @@ function allTickets() {
                               ?.themes.find(
                                 (theme) => theme.name.stroke === selectedTheme
                               )
-                              ?.subThemes.map((subTheme) => (
-                                <Dropdown.Item
-                                  key={subTheme.id}
-                                  onClick={() =>
-                                    handleSubThemeClick(
-                                      subTheme.name.stroke,
-                                      subTheme.id
-                                    )
-                                  }
-                                  href="#"
-                                >
-                                  {subTheme.name.stroke}
-                                </Dropdown.Item>
-                              ))}
+                              ?.subThemes.map(
+                                (subTheme) =>
+                                  subTheme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={subTheme.id}
+                                      onClick={() =>
+                                        handleSubThemeClick(
+                                          subTheme.name.stroke,
+                                          subTheme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {subTheme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
                           </DropdownButton>
                         )}
 
@@ -1176,17 +1187,20 @@ function allTickets() {
                             get_translation("INTERFACE_SELECT_UNIT")
                           }
                         >
-                          {dataTheme.map((unit, index) => (
-                            <Dropdown.Item
-                              key={index}
-                              onClick={() =>
-                                handleUnitClick(unit.name.stroke, unit.id)
-                              }
-                              href="#"
-                            >
-                              {unit.name.stroke}
-                            </Dropdown.Item>
-                          ))}
+                          {dataTheme.map(
+                            (unit, index) =>
+                              unit.visibility !== 3 && (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() =>
+                                    handleUnitClick(unit.name.stroke, unit.id)
+                                  }
+                                  href="#"
+                                >
+                                  {unit.name.stroke}
+                                </Dropdown.Item>
+                              )
+                          )}
                         </DropdownButton>
 
                         {selectedUnit && (
@@ -1199,20 +1213,23 @@ function allTickets() {
                           >
                             {dataTheme
                               .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.map((theme) => (
-                                <Dropdown.Item
-                                  key={theme.id}
-                                  onClick={() =>
-                                    handleThemeClick(
-                                      theme.name.stroke,
-                                      theme.id
-                                    )
-                                  }
-                                  href="#"
-                                >
-                                  {theme.name.stroke}
-                                </Dropdown.Item>
-                              ))}
+                              ?.themes.map(
+                                (theme) =>
+                                  theme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={theme.id}
+                                      onClick={() =>
+                                        handleThemeClick(
+                                          theme.name.stroke,
+                                          theme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {theme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
                           </DropdownButton>
                         )}
 
@@ -1229,20 +1246,23 @@ function allTickets() {
                               ?.themes.find(
                                 (theme) => theme.name.stroke === selectedTheme
                               )
-                              ?.subThemes.map((subTheme) => (
-                                <Dropdown.Item
-                                  key={subTheme.id}
-                                  onClick={() =>
-                                    handleSubThemeClick(
-                                      subTheme.name.stroke,
-                                      subTheme.id
-                                    )
-                                  }
-                                  href="#"
-                                >
-                                  {subTheme.name.stroke}
-                                </Dropdown.Item>
-                              ))}
+                              ?.subThemes.map(
+                                (subTheme) =>
+                                  subTheme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={subTheme.id}
+                                      onClick={() =>
+                                        handleSubThemeClick(
+                                          subTheme.name.stroke,
+                                          subTheme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {subTheme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
                           </DropdownButton>
                         )}
                       </div>
