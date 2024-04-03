@@ -109,6 +109,9 @@ export const resolvers = {
         userList: async (_, args) => {
             return await User.GetList();
         },
+        helperPerms: async (_, { id }) => {
+            return await HelperPermission.GetById(id);
+        },
         helper: async (_, { id }) => {
             return await Helper.GetById(id);
         },

@@ -28,6 +28,8 @@ export const Queries = `
         user(id: Int!): User
         userList(token: String!): [User]
 
+        helperPerms(id: Int!): HelperPermissions!
+
         clientList: [Client]
 
         ticketList(filters: TicketFilter!): TicketList!
