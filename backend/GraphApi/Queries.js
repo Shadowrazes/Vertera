@@ -47,13 +47,13 @@ export const Queries = `
         ticketStatusList: [TicketStatus]
         
         departmentList: [Department]
+
+        jobTitleList: [HelperJobTitle]
+
+        translationListFull: [TranslationFull]
     }
 
     type AdminQuery {
         class: String!
-
-        translationListFull: [TranslationFull]
-
-        jobTitleList: [HelperJobTitle]
     }
 `;

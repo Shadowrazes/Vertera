@@ -145,14 +145,15 @@ export const resolvers = {
         departmentList: async (_, args) => {
             return await Department.GetList();
         },
-    },
-    AdminQuery: {
         jobTitleList: async (_, args) => {
             return await HelperJobTitle.GetList();
         },
         translationListFull: async (_, args) => {
             return await Translation.GetListFull();
         },
+    },
+    AdminQuery: {
+        
     },
     Mutation: {
         clientMutation: async (_, args, context) => {
