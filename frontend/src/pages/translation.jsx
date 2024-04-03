@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { Table, Form, Modal, Button } from "react-bootstrap";
 
-import { TRANSLATION_LIST } from "../apollo/queries";
+import { TRANSLATION_LIST, HELPER_PERMS } from "../apollo/queries";
 import { UPDATE_TRANSLATION } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
@@ -25,8 +25,18 @@ function Translation() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" ||
+      dataPerms?.helperQuery?.helperPerms.translationEdit
+    );
   };
 
   const { loading, error, data } = useQuery(TRANSLATION_LIST, {
@@ -36,8 +46,8 @@ function Translation() {
   });
 
   useEffect(() => {
-    if (data && data.adminQuery.translationListFull) {
-      setData(data.adminQuery.translationListFull);
+    if (data && data.helperQuery.translationListFull) {
+      setData(data.helperQuery.translationListFull);
     }
   }, [data]);
 
@@ -69,7 +79,7 @@ function Translation() {
     return <h2>Что-то пошло не так</h2>;
   }
 
-  const handleTranslation = (e, indexRow, indexColumn, code, lang) => {
+  const handleTranslation = (e, code, lang) => {
     const { value } = e.target;
 
     const updatedTranslationsCopy = [...updatedTranslations];
@@ -208,8 +218,6 @@ function Translation() {
                               onChange={(e) =>
                                 handleTranslation(
                                   e,
-                                  indexRow,
-                                  indexColumn,
                                   translationsData.code,
                                   translationStroke.lang
                                 )

@@ -3,8 +3,8 @@ import { Table, Tabs, Tab, Form, Modal, Button } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
-import { COUNTRY_LIST, LANGUAGE_LIST } from "../apollo/queries";
-import { ADD_LANG, DELETE_LANG } from "../apollo/mutations";
+import { COUNTRY_LIST, LANGUAGE_LIST, HELPER_PERMS } from "../apollo/queries";
+import { ADD_LANG, DELETE_LANG, EDIT_LANG } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -13,6 +13,7 @@ import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
 import DeleteIcon from "../assets/delete_icon.svg";
+import ApplyIcon from "../assets/apply_icon.svg";
 import "../css/table.css";
 import "../css/edit-ticket.css";
 import "../css/translation.css";
@@ -21,6 +22,8 @@ import "../css/countries.css";
 function Countries() {
   const [countiesList, setCountiesList] = useState([]);
   const [langList, setLangList] = useState([]);
+  const [changes, setChanges] = useState({});
+  const [inputValues, setInputValues] = useState({});
 
   const [newCodeValue, setNewCodeValue] = useState("");
   const [newNameValue, setNewNameValue] = useState("");
@@ -29,6 +32,7 @@ function Countries() {
 
   const [isAddLangVisible, setIsAddLangVisible] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
+  const [isApplyColumnVisible, setIsApplyColumnVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
@@ -38,8 +42,18 @@ function Countries() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "helper" || user.role === "system";
+    return (
+      user.role === "system" ||
+      dataPerms?.helperQuery?.helperPerms.translationEdit
+    );
   };
 
   const { loading, error, data, refetch } = useQuery(COUNTRY_LIST, {
@@ -80,6 +94,7 @@ function Countries() {
 
   const [addLang] = useMutation(ADD_LANG);
   const [deleteLang] = useMutation(DELETE_LANG);
+  const [editLang] = useMutation(EDIT_LANG);
 
   if (loading) {
     return <Loader />;
@@ -231,6 +246,45 @@ function Countries() {
     }
   };
 
+  const handleLangChange = (id, field, value) => {
+    setIsApplyColumnVisible(true);
+
+    setChanges({ ...changes, [id]: true });
+
+    setInputValues({
+      ...inputValues,
+      [id]: { ...inputValues[id], [field]: value, ["id"]: id },
+    });
+  };
+
+  const isApplyVisible = (id) => {
+    return changes[id];
+  };
+
+  const handleApplyChange = async (id) => {
+    const updatedChanges = { ...changes };
+    delete updatedChanges[id];
+    setChanges(updatedChanges);
+
+    if (Object.keys(updatedChanges).length == 0) {
+      setIsApplyColumnVisible(false);
+    }
+
+    try {
+      const result = await editLang({
+        variables: {
+          token: user.token,
+          id: inputValues[id].id,
+          code: inputValues[id].code,
+          name: inputValues[id].name,
+        },
+      });
+      console.log("Язык успешно обновлен", result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       {isAdmin() ? (
@@ -292,6 +346,7 @@ function Countries() {
                       <th>Код</th>
                       <th>Название</th>
                       <th>Удалить</th>
+                      {isApplyColumnVisible && <th>Применить</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -309,17 +364,21 @@ function Countries() {
                         <td>
                           <Form.Control
                             type="text"
-                            value={lang.code}
+                            value={inputValues[lang.id]?.code || lang.code}
                             className="countries__input"
-                            //   onChange={}
+                            onChange={(e) =>
+                              handleLangChange(lang.id, "code", e.target.value)
+                            }
                           />
                         </td>
                         <td>
                           <Form.Control
                             type="text"
-                            value={lang.name}
+                            value={inputValues[lang.id]?.name || lang.name}
                             className="countries__input"
-                            //   onChange={}
+                            onChange={(e) =>
+                              handleLangChange(lang.id, "name", e.target.value)
+                            }
                           />
                         </td>
                         <td>
@@ -330,6 +389,16 @@ function Countries() {
                             onClick={(e) => handleDeleteLang(e, lang.id)}
                           />
                         </td>
+                        <td>
+                          {isApplyVisible(lang.id) && (
+                            <img
+                              src={ApplyIcon}
+                              alt=""
+                              className="countries__delete-icon"
+                              onClick={() => handleApplyChange(lang.id)}
+                            />
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -337,11 +406,6 @@ function Countries() {
               </div>
               {isButtonVisible && (
                 <div className="countries__lang-buttons">
-                  <ButtonCustom
-                    title="Применить изменения"
-                    // onClick={}
-                    className={"table__btn"}
-                  />
                   <ButtonCustom
                     title="Добавить язык"
                     onClick={handleAddLangView}

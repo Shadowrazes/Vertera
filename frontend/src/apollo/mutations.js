@@ -163,22 +163,24 @@ export const EDIT_HELPER_USER = gql`
     $departmentId: [Int]!
     $jobTitleId: Int!
   ) {
-    adminMutation(token: $token) {
-      updateHelperUser(
-        id: $id
-        userFields: {
-          name: $name
-          surname: $surname
-          patronymic: $patronymic
-          countryId: $countryId
+    helperMutation(token: $token) {
+      helperObj {
+        updateHelperUser(
+          id: $id
+          userFields: {
+            name: $name
+            surname: $surname
+            patronymic: $patronymic
+            countryId: $countryId
+          }
+          helperFields: {
+            jobTitleId: $jobTitleId
+            birthday: $birthday
+            departmentIds: $departmentId
+          }
+        ) {
+          changed
         }
-        helperFields: {
-          jobTitleId: $jobTitleId
-          birthday: $birthday
-          departmentIds: $departmentId
-        }
-      ) {
-        changed
       }
     }
   }
@@ -251,30 +253,6 @@ export const EDIT_UNIT = gql`
             orderNum: $orderNum
           }
         ) {
-          changed
-        }
-      }
-    }
-  }
-`;
-
-export const DELETE_UNIT = gql`
-  mutation ($token: String!, $id: Int!) {
-    helperMutation(token: $token) {
-      themeObj {
-        updateUnit(id: $id, fields: { visibility: 3, lang: "ru" }) {
-          changed
-        }
-      }
-    }
-  }
-`;
-
-export const ACTIVATE_UNIT = gql`
-  mutation ($token: String!, $id: Int!) {
-    helperMutation(token: $token) {
-      themeObj {
-        updateUnit(id: $id, fields: { visibility: 1, lang: "ru" }) {
           changed
         }
       }
@@ -481,9 +459,11 @@ export const SPLIT_TICKET = gql`
 
 export const UPDATE_TRANSLATION = gql`
   mutation ($token: String!, $translationUpdate: [TranslationUpdate!]!) {
-    adminMutation(token: $token) {
-      updateTranslation(fields: $translationUpdate) {
-        changed
+    helperMutation(token: $token) {
+      translationObj {
+        updateTranslation(fields: $translationUpdate) {
+          changed
+        }
       }
     }
   }
@@ -556,11 +536,48 @@ export const ADD_LANG = gql`
   }
 `;
 
+export const EDIT_LANG = gql`
+  mutation ($token: String!, $id: Int!, $code: String, $name: String) {
+    helperMutation(token: $token) {
+      translationObj {
+        updateLang(id: $id, fields: { code: $code, name: $name }) {
+          changed
+        }
+      }
+    }
+  }
+`;
+
 export const DELETE_LANG = gql`
   mutation ($token: String!, $id: Int!) {
     helperMutation(token: $token) {
       translationObj {
         deleteLang(id: $id)
+      }
+    }
+  }
+`;
+
+export const UPDATE_CURATOR_PERMS = gql`
+  mutation (
+    $token: String!
+    $id: Int!
+    $sendMsg: Boolean!
+    $helperEdit: Boolean!
+    $themeEdit: Boolean!
+    $translationEdit: Boolean!
+  ) {
+    adminMutation(token: $token) {
+      updateHelperPerms(
+        id: $id
+        fields: {
+          sendMsg: $sendMsg
+          helperEdit: $helperEdit
+          themeEdit: $themeEdit
+          translationEdit: $translationEdit
+        }
+      ) {
+        changed
       }
     }
   }

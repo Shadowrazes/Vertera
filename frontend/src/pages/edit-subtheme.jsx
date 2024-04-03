@@ -10,12 +10,13 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { SUBTHEME, THEME_LIST, DEPARTMENTS_LIST } from "../apollo/queries";
 import {
-  EDIT_SUBTHEME,
-  DELETE_SUBTHEME,
-  ACTIVATE_SUBTHEME,
-} from "../apollo/mutations";
+  SUBTHEME,
+  THEME_LIST,
+  DEPARTMENTS_LIST,
+  HELPER_PERMS,
+} from "../apollo/queries";
+import { EDIT_SUBTHEME } from "../apollo/mutations";
 
 import { MultiSelect } from "primereact/multiselect";
 import BackTitle from "../components/back-title";
@@ -43,9 +44,15 @@ function EditSubtheme() {
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
-  const [showThree, setShowThree] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
+
+  const visibilityItems = {
+    1: "Доступно всем",
+    2: "Доступно кураторам",
+    3: "Не доступно",
+  };
+
+  const findKeyByValue = (obj, value) =>
+    Object.keys(obj).find((key) => obj[key] === value);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -53,8 +60,17 @@ function EditSubtheme() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const {
@@ -84,11 +100,6 @@ function EditSubtheme() {
 
   const [editSubtheme, { loading: loadingEditSubtheme }] =
     useMutation(EDIT_SUBTHEME);
-  const [deleteSubtheme, { loading: loadingDeleteSubtheme }] =
-    useMutation(DELETE_SUBTHEME);
-
-  const [activateSubtheme, { loading: loadingActivateSubtheme }] =
-    useMutation(ACTIVATE_SUBTHEME);
 
   const navigate = useNavigate();
 
@@ -199,10 +210,6 @@ function EditSubtheme() {
     return <Loader />;
   }
 
-  if (loadingDeleteSubtheme) {
-    return <Loader />;
-  }
-
   const handleUnitClick = (unit, unitId) => {
     setSelectedItem(unit);
     setSelectedUnit(unit);
@@ -252,13 +259,13 @@ function EditSubtheme() {
   const handleEditSubtheme = async (e) => {
     e.preventDefault();
 
-    console.log(selectedUnit);
-    console.log(selectedUnitId);
-    console.log(selectedTheme);
-    console.log(selectedThemeId);
-    console.log(nameValue);
-    console.log(selectedDepartments);
-    console.log(selectedDepartmentsId);
+    // console.log(selectedUnit);
+    // console.log(selectedUnitId);
+    // console.log(selectedTheme);
+    // console.log(selectedThemeId);
+    // console.log(nameValue);
+    // console.log(selectedDepartments);
+    // console.log(selectedDepartmentsId);
 
     if (
       nameValue.trim() == "" ||
@@ -280,7 +287,7 @@ function EditSubtheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           departmentIds: selectedDepartmentsId,
-          visibility: visibility,
+          visibility: parseInt(visibility),
           orderNum: orderNum,
         },
       });
@@ -293,67 +300,17 @@ function EditSubtheme() {
     }
   };
 
-  const handleDeleteTheme = (e) => {
-    e.preventDefault();
-    handleShowWarning();
-  };
-
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    setShowWarning(false);
-
-    try {
-      const result = await deleteSubtheme({
-        variables: {
-          token: user.token,
-          id: parseInt(subthemeId),
-        },
-      });
-      console.log("Подтема успешно удалена:", result);
-      setShowTwo(true);
-    } catch (error) {
-      console.error("Ошибка удалении подтемы:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
-  const handleActivateSubtheme = async (e) => {
-    e.preventDefault();
-
-    try {
-      const result = await activateSubtheme({
-        variables: {
-          token: user.token,
-          id: parseInt(subthemeId),
-        },
-      });
-      console.log("Подтема успешно активирована:", result);
-      setShowThree(true);
-    } catch (error) {
-      console.error("Ошибка активации подтемы:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
   const handleShow = () => {
     setShow(true);
   };
 
-  const handleShowWarning = () => {
-    setShowWarning(true);
-  };
-
-  const handleClose = () => {
-    setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
-  };
-
   const handleCloseLeave = () => {
     setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
     goToAllSubthemes();
+  };
+
+  const handleVisibilityClick = (visibility) => {
+    setVisibility(findKeyByValue(visibilityItems, visibility));
   };
 
   const newDepartmentList = departmentList.map((department) => ({
@@ -466,6 +423,26 @@ function EditSubtheme() {
               />
             </div>
 
+            <div className="edit-subtheme__field">
+              <Form.Label className="edit-curator__field-label">
+                Отображение
+              </Form.Label>
+              <DropdownButton
+                id="dropdown-custom-1"
+                title={visibilityItems[visibility] || "Уровень отображения"}
+              >
+                {Object.values(visibilityItems).map((item, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => handleVisibilityClick(item)}
+                    href="#"
+                  >
+                    {item}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+
             <div className="edit-curator__column">
               {isErrorVisible && (
                 <span className="form__error">{errorMsg()}</span>
@@ -476,23 +453,6 @@ function EditSubtheme() {
                   className={"add-curator__btn edit-curator__btn"}
                   onClick={handleEditSubtheme}
                 />
-                {visibility === 3 ? (
-                  <ButtonCustom
-                    title="Активировать подтему"
-                    className={
-                      "add-curator__btn edit-curator__btn alltickets__button-two"
-                    }
-                    onClick={handleActivateSubtheme}
-                  />
-                ) : (
-                  <ButtonCustom
-                    title="Деактивировать подтему"
-                    className={
-                      "add-curator__btn edit-curator__btn alltickets__button-two"
-                    }
-                    onClick={handleDeleteTheme}
-                  />
-                )}
               </div>
             </div>
           </Col>
@@ -507,51 +467,6 @@ function EditSubtheme() {
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
                 Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showTwo} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Подтема деактивирована</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Подтема успешно деактивирована</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showThree} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Подтема активирована</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Подтема успешно активирована</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showWarning} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Вы уверены, что хотите деактивировать эту подтему?</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Отмена
-              </Button>
-              <Button variant="primary" onClick={handleConfirm}>
-                Продолжить
               </Button>
             </Modal.Footer>
           </Modal>

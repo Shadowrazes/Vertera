@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Form,
@@ -11,6 +11,7 @@ import {
   DropdownButton,
 } from "react-bootstrap";
 
+import { HELPER_PERMS } from "../apollo/queries";
 import { ADD_UNIT } from "../apollo/mutations";
 
 import ButtonCustom from "../components/button";
@@ -28,16 +29,23 @@ function addUnit() {
   const [orderNum, setOrderNum] = useState(0);
   const [selectedVisibility, setSelectedVisibility] = useState(null);
 
-  const visibilityItems = ["Все", "Куратор", "Админ"];
-
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const navigate = useNavigate();
@@ -129,16 +137,6 @@ function addUnit() {
     goToAllUnits();
   };
 
-  // const handleVisibilityClick = (visibility) => {
-  //   if (visibility === "Все") {
-  //     setSelectedVisibility(2);
-  //   } else if (visibility === "Куратор") {
-  //     setSelectedVisibility(3);
-  //   } else if (visibility === "Админ") {
-  //     setSelectedVisibility(4);
-  //   }
-  // };
-
   return (
     <>
       {isAdmin() ? (
@@ -165,26 +163,6 @@ function addUnit() {
                   onChange={handleOrderNumChange}
                   min={0}
                 />
-                {/* <Form.Label
-                  className="edit-curator__field-label"
-                  style={{ marginTop: "20px" }}
-                >
-                  Отображение
-                </Form.Label>
-                <DropdownButton
-                  id="dropdown-custom-1"
-                  title={selectedVisibility || "Выберите для кого отображать"}
-                >
-                  {visibilityItems.map((item, index) => (
-                    <Dropdown.Item
-                      key={index}
-                      // onClick={}
-                      href="#"
-                    >
-                      {item}
-                    </Dropdown.Item>
-                  ))}
-                </DropdownButton> */}
               </Form.Group>
               {isErrorVisible && (
                 <span className="form__error">{errorMsg()}</span>
