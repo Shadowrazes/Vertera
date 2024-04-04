@@ -66,6 +66,14 @@ export const ADD_MESSAGE = gql`
   }
 `;
 
+export const DELETE_MESSAGE = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      deleteMessage(id: $id)
+    }
+  }
+`;
+
 export const UPDATE_TICKET = gql`
   mutation ($token: String!, $id: Int!, $fields: TicketUpdate!) {
     helperMutation(token: $token) {
@@ -553,6 +561,62 @@ export const DELETE_LANG = gql`
     helperMutation(token: $token) {
       translationObj {
         deleteLang(id: $id)
+      }
+    }
+  }
+`;
+
+export const ADD_COUNTRY = gql`
+  mutation (
+    $token: String!
+    $code: String!
+    $stroke: String!
+    $langIds: [Int]!
+  ) {
+    helperMutation(token: $token) {
+      translationObj {
+        addCountry(
+          fields: {
+            code: $code
+            stroke: $stroke
+            langIds: $langIds
+            lang: "ru"
+          }
+        )
+      }
+    }
+  }
+`;
+
+export const EDIT_COUNTRY = gql`
+  mutation (
+    $token: String!
+    $id: Int!
+    $code: String
+    $stroke: String
+    $langIds: [Int]
+  ) {
+    helperMutation(token: $token) {
+      translationObj {
+        updateCountry(
+          id: $id
+          fields: {
+            code: $code
+            stroke: $stroke
+            langIds: $langIds
+            lang: "ru"
+          }
+        )
+      }
+    }
+  }
+`;
+
+export const DELETE_COUNTRY = gql`
+  mutation ($token: String!, $id: Int!) {
+    helperMutation(token: $token) {
+      translationObj {
+        deleteCountry(id: $id)
       }
     }
   }

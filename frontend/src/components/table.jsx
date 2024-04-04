@@ -242,17 +242,21 @@ function TableTickets() {
   const getStatusColor = (status) => {
     switch (status) {
       case "Новый":
-        return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
+        return "#E3F3F6";
       case "В процессе":
-        return "#E6E3F6";
+        return "#F6F6E3";
       case "На уточнении":
-        return "rgba(171, 144, 0, 0.11)";
+        return "#F0E3F6";
       case "Ожидает дополнения":
-        return "rgba(102, 163, 209, 0.4)";
-      case "Закрыт":
-        return "rgba(171, 0, 0, 0.11)";
+        return "#F6EDE3";
+      case "У наставника":
+        return "#E3E5F6";
+      case "Уведомление":
+        return "#FFFFFF";
+      case "Выполнено":
+        return "#E3F6E5";
       default:
-        return "white";
+        return "#FFFFFF";
     }
   };
 
@@ -498,146 +502,6 @@ function TableTickets() {
           />
         </>
       )}
-      {/* <Table className="table__table">
-        {tickets.map((ticket) => (
-          <tr key={ticket.id}>
-            {isAdmin() && (
-              <td>
-                <Link
-                  to={`/dialog/${ticket.link}`}
-                  state={{
-                    status: ticket.status.name.stroke,
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  {ticket.id}
-                </Link>
-              </td>
-            )}
-            <td style={{ textAlign: "left" }}>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                {`${
-                  ticket.subTheme.theme.unit.name.stroke ===
-                  "Партнерам/Клиентам"
-                    ? "ПК"
-                    : "ДО"
-                } | ${ticket.subTheme.theme.name.stroke} ${
-                  ticket.subTheme.name.stroke === "none"
-                    ? ""
-                    : `| ${ticket.subTheme.name.stroke}`
-                }`}
-              </Link>
-            </td>
-            <td>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                {DateTime.fromISO(ticket.date, {
-                  zone: "utc",
-                })
-                  .toLocal()
-                  .toFormat("yyyy.MM.dd")}
-                <br />
-                {DateTime.fromISO(ticket.date, {
-                  zone: "utc",
-                })
-                  .toLocal()
-                  .toFormat("HH:mm:ss")}
-              </Link>
-            </td>
-            <td>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                {ticket.title.length > 20
-                  ? `${ticket.title.slice(0, 20)}...`
-                  : `${ticket.title}`}
-              </Link>
-            </td>
-            {isAdmin() && (
-              <td>
-                <Link
-                  to={`/dialog/${ticket.link}`}
-                  state={{
-                    status: ticket.status.name.stroke,
-                    linkPrev: window.location.href,
-                  }}
-                  className="alltickets__link"
-                >
-                  {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
-                </Link>
-              </td>
-            )}
-            <td>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
-                {ticket.lastMessage.sender.surname === "system"
-                  ? "Системное сообщение"
-                  : `${
-                      ticket.lastMessage.sender.name
-                    } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
-              </Link>
-            </td>
-            <td>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                {ticket.messages.length}
-              </Link>
-            </td>
-            <td>
-              <Link
-                to={`/dialog/${ticket.link}`}
-                state={{
-                  status: ticket.status.name.stroke,
-                  linkPrev: window.location.href,
-                }}
-                className="alltickets__link"
-              >
-                <span
-                  className="table__status"
-                  style={{
-                    background: getStatusColor(ticket.status.name.stroke),
-                    minWidth: "103px",
-                  }}
-                >
-                  {ticket.status.name.stroke}
-                </span>
-              </Link>
-            </td>
-          </tr>
-        ))}
-      </Table> */}
     </>
   );
 }

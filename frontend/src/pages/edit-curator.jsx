@@ -56,7 +56,6 @@ function EditCurator() {
   const [selectedCountryId, setSelectedCountryId] = useState(null);
   const [isActive, setIsActive] = useState(null);
 
-  // права доступа
   const [selectedAccessCurators, setSelectedAccessCurators] = useState(false);
   const [selectedAccessThemes, setSelectedAccessThemes] = useState(false);
   const [selectedAccessTransfers, setSelectedAccessTransfers] = useState(false);
@@ -109,6 +108,7 @@ function EditCurator() {
   const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

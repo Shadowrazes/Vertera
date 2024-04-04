@@ -6,7 +6,7 @@ const getStatusColor = (status) => {
   switch (status) {
     case "Открыто":
       return "#00AB97";
-    case "Закрыто":
+    case "Выполнено":
       return "#AB0000";
     default:
       return "black";
