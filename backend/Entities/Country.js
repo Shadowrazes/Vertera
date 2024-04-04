@@ -26,7 +26,7 @@ class Country extends Entity {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = { nameCode };
+            const insertFields = { nameCode, code: fields.code };
             const result = await super.TransRequest(conn, sql, [insertFields]);
 
             const langResult = await CountryLangs.TransInsert(conn, result.insertId, fields.langIds);
