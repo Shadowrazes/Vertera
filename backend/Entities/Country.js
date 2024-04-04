@@ -59,7 +59,7 @@ class Country extends Entity {
                 result = await super.TransRequest(conn, sql, [updateFields, id]);
             }
 
-            return result;
+            return result == undefined;
         });
     }
 
