@@ -216,7 +216,7 @@ class Helper extends Entity {
             ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.RecipientIdField} 
             LEFT JOIN ${User.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField} 
-            WHERE ${this.PrimaryField} IN ( 
+            WHERE ${this.TableName}.${this.PrimaryField} IN ( 
                 SELECT ${HelperDepartment.HelperIdField}  
                 FROM ${HelperDepartment.TableName} 
                 WHERE ${HelperDepartment.DepartmentIdField} 
