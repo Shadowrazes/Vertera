@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 import { Table, DropdownButton, Dropdown, Form } from "react-bootstrap";
 
-import { THEME_LIST } from "../apollo/queries";
+import { THEME_LIST, HELPER_PERMS } from "../apollo/queries";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -26,8 +26,17 @@ function Theme() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const { loading, error, data, refetch } = useQuery(THEME_LIST, {

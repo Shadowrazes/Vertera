@@ -449,7 +449,7 @@ export const CURATORS_LIST = gql`
 
 export const JOB_TITLE_LIST = gql`
   query ($token: String!, $lang: String!) {
-    adminQuery(token: $token) {
+    helperQuery(token: $token) {
       jobTitleList {
         id
         name(lang: $lang) {
@@ -498,6 +498,19 @@ export const HELPER = gql`
           themeEdit
           translationEdit
         }
+      }
+    }
+  }
+`;
+
+export const HELPER_PERMS = gql`
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
+      helperPerms(id: $id) {
+        sendMsg
+        helperEdit
+        themeEdit
+        translationEdit
       }
     }
   }
@@ -643,7 +656,7 @@ export const STATUS_LIST = gql`
 
 export const TRANSLATION_LIST = gql`
   query ($token: String!) {
-    adminQuery(token: $token) {
+    helperQuery(token: $token) {
       translationListFull {
         id
         code

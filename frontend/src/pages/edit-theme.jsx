@@ -11,8 +11,8 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { THEME, THEME_LIST } from "../apollo/queries";
-import { EDIT_THEME, DELETE_THEME, ACTIVATE_THEME } from "../apollo/mutations";
+import { THEME, THEME_LIST, HELPER_PERMS } from "../apollo/queries";
+import { EDIT_THEME } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
@@ -34,9 +34,15 @@ function EditTheme() {
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
-  const [showThree, setShowThree] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
+
+  const visibilityItems = {
+    1: "Доступно всем",
+    2: "Доступно кураторам",
+    3: "Не доступно",
+  };
+
+  const findKeyByValue = (obj, value) =>
+    Object.keys(obj).find((key) => obj[key] === value);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -44,8 +50,17 @@ function EditTheme() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const {
@@ -65,10 +80,6 @@ function EditTheme() {
   });
 
   const [editTheme, { loading: loadingEditTheme }] = useMutation(EDIT_THEME);
-  const [deleteTheme, { loading: loadingDeleteTheme }] =
-    useMutation(DELETE_THEME);
-  const [activateTheme, { loading: loadingActivateTheme }] =
-    useMutation(ACTIVATE_THEME);
 
   const navigate = useNavigate();
 
@@ -135,10 +146,6 @@ function EditTheme() {
     return <Loader />;
   }
 
-  if (loadingDeleteTheme) {
-    return <Loader />;
-  }
-
   const handleUnitClick = (unit, unitId) => {
     setSelectedItem(unit);
     setSelectedUnit(unit);
@@ -195,7 +202,7 @@ function EditTheme() {
           unitId: selectedUnitId,
           stroke: nameValue.trim(),
           lang: "ru",
-          visibility: visibility,
+          visibility: parseInt(visibility),
           orderNum: orderNum,
         },
       });
@@ -208,67 +215,17 @@ function EditTheme() {
     }
   };
 
-  const handleDeleteTheme = (e) => {
-    e.preventDefault();
-    handleShowWarning();
-  };
-
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    setShowWarning(false);
-
-    try {
-      const result = await deleteTheme({
-        variables: {
-          token: user.token,
-          id: parseInt(themeId),
-        },
-      });
-      console.log("Тема успешно удалена:", result);
-      setShowTwo(true);
-    } catch (error) {
-      console.error("Ошибка удалении темы:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
-  const handleActivateTheme = async (e) => {
-    e.preventDefault();
-
-    try {
-      const result = await activateTheme({
-        variables: {
-          token: user.token,
-          id: parseInt(themeId),
-        },
-      });
-      console.log("Тема успешно активирована:", result);
-      setShowThree(true);
-    } catch (error) {
-      console.error("Ошибка активации темы:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
   const handleShow = () => {
     setShow(true);
   };
 
-  const handleShowWarning = () => {
-    setShowWarning(true);
-  };
-
-  const handleClose = () => {
-    setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
-  };
-
   const handleCloseLeave = () => {
     setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
     goToAllThemes();
+  };
+
+  const handleVisibilityClick = (visibility) => {
+    setVisibility(findKeyByValue(visibilityItems, visibility));
   };
 
   return (
@@ -322,6 +279,27 @@ function EditTheme() {
                   onChange={handleOnChangeOrderNum}
                   min={0}
                 />
+
+                <Form.Label
+                  className="edit-curator__field-label"
+                  style={{ marginTop: "20px" }}
+                >
+                  Порядок
+                </Form.Label>
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={visibilityItems[visibility] || "Уровень отображения"}
+                >
+                  {Object.values(visibilityItems).map((item, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleVisibilityClick(item)}
+                      href="#"
+                    >
+                      {item}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
               </Form.Group>
 
               <div className="edit-curator__column">
@@ -334,23 +312,6 @@ function EditTheme() {
                     className={"add-curator__btn edit-curator__btn"}
                     onClick={handleEditTheme}
                   />
-                  {visibility === 3 ? (
-                    <ButtonCustom
-                      title="Активировать тему"
-                      className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
-                      }
-                      onClick={handleActivateTheme}
-                    />
-                  ) : (
-                    <ButtonCustom
-                      title="Деактивировать тему"
-                      className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
-                      }
-                      onClick={handleDeleteTheme}
-                    />
-                  )}
                 </div>
               </div>
             </Col>
@@ -366,54 +327,6 @@ function EditTheme() {
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
                 Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showTwo} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Тема деактивирована</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Тема успешно деактивирована</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showThree} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Тема активирована</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Тема успешно активирована</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showWarning} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                Вы уверены, что хотите деактивировать эту тему, а также все
-                подтемы, соответствующие ей?
-              </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Отмена
-              </Button>
-              <Button variant="primary" onClick={handleConfirm}>
-                Продолжить
               </Button>
             </Modal.Footer>
           </Modal>

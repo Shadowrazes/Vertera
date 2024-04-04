@@ -17,8 +17,7 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 
-import { LOGIN } from "../apollo/queries";
-import { TRANSLATE } from "../apollo/queries";
+import { LOGIN, TRANSLATE, HELPER_PERMS } from "../apollo/queries";
 
 import Logo from "../assets/logo.svg";
 import headerBtn from "../assets/header_exit.svg";
@@ -31,8 +30,10 @@ function Header({ user }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [menuTarget, setMenuTarget] = useState(null);
+
   const [isLoad, setIsLoad] = useState(false);
   const [isError, setIsError] = useState(false);
+
   const [language, setLanguage] = useState(localStorage.getItem("language"));
   const ref = useRef(null);
 
@@ -44,6 +45,13 @@ function Header({ user }) {
     variables: {
       token: user?.token,
       lang: language,
+    },
+  });
+
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
     },
   });
 
@@ -62,7 +70,7 @@ function Header({ user }) {
       });
       localStorage.setItem("translation", JSON.stringify(translateList));
     }
-  }, [languageData]);
+  }, [languageData, dataPerms]);
 
   const languagesList = [
     {
@@ -340,19 +348,26 @@ function Header({ user }) {
                   </Nav.Link>
                 </>
               )}
-              {isAdmin() && (
+
+              {dataPerms?.helperQuery?.helperPerms.helperEdit || isAdmin() ? (
+                <Nav.Link href="/curators">
+                  {get_translation("INTERFACE_CURATORS")}
+                </Nav.Link>
+              ) : null}
+              {dataPerms?.helperQuery?.helperPerms.themeEdit || isAdmin() ? (
+                <Nav.Link href="/themes">
+                  {get_translation("INTERFACE_THEMES")}
+                </Nav.Link>
+              ) : null}
+              {dataPerms?.helperQuery?.helperPerms.translationEdit ||
+              isAdmin() ? (
                 <>
-                  <Nav.Link href="/curators">
-                    {get_translation("INTERFACE_CURATORS")}
-                  </Nav.Link>
-                  <Nav.Link href="/themes">
-                    {get_translation("INTERFACE_THEMES")}
-                  </Nav.Link>
                   <Nav.Link href="/translation">
                     {get_translation("INTERFACE_TRANSLATION")}
                   </Nav.Link>
+                  <Nav.Link href="/countries">Страны</Nav.Link>
                 </>
-              )}
+              ) : null}
               <Nav.Link>
                 <Button variant="danger" size="sm" onClick={handleShow}>
                   {get_translation("INTERFACE_LOG_OUT")}

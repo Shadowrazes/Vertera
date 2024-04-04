@@ -3,7 +3,7 @@ import { Table, Form } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
-import { CURATORS_LIST } from "../apollo/queries";
+import { CURATORS_LIST, HELPER_PERMS } from "../apollo/queries";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -25,8 +25,17 @@ function Curators() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "helper" || user.role === "system";
+    return (
+      dataPerms.helperQuery.helperPerms.helperEdit || user.role === "system"
+    );
   };
 
   const { loading, error, data, refetch } = useQuery(CURATORS_LIST, {

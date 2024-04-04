@@ -15,6 +15,7 @@ import {
   COUNTRY_LIST,
   DEPARTMENTS_LIST,
   JOB_TITLE_LIST,
+  HELPER_PERMS,
 } from "../apollo/queries";
 import { ADD_HELPER_USER } from "../apollo/mutations";
 
@@ -60,8 +61,17 @@ function AddCurator() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms.helperQuery.helperPerms.helperEdit
+    );
   };
 
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST, {
@@ -102,8 +112,8 @@ function AddCurator() {
       setDepartmentList(data.helperQuery.departmentList);
     }
 
-    if (dataJobTitle && dataJobTitle.adminQuery.jobTitleList) {
-      setJobTitleList(dataJobTitle.adminQuery.jobTitleList);
+    if (dataJobTitle && dataJobTitle.helperQuery.jobTitleList) {
+      setJobTitleList(dataJobTitle.helperQuery.jobTitleList);
     }
 
     if (dataCountryList && dataCountryList.clientQuery.countryList) {

@@ -11,7 +11,7 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { THEME_LIST } from "../apollo/queries";
+import { THEME_LIST, HELPER_PERMS } from "../apollo/queries";
 import { ADD_THEME } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
@@ -41,8 +41,17 @@ function AddTheme() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const { loading, error, data } = useQuery(THEME_LIST, {
@@ -150,7 +159,7 @@ function AddTheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           visibility: 1,
-          orderNum: orderNum,
+          orderNum: parseInt(orderNum),
         },
       });
 

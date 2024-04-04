@@ -15,12 +15,14 @@ import {
   DELETE_USER,
   DISABLE_HELPER_USER,
   EDIT_HELPER_USER,
+  UPDATE_CURATOR_PERMS,
 } from "../apollo/mutations";
 import {
   COUNTRY_LIST,
   DEPARTMENTS_LIST,
   HELPER,
   JOB_TITLE_LIST,
+  HELPER_PERMS,
 } from "../apollo/queries";
 
 import { MultiSelect } from "primereact/multiselect";
@@ -55,10 +57,10 @@ function EditCurator() {
   const [isActive, setIsActive] = useState(null);
 
   // права доступа
-  const [selectedAcessCurators, setSelectedAcessCurators] = useState(false);
-  const [selectedAcessThemes, setSelectedAcessThemes] = useState(false);
-  const [selectedAcessTransfers, setSelectedAcessTransfers] = useState(false);
-  const [selectedAcessToAnswers, setSelectedAcessToAnswers] = useState(false);
+  const [selectedAccessCurators, setSelectedAccessCurators] = useState(false);
+  const [selectedAccessThemes, setSelectedAccessThemes] = useState(false);
+  const [selectedAccessTransfers, setSelectedAccessTransfers] = useState(false);
+  const [selectedAccessToAnswers, setSelectedAccessToAnswers] = useState(false);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -73,8 +75,17 @@ function EditCurator() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms.helperQuery.helperPerms.helperEdit
+    );
   };
 
   const { loading, error, data } = useQuery(HELPER, {
@@ -109,6 +120,8 @@ function EditCurator() {
 
   const [deleteUser, { loading: loadingDeleteUser }] = useMutation(DELETE_USER);
 
+  const [updateCuratorPerms] = useMutation(UPDATE_CURATOR_PERMS);
+
   const navigate = useNavigate();
 
   const goToAllCurators = () => {
@@ -119,6 +132,15 @@ function EditCurator() {
     if (data && data.helperQuery.helper) {
       // console.log(data.helper.birthday);
       setBirthdayValue(new Date(data.helperQuery.helper.birthday));
+    }
+
+    if (data && data.helperQuery.helper.permissions) {
+      setSelectedAccessToAnswers(data.helperQuery.helper.permissions.sendMsg);
+      setSelectedAccessCurators(data.helperQuery.helper.permissions.helperEdit);
+      setSelectedAccessThemes(data.helperQuery.helper.permissions.themeEdit);
+      setSelectedAccessTransfers(
+        data.helperQuery.helper.permissions.translationEdit
+      );
     }
 
     if (data && data.helperQuery.helper.user) {
@@ -154,9 +176,9 @@ function EditCurator() {
       setDepartmentList(dataDepartmentsList.helperQuery.departmentList);
     }
 
-    if (dataJobTitleList && dataJobTitleList.adminQuery.jobTitleList) {
+    if (dataJobTitleList && dataJobTitleList.helperQuery.jobTitleList) {
       // console.log(dataJobTitleList.jobTitleList);
-      setJobTitleList(dataJobTitleList.adminQuery.jobTitleList);
+      setJobTitleList(dataJobTitleList.helperQuery.jobTitleList);
     }
 
     if (dataCountryList && dataCountryList.clientQuery.countryList) {
@@ -227,20 +249,20 @@ function EditCurator() {
     setIsErrorVisible(false);
   };
 
-  const handleOnChangeAcessCurators = (e) => {
-    setSelectedAcessCurators(e.target.checked);
+  const handleOnChangeAccessCurators = (e) => {
+    setSelectedAccessCurators(e.target.checked);
   };
 
-  const handleOnChangeAcessThemes = (e) => {
-    setSelectedAcessThemes(e.target.checked);
+  const handleOnChangeAccessThemes = (e) => {
+    setSelectedAccessThemes(e.target.checked);
   };
 
-  const handleOnChangeAcessTransfers = (e) => {
-    setSelectedAcessTransfers(e.target.checked);
+  const handleOnChangeAccessTransfers = (e) => {
+    setSelectedAccessTransfers(e.target.checked);
   };
 
-  const handleOnChangeAcessAnswers = (e) => {
-    setSelectedAcessToAnswers(e.target.checked);
+  const handleOnChangeAccessAnswers = (e) => {
+    setSelectedAccessToAnswers(e.target.checked);
   };
 
   const handlePeriodClick = (originalDate) => {
@@ -322,6 +344,23 @@ function EditCurator() {
     const formattedDate = handlePeriodClick(birthdayValue);
 
     try {
+      const result = await updateCuratorPerms({
+        variables: {
+          token: user.token,
+          id: parseInt(curatorId),
+          sendMsg: selectedAccessToAnswers,
+          helperEdit: selectedAccessCurators,
+          themeEdit: selectedAccessThemes,
+          translationEdit: selectedAccessTransfers,
+        },
+      });
+      console.log("Права доступа успешно обновлены:", result);
+    } catch (error) {
+      console.error("Ошибка при обновлении прав:", error);
+      setIsErrorVisible(true);
+    }
+
+    try {
       let result;
       if (patronymicValue == null || patronymicValue.trim() == "") {
         result = await editHelperUser({
@@ -334,12 +373,6 @@ function EditCurator() {
             countryId: selectedCountryId,
             departmentId: selectedDepartmentsId,
             jobTitleId: selectedJobTitleId,
-            // acess: {
-            //   acessCurators: selectedAcessCurators,
-            //   acessThemes: selectedAcessThemes,
-            //   acessTransfers: selectedAcessTransfers,
-            //   acessToAnswer: selectedAcessToAnswers
-            // },
           },
         });
       } else {
@@ -354,12 +387,6 @@ function EditCurator() {
             countryId: selectedCountryId,
             departmentId: selectedDepartmentsId,
             jobTitleId: selectedJobTitleId,
-            // acess: {
-            //   acessCurators: selectedAcessCurators,
-            //   acessThemes: selectedAcessThemes,
-            //   acessTransfers: selectedAcessTransfers,
-            //   acessToAnswer: selectedAcessToAnswers
-            // },
           },
         });
       }
@@ -515,71 +542,80 @@ function EditCurator() {
                   onChange={(date) => setBirthdayValue(date)}
                 />
               </Form.Group>
-              <Form.Group
-                className="edit-curator__field-column"
-                controlId="CountryForm"
-              >
-                <div className="edit-curator__checkbox-block">
-                  <Form.Check
-                    className=""
-                    type="checkbox"
-                    id="custom-switch"
-                    value={selectedAcessCurators}
-                    onChange={handleOnChangeAcessCurators}
-                  />
-                  <span className="edit-curator__field-label">
-                    Редактирование кураторов
-                  </span>
-                </div>
-              </Form.Group>
-              <Form.Group
-                className="edit-curator__field-column"
-                controlId="CountryForm"
-              >
-                <div className="edit-curator__checkbox-block">
-                  <Form.Check
-                    type="checkbox"
-                    id="custom-switch"
-                    value={selectedAcessThemes}
-                    onChange={handleOnChangeAcessThemes}
-                  />
-                  <span className="edit-curator__field-label">
-                    Редактирование тем
-                  </span>
-                </div>
-              </Form.Group>
-              <Form.Group
-                className="edit-curator__field-column"
-                controlId="CountryForm"
-              >
-                <div className="edit-curator__checkbox-block">
-                  <Form.Check
-                    type="checkbox"
-                    id="custom-switch"
-                    value={selectedAcessTransfers}
-                    onChange={handleOnChangeAcessTransfers}
-                  />
-                  <span className="edit-curator__field-label">
-                    Редактирование переводов
-                  </span>
-                </div>
-              </Form.Group>
-              <Form.Group
-                className="edit-curator__field-column"
-                controlId="CountryForm"
-              >
-                <div className="edit-curator__checkbox-block">
-                  <Form.Check
-                    type="checkbox"
-                    id="custom-switch"
-                    value={selectedAcessToAnswers}
-                    onChange={handleOnChangeAcessAnswers}
-                  />
-                  <span className="edit-curator__field-label">
-                    Возможность отвечать на обращения
-                  </span>
-                </div>
-              </Form.Group>
+
+              {user.role === "system" && (
+                <>
+                  <Form.Group
+                    className="edit-curator__field-column"
+                    controlId="CountryForm"
+                  >
+                    <div className="edit-curator__checkbox-block">
+                      <Form.Check
+                        className=""
+                        type="checkbox"
+                        id="custom-switch"
+                        value={selectedAccessCurators}
+                        checked={selectedAccessCurators}
+                        onChange={handleOnChangeAccessCurators}
+                      />
+                      <span className="edit-curator__field-label">
+                        Редактирование кураторов
+                      </span>
+                    </div>
+                  </Form.Group>
+                  <Form.Group
+                    className="edit-curator__field-column"
+                    controlId="CountryForm"
+                  >
+                    <div className="edit-curator__checkbox-block">
+                      <Form.Check
+                        type="checkbox"
+                        id="custom-switch"
+                        value={selectedAccessThemes}
+                        checked={selectedAccessThemes}
+                        onChange={handleOnChangeAccessThemes}
+                      />
+                      <span className="edit-curator__field-label">
+                        Редактирование тем
+                      </span>
+                    </div>
+                  </Form.Group>
+                  <Form.Group
+                    className="edit-curator__field-column"
+                    controlId="CountryForm"
+                  >
+                    <div className="edit-curator__checkbox-block">
+                      <Form.Check
+                        type="checkbox"
+                        id="custom-switch"
+                        value={selectedAccessTransfers}
+                        checked={selectedAccessTransfers}
+                        onChange={handleOnChangeAccessTransfers}
+                      />
+                      <span className="edit-curator__field-label">
+                        Редактирование переводов
+                      </span>
+                    </div>
+                  </Form.Group>
+                  <Form.Group
+                    className="edit-curator__field-column"
+                    controlId="CountryForm"
+                  >
+                    <div className="edit-curator__checkbox-block">
+                      <Form.Check
+                        type="checkbox"
+                        id="custom-switch"
+                        value={selectedAccessToAnswers}
+                        checked={selectedAccessToAnswers}
+                        onChange={handleOnChangeAccessAnswers}
+                      />
+                      <span className="edit-curator__field-label">
+                        Возможность отвечать на обращения
+                      </span>
+                    </div>
+                  </Form.Group>
+                </>
+              )}
             </Col>
 
             <Col className="edit-curator__column">

@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { Form, Row, Col, Modal, Button } from "react-bootstrap";
+import {
+  Form,
+  Row,
+  Col,
+  Modal,
+  Button,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 
-import { UNIT } from "../apollo/queries";
-import { EDIT_UNIT, DELETE_UNIT, ACTIVATE_UNIT } from "../apollo/mutations";
+import { UNIT, HELPER_PERMS } from "../apollo/queries";
+import { EDIT_UNIT } from "../apollo/mutations";
 
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
@@ -22,9 +30,15 @@ function EditUnit() {
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
-  const [showThree, setShowThree] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
+
+  const visibilityItems = {
+    1: "Доступно всем",
+    2: "Доступно кураторам",
+    3: "Не доступно",
+  };
+
+  const findKeyByValue = (obj, value) =>
+    Object.keys(obj).find((key) => obj[key] === value);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -32,8 +46,17 @@ function EditUnit() {
     window.location.href = "/";
   }
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user.role === "system";
+    return (
+      user.role === "system" || dataPerms?.helperQuery?.helperPerms.themeEdit
+    );
   };
 
   const { loading, error, data, refetch } = useQuery(UNIT, {
@@ -44,9 +67,6 @@ function EditUnit() {
   });
 
   const [editUnit, { loading: loadingEditUnit }] = useMutation(EDIT_UNIT);
-  const [deleteUnit, { loading: loadingDeleteUnit }] = useMutation(DELETE_UNIT);
-  const [activateUnit, { loading: loadingActivateUnit }] =
-    useMutation(ACTIVATE_UNIT);
 
   const navigate = useNavigate();
 
@@ -97,10 +117,6 @@ function EditUnit() {
     return <Loader />;
   }
 
-  if (loadingDeleteUnit) {
-    return <Loader />;
-  }
-
   const handleOnChangeName = (e) => {
     setNameValue(e.target.value);
     setIsErrorVisible(false);
@@ -141,8 +157,8 @@ function EditUnit() {
           id: parseInt(unitId),
           stroke: nameValue.trim(),
           lang: "ru",
-          visibility: 1,
-          orderNum: orderNum,
+          visibility: parseInt(visibility),
+          orderNum: parseInt(orderNum),
         },
       });
 
@@ -154,67 +170,17 @@ function EditUnit() {
     }
   };
 
-  const handleDeleteUnit = (e) => {
-    e.preventDefault();
-    handleShowWarning();
-  };
-
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    setShowWarning(false);
-
-    try {
-      const result = await deleteUnit({
-        variables: {
-          token: user.token,
-          id: parseInt(unitId),
-        },
-      });
-      console.log("Раздел успешно удален:", result);
-      setShowTwo(true);
-    } catch (error) {
-      console.error("Ошибка удалении раздела:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
-  const handleActivateUnit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const result = await activateUnit({
-        variables: {
-          token: user.token,
-          id: parseInt(unitId),
-        },
-      });
-      console.log("Раздел успешно активирован:", result);
-      setShowThree(true);
-    } catch (error) {
-      console.error("Ошибка активации раздела:", error);
-      setIsErrorVisible(true);
-    }
-  };
-
   const handleShow = () => {
     setShow(true);
   };
 
-  const handleShowWarning = () => {
-    setShowWarning(true);
-  };
-
-  const handleClose = () => {
-    setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
-  };
-
   const handleCloseLeave = () => {
     setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
     goToAllUnits();
+  };
+
+  const handleVisibilityClick = (visibility) => {
+    setVisibility(findKeyByValue(visibilityItems, visibility));
   };
 
   return (
@@ -247,6 +213,24 @@ function EditUnit() {
                   onChange={handleOnChangeOrderNum}
                   min={0}
                 />
+
+                <Form.Label className="edit-curator__field-label">
+                  Отображение
+                </Form.Label>
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={visibilityItems[visibility] || "Уровень отображения"}
+                >
+                  {Object.values(visibilityItems).map((item, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleVisibilityClick(item)}
+                      href="#"
+                    >
+                      {item}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
               </Form.Group>
 
               <div className="edit-unit__column">
@@ -259,23 +243,6 @@ function EditUnit() {
                     className={"add-curator__btn edit-curator__btn"}
                     onClick={handleEditUnit}
                   />
-                  {visibility === 3 ? (
-                    <ButtonCustom
-                      title="Активировать раздел"
-                      className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
-                      }
-                      onClick={handleActivateUnit}
-                    />
-                  ) : (
-                    <ButtonCustom
-                      title="Деактивировать раздел"
-                      className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
-                      }
-                      onClick={handleDeleteUnit}
-                    />
-                  )}
                 </div>
               </div>
             </Col>
@@ -291,54 +258,6 @@ function EditUnit() {
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseLeave}>
                 Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showTwo} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Раздел деактивирован</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Раздел успешно деактивирован</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showThree} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Раздел активирован</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Раздел успешно активирован</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal show={showWarning} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                Вы уверены, что хотите деактивировать этот раздел, а также все
-                темы и подтемы, соответствующие ему?
-              </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Отмена
-              </Button>
-              <Button variant="primary" onClick={handleConfirm}>
-                Продолжить
               </Button>
             </Modal.Footer>
           </Modal>
