@@ -17,6 +17,8 @@ export const Mutations = `
 
     type HelperMutation {
         class: String!
+
+        deleteMessage(id: Int!): Int!
         
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!

@@ -200,6 +200,9 @@ export const resolvers = {
         },
     },
     HelperMutation: {
+        deleteMessage: async (_, { id }, context) => {
+            return await Message.DeleteCascade(id, context.user);
+        },
         addTicketMass: async (_, args) => {
             return await Ticket.TransInsertMass(args);
         },

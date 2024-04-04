@@ -155,8 +155,13 @@ class Message extends Entity {
         });
     }
 
-    static async Delete(id) {
+    static async DeleteCascade(id, initiator) {
+        const curMsg = await this.GetById(id);
+        if(curMsg.senderId != initiator.id) throw new Error(Errors.DelNotOwnMsg);
 
+        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+        const result = await super.Request(sql, [id]);
+        return result.affectedRows;
     }
 }
 

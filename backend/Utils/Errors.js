@@ -13,6 +13,7 @@ class Errors {
     static IncorrectMsgReciever = 'Incorrect msg reciever';
     static UserNotFOund = 'Incorrect user';
     static MsgSendForbidden = 'Msg forbidden';
+    static DelNotOwnMsg = 'Del forbidden';
     static MsgInClosedTicket = 'Ticket closed';
     static UpdateOfNotificationTicket = 'Changes forbidden';
     static ForbiddenTranslationType = 'This type of translation is forbidden';
