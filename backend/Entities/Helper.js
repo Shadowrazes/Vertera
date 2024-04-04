@@ -214,6 +214,8 @@ class Helper extends Entity {
                 GROUP BY ${Ticket.RecipientIdField}
             ) AS ${Ticket.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.RecipientIdField} 
+            LEFT JOIN ${User.TableName} 
+            ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField} 
             WHERE ${this.PrimaryField} IN ( 
                 SELECT ${HelperDepartment.HelperIdField}  
                 FROM ${HelperDepartment.TableName} 
@@ -223,6 +225,7 @@ class Helper extends Entity {
                 ) 
                 GROUP BY ${HelperDepartment.HelperIdField}
             ) 
+            AND ${User.TableName}.${User.IsActiveField} <> 0
             ORDER BY ${ticketCountAS}
             LIMIT 1
         `;
