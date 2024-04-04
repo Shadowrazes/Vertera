@@ -156,7 +156,7 @@ class Message extends Entity {
     }
 
     static async DeleteCascade(id, initiator) {
-        const curMsg = await this.GetById(id);
+        const curMsg = await this.GetById(id, initiator);
         if(curMsg.senderId != initiator.id) throw new Error(Errors.DelNotOwnMsg);
 
         const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
