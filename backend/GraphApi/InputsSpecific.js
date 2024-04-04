@@ -41,6 +41,11 @@ export const InputsSpecific = `
         offset: Int!
         dateAfter: DateTime
         dateBefore: DateTime
+        unitIds: [Int]
+        themeIds: [Int]
+        subThemeIds: [Int]
+        countryIds: [Int]
+        departmentIds: [Int]
     }
 
     input TicketSplitArgItem {
