@@ -87,6 +87,7 @@ function AddCurator() {
   } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

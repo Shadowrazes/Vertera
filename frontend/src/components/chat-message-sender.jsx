@@ -1,18 +1,33 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+
+import { MESSAGE } from "../apollo/queries";
+
+import ButtonCustom from "../components/button";
 
 import { franc } from "franc";
 import { Translater } from "../api/translater";
 
+import DeleteMsgIcon from "../assets/delete_msg_icon.svg";
 import "../css/chat-message-sender.css";
 
-function ChatMessage({ message, sender, time, attachs }) {
+function ChatMessage({ id, message, sender, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
+  const [senderId, setSenderId] = useState(null);
 
   let isVisible;
 
   const isBuild = import.meta.env.DEV !== "build";
 
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [language, setLanguage] = useState(localStorage.getItem("language"));
+
+  const { data } = useQuery(MESSAGE, {
+    variables: {
+      token: user.token,
+      id: id,
+    },
+  });
 
   const languageCode = {
     rus: ["RU", "/flags/ru.svg"],
@@ -85,9 +100,18 @@ function ChatMessage({ message, sender, time, attachs }) {
         // console.log("selected", languageCodeQuery[language]);
       }
     };
+
+    if (data && data.clientQuery.message) {
+      setSenderId(data.clientQuery.message.sender.id);
+    }
+
     fetchData();
     setTranslatedText("");
-  }, [message, language]);
+  }, [data, message, language]);
+
+  const handleDeleteMsg = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <>
@@ -146,6 +170,19 @@ function ChatMessage({ message, sender, time, attachs }) {
             </>
           )}
           <span className="chat-message-sender__time">{time}</span>
+          {console.log(user.id)}
+          {console.log(senderId)}
+          {user.id === senderId && (
+            <div className="chat-message-sender__delete">
+              <img
+                src={DeleteMsgIcon}
+                alt=""
+                className="countries__delete-icon"
+                style={{ width: "42px" }}
+                onClick={() => handleDeleteMsg}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>

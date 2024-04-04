@@ -221,6 +221,7 @@ function allTickets() {
   const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
   const { getCuratorsList, data: dataCurators } = useQuery(CURATORS_LIST, {
@@ -825,17 +826,21 @@ function allTickets() {
   const getStatusColor = (status) => {
     switch (status) {
       case "Новый":
-        return "linear-gradient(0deg, rgba(0, 171, 151, 0.11) 0%, rgba(0, 171, 151, 0.11) 100%), #FFF";
+        return "#E3F3F6";
       case "В процессе":
-        return "#E6E3F6";
+        return "#F6F6E3";
       case "На уточнении":
-        return "rgba(171, 144, 0, 0.11)";
+        return "#F0E3F6";
       case "Ожидает дополнения":
-        return "rgba(102, 163, 209, 0.4)";
-      case "Закрыт":
-        return "rgba(171, 0, 0, 0.11)";
+        return "#F6EDE3";
+      case "У наставника":
+        return "#E3E5F6";
+      case "Уведомление":
+        return "#FFFFFF";
+      case "Выполнено":
+        return "#E3F6E5";
       default:
-        return "white";
+        return "#FFFFFF";
     }
   };
 

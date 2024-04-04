@@ -220,6 +220,18 @@ export const MESSAGES_CHAT = gql`
   }
 `;
 
+export const MESSAGE = gql`
+  query ($token: String!, $id: Int!) {
+    clientQuery(token: $token) {
+      message(id: $id) {
+        sender {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export const MESSAGES_CHAT_CLIENT = gql`
   query ($token: String!, $link: String!) {
     clientQuery(token: $token) {
@@ -517,17 +529,36 @@ export const HELPER_PERMS = gql`
 `;
 
 export const COUNTRY_LIST = gql`
-  query ($token: String!) {
+  query ($token: String!, $lang: String!) {
     clientQuery(token: $token) {
       countryList {
         id
         code
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
         langs {
           id
           code
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const COUNTRY = gql`
+  query ($token: String!, $id: Int!) {
+    clientQuery(token: $token) {
+      country(id: $id) {
+        id
+        code
+        name(lang: "ru") {
+          code
+          stroke
+        }
+        langs {
+          id
           name
         }
       }

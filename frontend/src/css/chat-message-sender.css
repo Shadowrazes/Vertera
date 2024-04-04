@@ -78,6 +78,12 @@
   font-weight: 400;
 }
 
+.chat-message-sender__delete {
+  text-align: right;
+  margin-right: -50px;
+  margin-top: 10px;
+}
+
 @media screen and (max-width: 768px) {
   .chat-message-sender__container {
     width: 100%;

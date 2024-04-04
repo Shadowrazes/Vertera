@@ -447,7 +447,7 @@ function Chat() {
 
     setMessage(draftToHtml(rawContent));
 
-    console.log(draftToHtml(rawContent));
+    // console.log(draftToHtml(rawContent));
     return draftToHtml(rawContent);
   };
 
@@ -519,6 +519,8 @@ function Chat() {
   const sendMsg = async (e) => {
     e.preventDefault();
 
+    // console.log(getContent());
+
     if (loaderAddMsg) {
       return <Loader />;
     }
@@ -526,9 +528,9 @@ function Chat() {
       return <h2>Что-то пошло не так</h2>;
     }
 
-    console.log();
+    // console.log(message);
 
-    if (message == "<p></p>") {
+    if (message == "<p></p>" || message == "<p></p>\n") {
       return;
     }
 
@@ -2300,6 +2302,7 @@ function Chat() {
                 {msg.sender.id === userId ? (
                   <>
                     <ChatMessageSender
+                      id={msg.id}
                       message={msg.text}
                       sender={msg.sender}
                       time={DateTime.fromISO(msg.date, { zone: "utc" })

@@ -22,6 +22,8 @@ import Admin from "./pages/admin";
 import OuterAuth from "./pages/outer-auth";
 import Translation from "./pages/translation";
 import Countries from "./pages/countries";
+import AddCountry from "./pages/add-country";
+import EditCountry from "./pages/edit-country";
 import CuratorCreateTicket from "./pages/curator-create-ticket";
 import NotFoundPage from "./pages/not-found-page";
 
@@ -71,6 +73,12 @@ function App() {
           <Route path="/external/authorization" element={<OuterAuth />} />
           <Route path="/translation" element={<Translation />} />
           <Route path="/countries" element={<Countries />} />
+          <Route path="/add-country" element={<AddCountry />} />
+          <Route
+            path="/edit-country/:countryId"
+            Component={EditCountry}
+            element={<EditCountry />}
+          />
           <Route
             path="/curator-create-ticket"
             element={<CuratorCreateTicket />}

@@ -37,6 +37,7 @@ function Countries() {
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -59,6 +60,7 @@ function Countries() {
   const { loading, error, data, refetch } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 
@@ -324,7 +326,15 @@ function Countries() {
                           )}
                         </td>
                         <td>
-                          <img src={EditIcon} alt="" />
+                          <Link
+                            to={`/edit-country/${country.id}`}
+                            state={{
+                              linkPrev: window.location.href,
+                            }}
+                            className="alltickets__link"
+                          >
+                            <img src={EditIcon} alt="" />
+                          </Link>
                         </td>
                       </tr>
                     ))}
