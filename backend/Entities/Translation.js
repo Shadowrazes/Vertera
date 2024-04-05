@@ -99,13 +99,17 @@ class Translation extends Entity {
     }
 
     static async GetListFull() {
+        let codesArr = [];
         const isActiveLangsCodes = await Langs.GetIsActiveCodeList();
+        isActiveLangsCodes.forEach((obj) => {
+            codesArr.push(obj.code);
+        });
 
         const sql = `
-            SELECT ${this.PrimaryField}, ${this.TypeField}, ${this.CodeField}, ? 
+            SELECT ${this.PrimaryField}, ${this.TypeField}, ${this.CodeField}, ?? 
             FROM ${this.TableName}
         `;
-        let result = await super.Request(sql, [isActiveLangsCodes]);
+        let result = await super.Request(sql, [codesArr]);
         this.TransformTranslations(result);
         return result;
     }
