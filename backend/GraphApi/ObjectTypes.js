@@ -173,6 +173,7 @@ export const ObjectTypes = `
         date: DateTime!
         readed: Boolean!
         visibility: Int!
+        isActive: Int!
     }
 
     type Attachment {

@@ -174,23 +174,17 @@ export const resolvers = {
             return await Client.TransInsert(args.userFields, args.clientFields);
         },
         addTicket: async (_, args, context) => {
-            if(context.user.role != User.RoleClient){
-                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
-            }
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             return await Ticket.TransInsert(args);
         },
         addMessage: async (_, args, context) => {
-            if(context.user.role != User.RoleClient){
-                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
-            }
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             args.fields.type = Message.TypeDefault;
             return await Message.TransInsert(args.fields);
         },
-        updateMessage: async (_, args) => {
-            if(context.user.role != User.RoleClient){
-                await HelperPermission.Validate(context.user.id, HelperPermission.SendMsgField);
-            }
-            return await Message.TransUpdate(args.id, args.fields);
+        updateMessage: async (_, args, context) => {
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
+            return await Message.TransUpdate(args.id, args.fields, context.user);
         },
         updateClientUser: async (_, args) => {
             return await Client.TransUpdate(args.id, args.userFields, args.clientFields);
@@ -200,31 +194,32 @@ export const resolvers = {
         },
     },
     HelperMutation: {
-        deleteMessage: async (_, { id }, context) => {
-            return await Message.DeleteCascade(id, context.user);
-        },
-        addTicketMass: async (_, args) => {
+        addTicketMass: async (_, args, context) => {
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             return await Ticket.TransInsertMass(args);
         },
         updateTicket: async (_, args, context) => {
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             return await Ticket.TransUpdate(args.id, args.fields, args.departmentId, context.user);
         },
         splitTicket: async (_, args, context) => {
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             return await Ticket.Split(args.id, args.argsList, context.user);
         },
         redirectTicketToMentor: async (_, args, context) => {
+            await HelperPermission.Validate(context.user, HelperPermission.SendMsgField);
             return await Ticket.RedirectToMentor(args.id, args.mentorId, context.user);
         },
         helperObj: async (_, args, context) => {
-            await HelperPermission.Validate(context.user.id, HelperPermission.HelperEditField);
+            await HelperPermission.Validate(context.user, HelperPermission.HelperEditField);
             return {class: 'helperObj'};
         },
         themeObj: async (_, args, context) => {
-            await HelperPermission.Validate(context.user.id, HelperPermission.ThemeEditField);
+            await HelperPermission.Validate(context.user, HelperPermission.ThemeEditField);
             return {class: 'themeObj'};
         },
         translationObj: async (_, args, context) => {
-            await HelperPermission.Validate(context.user.id, HelperPermission.TranslationEditField);
+            await HelperPermission.Validate(context.user, HelperPermission.TranslationEditField);
             return {class: 'translationObj'};
         },
     },
@@ -312,18 +307,6 @@ export const resolvers = {
         },
         updateHelperPerms: async (_, args) => {
             return await HelperPermission.TransUpdate(args.id, args.fields);
-        },
-        deleteTicket: async (_, { id }) => {
-            return await Ticket.DeleteCascade(id);
-        },
-        deleteUser: async (_, { id }) => {
-            return await User.DeleteCascade(id);
-        },
-        deleteThemeDepartment: async (_, { id }) => {
-            return await ThemeDepartment.DeleteCascade(id);
-        },
-        deleteDepartment: async (_, { id }) => {
-            return await Department.DeleteCascade(id);
         },
     },
     User: {

@@ -10,16 +10,14 @@ export const Mutations = `
         addTicket(ticketFields: TicketInsert!, messageFields: MessageInsert!, notification: Boolean!): TicketInsertInfo!
         addMessage(fields: MessageInsert!): Int!
 
-        updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateMessage(id: Int!, fields: MessageUpdate!): UpdateInfo!
+        updateClientUser(id: Int!, userFields: UserUpdate!, clientFields: ClientUpdate!): UpdateInfo!
         updateTicketByClient(id: Int!, fields: TicketClientUpdate!): UpdateInfo!
     }
 
     type HelperMutation {
         class: String!
 
-        deleteMessage(id: Int!): Int!
-        
         updateTicket(id: Int!, fields: TicketUpdate!, departmentId: Int): UpdateInfo!
         splitTicket(id: Int!, argsList: [TicketSplitArgItem!]!): Int!
         redirectTicketToMentor(id: Int!, mentorId: Int!): Int!
@@ -41,10 +39,5 @@ export const Mutations = `
         updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
         updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
         updateHelperPerms(id: Int!, fields: HelperPermissionsUpdate!): UpdateInfo!
-
-        deleteTicket(id: Int!): Int!
-        deleteUser(id: Int!) : Int!
-        deleteThemeDepartment(id: Int!) : Int!
-        deleteDepartment(id: Int!) : Int!
     }
 `;

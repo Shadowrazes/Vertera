@@ -17,6 +17,7 @@ export const InputsUpdate = `
 
     input MessageUpdate {
         readed: Boolean
+        isActive: Boolean
     }
 
     input UserUpdate {

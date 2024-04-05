@@ -19,6 +19,7 @@ class Message extends Entity {
     static TextField = 'text';
     static DateField = 'date';
     static VisibilityField = 'visibility';
+    static IsActiveField = 'isActive';
 
     static TypeDefault = 'common';
     static TypeSystem = 'system';
@@ -30,8 +31,11 @@ class Message extends Entity {
 
     static async GetById(id, initiator) {
         let sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        if(initiator.role == User.RoleClient){
-            sql += ` AND ${this.VisibilityField} < ${this.VisibleByHelpers}`;
+        if (initiator.role == User.RoleClient) {
+            sql += ` 
+                AND ${this.VisibilityField} < ${this.VisibleByHelpers}
+                AND ${this.IsActiveField} <> 0
+            `;
         }
         const result = await super.Request(sql, [id]);
         return result[0];
@@ -39,8 +43,11 @@ class Message extends Entity {
 
     static async GetListByTicket(ticketId, initiator) {
         let sql = `SELECT * FROM ${this.TableName} WHERE ${this.TicketIdField} = ?`;
-        if(initiator.role == User.RoleClient){
-            sql += ` AND ${this.VisibilityField} < ${this.VisibleByHelpers}`;
+        if (initiator.role == User.RoleClient) {
+            sql += ` 
+                AND ${this.VisibilityField} < ${this.VisibleByHelpers}
+                AND ${this.IsActiveField} <> 0
+            `;
         }
         const result = await super.Request(sql, [ticketId]);
         return result;
@@ -53,7 +60,7 @@ class Message extends Entity {
             if (curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
 
             const parentMessages = await this.GetListByTicket(ticketId);
-            
+
             const firstMsg = parentMessages.shift();
             const firstMsgAttachs = await Attachment.GetListByMsg(firstMsg.id);
 
@@ -70,10 +77,10 @@ class Message extends Entity {
             let curTicket = await Ticket.GetById(args.ticketId);
             const isFirstMsg = curTicket == undefined;
 
-            if(isFirstMsg){
+            if (isFirstMsg) {
                 curTicket = await Ticket.TransGetById(conn, args.ticketId);
             }
-            
+
             // Если тикет - уведомление или закрыт, писать запрещено
             if (curTicket.statusId == Ticket.StatusIdClosed) throw new Error(Errors.MsgInClosedTicket);
             if (!isFirstMsg && curTicket.statusId == this.StatusIdNotification) throw new Error(Errors.UpdateOfNotificationTicket);
@@ -89,13 +96,12 @@ class Message extends Entity {
                 curTicket.assistantId,
                 User.AdminId
             ];
-            if (!allowedSenderIds.includes(sender.id)) 
-            {
+            if (!allowedSenderIds.includes(sender.id)) {
                 throw new Error(Errors.MsgSendForbidden);
             }
 
             let visibility = this.VisibleByAll;
-            if (curTicket.statusId == Ticket.StatusIdOnRevision && sender.role == User.RoleHelper){
+            if (curTicket.statusId == Ticket.StatusIdOnRevision && sender.role == User.RoleHelper) {
                 visibility = this.VisibleByHelpers;
             }
 
@@ -122,7 +128,7 @@ class Message extends Entity {
             if (!isFirstMsg) {
                 const curReciever = await User.GetById(reciever.id);
 
-                if (curTicket.initiatorId != curReciever.id && curTicket.recipientId != curReciever.id){
+                if (curTicket.initiatorId != curReciever.id && curTicket.recipientId != curReciever.id) {
                     throw new Error(Errors.IncorrectMsgReciever);
                 }
 
@@ -144,9 +150,27 @@ class Message extends Entity {
         }
     }
 
-    static async TransUpdate(id, fields) {
+    static async TransUpdate(id, fields, initiator) {
         return await super.Transaction(async (conn) => {
             if (super.IsArgsEmpty(fields)) throw new Error(Errors.EmptyArgsFields);
+
+            const curMsg = await this.GetById(id, initiator);
+            if (curMsg.senderId != initiator.id) throw new Error(Errors.UpdNotOwnMsg);
+
+            const curTicket = await Ticket.GetById(curMsg.ticketId);
+
+            if (fields.isActive != undefined) {
+                let msgUpdLogFields = { ticketId: curTicket.id, initiatorId: initiator.id };
+
+                if (!fields.isActive) {
+                    msgUpdLogFields = { type: TicketLog.TypeMsgDel, info: `Удалил сообщение` };
+                }
+                else {
+                    msgUpdLogFields = { type: TicketLog.TypeMsgRecover, info: `Восстановил сообщение` };
+                }
+
+                const msgUpdLogRes = await TicketLog.TransInsert(conn, msgUpdLogFields);
+            }
 
             const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
             const result = await super.TransRequest(conn, sql, [fields, id]);
@@ -156,12 +180,23 @@ class Message extends Entity {
     }
 
     static async DeleteCascade(id, initiator) {
-        const curMsg = await this.GetById(id, initiator);
-        if(curMsg.senderId != initiator.id) throw new Error(Errors.DelNotOwnMsg);
+        return await super.Transaction(async (conn) => {
+            const curMsg = await this.GetById(id, initiator);
+            if (curMsg.senderId != initiator.id) throw new Error(Errors.UpdNotOwnMsg);
 
-        const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [id]);
-        return result.affectedRows;
+            const curTicket = await Ticket.GetById(curMsg.ticketId);
+
+            const sql = `DELETE FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.TransRequest(conn, sql, [id]);
+
+            const msgDelLogFields = {
+                type: TicketLog.TypeMsgDel, ticketId: curTicket.id,
+                info: `Удалил сообщение`, initiatorId: initiator.id
+            };
+            const msgDelLogRes = await TicketLog.TransInsert(conn, msgDelLogFields);
+
+            return result.affectedRows;
+        });
     }
 }
 

@@ -13,8 +13,9 @@ class Errors {
     static IncorrectMsgReciever = 'Incorrect msg reciever';
     static UserNotFOund = 'Incorrect user';
     static MsgSendForbidden = 'Msg forbidden';
-    static DelNotOwnMsg = 'Del forbidden';
+    static UpdNotOwnMsg = 'Upd forbidden';
     static MsgInClosedTicket = 'Ticket closed';
+    static NotEnoughPerms = 'Not enough perms';
     static UpdateOfNotificationTicket = 'Changes forbidden';
     static ForbiddenTranslationType = 'This type of translation is forbidden';
     static TranslationInsertLangNoRu = 'Insert is possible only by ru lang';

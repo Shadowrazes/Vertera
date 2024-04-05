@@ -11,6 +11,8 @@ class TicketLog extends Entity{
 
     static TypeCreate = 'create';
     static TypeMsgSend = 'msgSend';
+    static TypeMsgDel = 'msgDelete';
+    static TypeMsgRecover = 'msgRecover';
     static TypeSplit = 'split';
     static TypeDepChange = 'depChange';
     static TypeHelperAssign = 'helperAssign';

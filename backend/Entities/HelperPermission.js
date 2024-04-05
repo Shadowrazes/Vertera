@@ -10,14 +10,18 @@ class HelperPermission extends Entity {
     static ThemeEditField = 'themeEdit';
     static TranslationEditField = 'translationEdit';
 
-    static async Validate(helperId, permName) {
-        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
-        const result = await super.Request(sql, [helperId]);
-        const perms = result[0];
+    static async Validate(initiator, permName) {
+        if(initiator.role != User.RoleClient) {
+            const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
+            const result = await super.Request(sql, [initiator.id]);
+            const perms = result[0];
 
-        if(!perms[permName]) throw new Error(Errors.AccessForbidden);
+            if(!perms[permName]) throw new Error(Errors.NotEnoughPerms);
 
-        return perms[permName];
+            return perms[permName];
+        }
+
+        return true;
     }
 
     static async GetById(helperId) {
