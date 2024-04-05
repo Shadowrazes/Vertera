@@ -10,6 +10,7 @@ import TicketStatus from "./TicketStatus.js";
 import Department from "./Department.js";
 import HelperJobTitle from "./HelperJobTitle.js";
 import Country from "./Country.js";
+import Langs from "./Langs.js";
 
 class Translation extends Entity {
     static TableName = 'translations';
@@ -98,10 +99,13 @@ class Translation extends Entity {
     }
 
     static async GetListFull() {
+        const isActiveLangsCodes = await Langs.GetIsActiveCodeList();
+
         const sql = `
-            SELECT * FROM ${this.TableName}
+            SELECT ${this.PrimaryField}, ${this.TypeField}, ${this.CodeField}, ? 
+            FROM ${this.TableName}
         `;
-        let result = await super.Request(sql);
+        let result = await super.Request(sql, [isActiveLangsCodes]);
         this.TransformTranslations(result);
         return result;
     }

@@ -59,12 +59,14 @@ export const InputsUpdate = `
         lang: String!
         code: String
         stroke: String
+        isActive: Boolean
         langIds: [Int]
     }
 
     input LangUpdate {
         name: String
         code: String
+        isActive: Boolean
     }
 
     input TicketStatusUpdate {
@@ -102,8 +104,8 @@ export const InputsUpdate = `
     }
 
     input DepartmentUpdate {
-        stroke: String!
+        stroke: String
         lang: String!
-        individual: Boolean!
+        individual: Boolean
     }
 `;

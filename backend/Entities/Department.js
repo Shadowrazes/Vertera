@@ -24,7 +24,10 @@ class Department extends Entity {
             const nameCode = await Translation.TransInsert(conn, fields, this.TranslationType);
 
             const sql = `INSERT INTO ${this.TableName} SET ?`;
-            const insertFields = { individual: fields.individual, nameCode };
+
+            let insertFields = { nameCode };
+            if (fields.individual) insertFields.individual = fields.individual;
+
             const result = await super.TransRequest(conn, sql, [insertFields]);
             return nameCode;
         });

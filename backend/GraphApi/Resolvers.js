@@ -250,15 +250,6 @@ export const resolvers = {
         updateUnit: async (_, args, context) => {
             return await Unit.TransUpdate(args.id, args.fields, context.user);
         },
-        deleteUnit: async (_, { id }) => {
-            return await Unit.DeleteCascade(id);
-        },
-        deleteTheme: async (_, { id }) => {
-            return await Theme.DeleteCascade(id);
-        },
-        deleteSubTheme: async (_, { id }) => {
-            return await SubTheme.DeleteCascade(id);
-        },
     },
     TranslationObjMutation: {
         addCountry: async (_, args) => {
@@ -278,12 +269,6 @@ export const resolvers = {
         },
         updateTranslation: async (_, args) => {
             return await Translation.Update(args.fields);
-        },
-        deleteCountry: async (_, { id }) => {
-            return await Country.DeleteCascade(id);
-        },
-        deleteLang: async (_, { id }) => {
-            return await Langs.TransDelete(id);
         },
     },
     AdminMutation: {
@@ -307,6 +292,9 @@ export const resolvers = {
         },
         updateHelperPerms: async (_, args) => {
             return await HelperPermission.TransUpdate(args.id, args.fields);
+        },
+        deleteDepartment: async (_, { id }) => {
+            return await Department.DeleteCascade(id);
         },
     },
     User: {

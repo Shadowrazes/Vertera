@@ -65,7 +65,7 @@ export const InputsInsert = `
     input DepartmentInsert {
         stroke: String!
         lang: String!
-        individual: Boolean!
+        individual: Boolean
     }
 
     input TicketStatusInsert {

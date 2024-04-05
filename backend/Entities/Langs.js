@@ -6,6 +6,7 @@ class Langs extends Entity {
     static PrimaryField = 'id';
     static NameField = 'name';
     static CodeField = 'code';
+    static IsActiveField = 'isActive';
 
     static async GetById(id) {
         const sql = `SELECT * FROM ${this.TableName} WHERE ${this.PrimaryField} = ?`;
@@ -14,7 +15,13 @@ class Langs extends Entity {
     }
 
     static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.IsActiveField} <> 0`;
+        const result = await super.Request(sql);
+        return result;
+    }
+
+    static async GetIsActiveCodeList() {
+        const sql = `SELECT ${this.CodeField} FROM ${this.TableName} WHERE ${this.IsActiveField} <> 0`;
         const result = await super.Request(sql);
         return result;
     }

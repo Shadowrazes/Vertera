@@ -15,9 +15,6 @@ export const ObjectMutations = `
         updateSubTheme(id: Int!, fields: SubThemeUpdate!): UpdateInfo!
         updateTheme(id: Int!, fields: ThemeUpdate!): UpdateInfo!
         updateUnit(id: Int!, fields: UnitUpdate!): UpdateInfo!
-        deleteUnit(id: Int!) : Int!
-        deleteTheme(id: Int!) : Int!
-        deleteSubTheme(id: Int!) : Int!
     }
 
     type TranslationObjMutation {
@@ -29,7 +26,5 @@ export const ObjectMutations = `
         updateCountry(id: Int!, fields: CountryUpdate!): Int!
         updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
         updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
-        deleteCountry(id: Int!) : Int!
-        deleteLang(id: Int!) : Int!
     }
 `;

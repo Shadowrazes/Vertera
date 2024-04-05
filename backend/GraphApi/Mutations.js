@@ -39,5 +39,7 @@ export const Mutations = `
         updateTicketStatus(id: Int!, fields: TicketStatusUpdate!): UpdateInfo!
         updateHelperJobTitle(id: Int!, fields: HelperJobTitleUpdate!): UpdateInfo!
         updateHelperPerms(id: Int!, fields: HelperPermissionsUpdate!): UpdateInfo!
+
+        deleteDepartment(id: Int!) : Int!
     }
 `;

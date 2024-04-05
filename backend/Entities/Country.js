@@ -7,6 +7,7 @@ class Country extends Entity {
     static PrimaryField = 'id';
     static NameCodeField = 'nameCode';
     static CodeField = 'code';
+    static IsActiveField = 'isActive';
     static TranslationType = 'country'
 
     static async GetById(id) {
@@ -16,7 +17,7 @@ class Country extends Entity {
     }
 
     static async GetList() {
-        const sql = `SELECT * FROM ${this.TableName}`;
+        const sql = `SELECT * FROM ${this.TableName} WHERE ${this.IsActiveField} <> 0`;
         const result = await super.Request(sql);
         return result;
     }
@@ -54,6 +55,8 @@ class Country extends Entity {
 
             const updateFields = {};
             if (fields.code) updateFields.code = fields.code;
+            if (fields.isActive != undefined) updateFields.isActive = fields.isActive;
+
             if (!super.IsArgsEmpty(updateFields)) {
                 const sql = `UPDATE ${this.TableName} SET ? WHERE ${this.PrimaryField} = ?`;
                 result = await super.TransRequest(conn, sql, [updateFields, id]);

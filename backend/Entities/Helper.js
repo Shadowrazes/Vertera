@@ -31,7 +31,9 @@ class Helper extends Entity {
             SELECT * FROM ${this.TableName} 
             JOIN ${User.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField}
-            WHERE ${this.TableName}.${this.PrimaryField} <> 0
+            WHERE 
+            ${this.TableName}.${this.PrimaryField} <> 0 AND
+            ${User.TableName}.${User.IsActiveField} <> 0
         `;
 
         let fields = [];
