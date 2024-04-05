@@ -202,6 +202,7 @@
   border: 1px solid #00ab97 !important;
   font-family: "TT Norms Pro", sans-serif;
   color: #00ab97 !important;
+  margin-top: 20px;
 }
 
 .chat-input__row .chat-input__button-send {

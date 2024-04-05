@@ -24,6 +24,7 @@ import Translation from "./pages/translation";
 import Countries from "./pages/countries";
 import AddCountry from "./pages/add-country";
 import EditCountry from "./pages/edit-country";
+import Departments from "./pages/departments";
 import CuratorCreateTicket from "./pages/curator-create-ticket";
 import NotFoundPage from "./pages/not-found-page";
 
@@ -79,6 +80,7 @@ function App() {
             Component={EditCountry}
             element={<EditCountry />}
           />
+          <Route path="/departments" element={<Departments />} />
           <Route
             path="/curator-create-ticket"
             element={<CuratorCreateTicket />}

@@ -428,6 +428,27 @@ export const ACTIVATE_SUBTHEME = gql`
   }
 `;
 
+export const ADD_DEPARTMENT = gql`
+  mutation ($token: String!, $stroke: String!) {
+    adminMutation(token: $token) {
+      addDepartment(fields: { stroke: $stroke, lang: "ru", individual: false })
+    }
+  }
+`;
+
+export const EDIT_DEPARTMENT = gql`
+  mutation ($token: String!, $id: Int!, $stroke: String!) {
+    adminMutation(token: $token) {
+      updateDepartment(
+        id: $id
+        fields: { stroke: $stroke, lang: "ru", individual: false }
+      ) {
+        changed
+      }
+    }
+  }
+`;
+
 export const EDIT_TICKET = gql`
   mutation (
     $token: String!

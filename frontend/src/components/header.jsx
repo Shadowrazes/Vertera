@@ -227,7 +227,6 @@ function Header({ user }) {
       console.log(userName);
       document.location.href = "/all-tickets";
     }
-    refetch();
   }, [data, loginVariables]);
 
   useEffect(() => {
@@ -343,12 +342,13 @@ function Header({ user }) {
                   <Nav.Link href="/stats">
                     {get_translation("INTERFACE_STATS")}
                   </Nav.Link>
-                  <Nav.Link href="/curator-create-ticket">
-                    Создать обращение
-                  </Nav.Link>
                 </>
               )}
-
+              {isHelper() && dataPerms?.helperQuery?.helperPerms?.sendMsg ? (
+                <Nav.Link href="/curator-create-ticket">
+                  Создать обращение
+                </Nav.Link>
+              ) : null}
               {dataPerms?.helperQuery?.helperPerms.helperEdit || isAdmin() ? (
                 <Nav.Link href="/curators">
                   {get_translation("INTERFACE_CURATORS")}

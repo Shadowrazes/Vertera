@@ -33,6 +33,7 @@ import {
   MESSAGES_CHAT,
   MESSAGES_CHAT_CLIENT,
   THEME_LIST,
+  HELPER_PERMS,
 } from "../apollo/queries";
 
 import { Editor } from "react-draft-wysiwyg";
@@ -159,6 +160,13 @@ function Chat() {
   const { loading, error, data, refetch } = isAdmin()
     ? adminRequest()
     : clientRequest();
+
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
 
   const {
     loading: loadingThemeList,
@@ -1352,6 +1360,10 @@ function Chat() {
     setShowEditTicketErorr(false);
   };
 
+  const handleRefetch = () => {
+    refetch();
+  };
+
   if (isLoadingClose || !data?.clientQuery?.ticket) {
     refetch();
     return <Loader />;
@@ -1382,7 +1394,8 @@ function Chat() {
 
         {isAdmin() &&
           isVisibleHelperButtons &&
-          currentStatus !== "Уведомление" && (
+          currentStatus !== "Уведомление" &&
+          dataPerms.helperQuery.helperPerms.sendMsg && (
             <>
               <div className="chat__helper-buttons">
                 {isAdmin() &&
@@ -1614,7 +1627,8 @@ function Chat() {
                       )
                       .map(
                         (curator, index) =>
-                          curator.user.isActive && (
+                          curator.user.isActive &&
+                          curator.permissions.sendMsg && (
                             <Dropdown.Item
                               key={index}
                               onClick={() =>
@@ -1984,11 +1998,15 @@ function Chat() {
           {isVisible &&
           isAdmin() &&
           currentStatus !== "Новый" &&
-          currentStatus !== "Уведомление" ? (
+          currentStatus !== "Уведомление" &&
+          (user.id == data.clientQuery.ticket.initiator.id ||
+            user.id == data.clientQuery.ticket.recipient.id ||
+            user.id == data.clientQuery.ticket?.assistant?.id) &&
+          dataPerms.helperQuery.helperPerms.sendMsg ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
               {/* <button
                 className={
-                  isFormVisible ? "toggle-button-active" : "toggle-button"
+                  isFormVisible ? "toggle-button-active" : "toggle-button
                 }
                 onClick={toggleFormVisibility}
                 type="button"
@@ -2100,7 +2118,9 @@ function Chat() {
                       type="submit"
                       onClick={handleSubmit}
                     />
-                    {isAdmin() && currentStatus == "В процессе" ? (
+                    {isAdmin() &&
+                    currentStatus == "В процессе" &&
+                    dataPerms.helperQuery.helperPerms.sendMsg ? (
                       <ButtonCustom
                         title="Закрыть заявку"
                         className="chat-input__button-close"
@@ -2111,7 +2131,9 @@ function Chat() {
                       <></>
                     )}
                   </div>
-                  {isAdmin() && currentStatus == "Новый" ? (
+                  {isAdmin() &&
+                  currentStatus == "Новый" &&
+                  dataPerms.helperQuery.helperPerms.sendMsg ? (
                     <>
                       <div className="chat-input__button-row">
                         <ButtonCustom
@@ -2120,7 +2142,7 @@ function Chat() {
                           onClick={handleInProgress}
                         />
                       </div>
-                      {isAdmin() && (
+                      {/* {isAdmin() && (
                         <>
                           <a className="alltickets__link">
                             <ButtonCustom
@@ -2134,7 +2156,7 @@ function Chat() {
                             />
                           </a>
                         </>
-                      )}
+                      )} */}
                     </>
                   ) : (
                     <></>
@@ -2152,7 +2174,9 @@ function Chat() {
                       : "chat-input__button-row"
                   }
                 >
-                  {isAdmin() && currentStatus == "В процессе" ? (
+                  {isAdmin() &&
+                  currentStatus == "В процессе" &&
+                  dataPerms.helperQuery.helperPerms.sendMsg ? (
                     <ButtonCustom
                       title="Закрыть заявку"
                       className="chat-input__button-close"
@@ -2162,7 +2186,9 @@ function Chat() {
                     <></>
                   )}
                 </div>
-                {isAdmin() && currentStatus == "Новый" ? (
+                {isAdmin() &&
+                currentStatus == "Новый" &&
+                dataPerms.helperQuery.helperPerms.sendMsg ? (
                   <>
                     <div className="chat-input__button-row">
                       <ButtonCustom
@@ -2171,7 +2197,7 @@ function Chat() {
                         onClick={handleInProgress}
                       />
                     </div>
-                    {isAdmin() && (
+                    {/* {isAdmin() && (
                       <>
                         <a className="alltickets__link">
                           <ButtonCustom
@@ -2185,7 +2211,7 @@ function Chat() {
                           />
                         </a>
                       </>
-                    )}
+                    )} */}
                   </>
                 ) : (
                   <></>
@@ -2305,11 +2331,11 @@ function Chat() {
                       id={msg.id}
                       message={msg.text}
                       sender={msg.sender}
+                      onClick={handleRefetch}
                       time={DateTime.fromISO(msg.date, { zone: "utc" })
                         .toLocal()
                         .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
                       attachs={msg.attachs}
-                      onClick
                     />
                   </>
                 ) : msg.sender.role === "system" ? (
