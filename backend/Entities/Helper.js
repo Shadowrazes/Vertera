@@ -208,14 +208,20 @@ class Helper extends Entity {
                 ${this.TableName}.${this.PrimaryField}, 
                 IFNULL(${Ticket.TableName}.${ticketCountAS}, 0) AS ${ticketCountAS}
             FROM ${this.TableName}
+            
             LEFT JOIN (
                 SELECT ${Ticket.RecipientIdField}, COUNT(*) AS ${ticketCountAS}
                 FROM ${Ticket.TableName} WHERE ${Ticket.StatusIdField} NOT IN (?)
                 GROUP BY ${Ticket.RecipientIdField}
             ) AS ${Ticket.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${Ticket.TableName}.${Ticket.RecipientIdField} 
+            
             LEFT JOIN ${User.TableName} 
-            ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField} 
+            ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField}
+
+            LEFT JOIN ${HelperPermission.TableName} 
+            ON ${this.TableName}.${this.PrimaryField} = ${HelperPermission.TableName}.${HelperPermission.PrimaryField}  
+            
             WHERE ${this.TableName}.${this.PrimaryField} IN ( 
                 SELECT ${HelperDepartment.HelperIdField}  
                 FROM ${HelperDepartment.TableName} 
@@ -226,8 +232,9 @@ class Helper extends Entity {
                 GROUP BY ${HelperDepartment.HelperIdField}
             ) 
             AND ${User.TableName}.${User.IsActiveField} <> 0
-            ORDER BY ${ticketCountAS}
-            LIMIT 1
+            AND ${HelperPermission.TableName}.${HelperPermission.SendMsgField} <> 0
+
+            ORDER BY ${ticketCountAS} LIMIT 1
         `;
         const result = await super.Request(sql, fields);
         return result[0].id;
