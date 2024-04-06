@@ -4,7 +4,11 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
 
 import { DEPARTMENTS_LIST } from "../apollo/queries";
-import { ADD_DEPARTMENT, EDIT_DEPARTMENT } from "../apollo/mutations";
+import {
+  ADD_DEPARTMENT,
+  DELETE_DEPARTMENT,
+  EDIT_DEPARTMENT,
+} from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
@@ -20,10 +24,15 @@ function Departments() {
   const [changes, setChanges] = useState({});
   const [inputValues, setInputValues] = useState({});
 
+  const [newNameValue, setNewNameValue] = useState("");
+  const [deleteId, setDeleteId] = useState(null);
+
   const [isApplyColumnVisible, setIsApplyColumnVisible] = useState(false);
-  const [isAddLangVisible, setIsAddLangVisible] = useState(false);
+  const [isAddDepartmentVisible, setIsAddDepartmentVisible] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [isErrorEditVisible, setIsErrorEditVisible] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [language, setLanguage] = useState(localStorage.getItem("language"));
@@ -53,6 +62,8 @@ function Departments() {
 
   const [addDepartment] = useMutation(ADD_DEPARTMENT);
   const [editDepartment] = useMutation(EDIT_DEPARTMENT);
+  const [deleteDepartment, { loading: loadingDelete }] =
+    useMutation(DELETE_DEPARTMENT);
 
   if (loading) {
     return <Loader />;
@@ -79,40 +90,41 @@ function Departments() {
     return <h2>Что-то пошло не так</h2>;
   }
 
+  if (loadingDelete) {
+    return <Loader />;
+  }
+
   const handleAddDepartmentView = () => {
-    setIsAddLangVisible(true);
+    setIsAddDepartmentVisible(true);
     setIsButtonVisible(false);
   };
 
   const handleCloseClick = () => {
     setIsButtonVisible(true);
-    setIsAddLangVisible(false);
+    setIsAddDepartmentVisible(false);
     setIsErrorVisible(false);
 
     setNewNameValue("");
-    setQueryError("");
   };
 
-  //   const handleNewName = (e) => {
-  //     setNewNameValue(e.target.value);
-  //     setIsErrorVisible(false);
-  //   };
+  const handleNewName = (e) => {
+    setNewNameValue(e.target.value);
+    setIsErrorVisible(false);
+  };
 
   const errorMsg = () => {
     let error = "";
 
-    if (newCodeValue.trim() == "") {
-      error = "Введите код языка";
-    } else if (newNameValue.trim() == "") {
-      error = "Введите название языка";
+    if (newNameValue.trim() == "") {
+      error = "Введите название департамента";
     } else {
-      error = "Ошибка при добавлении языка";
+      error = "Ошибка при добавлении департамента";
     }
 
     return error;
   };
 
-  const handleAddLang = async (e) => {
+  const handleAddDepartment = async (e) => {
     e.preventDefault();
 
     if (newNameValue.trim() == "") {
@@ -126,21 +138,21 @@ function Departments() {
       const result = await addDepartment({
         variables: {
           token: user.token,
-          name: newNameValue.trim(),
+          stroke: newNameValue.trim(),
         },
       });
       refetch();
       setNewNameValue("");
-      console.log("Язык успешно добавлен:", result);
+      console.log("Департамент успешно добавлен:", result);
     } catch (error) {
       console.log(error.networkError.result.errors[0].message);
-      setQueryError(error.networkError.result.errors[0].message);
       setIsErrorVisible(true);
     }
   };
 
   const handleDepartmentChange = (id, value) => {
     setIsApplyColumnVisible(true);
+    setIsErrorEditVisible(false);
 
     setChanges({ ...changes, [id]: true });
 
@@ -154,7 +166,20 @@ function Departments() {
     return changes[id];
   };
 
+  const errorEditMsg = () => {
+    let error = "Введите название департамента";
+
+    return error;
+  };
+
   const handleApplyChange = async (id) => {
+    if (inputValues[id].stroke.trim() == "") {
+      setIsErrorEditVisible(true);
+      return;
+    }
+
+    setIsErrorEditVisible(false);
+
     const updatedChanges = { ...changes };
     delete updatedChanges[id];
     setChanges(updatedChanges);
@@ -174,6 +199,42 @@ function Departments() {
       console.log("Департамент успешно обновлен", result);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleDeleteDepartment = async (e, id) => {
+    e.preventDefault();
+    setDeleteId(id);
+    setShowWarning(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowWarning(false);
+  };
+
+  const handleCloseWarning = async () => {
+    setShowWarning(false);
+    setIsErrorEditVisible(false);
+
+    const updatedChanges = { ...changes };
+    delete updatedChanges[deleteId];
+    setChanges(updatedChanges);
+
+    if (Object.keys(updatedChanges).length == 0) {
+      setIsApplyColumnVisible(false);
+    }
+
+    try {
+      const result = await deleteDepartment({
+        variables: {
+          token: user.token,
+          id: deleteId,
+        },
+      });
+      refetch();
+      console.log("Департамент успешно удален:", result);
+    } catch (error) {
+      console.log(error.networkError.result.errors[0].message);
     }
   };
 
@@ -208,8 +269,9 @@ function Departments() {
                       <Form.Control
                         type="text"
                         value={
-                          inputValues[department.id]?.stroke ||
-                          department.name.stroke
+                          (inputValues[department.id]?.stroke !== undefined
+                            ? inputValues[department.id]?.stroke
+                            : department.name.stroke) || ""
                         }
                         className="countries__input"
                         onChange={(e) =>
@@ -222,7 +284,9 @@ function Departments() {
                         src={DeleteIcon}
                         alt=""
                         className="countries__delete-icon"
-                        // onClick={(e) => handleDeleteLang(e, department.id)}
+                        onClick={(e) =>
+                          handleDeleteDepartment(e, department.id)
+                        }
                       />
                     </td>
                     <td>
@@ -240,29 +304,30 @@ function Departments() {
               </tbody>
             </Table>
           </div>
+          {isErrorEditVisible && (
+            <span
+              className="form__error"
+              style={{ marginBottom: "20px", display: "block" }}
+            >
+              {errorEditMsg()}
+            </span>
+          )}
           {isButtonVisible && (
             <div className="countries__lang-buttons">
               <ButtonCustom
-                title="Добавить язык"
-                onClick={handleAddLangView}
+                title="Добавить департамент"
+                onClick={handleAddDepartmentView}
                 className={"table__btn"}
               />
             </div>
           )}
-          {isAddLangVisible && (
+          {isAddDepartmentVisible && (
             <>
               <div style={{ position: "relative" }}>
                 <a onClick={handleCloseClick}>
                   <div className="chat__edit-close"></div>
                 </a>
                 <div className="countries__column">
-                  <Form.Control
-                    type="text"
-                    placeholder="Код"
-                    value={newCodeValue}
-                    className="add-currator__input"
-                    onChange={handleNewCode}
-                  />
                   <Form.Control
                     type="text"
                     placeholder="Название"
@@ -275,13 +340,26 @@ function Departments() {
                   )}
                   <ButtonCustom
                     title="Добавить"
-                    onClick={handleAddLang}
+                    onClick={handleAddDepartment}
                     className={"table__btn"}
                   />
                 </div>
               </div>
             </>
           )}
+          <Modal show={showWarning} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Предупреждение</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Вы уверены, что хотите удалить этот дераптамент?</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseWarning}>
+                Удалить
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </>
       ) : (
         <NotFoundPage />

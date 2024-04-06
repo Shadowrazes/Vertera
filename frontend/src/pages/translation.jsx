@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { Table, Form, Modal, Button } from "react-bootstrap";
 
-import { TRANSLATION_LIST, HELPER_PERMS } from "../apollo/queries";
+import {
+  TRANSLATION_LIST,
+  LANGUAGE_LIST,
+  HELPER_PERMS,
+} from "../apollo/queries";
 import { UPDATE_TRANSLATION } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
@@ -14,12 +18,14 @@ import "../css/translation.css";
 
 function Translation() {
   const [dataQuery, setData] = useState([]);
+  const [langList, setLanglist] = useState([]);
 
   const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
   const [show, setShow] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -45,11 +51,22 @@ function Translation() {
     },
   });
 
+  const { data: dataLangList } = useQuery(LANGUAGE_LIST, {
+    variables: {
+      token: user.token,
+      lang: language,
+    },
+  });
+
   useEffect(() => {
     if (data && data.helperQuery.translationListFull) {
       setData(data.helperQuery.translationListFull);
     }
-  }, [data]);
+
+    if (dataLangList && dataLangList.clientQuery.langList) {
+      setLanglist(dataLangList.clientQuery.langList);
+    }
+  }, [data, dataLangList]);
 
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION);
 
@@ -104,38 +121,6 @@ function Translation() {
   };
 
   const handleUpdateTranslation = async () => {
-    // let newTranslatons = updatedTranslations
-    //   .filter((updatedTranslation) => updatedTranslation)
-    //   .map(({ code, ru, en, es, cs, bg, de, hu, kk }) => {
-    //     const result = [];
-    //     if (ru !== undefined) {
-    //       result.push({ lang: "ru", stroke: ru, code: code });
-    //     }
-    //     if (en !== undefined) {
-    //       result.push({ lang: "en", stroke: en, code: code });
-    //     }
-    //     if (es !== undefined) {
-    //       result.push({ lang: "es", stroke: es, code: code });
-    //     }
-    //     if (cs !== undefined) {
-    //       result.push({ lang: "cs", stroke: cs, code: code });
-    //     }
-    //     if (bg !== undefined) {
-    //       result.push({ lang: "bg", stroke: bg, code: code });
-    //     }
-    //     if (de !== undefined) {
-    //       result.push({ lang: "de", stroke: de, code: code });
-    //     }
-    //     if (hu !== undefined) {
-    //       result.push({ lang: "hu", stroke: hu, code: code });
-    //     }
-    //     if (kk !== undefined) {
-    //       result.push({ lang: "kk", stroke: en, code: code });
-    //     }
-    //     return result;
-    //   })
-    //   .flat();
-
     if (updatedTranslations.length === 0) {
       return;
     }
@@ -178,14 +163,17 @@ function Translation() {
                 <thead>
                   <tr>
                     <td>Строковый код</td>
-                    <td>Русский</td>
+                    {langList.map((lang) => (
+                      <td>{lang.name}</td>
+                    ))}
+                    {/* <td>Русский</td>
                     <td>Английский</td>
                     <td>Испанский</td>
                     <td>Чешский</td>
                     <td>Болгарский</td>
                     <td>Немецкий</td>
                     <td>Венгерский</td>
-                    <td>Казахский</td>
+                    <td>Казахский</td> */}
                   </tr>
                 </thead>
                 <tbody>

@@ -359,13 +359,16 @@ function Header({ user }) {
                   {get_translation("INTERFACE_THEMES")}
                 </Nav.Link>
               ) : null}
+              {isAdmin() && (
+                <Nav.Link href="/departments">Департаменты</Nav.Link>
+              )}
               {dataPerms?.helperQuery?.helperPerms.translationEdit ||
               isAdmin() ? (
                 <>
                   <Nav.Link href="/translation">
                     {get_translation("INTERFACE_TRANSLATION")}
                   </Nav.Link>
-                  <Nav.Link href="/countries">Страны</Nav.Link>
+                  <Nav.Link href="/countries">Страны и языки</Nav.Link>
                 </>
               ) : null}
               <Nav.Link>

@@ -34,6 +34,7 @@ function Countries() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [isApplyColumnVisible, setIsApplyColumnVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [isErrorEditVisible, setIsErrorEditVisible] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -95,7 +96,7 @@ function Countries() {
   }, [data, dataLangList]);
 
   const [addLang] = useMutation(ADD_LANG);
-  const [deleteLang] = useMutation(DELETE_LANG);
+  const [deleteLang, { loading: loadingDelete }] = useMutation(DELETE_LANG);
   const [editLang] = useMutation(EDIT_LANG);
 
   if (loading) {
@@ -121,6 +122,10 @@ function Countries() {
       }
     }
     return <h2>Что-то пошло не так</h2>;
+  }
+
+  if (loadingDelete) {
+    return <Loader />;
   }
 
   if (loadingLangList) {
@@ -234,6 +239,16 @@ function Countries() {
 
   const handleCloseWarning = async () => {
     setShowWarning(false);
+    setIsErrorEditVisible(false);
+
+    const updatedChanges = { ...changes };
+    delete updatedChanges[deleteId];
+    setChanges(updatedChanges);
+
+    if (Object.keys(updatedChanges).length == 0) {
+      setIsApplyColumnVisible(false);
+    }
+
     try {
       const result = await deleteLang({
         variables: {
@@ -250,6 +265,7 @@ function Countries() {
 
   const handleLangChange = (id, field, value) => {
     setIsApplyColumnVisible(true);
+    setIsErrorEditVisible(false);
 
     setChanges({ ...changes, [id]: true });
 
@@ -263,7 +279,20 @@ function Countries() {
     return changes[id];
   };
 
+  const errorEditMsg = () => {
+    let error = "Введите код или название языка";
+
+    return error;
+  };
+
   const handleApplyChange = async (id) => {
+    if (inputValues[id].code == "" || inputValues[id].name.trim() == "") {
+      setIsErrorEditVisible(true);
+      return;
+    }
+
+    setIsErrorEditVisible(false);
+
     const updatedChanges = { ...changes };
     delete updatedChanges[id];
     setChanges(updatedChanges);
@@ -374,7 +403,11 @@ function Countries() {
                         <td>
                           <Form.Control
                             type="text"
-                            value={inputValues[lang.id]?.code || lang.code}
+                            value={
+                              (inputValues[lang.id]?.code !== undefined
+                                ? inputValues[lang.id]?.code
+                                : lang.code) || ""
+                            }
                             className="countries__input"
                             onChange={(e) =>
                               handleLangChange(lang.id, "code", e.target.value)
@@ -384,7 +417,11 @@ function Countries() {
                         <td>
                           <Form.Control
                             type="text"
-                            value={inputValues[lang.id]?.name || lang.name}
+                            value={
+                              (inputValues[lang.id]?.name !== undefined
+                                ? inputValues[lang.id]?.name
+                                : lang.name) || ""
+                            }
                             className="countries__input"
                             onChange={(e) =>
                               handleLangChange(lang.id, "name", e.target.value)
@@ -414,6 +451,14 @@ function Countries() {
                   </tbody>
                 </Table>
               </div>
+              {isErrorEditVisible && (
+                <span
+                  className="form__error"
+                  style={{ marginBottom: "20px", display: "block" }}
+                >
+                  {errorEditMsg()}
+                </span>
+              )}
               {isButtonVisible && (
                 <div className="countries__lang-buttons">
                   <ButtonCustom
