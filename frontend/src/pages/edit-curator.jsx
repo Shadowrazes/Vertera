@@ -97,6 +97,7 @@ function EditCurator() {
   const { data: dataDepartmentsList } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
   const { data: dataJobTitleList } = useQuery(JOB_TITLE_LIST, {

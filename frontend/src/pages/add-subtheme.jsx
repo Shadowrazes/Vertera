@@ -42,6 +42,7 @@ function AddSubtheme() {
   const [orderNum, setOrderNum] = useState(0);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -72,6 +73,7 @@ function AddSubtheme() {
   } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

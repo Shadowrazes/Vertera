@@ -55,6 +55,7 @@ function EditSubtheme() {
     Object.keys(obj).find((key) => obj[key] === value);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -89,6 +90,7 @@ function EditSubtheme() {
   } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
+      token: language,
     },
   });
   const { loading, error, data, refetch } = useQuery(SUBTHEME, {
