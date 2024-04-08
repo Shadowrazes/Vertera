@@ -193,7 +193,7 @@ class Ticket extends Entity {
             const countryHelperIdsSubQuery = `
                 SELECT ${User.PrimaryField} 
                 FROM ${User.TableName} 
-                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = ${User.RoleHelper}
+                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = '${User.RoleHelper}'
             `;
 
             sql += ` 
@@ -208,7 +208,7 @@ class Ticket extends Entity {
             const countryClientIdsSubQuery = `
                 SELECT ${User.PrimaryField} 
                 FROM ${User.TableName} 
-                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = 'client'
+                WHERE ${User.CountryIdField} IN (?) AND ${User.RoleField} = '${User.RoleClient}'
             `;
 
             sql += ` 
