@@ -465,7 +465,7 @@ class Ticket extends Entity {
             if(fields.assistantId){
                 let assistantConnLogFields = {
                     type: TicketLog.TypeAssistantConn, ticketId: id,
-                    info: 'Подключен к диалогу', initiatorId: fields.assistantId
+                    info: `ID ${fields.assistantId} Подключен к диалогу`, initiatorId: initiator.id
                 };
 
                 let statusChangeLogFields = {
@@ -488,8 +488,8 @@ class Ticket extends Entity {
                     const statusChangeLogRes = await TicketLog.TransInsert(conn, statusChangeLogFields);
                 }
                 else {
-                    assistantConnLogFields.info = 'Отключен от диалога';
-                    assistantConnLogFields.initiatorId = curTicket.assistantId;
+                    assistantConnLogFields.info = `ID ${curTicket.assistantId} Отключен от диалога`;
+                    assistantConnLogFields.initiatorId = initiator.id;
                     const sql = `
                         UPDATE ${this.TableName} 
                         SET ${this.AssistantIdField} = NULL
@@ -517,7 +517,7 @@ class Ticket extends Entity {
             if (fields.subThemeId) {
                 const themeChangeLogFields = {
                     type: TicketLog.TypeThemeChange, ticketId: id,
-                    info: `Изменил тему`, initiatorId: initiator.id
+                    info: `Изменил подтему на ID ${fields.subThemeId}`, initiatorId: initiator.id
                 };
                 const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
             }
@@ -525,7 +525,7 @@ class Ticket extends Entity {
             if (fields.title) {
                 const titleChangeLogFields = {
                     type: TicketLog.TypeTitleChange, ticketId: id,
-                    info: `Изменил заголовок`, initiatorId: initiator.id
+                    info: `Изменил заголовок на '${fields.title}'`, initiatorId: initiator.id
                 };
                 const titleChangeLogRes = await TicketLog.TransInsert(conn, titleChangeLogFields);
             }
@@ -533,7 +533,7 @@ class Ticket extends Entity {
             if (fields.initiatorId) {
                 const initiatorChangeLogFields = {
                     type: TicketLog.TypeInitiatorChange, ticketId: id,
-                    info: `Изменил создателя`, initiatorId: initiator.id
+                    info: `Изменил создателя на ID ${fields.initiatorId}`, initiatorId: initiator.id
                 };
                 const initiatorChangeLogRes = await TicketLog.TransInsert(conn, initiatorChangeLogFields);
             }
@@ -541,7 +541,7 @@ class Ticket extends Entity {
             if (fields.recipientId) {
                 const recipientChangeLogFields = {
                     type: TicketLog.TypeRecipientChange, ticketId: id,
-                    info: `Изменил адресата`, initiatorId: initiator.id
+                    info: `Изменил адресата на ID ${fields.recipientId}`, initiatorId: initiator.id
                 };
                 const recipientChangeLogRes = await TicketLog.TransInsert(conn, recipientChangeLogFields);
             }
@@ -570,7 +570,7 @@ class Ticket extends Entity {
 
                     const helperAssignLogFields = {
                         type: TicketLog.TypeHelperAssign, ticketId: id,
-                        info: `Изменен куратор (деп.)`, initiatorId: User.AdminId
+                        info: `Изменен куратор (деп.) на ID ${fields.recipientId}`, initiatorId: User.AdminId
                     };
                     const helperAssignLogRes = await TicketLog.TransInsert(conn, helperAssignLogFields);
                 }

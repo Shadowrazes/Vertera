@@ -130,7 +130,7 @@ class Message extends Entity {
 
             const msgLogFields = {
                 type: TicketLog.TypeMsgSend, ticketId: args.ticketId,
-                info: `Отправил сообщение`, initiatorId: args.senderId
+                info: `Отправил сообщение ${result.insertId}`, initiatorId: args.senderId
             };
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
@@ -173,11 +173,11 @@ class Message extends Entity {
 
                 if (!fields.isActive) {
                     msgUpdLogFields.type = TicketLog.TypeMsgDel;
-                    msgUpdLogFields.info = `Удалил сообщение`;
+                    msgUpdLogFields.info = `Удалил сообщение ${id}`;
                 }
                 else {
                     msgUpdLogFields.type = TicketLog.TypeMsgRecover;
-                    msgUpdLogFields.info = `Восстановил сообщение`;
+                    msgUpdLogFields.info = `Восстановил сообщение ${id}`;
                 }
 
                 const msgUpdLogRes = await TicketLog.TransInsert(conn, msgUpdLogFields);
