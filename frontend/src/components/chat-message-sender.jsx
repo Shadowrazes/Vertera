@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { MESSAGE } from "../apollo/queries";
+import { DELETE_MESSAGE } from "../apollo/mutations";
 
 import ButtonCustom from "../components/button";
 
@@ -11,7 +12,7 @@ import { Translater } from "../api/translater";
 import DeleteMsgIcon from "../assets/delete_msg_icon.svg";
 import "../css/chat-message-sender.css";
 
-function ChatMessage({ id, message, sender, time, attachs }) {
+function ChatMessage({ id, message, sender, time, attachs, onClick }) {
   const [translatedText, setTranslatedText] = useState("");
   const [senderId, setSenderId] = useState(null);
 
@@ -109,8 +110,25 @@ function ChatMessage({ id, message, sender, time, attachs }) {
     setTranslatedText("");
   }, [data, message, language]);
 
-  const handleDeleteMsg = (e) => {
+  const [deleteMessage] = useMutation(DELETE_MESSAGE);
+
+  const handleDeleteMsg = async (e) => {
     e.preventDefault();
+
+    try {
+      const result = await deleteMessage({
+        variables: {
+          token: user.token,
+          id: id,
+        },
+      });
+      console.log("Сообщение успешно добавлена:", result);
+      if (onClick) {
+        onClick();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -170,8 +188,6 @@ function ChatMessage({ id, message, sender, time, attachs }) {
             </>
           )}
           <span className="chat-message-sender__time">{time}</span>
-          {console.log(user.id)}
-          {console.log(senderId)}
           {user.id === senderId && (
             <div className="chat-message-sender__delete">
               <img
@@ -179,7 +195,7 @@ function ChatMessage({ id, message, sender, time, attachs }) {
                 alt=""
                 className="countries__delete-icon"
                 style={{ width: "42px" }}
-                onClick={() => handleDeleteMsg}
+                onClick={(e) => handleDeleteMsg(e)}
               />
             </div>
           )}

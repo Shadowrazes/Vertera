@@ -124,7 +124,7 @@ function AddCurator() {
     if (location.state && location.state.linkPrev) {
       setLinkPrev(location.state.linkPrev);
     }
-  }, [data, dataJobTitle, location.state]);
+  }, [data, dataJobTitle, dataCountryList, location.state]);
 
   const [addHelperUser] = useMutation(ADD_HELPER_USER);
 
@@ -393,7 +393,7 @@ function AddCurator() {
 
               <DatePicker
                 id="DatePicker"
-                placeholder={get_translation("INTERFACE_DATA_OF_BIRTH")}
+                placeholder={get_translation("INTERFACE_DATE_OF_BIRTHDAY")}
                 className="add-curator__date-picker"
                 locale={{
                   sunday: "Вс",

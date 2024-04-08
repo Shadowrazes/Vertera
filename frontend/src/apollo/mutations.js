@@ -428,6 +428,32 @@ export const ACTIVATE_SUBTHEME = gql`
   }
 `;
 
+export const ADD_DEPARTMENT = gql`
+  mutation ($token: String!, $stroke: String!) {
+    adminMutation(token: $token) {
+      addDepartment(fields: { stroke: $stroke, lang: "ru" })
+    }
+  }
+`;
+
+export const EDIT_DEPARTMENT = gql`
+  mutation ($token: String!, $id: Int!, $stroke: String!) {
+    adminMutation(token: $token) {
+      updateDepartment(id: $id, fields: { stroke: $stroke, lang: "ru" }) {
+        changed
+      }
+    }
+  }
+`;
+
+export const DELETE_DEPARTMENT = gql`
+  mutation ($token: String!, $id: Int!) {
+    adminMutation(token: $token) {
+      deleteDepartment(id: $id)
+    }
+  }
+`;
+
 export const EDIT_TICKET = gql`
   mutation (
     $token: String!
@@ -560,7 +586,9 @@ export const DELETE_LANG = gql`
   mutation ($token: String!, $id: Int!) {
     helperMutation(token: $token) {
       translationObj {
-        deleteLang(id: $id)
+        updateLang(id: $id, fields: { isActive: false }) {
+          changed
+        }
       }
     }
   }
@@ -616,7 +644,7 @@ export const DELETE_COUNTRY = gql`
   mutation ($token: String!, $id: Int!) {
     helperMutation(token: $token) {
       translationObj {
-        deleteCountry(id: $id)
+        updateCountry(id: $id, fields: { isActive: false, lang: "ru" })
       }
     }
   }

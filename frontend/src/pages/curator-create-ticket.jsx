@@ -16,7 +16,7 @@ import draftToHtml from "draftjs-to-html";
 import { EditorState, convertToRaw } from "draft-js";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { THEME_LIST, CURATORS_LIST } from "../apollo/queries";
+import { THEME_LIST, CURATORS_LIST, HELPER_PERMS } from "../apollo/queries";
 import { ADD_TICKET, CURATOR_ADD_TICKET } from "../apollo/mutations";
 
 import { Editor } from "react-draft-wysiwyg";
@@ -24,6 +24,7 @@ import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
+import NotFoundPage from "./not-found-page";
 
 import "../css/form.css";
 import "../css/curator-create-ticket.css";
@@ -78,8 +79,18 @@ function CuratorCreateTicket() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
+  const { data: dataPerms } = useQuery(HELPER_PERMS, {
+    variables: {
+      token: user?.token,
+      id: user?.id,
+    },
+  });
+
   const isAdmin = () => {
-    return user?.role === "helper" || user?.role === "system";
+    return (
+      (user?.role === "helper" && dataPerms.helperQuery.helperPerms.sendMsg) ||
+      user?.role === "system"
+    );
   };
 
   const [fileInputs, setFileInputs] = useState([
@@ -623,7 +634,7 @@ function CuratorCreateTicket() {
   };
 
   const newCuratorList = dataQueryCurators
-    .filter((curator) => curator.user.isActive == true)
+    .filter((curator) => curator.user.isActive && curator.permissions.sendMsg)
     .map((curator) => ({
       name: `${curator.user.surname} ${curator.user.name} ${
         curator.user.patronymic ? ` ${curator.user.patronymic}` : ""
@@ -633,315 +644,338 @@ function CuratorCreateTicket() {
 
   return (
     <>
-      <TitleH2
-        title={get_translation("INTERFACE_CREATE_TICKET")}
-        className="title__heading"
-      />
-      <Form method="post">
-        <Row className="form__row">
-          <Col className="form__column">
-            <DropdownButton
-              id="dropdown-custom-1"
-              title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
-            >
-              {dataQuery.map(
-                (unit, index) =>
-                  unit.visibility !== 3 && (
-                    <Dropdown.Item
-                      key={index}
-                      onClick={() => handleUnitClick(unit.name.stroke, unit.id)}
-                      href="#"
-                    >
-                      {unit.name.stroke}
-                    </Dropdown.Item>
-                  )
-              )}
-            </DropdownButton>
-
-            {selectedUnit && (
-              <DropdownButton
-                id="dropdown-custom-1"
-                title={
-                  selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
-                }
-              >
-                {dataQuery
-                  .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.map(
-                    (theme) =>
-                      theme.visibility !== 3 && (
+      {isAdmin() ? (
+        <>
+          <TitleH2
+            title={get_translation("INTERFACE_CREATE_TICKET")}
+            className="title__heading"
+          />
+          <Form method="post">
+            <Row className="form__row">
+              <Col className="form__column">
+                <DropdownButton
+                  id="dropdown-custom-1"
+                  title={
+                    selectedItem || get_translation("INTERFACE_SELECT_UNIT")
+                  }
+                >
+                  {dataQuery.map(
+                    (unit, index) =>
+                      unit.visibility !== 3 && (
                         <Dropdown.Item
-                          key={theme.id}
+                          key={index}
                           onClick={() =>
-                            handleThemeClick(theme.name.stroke, theme.id)
+                            handleUnitClick(unit.name.stroke, unit.id)
                           }
                           href="#"
                         >
-                          {theme.name.stroke}
+                          {unit.name.stroke}
                         </Dropdown.Item>
                       )
                   )}
-              </DropdownButton>
-            )}
+                </DropdownButton>
 
-            {isSubThemeDropdownVisible && selectedTheme && (
-              <DropdownButton
-                id="dropdown-custom-1"
-                title={
-                  selectedSubTheme || get_translation("INTERFACE_SUBTHEME")
-                }
-              >
-                {dataQuery
-                  .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-                  ?.subThemes.map(
-                    (subTheme) =>
-                      subTheme.visibility !== 3 && (
-                        <Dropdown.Item
-                          key={subTheme.id}
-                          onClick={() =>
-                            handleSubThemeClick(
-                              subTheme.name.stroke,
-                              subTheme.id
-                            )
-                          }
-                          href="#"
-                        >
-                          {subTheme.name.stroke}
-                        </Dropdown.Item>
+                {selectedUnit && (
+                  <DropdownButton
+                    id="dropdown-custom-1"
+                    title={
+                      selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
+                    }
+                  >
+                    {dataQuery
+                      .find((unit) => unit.name.stroke === selectedUnit)
+                      ?.themes.map(
+                        (theme) =>
+                          theme.visibility !== 3 && (
+                            <Dropdown.Item
+                              key={theme.id}
+                              onClick={() =>
+                                handleThemeClick(theme.name.stroke, theme.id)
+                              }
+                              href="#"
+                            >
+                              {theme.name.stroke}
+                            </Dropdown.Item>
+                          )
+                      )}
+                  </DropdownButton>
+                )}
+
+                {isSubThemeDropdownVisible && selectedTheme && (
+                  <DropdownButton
+                    id="dropdown-custom-1"
+                    title={
+                      selectedSubTheme || get_translation("INTERFACE_SUBTHEME")
+                    }
+                  >
+                    {dataQuery
+                      .find((unit) => unit.name.stroke === selectedUnit)
+                      ?.themes.find(
+                        (theme) => theme.name.stroke === selectedTheme
                       )
+                      ?.subThemes.map(
+                        (subTheme) =>
+                          subTheme.visibility !== 3 && (
+                            <Dropdown.Item
+                              key={subTheme.id}
+                              onClick={() =>
+                                handleSubThemeClick(
+                                  subTheme.name.stroke,
+                                  subTheme.id
+                                )
+                              }
+                              href="#"
+                            >
+                              {subTheme.name.stroke}
+                            </Dropdown.Item>
+                          )
+                      )}
+                  </DropdownButton>
+                )}
+                <div className="curator-create-ticket__reciever-label">
+                  {(isCuratorsDropdownVisible || isIdFileInputVisible) && (
+                    <a onClick={handleCloseClick}>
+                      <div className="chat__edit-close"></div>
+                    </a>
                   )}
-              </DropdownButton>
-            )}
-            <div className="curator-create-ticket__reciever-label">
-              {(isCuratorsDropdownVisible || isIdFileInputVisible) && (
-                <a onClick={handleCloseClick}>
-                  <div className="chat__edit-close"></div>
-                </a>
-              )}
-              <Form.Label className="edit-curator__field-label">
-                Получатели
-              </Form.Label>
-            </div>
-            {isButtonsVisible && (
-              <div className="chat__helper-buttons">
-                <ButtonCustom
-                  title="Выбрать куратора"
-                  className="chat-input__button-close"
-                  onClick={handleCuratorsDropdown}
-                />
-                <ButtonCustom
-                  title="Вставить список"
-                  className="chat-input__button-close"
-                  onClick={handleIdFileInput}
-                />
-              </div>
-            )}
-            {isCuratorsDropdownVisible && (
-              <>
-                <MultiSelect
-                  value={selectedCurators}
-                  onChange={(e) => handleCuratorsOnChange(e.value)}
-                  options={newCuratorList}
-                  optionLabel="name"
-                  className="add-curator__multiselect"
-                  placeholder={get_translation("INTERFACE_CURATOR")}
-                  emptyMessage="Нет доступных опций"
-                  filter
-                />
-              </>
-            )}
-            {isIdFileInputVisible && (
-              <>
-                <Form.Group className="mb-3 fileIdInput">
-                  <Form.Control
-                    type="file"
-                    accept=".txt"
-                    onChange={handleIdFileInputOnChange}
-                    className="idFileInput"
-                  />
-                </Form.Group>
-                {isShowSpinner && <Spinner animation="border" />}
-                {isShowInfo && (
+                  <Form.Label className="edit-curator__field-label">
+                    Получатели
+                  </Form.Label>
+                </div>
+                {isButtonsVisible && (
+                  <div className="chat__helper-buttons">
+                    <ButtonCustom
+                      title="Выбрать куратора"
+                      className="chat-input__button-close"
+                      onClick={handleCuratorsDropdown}
+                    />
+                    <ButtonCustom
+                      title="Вставить список"
+                      className="chat-input__button-close"
+                      onClick={handleIdFileInput}
+                    />
+                  </div>
+                )}
+                {isCuratorsDropdownVisible && (
                   <>
-                    {failedImports == 0 && (
-                      <Alert
-                        variant="success"
-                        className="curator-create-ticket__alert"
-                      >
-                        Успешный импорт <br /> <br />
-                        Импортировано {successfulImports} записей
-                      </Alert>
-                    )}
+                    <MultiSelect
+                      value={selectedCurators}
+                      onChange={(e) => handleCuratorsOnChange(e.value)}
+                      options={newCuratorList}
+                      optionLabel="name"
+                      className="add-curator__multiselect"
+                      placeholder={get_translation("INTERFACE_CURATOR")}
+                      emptyMessage="Нет доступных опций"
+                      filter
+                    />
+                  </>
+                )}
+                {isIdFileInputVisible && (
+                  <>
+                    <Form.Group className="mb-3 fileIdInput">
+                      <Form.Control
+                        type="file"
+                        accept=".txt"
+                        onChange={handleIdFileInputOnChange}
+                        className="idFileInput"
+                      />
+                    </Form.Group>
+                    {isShowSpinner && <Spinner animation="border" />}
+                    {isShowInfo && (
+                      <>
+                        {failedImports == 0 && (
+                          <Alert
+                            variant="success"
+                            className="curator-create-ticket__alert"
+                          >
+                            Успешный импорт <br /> <br />
+                            Импортировано {successfulImports} записей
+                          </Alert>
+                        )}
 
-                    {failedImports > 0 && (
-                      <Alert
-                        variant="warning"
-                        className="curator-create-ticket__alert"
-                      >
-                        Застично успешный импорт <br /> <br />
-                        Импортировано {successfulImports} записей <br />
-                        Не удалось импортировать {failedImports} записей <br />
-                      </Alert>
-                    )}
+                        {failedImports > 0 && (
+                          <Alert
+                            variant="warning"
+                            className="curator-create-ticket__alert"
+                          >
+                            Застично успешный импорт <br /> <br />
+                            Импортировано {successfulImports} записей <br />
+                            Не удалось импортировать {
+                              failedImports
+                            } записей <br />
+                          </Alert>
+                        )}
 
-                    {successfulImports === null && failedImports === null && (
-                      <Alert
-                        variant="danger"
-                        className="curator-create-ticket__alert"
-                      >
-                        Записей в файле не найдено
-                      </Alert>
+                        {successfulImports === null &&
+                          failedImports === null && (
+                            <Alert
+                              variant="danger"
+                              className="curator-create-ticket__alert"
+                            >
+                              Записей в файле не найдено
+                            </Alert>
+                          )}
+                      </>
                     )}
                   </>
                 )}
-              </>
-            )}
-          </Col>
+              </Col>
 
-          <Col className="form__column">
-            <Form.Group controlId="TicketTitleForm">
-              <Form.Control
-                type="text"
-                placeholder={get_translation("INTERFACE_TICKET_TITLE")}
-                className="form__input"
-                value={ticketTitleValue}
-                onChange={handleTicketTitleChange}
-              />
-            </Form.Group>
-            <Form.Group className="custom-editor">
-              <Editor
-                editorState={editorState}
-                onEditorStateChange={handleEditorChange}
-                stripPastedStyles
-                toolbarStyle={{
-                  border: "1px solid #dee2e6",
-                  borderRadius: "6px 6px 0 0",
-                }}
-                editorStyle={{
-                  border: "1px solid #dee2e6",
-                  borderRadius: "0 0 6px 6px",
-                  padding: "10px",
-                  heigth: "250px",
-                }}
-                placeholder={get_translation("INTERFACE_ENTER_MSG")}
-                toolbar={{
-                  options: ["inline", "list", "emoji", "remove", "history"],
-                  inline: {
-                    options: ["bold", "italic", "underline", "strikethrough"],
-                  },
-                  list: {
-                    options: ["unordered", "ordered"],
-                  },
-                }}
-              />
-            </Form.Group>
-            <div className="file-inputs">
-              {fileInputs.map((fileInput, index) => (
-                <Form.Group className="mb-3 fileInputForm" key={fileInput.id}>
+              <Col className="form__column">
+                <Form.Group controlId="TicketTitleForm">
                   <Form.Control
-                    type="file"
-                    accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                    onChange={handleFileChange}
+                    type="text"
+                    placeholder={get_translation("INTERFACE_TICKET_TITLE")}
+                    className="form__input"
+                    value={ticketTitleValue}
+                    onChange={handleTicketTitleChange}
                   />
-                  {index > 0 && (
-                    <Button
-                      variant="outline-danger"
-                      onClick={() => handleRemoveFileInput(fileInput.id)}
-                    >
-                      {get_translation("INTERFACE_DELETE")}
-                    </Button>
-                  )}
                 </Form.Group>
-              ))}
+                <Form.Group className="custom-editor">
+                  <Editor
+                    editorState={editorState}
+                    onEditorStateChange={handleEditorChange}
+                    stripPastedStyles
+                    toolbarStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px 6px 0 0",
+                    }}
+                    editorStyle={{
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0 0 6px 6px",
+                      padding: "10px",
+                      heigth: "250px",
+                    }}
+                    placeholder={get_translation("INTERFACE_ENTER_MSG")}
+                    toolbar={{
+                      options: ["inline", "list", "emoji", "remove", "history"],
+                      inline: {
+                        options: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "strikethrough",
+                        ],
+                      },
+                      list: {
+                        options: ["unordered", "ordered"],
+                      },
+                    }}
+                  />
+                </Form.Group>
+                <div className="file-inputs">
+                  {fileInputs.map((fileInput, index) => (
+                    <Form.Group
+                      className="mb-3 fileInputForm"
+                      key={fileInput.id}
+                    >
+                      <Form.Control
+                        type="file"
+                        accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                        onChange={handleFileChange}
+                      />
+                      {index > 0 && (
+                        <Button
+                          variant="outline-danger"
+                          onClick={() => handleRemoveFileInput(fileInput.id)}
+                        >
+                          {get_translation("INTERFACE_DELETE")}
+                        </Button>
+                      )}
+                    </Form.Group>
+                  ))}
 
-              <Button
-                variant="outline-primary"
-                id="AddFileButton"
-                onClick={handleAddFileInput}
-              >
-                {get_translation("INTERFACE_ADD_FILE")}
+                  <Button
+                    variant="outline-primary"
+                    id="AddFileButton"
+                    onClick={handleAddFileInput}
+                  >
+                    {get_translation("INTERFACE_ADD_FILE")}
+                  </Button>
+                </div>
+
+                {isCuratorsDropdownVisible || isIdFileInputVisible ? (
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="options"
+                    defaultValue={1}
+                    value={selectedValue}
+                    onChange={handleToggleChange}
+                  >
+                    <ToggleButton id="tbg-radio-1" value={1}>
+                      Создать обращение
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-2" value={2}>
+                      Создать уведомление
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                ) : null}
+
+                {isVisible && <span className="form__error">{errorMsg()}</span>}
+
+                <Button
+                  variant="primary"
+                  id="ButtonForm"
+                  type="submit"
+                  onClick={handleNewTicket}
+                >
+                  {get_translation("INTERFACE_SEND")}
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+
+          <Modal show={showSuccess} onHide={handleCloseSuccess}>
+            <Modal.Header closeButton>
+              <Modal.Title>
+                {isNotificaton ? "Уведомления " : "Обращения "}
+                созданы
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                {isNotificaton ? "Уведомления " : "Обращения "} успешно созданы
+                и отправлены получателям
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseSuccess}>
+                {get_translation("INTERFACE_CLOSE")}
               </Button>
-            </div>
+            </Modal.Footer>
+          </Modal>
 
-            {isCuratorsDropdownVisible || isIdFileInputVisible ? (
-              <ToggleButtonGroup
-                type="radio"
-                name="options"
-                defaultValue={1}
-                value={selectedValue}
-                onChange={handleToggleChange}
-              >
-                <ToggleButton id="tbg-radio-1" value={1}>
-                  Создать обращение
-                </ToggleButton>
-                <ToggleButton id="tbg-radio-2" value={2}>
-                  Создать уведомление
-                </ToggleButton>
-              </ToggleButtonGroup>
-            ) : null}
-
-            {isVisible && <span className="form__error">{errorMsg()}</span>}
-
-            <Button
-              variant="primary"
-              id="ButtonForm"
-              type="submit"
-              onClick={handleNewTicket}
-            >
-              {get_translation("INTERFACE_SEND")}
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-
-      <Modal show={showSuccess} onHide={handleCloseSuccess}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {isNotificaton ? "Уведомления " : "Обращения "}
-            созданы
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            {isNotificaton ? "Уведомления " : "Обращения "} успешно созданы и
-            отправлены получателям
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseSuccess}>
-            {get_translation("INTERFACE_CLOSE")}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showError} onHide={handleCloseError}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {isNotificaton ? "Уведомления " : "Обращения "}
-            были созданы частично
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Часть {isNotificaton ? " уведомлений " : " обращений "} успешно
-            отправлена. Следующие ID не удалось найти:
-          </p>
-          <ul className="failed-imports">
-            {failedQueryImports?.slice(0, 5).map((failedImport, index) => (
-              <li key={index}>{failedImport}</li>
-            ))}
-            {failedQueryImports?.length > 5 && (
-              <li>и еще {failedQueryImports.length - 5} записей</li>
-            )}
-          </ul>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseError}>
-            {get_translation("INTERFACE_CLOSE")}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal show={showError} onHide={handleCloseError}>
+            <Modal.Header closeButton>
+              <Modal.Title>
+                {isNotificaton ? "Уведомления " : "Обращения "}
+                были созданы частично
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                Часть {isNotificaton ? " уведомлений " : " обращений "} успешно
+                отправлена. Следующие ID не удалось найти:
+              </p>
+              <ul className="failed-imports">
+                {failedQueryImports?.slice(0, 5).map((failedImport, index) => (
+                  <li key={index}>{failedImport}</li>
+                ))}
+                {failedQueryImports?.length > 5 && (
+                  <li>и еще {failedQueryImports.length - 5} записей</li>
+                )}
+              </ul>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseError}>
+                {get_translation("INTERFACE_CLOSE")}
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <NotFoundPage />
+      )}
     </>
   );
 }

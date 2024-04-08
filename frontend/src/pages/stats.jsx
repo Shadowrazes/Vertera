@@ -469,7 +469,8 @@ function Stats() {
               >
                 {dataQueryCurators.map(
                   (curator, index) =>
-                    curator.user.isActive && (
+                    curator.user.isActive &&
+                    curator.permissions.sendMsg && (
                       <Dropdown.Item
                         key={index}
                         onClick={() =>

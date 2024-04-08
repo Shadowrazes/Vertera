@@ -227,7 +227,6 @@ function Header({ user }) {
       console.log(userName);
       document.location.href = "/all-tickets";
     }
-    refetch();
   }, [data, loginVariables]);
 
   useEffect(() => {
@@ -343,12 +342,13 @@ function Header({ user }) {
                   <Nav.Link href="/stats">
                     {get_translation("INTERFACE_STATS")}
                   </Nav.Link>
-                  <Nav.Link href="/curator-create-ticket">
-                    Создать обращение
-                  </Nav.Link>
                 </>
               )}
-
+              {isHelper() && dataPerms?.helperQuery?.helperPerms?.sendMsg ? (
+                <Nav.Link href="/curator-create-ticket">
+                  Создать обращение
+                </Nav.Link>
+              ) : null}
               {dataPerms?.helperQuery?.helperPerms.helperEdit || isAdmin() ? (
                 <Nav.Link href="/curators">
                   {get_translation("INTERFACE_CURATORS")}
@@ -359,13 +359,16 @@ function Header({ user }) {
                   {get_translation("INTERFACE_THEMES")}
                 </Nav.Link>
               ) : null}
+              {isAdmin() && (
+                <Nav.Link href="/departments">Департаменты</Nav.Link>
+              )}
               {dataPerms?.helperQuery?.helperPerms.translationEdit ||
               isAdmin() ? (
                 <>
                   <Nav.Link href="/translation">
                     {get_translation("INTERFACE_TRANSLATION")}
                   </Nav.Link>
-                  <Nav.Link href="/countries">Страны</Nav.Link>
+                  <Nav.Link href="/countries">Страны и языки</Nav.Link>
                 </>
               ) : null}
               <Nav.Link>

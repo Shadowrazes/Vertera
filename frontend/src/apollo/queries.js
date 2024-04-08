@@ -399,11 +399,11 @@ export const THEME_LIST = gql`
 `;
 
 export const DEPARTMENTS_LIST = gql`
-  query ($token: String!) {
+  query ($token: String!, $lang: String!) {
     helperQuery(token: $token) {
       departmentList {
         id
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
       }
@@ -453,19 +453,6 @@ export const CURATORS_LIST = gql`
           helperEdit
           themeEdit
           translationEdit
-        }
-      }
-    }
-  }
-`;
-
-export const JOB_TITLE_LIST = gql`
-  query ($token: String!, $lang: String!) {
-    helperQuery(token: $token) {
-      jobTitleList {
-        id
-        name(lang: $lang) {
-          stroke
         }
       }
     }
@@ -523,6 +510,19 @@ export const HELPER_PERMS = gql`
         helperEdit
         themeEdit
         translationEdit
+      }
+    }
+  }
+`;
+
+export const JOB_TITLE_LIST = gql`
+  query ($token: String!, $lang: String!) {
+    helperQuery(token: $token) {
+      jobTitleList {
+        id
+        name(lang: $lang) {
+          stroke
+        }
       }
     }
   }
