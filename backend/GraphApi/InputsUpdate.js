@@ -4,6 +4,7 @@ export const InputsUpdate = `
         recipientId: Int
         assistantId: Int
         statusId: Int
+        title: String
         unitId: Int
         themeId: Int
         subThemeId: Int

@@ -20,6 +20,7 @@ class TicketLog extends Entity{
     static TypeSplitCreate = 'splitCreate';
     static TypeClientReaction = 'clientReaction';
     static TypeThemeChange = 'themeChange';
+    static TypeTitleChange = 'titleChange';
     static TypeAssistantConn = 'assistantConn';
     static TypeInitiatorChange = 'initiatorChange';
     static TypeRecipientChange = 'recipientChange';

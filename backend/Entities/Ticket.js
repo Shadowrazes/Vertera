@@ -522,6 +522,14 @@ class Ticket extends Entity {
                 const themeChangeLogRes = await TicketLog.TransInsert(conn, themeChangeLogFields);
             }
 
+            if (fields.title) {
+                const titleChangeLogFields = {
+                    type: TicketLog.TypeTitleChange, ticketId: id,
+                    info: `Изменил заголовок`, initiatorId: initiator.id
+                };
+                const titleChangeLogRes = await TicketLog.TransInsert(conn, titleChangeLogFields);
+            }
+
             if (fields.initiatorId) {
                 const initiatorChangeLogFields = {
                     type: TicketLog.TypeInitiatorChange, ticketId: id,
