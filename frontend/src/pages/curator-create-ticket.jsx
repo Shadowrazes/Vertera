@@ -88,7 +88,8 @@ function CuratorCreateTicket() {
 
   const isAdmin = () => {
     return (
-      (user?.role === "helper" && dataPerms.helperQuery.helperPerms.sendMsg) ||
+      (user?.role === "helper" &&
+        dataPerms?.helperQuery?.helperPerms?.sendMsg) ||
       user?.role === "system"
     );
   };
@@ -392,10 +393,16 @@ function CuratorCreateTicket() {
             },
           })
             .then((data) => {
-              console.log(data.data.helperMutation.addTicketMass);
+              // console.log(idInputs);
+              // console.log(failedQueryImports);
               setFailedQueryImports(data.data.helperMutation.addTicketMass);
-              // handleShowSuccess();
-              handleShowError();
+
+              if (data.data.helperMutation.addTicketMass.length !== 0) {
+                handleShowError();
+              } else {
+                handleShowSuccess();
+              }
+
               setIsVisible(false);
               // handleShow();
             })
@@ -798,7 +805,7 @@ function CuratorCreateTicket() {
                             variant="warning"
                             className="curator-create-ticket__alert"
                           >
-                            Застично успешный импорт <br /> <br />
+                            Частично успешный импорт <br /> <br />
                             Импортировано {successfulImports} записей <br />
                             Не удалось импортировать {
                               failedImports

@@ -2,26 +2,15 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { MESSAGE } from "../apollo/queries";
-import { DELETE_MESSAGE } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
 
 import { franc } from "franc";
 import { Translater } from "../api/translater";
 
-import DeleteMsgIcon from "../assets/delete_msg_icon.svg";
 import "../css/chat-message-sender.css";
 
-function ChatMessage({
-  id,
-  message,
-  sender,
-  visibility,
-  removable,
-  time,
-  attachs,
-  onClick,
-}) {
+function ChatMessage({ id, message, sender, time, attachs, onClick }) {
   const [translatedText, setTranslatedText] = useState("");
   const [senderId, setSenderId] = useState(null);
 
@@ -85,13 +74,13 @@ function ChatMessage({
   };
 
   const handleTranslate = async (text, lang) => {
-    try {
-      const translatedText = await Translater(text, lang);
-      setTranslatedText(translatedText);
-      // console.log(translatedText);
-    } catch (error) {
-      console.error("Error during translation:", error.message);
-    }
+    // try {
+    //   const translatedText = await Translater(text, lang);
+    //   setTranslatedText(translatedText);
+    //   // console.log(translatedText);
+    // } catch (error) {
+    //   console.error("Error during translation:", error.message);
+    // }
   };
 
   useEffect(() => {
@@ -119,46 +108,18 @@ function ChatMessage({
     setTranslatedText("");
   }, [data, message, language]);
 
-  const [deleteMessage, { loading: loadingDelete }] =
-    useMutation(DELETE_MESSAGE);
-
-  if (loadingDelete) {
-    return <Loader />;
-  }
-
-  const handleDeleteMsg = async (e) => {
-    e.preventDefault();
-
-    try {
-      const result = await deleteMessage({
-        variables: {
-          token: user.token,
-          id: id,
-        },
-      });
-      console.log("Сообщение успешно добавлена:", result);
-      if (onClick) {
-        onClick();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <>
       <div className="chat-message-sender__container">
         <div
-          className={
-            visibility == 2
-              ? "chat-message-sender__box chat-message-sender__box-curators-chat"
-              : "chat-message-sender__box"
-          }
+          className="chat-message-sender__box"
+          style={{ background: "rgb(0 0 0 / 9%)" }}
         >
           <h3 className="chat-message-sender__name">{getFullName(sender)}</h3>
           <div
             dangerouslySetInnerHTML={{ __html: message }}
             className="chat-message-sender__text"
+            style={{ textDecoration: "line-through" }}
           ></div>
           {translatedText !== "" &&
             languageCode[franc(message)] !== language && (
@@ -207,20 +168,15 @@ function ChatMessage({
               </div>
             </>
           )}
-          <span className="chat-message-sender__time">{time}</span>
-          {user.id === senderId &&
-            sender.role !== "client" &&
-            removable !== null && (
-              <div className="chat-message-sender__delete">
-                <img
-                  src={DeleteMsgIcon}
-                  alt=""
-                  className="countries__delete-icon"
-                  style={{ width: "42px" }}
-                  onClick={(e) => handleDeleteMsg(e)}
-                />
-              </div>
-            )}
+          <div className="chat-message-deleted__delete-msg">
+            <span>Сообщение удалено</span>
+            <span
+              className="chat-message-sender__time"
+              style={{ marginTop: "0" }}
+            >
+              {time}
+            </span>
+          </div>
         </div>
       </div>
     </>

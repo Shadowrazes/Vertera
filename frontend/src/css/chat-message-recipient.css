@@ -145,6 +145,11 @@
   font-weight: bold;
 }
 
+.chat-message-recipient__box-curators-chat {
+  border: none;
+  background: rgb(255, 134, 134, 0.2);
+}
+
 @media screen and (max-width: 768px) {
   .chat-message-recipient__container {
     width: 100%;

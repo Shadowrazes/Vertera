@@ -694,12 +694,11 @@ function allTickets() {
       let helperIds;
       if (selectedCuratorsId.length === 0) {
         helperIds = user.id;
+        if (user.id == 0) {
+          helperIds = undefined;
+        }
       } else {
         helperIds = selectedCuratorsId;
-      }
-
-      if (user.id == 0) {
-        helperIds = undefined;
       }
 
       const variables = {

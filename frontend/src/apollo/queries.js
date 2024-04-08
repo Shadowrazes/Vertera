@@ -171,6 +171,9 @@ export const MESSAGES_CHAT = gql`
         messages {
           id
           text
+          visibility
+          isActive
+          removable
           attachs {
             id
             path
@@ -260,6 +263,8 @@ export const MESSAGES_CHAT_CLIENT = gql`
         messages {
           id
           text
+          visibility
+          removable
           attachs {
             id
             path

@@ -84,6 +84,17 @@
   margin-top: 10px;
 }
 
+.chat-message-deleted__delete-msg {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.chat-message-sender__box-curators-chat {
+  background: rgb(203, 134, 255, 0.3);
+}
+
 @media screen and (max-width: 768px) {
   .chat-message-sender__container {
     width: 100%;
