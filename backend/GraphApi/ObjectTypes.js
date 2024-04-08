@@ -174,6 +174,7 @@ export const ObjectTypes = `
         readed: Boolean!
         visibility: Int!
         isActive: Int!
+        removable: Boolean
     }
 
     type Attachment {

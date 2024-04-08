@@ -50,6 +50,15 @@ class Message extends Entity {
             `;
         }
         const result = await super.Request(sql, [ticketId]);
+
+        for (let i = result.length - 1; i >= 0; i--) {
+            if (result[i].senderId === initiator.id) {
+                result[i].removable = true;
+            } else {
+                break;
+            }
+        }
+
         return result;
     }
 
