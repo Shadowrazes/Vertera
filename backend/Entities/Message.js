@@ -163,10 +163,12 @@ class Message extends Entity {
                 let msgUpdLogFields = { ticketId: curTicket.id, initiatorId: initiator.id };
 
                 if (!fields.isActive) {
-                    msgUpdLogFields = { type: TicketLog.TypeMsgDel, info: `Удалил сообщение` };
+                    msgUpdLogFields.type = TicketLog.TypeMsgDel;
+                    msgUpdLogFields.info = `Удалил сообщение`;
                 }
                 else {
-                    msgUpdLogFields = { type: TicketLog.TypeMsgRecover, info: `Восстановил сообщение` };
+                    msgUpdLogFields.type = TicketLog.TypeMsgRecover;
+                    msgUpdLogFields.info = `Восстановил сообщение`;
                 }
 
                 const msgUpdLogRes = await TicketLog.TransInsert(conn, msgUpdLogFields);
