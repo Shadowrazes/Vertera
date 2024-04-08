@@ -90,7 +90,7 @@ function EditSubtheme() {
   } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
-      token: language,
+      lang: language,
     },
   });
   const { loading, error, data, refetch } = useQuery(SUBTHEME, {
