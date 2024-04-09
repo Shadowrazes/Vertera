@@ -5,7 +5,7 @@ export const ObjectTypes = `
         surname: String!
         patronymic: String
         role: String!
-        country: Country!
+        country: Country
         isActive: Boolean!
         outerId: Int
         email: String
@@ -15,6 +15,7 @@ export const ObjectTypes = `
     type Country {
         id: Int!
         code: String!
+        isActive: Int!
         name(lang: String!): Translation!
         langs: [Lang]!
     }
@@ -23,6 +24,7 @@ export const ObjectTypes = `
         id: Int!
         name: String!
         code: String!
+        isActive: Int!
     }
 
     type Client {
@@ -82,7 +84,7 @@ export const ObjectTypes = `
         status: TicketStatus!
         date: DateTime!
         title: String!
-        subTheme: SubTheme!
+        subTheme: SubTheme
         reaction: Int
         messages: [Message]
         lastMessage: Message!
@@ -138,7 +140,7 @@ export const ObjectTypes = `
         id: Int!
         name(lang: String!): Translation!
         subThemes: [SubTheme]!
-        unit: Unit!
+        unit: Unit
         visibility: Int!
         orderNum: Int!
     }
@@ -146,7 +148,7 @@ export const ObjectTypes = `
     type SubTheme {
         id: Int!
         name(lang: String!): Translation!
-        theme: Theme!
+        theme: Theme
         orderNum: Int!
         visibility: Int!
         departments: [Department]!
