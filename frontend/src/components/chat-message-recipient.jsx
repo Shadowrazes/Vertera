@@ -5,7 +5,7 @@ import { franc } from "franc";
 
 import "../css/chat-message-recipient.css";
 
-function ChatMessage({ message, sender, time, attachs }) {
+function ChatMessage({ message, sender, visibility, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
   let isVisible;
   const isBuild = import.meta.env.DEV !== "build";
@@ -92,7 +92,13 @@ function ChatMessage({ message, sender, time, attachs }) {
   return (
     <>
       <div className="chat-message-recipient__container">
-        <div className="chat-message-recipient__box">
+        <div
+          className={
+            visibility == 2
+              ? "chat-message-recipient__box chat-message-recipient__box-curators-chat"
+              : "chat-message-recipient__box"
+          }
+        >
           <h3 className="chat-message-recipient__name">
             {getFullName(sender)}
           </h3>

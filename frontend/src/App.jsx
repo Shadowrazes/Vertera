@@ -26,6 +26,7 @@ import AddCountry from "./pages/add-country";
 import EditCountry from "./pages/edit-country";
 import Departments from "./pages/departments";
 import CuratorCreateTicket from "./pages/curator-create-ticket";
+import DNDTable from "./components/dnd-table";
 import NotFoundPage from "./pages/not-found-page";
 
 import "./App.css";
@@ -85,6 +86,7 @@ function App() {
             path="/curator-create-ticket"
             element={<CuratorCreateTicket />}
           />
+          <Route path="/dndtable" element={<DNDTable />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

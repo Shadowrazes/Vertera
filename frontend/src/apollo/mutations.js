@@ -68,8 +68,10 @@ export const ADD_MESSAGE = gql`
 
 export const DELETE_MESSAGE = gql`
   mutation ($token: String!, $id: Int!) {
-    helperMutation(token: $token) {
-      deleteMessage(id: $id)
+    clientMutation(token: $token) {
+      updateMessage(id: $id, fields: { isActive: false }) {
+        changed
+      }
     }
   }
 `;
@@ -460,6 +462,7 @@ export const EDIT_TICKET = gql`
     $id: Int!
     $recipientId: Int
     $assistantId: Int
+    $title: String
     $unitId: Int
     $themeId: Int
     $subThtmeId: Int
@@ -472,6 +475,7 @@ export const EDIT_TICKET = gql`
           recipientId: $recipientId
           unitId: $unitId
           themeId: $themeId
+          title: $title
           subThemeId: $subThtmeId
           assistantId: $assistantId
         }

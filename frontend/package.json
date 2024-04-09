@@ -24,6 +24,7 @@
     "history": "^5.3.0",
     "json-graphql-server": "^2.3.2",
     "luxon": "^3.4.4",
+    "material-react-table": "^2.12.1",
     "mdb-react-ui-kit": "^7.1.0",
     "multiselect-react-dropdown": "^2.0.25",
     "primereact": "^10.3.1",

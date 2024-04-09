@@ -77,6 +77,7 @@ function AddCurator() {
   const { loading, error, data } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

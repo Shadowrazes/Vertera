@@ -576,7 +576,10 @@ function FormComponent() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>{get_translation("INTERFACE_MESSAGE_CREATION_TICKET_FULL")}</p>
+          <p>
+            Ваше обращение в техподдержку VERTERA принято в обработку.
+            Пожалуйста, ожидайте ответа. (До 24 часов в рабочее время)
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

@@ -41,6 +41,7 @@ import ButtonCustom from "../components/button";
 import ChatMessageRecepient from "../components/chat-message-recipient";
 import ChatMessageSender from "../components/chat-message-sender";
 import ChatMessageSystem from "../components/chat-message-system";
+import ChatMessageDeleted from "../components/chat-message-deleted";
 import TicketTitle from "../components/ticket-title";
 import Loader from "../pages/loading";
 import NotFoundPage from "./not-found-page";
@@ -86,6 +87,7 @@ function Chat() {
   const [selectedThemeIdEdit, setSelectedThemeIdEdit] = useState(null);
   const [selectedSubThemeEdit, setSelectedSubThemeEdit] = useState(null);
   const [selectedSubThemeIdEdit, setSelectedSubThemeIdEdit] = useState(null);
+  const [titleValue, setTitleValue] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [selectedCurator, setSelectedCurator] = useState(null);
@@ -121,6 +123,7 @@ function Chat() {
   const [showCuratorChat, setShowCuratorChat] = useState(false);
   const [showMentor, setShowMentor] = useState(false);
   const [showEditTicketError, setShowEditTicketErorr] = useState(false);
+  const [showMsg, setShowMsg] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
@@ -285,6 +288,7 @@ function Chat() {
         data.clientQuery.ticket.subTheme.theme.name.stroke,
         data.clientQuery.ticket.subTheme.theme.id
       );
+      setTitleValue(data.clientQuery.ticket.title);
 
       setSelectedCurator(
         `${data.clientQuery.ticket.recipient.surname} ${
@@ -306,7 +310,7 @@ function Chat() {
       //console.log(data.ticket.id);
       //console.log(data.ticket.subTheme.theme.unit.name.stroke);
 
-      if (data.clientQuery.ticket.status.name.stroke !== "Закрыт") {
+      if (data.clientQuery.ticket.status.name.stroke !== "Выполнено") {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -603,7 +607,7 @@ function Chat() {
       .catch((error) => {
         console.error("Ошибка при загрузке файлов:", error);
       });
-
+    handleShowMsg();
     setMessage("");
     setEditorState(EditorState.createEmpty());
     if (inputRef.current) {
@@ -634,8 +638,7 @@ function Chat() {
           },
         },
       });
-      // setTicketStatus("Закрыт");
-      setCurrentStatus("Закрыт");
+      setCurrentStatus("Выполнено");
       // console.log(ticketStatus);
       setIsLoadingClose(false);
     } catch (error) {
@@ -643,6 +646,14 @@ function Chat() {
 
       setIsLoadingClose(false);
     }
+  };
+
+  const handleShowMsg = () => {
+    setShowMsg(true);
+  };
+
+  const handleCloseMsg = () => {
+    setShowMsg(false);
   };
 
   const handleOpen = async () => {
@@ -665,9 +676,7 @@ function Chat() {
           },
         },
       });
-      // setTicketStatus("Закрыт");
       setCurrentStatus("В процессе");
-      // console.log(ticketStatus);
       setIsLoadingClose(false);
     } catch (error) {
       console.error("Ошибка при открытии заявки:", error);
@@ -1037,7 +1046,7 @@ function Chat() {
               subThemeId: input.subthemeId,
             },
             messageFields: {
-              senderId: userId,
+              senderId: clientId,
               recieverId: senderId,
               ticketId: ticketId,
               text: input.text,
@@ -1124,6 +1133,11 @@ function Chat() {
     // console.log(subThemeId);
   };
 
+  const handleTitleChange = (e) => {
+    setTitleValue(e.target.value);
+    setIsErrorVisibleEdit(false);
+  };
+
   const handleCuratorClick = (
     curatorName,
     curatorSurname,
@@ -1148,6 +1162,8 @@ function Chat() {
       error = "Выберите тему";
     } else if (selectedSubThemeIdEdit == null) {
       error = "Выберите подтему";
+    } else if (titleValue.trim() == "") {
+      error = "Укажите заголовок обращения";
     } else if (selectedCurator == null) {
       error = "Выберите куратора";
     } else {
@@ -1162,6 +1178,7 @@ function Chat() {
       selectedUnitEdit == null ||
       selectedThemeEdit == null ||
       selectedSubThemeIdEdit == null ||
+      titleValue.trim() == "" ||
       selectedCurator == null
     ) {
       setIsErrorVisibleEdit(true);
@@ -1175,6 +1192,7 @@ function Chat() {
           token: user.token,
           id: ticketId,
           recipientId: selectedCuratorId,
+          title: titleValue,
           unitId: selectedUnitIdEdit,
           themeId: selectedThemeIdEdit,
           subThemeId: selectedSubThemeIdEdit,
@@ -1372,9 +1390,11 @@ function Chat() {
   return (
     <>
       <div
-        className={currentStatus == "Закрыт" ? "" : "chat-messages__container"}
+        className={
+          currentStatus == "Выполнено" ? "" : "chat-messages__container"
+        }
       >
-        {currentStatus !== null && currentStatus !== "Закрыт" ? (
+        {currentStatus !== null && currentStatus !== "Выполнено" ? (
           <div className="alltickets__container">
             <TicketTitle
               title={`${data.clientQuery.ticket.title}`}
@@ -1399,7 +1419,7 @@ function Chat() {
             <>
               <div className="chat__helper-buttons">
                 {isAdmin() &&
-                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Выполнено" &&
                   user.id !== data?.clientQuery?.ticket.assistant?.id && (
                     <a className="alltickets__link">
                       <ButtonCustom
@@ -1411,7 +1431,7 @@ function Chat() {
                   )}
 
                 {isAdmin() &&
-                  currentStatus !== "Закрыт" &&
+                  currentStatus !== "Выполнено" &&
                   currentStatus !== "Новый" &&
                   currentStatus !== "На уточнении" &&
                   currentStatus !== "У наставника" &&
@@ -1429,7 +1449,7 @@ function Chat() {
 
                 {isAdmin() &&
                   currentStatus == "На уточнении" &&
-                  user.id == data.clientQuery.ticket.recipient.id && (
+                  user.id == data.clientQuery.ticket.assistant.id && (
                     <>
                       <a className="alltickets__link">
                         <ButtonCustom
@@ -1464,7 +1484,7 @@ function Chat() {
                   </a>
                 )}
 
-                {currentStatus === "Закрыт" && isAdmin() && (
+                {currentStatus === "Выполнено" && isAdmin() && (
                   <>
                     <ButtonCustom
                       title="Открыть тикет"
@@ -1601,6 +1621,15 @@ function Chat() {
                     </DropdownButton>
                   </div>
                 )}
+                <Form.Label className="edit-curator__field-label">
+                  Заголовок обращения
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="add-currator__input add-theme__dropdown"
+                  value={titleValue}
+                  onChange={handleTitleChange}
+                />
               </Tab>
               <Tab
                 eventKey="curator"
@@ -2325,12 +2354,27 @@ function Chat() {
           (msg) =>
             msg.text !== "" && (
               <div key={msg.id}>
-                {msg.sender.id === userId ? (
+                {msg.isActive == 0 ? (
+                  <>
+                    <ChatMessageDeleted
+                      id={msg.id}
+                      message={msg.text}
+                      sender={msg.sender}
+                      onClick={handleRefetch}
+                      time={DateTime.fromISO(msg.date, { zone: "utc" })
+                        .toLocal()
+                        .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
+                      attachs={msg.attachs}
+                    />
+                  </>
+                ) : msg.sender.id === userId ? (
                   <>
                     <ChatMessageSender
                       id={msg.id}
                       message={msg.text}
                       sender={msg.sender}
+                      visibility={msg.visibility}
+                      removable={msg.removable}
                       onClick={handleRefetch}
                       time={DateTime.fromISO(msg.date, { zone: "utc" })
                         .toLocal()
@@ -2355,6 +2399,7 @@ function Chat() {
                   <ChatMessageRecepient
                     message={msg.text}
                     sender={msg.sender}
+                    visibility={msg.visibility}
                     time={DateTime.fromISO(msg.date, { zone: "utc" })
                       .toLocal()
                       .toFormat(`yyyy.MM.dd      HH:mm:ss`)}
@@ -2623,6 +2668,20 @@ function Chat() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleHideEditTicketError}>
+            Закрыть
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showMsg} onHide={handleCloseMsg}>
+        <Modal.Header closeButton>
+          <Modal.Title>Сообщение отправлено</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Сообщение успешно отправлено</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseMsg}>
             Закрыть
           </Button>
         </Modal.Footer>
