@@ -86,18 +86,19 @@ function ChatMessage({ id, message, sender, time, attachs, onClick }) {
   useEffect(() => {
     // console.log("time = ", time);
     const fetchData = async () => {
-      if (languageCode.hasOwnProperty(franc(message))) {
-        if ((languageCode[franc(message)][0] || franc(message)) !== language) {
-          handleTranslate(message, languageCodeQuery[language]);
-          // console.log("franc ", franc(message));
-          // console.log("orig", franc(message));
-          // console.log("selected", languageCodeQuery[language]);
-        }
-      } else {
-        handleTranslate(message, languageCodeQuery[language]);
-        // console.log("orig", franc(message));
-        // console.log("selected", languageCodeQuery[language]);
-      }
+      // if (languageCode.hasOwnProperty(franc(message))) {
+      //   if ((languageCode[franc(message)][0] || franc(message)) !== language) {
+      //     handleTranslate(message, languageCodeQuery[language]);
+      //     // console.log("franc ", franc(message));
+      //     // console.log("orig", franc(message));
+      //     // console.log("selected", languageCodeQuery[language]);
+      //   }
+      // } else {
+      //   handleTranslate(message, languageCodeQuery[language]);
+      //   // console.log("orig", franc(message));
+      //   // console.log("selected", languageCodeQuery[language]);
+      // }
+      handleTranslate(message, languageCodeQuery[language]);
     };
 
     if (data && data.clientQuery.message) {

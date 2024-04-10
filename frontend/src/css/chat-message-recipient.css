@@ -12,7 +12,7 @@
   border: 1px solid #dee2e6;
   border-radius: 15px;
   background: white;
-  padding: 50px 150px 30px 50px;
+  padding: 50px 50px 30px 50px;
 }
 
 .chat-message-recipient__text {
@@ -85,7 +85,6 @@
   display: block;
   margin-top: 30px;
   margin-left: -20px;
-  margin-right: -50px;
   text-align: right;
   white-space: pre-wrap;
 }
