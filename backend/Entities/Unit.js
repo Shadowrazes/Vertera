@@ -11,7 +11,7 @@ class Unit extends Entity {
     static TranslationType = 'unit';
 
     static async GetById(id, initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += ` AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
@@ -27,7 +27,7 @@ class Unit extends Entity {
     }
 
     static async GetList(initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += `WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;

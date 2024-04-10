@@ -13,7 +13,7 @@ class SubTheme extends Entity {
     static TranslationType = 'subTheme';
 
     static async GetById(id, initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += ` AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
@@ -29,7 +29,7 @@ class SubTheme extends Entity {
     }
 
     static async GetList(initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += `WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
@@ -45,7 +45,7 @@ class SubTheme extends Entity {
     }
 
     static async GetListByTheme(themeId, initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += ` AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;

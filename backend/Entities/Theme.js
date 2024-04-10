@@ -20,7 +20,7 @@ class Theme extends Entity {
     }
 
     static async GetById(id, initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += ` AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
@@ -36,7 +36,7 @@ class Theme extends Entity {
     }
 
     static async GetList(initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += `WHERE ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
@@ -52,7 +52,7 @@ class Theme extends Entity {
     }
 
     static async GetListByUnit(unitId, initiator, constraint) {
-        const constraintSql = ``;
+        let constraintSql = ``;
 
         if(constraint) {
             constraintSql += ` AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
