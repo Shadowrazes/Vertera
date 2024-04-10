@@ -19,29 +19,49 @@ class Theme extends Entity {
         return this.Visibilitises[role];
     }
 
-    static async GetById(id, initiator) {
+    static async GetById(id, initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += ` AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
+        }
+
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.PrimaryField} = ? AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
+            WHERE ${this.PrimaryField} = ?
+            ${constraintSql}
         `;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetList(initiator) {
+    static async GetList(initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += `WHERE ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
+        }
+
         const sql = `
             SELECT * FROM ${this.TableName}
-            WHERE ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
+            ${constraintSql}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetListByUnit(unitId, initiator) {
+    static async GetListByUnit(unitId, initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += ` AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}`;
+        }
+
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.UnitIdField} = ? AND ${this.VisibilityField} < ${this.ValidateVisibility(initiator.role)}
+            WHERE ${this.UnitIdField} = ?
+            ${constraintSql}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql, [unitId]);

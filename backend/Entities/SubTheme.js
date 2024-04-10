@@ -12,29 +12,49 @@ class SubTheme extends Entity {
     static VisibilityField = 'visibility';
     static TranslationType = 'subTheme';
 
-    static async GetById(id, initiator) {
+    static async GetById(id, initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += ` AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
+        }
+        
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.PrimaryField} = ? AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+            WHERE ${this.PrimaryField} = ?
+            ${constraintSql}
         `;
         const result = await super.Request(sql, [id]);
         return result[0];
     }
 
-    static async GetList(initiator) {
+    static async GetList(initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += `WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
+        }
+
         const sql = `
             SELECT * FROM ${this.TableName}
-            WHERE ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+            ${constraintSql}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql);
         return result;
     }
 
-    static async GetListByTheme(themeId, initiator) {
+    static async GetListByTheme(themeId, initiator, constraint) {
+        const constraintSql = ``;
+
+        if(constraint) {
+            constraintSql += ` AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}`;
+        }
+
         const sql = `
             SELECT * FROM ${this.TableName} 
-            WHERE ${this.ThemeIdField} = ? AND ${this.VisibilityField} < ${Theme.ValidateVisibility(initiator.role)}
+            WHERE ${this.ThemeIdField} = ?
+            ${constraintSql}
             ORDER BY ${this.OrderField} ASC
         `;
         const result = await super.Request(sql, [themeId]);
