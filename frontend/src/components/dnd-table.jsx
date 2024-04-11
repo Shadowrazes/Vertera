@@ -7,8 +7,12 @@ import {
 
 import { THEME_LIST, HELPER_PERMS } from "../apollo/queries";
 
+import Loader from "../pages/loading";
+
 const DNDTable = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const [data, setData] = useState([]);
 
   const {
     loading,
@@ -21,33 +25,22 @@ const DNDTable = () => {
     },
   });
 
-  // const initData = [
-  //   {
-  //     firstName: "Dylan",
-  //     lastName: "Murray",
-  //     city: "East Daphne",
-  //   },
-  //   {
-  //     firstName: "Raquel",
-  //     lastName: "Kohler",
-  //     city: "Columbus",
-  //   },
-  //   {
-  //     firstName: "Ervin",
-  //     lastName: "Reinger",
-  //     city: "South Linda",
-  //   },
-  //   {
-  //     firstName: "Brittany",
-  //     lastName: "McCullough",
-  //     city: "Lincoln",
-  //   },
-  //   {
-  //     firstName: "Branson",
-  //     lastName: "Frami",
-  //     city: "Charleston",
-  //   },
-  // ];
+  useEffect(() => {
+    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+      const formattedData = dataThemeList.clientQuery.allThemeTree.map(
+        (unit) => {
+          return {
+            orderNum: unit.orderNum,
+            id: unit.id,
+            name: unit.name.stroke,
+          };
+        }
+      );
+      setData(formattedData);
+    }
+
+    refetch();
+  }, [dataThemeList]);
 
   const columns = useMemo(
     () => [
@@ -67,30 +60,10 @@ const DNDTable = () => {
     []
   );
 
-  const [data, setData] = useState([]);
-  const [dataQuery, setDataQuery] = useState(null);
-  const [inputValues, setInputValues] = useState({});
-
-  useEffect(() => {
-    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
-      const formattedData = dataThemeList.clientQuery.allThemeTree.map(
-        (unit) => {
-          return {
-            orderNum: unit.orderNum,
-            id: unit.id,
-            name: unit.name.stroke,
-          };
-        }
-      );
-      setData(formattedData);
-    }
-
-    refetch();
-  }, [dataThemeList]);
-
   const table = useMaterialReactTable({
     autoResetPageIndex: false,
     columns,
+    enableColumnActions: false,
     data,
     enableRowOrdering: true,
     enableSorting: false,
@@ -108,6 +81,11 @@ const DNDTable = () => {
       },
     }),
   });
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return <MRT_TableContainer table={table} />;
 };
 
