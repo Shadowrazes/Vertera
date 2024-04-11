@@ -107,9 +107,6 @@ function Chat() {
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
   const [isVisibleSplit, setIsVisibleSplit] = useState(false);
   const [isVisibleSplitFields, setisVisibleSplitFields] = useState(false);
-  const [isAddCuratorButtonVisible, setIsAddCuratorButtonVisible] =
-    useState(true);
-  const [isSelectCuratorVisible, setIsSelectCuratorVisible] = useState(false);
   const [isVisibleCuratorsChat, setIsVisibleCuratorsChat] = useState(false);
   const [isVisibleMentor, setIsVisibleMentor] = useState(false);
   const [isSubThemeDropdownVisible, setIsSubThemeDropdownVisible] =
@@ -346,6 +343,8 @@ function Chat() {
           ),
           editorContent: EditorState.createEmpty(),
           text: "",
+          isVisibleButton: true,
+          isVisibleDropdown: false,
         }));
         handleThemeClick(_theme, _themeId);
         setInputValues(inputs);
@@ -1257,12 +1256,24 @@ function Chat() {
     setIsVisibleSplit(false);
     setisVisibleSplitFields(false);
     setIsVisibleMentor(false);
-    setIsAddCuratorButtonVisible(true);
-    setIsSelectCuratorVisible(false);
 
     setNewTicketsCount(undefined);
 
     setMentorId(null);
+  };
+
+  const handleCloseSplitAddCurator = () => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            isVisibleButton: true,
+            isVisibleDropdown: false,
+          }
+        : input
+    );
+
+    setInputValues(updatedInputValues);
   };
 
   const handleShow = () => {
@@ -1425,8 +1436,17 @@ function Chat() {
   };
 
   const handleSelectCuratorVisible = () => {
-    setIsAddCuratorButtonVisible(false);
-    setIsSelectCuratorVisible(true);
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            isVisibleButton: false,
+            isVisibleDropdown: true,
+          }
+        : input
+    );
+
+    setInputValues(updatedInputValues);
   };
 
   const handleRefetch = () => {
@@ -1954,51 +1974,58 @@ function Chat() {
                         )}
                     </DropdownButton>
                   )}
-                  {isAddCuratorButtonVisible && (
+                  {input.isVisibleButton && (
                     <ButtonCustom
                       title="Выбрать куратора"
                       onClick={handleSelectCuratorVisible}
                     />
                   )}
-                  {isSelectCuratorVisible && (
-                    <DropdownButton
-                      id="dropdown-custom-1"
-                      title={input.recepient || "Куратор"}
-                      className="themes__dropdown"
-                    >
-                      {dataQueryCurators
-                        .filter((curator) =>
-                          curator.departments.some((department) =>
-                            input.departmentsId.includes(department.id)
-                          )
-                        )
-                        .map(
-                          (curator, index) =>
-                            curator.user.isActive &&
-                            curator.permissions.sendMsg && (
-                              <Dropdown.Item
-                                key={index}
-                                onClick={() =>
-                                  handleCuratorClick(
-                                    curator.user.name,
-                                    curator.user.surname,
-                                    curator.user.patronymic,
-                                    curator.id
-                                  )
-                                }
-                                href="#"
-                              >
-                                {`${curator.user.surname} ${
-                                  curator.user.name
-                                } ${
-                                  curator.user.patronymic
-                                    ? ` ${curator.user.patronymic}`
-                                    : ""
-                                }`}
-                              </Dropdown.Item>
+                  {input.isVisibleDropdown && (
+                    <>
+                      <div style={{ position: "relative" }}>
+                        <a onClick={handleCloseSplitAddCurator}>
+                          <div className="chat__edit-close"></div>
+                        </a>
+                      </div>
+                      <DropdownButton
+                        id="dropdown-custom-1"
+                        title={input.recepient || "Куратор"}
+                        className="themes__dropdown"
+                      >
+                        {dataQueryCurators
+                          .filter((curator) =>
+                            curator.departments.some((department) =>
+                              input.departmentsId.includes(department.id)
                             )
-                        )}
-                    </DropdownButton>
+                          )
+                          .map(
+                            (curator, index) =>
+                              curator.user.isActive &&
+                              curator.permissions.sendMsg && (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() =>
+                                    handleCuratorClick(
+                                      curator.user.name,
+                                      curator.user.surname,
+                                      curator.user.patronymic,
+                                      curator.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {`${curator.user.surname} ${
+                                    curator.user.name
+                                  } ${
+                                    curator.user.patronymic
+                                      ? ` ${curator.user.patronymic}`
+                                      : ""
+                                  }`}
+                                </Dropdown.Item>
+                              )
+                          )}
+                      </DropdownButton>
+                    </>
                   )}
                   <Editor
                     editorState={input.editorContent}

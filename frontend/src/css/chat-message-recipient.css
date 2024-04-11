@@ -8,7 +8,7 @@
 }
 
 .chat-message-recipient__box {
-  width: 100%;
+  width: 85%;
   border: 1px solid #dee2e6;
   border-radius: 15px;
   background: white;
@@ -18,7 +18,7 @@
 .chat-message-recipient__text {
   max-width: 1075px;
   font-family: "TT Norms Pro", sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   word-wrap: break-word;
 }
 
@@ -83,7 +83,7 @@
   font-size: 15px;
   color: #5c5c5c;
   display: block;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: -20px;
   text-align: right;
   white-space: pre-wrap;
@@ -134,14 +134,16 @@
 .chat-message-recipient__name {
   font-family: "TT Norms Pro", sans-serif;
   font-weight: 400;
+  margin-bottom: 20px;
 }
 
 .chat-message-translate {
   border-top: 1px solid #dee2e6;
   margin-top: 10px;
   padding: 20px 0 20px 0;
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: right;
 }
 
 .chat-message-recipient__box-curators-chat {

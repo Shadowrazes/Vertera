@@ -185,7 +185,10 @@ function ChatMessage({
                     />
                   </span>
                 </div>
-                <div className="chat-message-recipient__text">
+                <div
+                  className="chat-message-recipient__text"
+                  style={{ textAlign: "right" }}
+                >
                   <i dangerouslySetInnerHTML={{ __html: translatedText }}></i>
                 </div>
               </>

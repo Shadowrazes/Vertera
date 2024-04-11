@@ -660,6 +660,15 @@ function CuratorCreateTicket() {
           <Form method="post">
             <Row className="form__row">
               <Col className="form__column">
+                <Form.Group controlId="TicketTitleForm">
+                  <Form.Control
+                    type="text"
+                    placeholder={get_translation("INTERFACE_TICKET_TITLE")}
+                    className="form__input"
+                    value={ticketTitleValue}
+                    onChange={handleTicketTitleChange}
+                  />
+                </Form.Group>
                 <DropdownButton
                   id="dropdown-custom-1"
                   title={
@@ -829,15 +838,6 @@ function CuratorCreateTicket() {
               </Col>
 
               <Col className="form__column">
-                <Form.Group controlId="TicketTitleForm">
-                  <Form.Control
-                    type="text"
-                    placeholder={get_translation("INTERFACE_TICKET_TITLE")}
-                    className="form__input"
-                    value={ticketTitleValue}
-                    onChange={handleTicketTitleChange}
-                  />
-                </Form.Group>
                 <Form.Group className="custom-editor">
                   <Editor
                     editorState={editorState}
