@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
+import { Button, Modal } from "react-bootstrap";
 
 import { MESSAGE } from "../apollo/queries";
 import { DELETE_MESSAGE } from "../apollo/mutations";
@@ -18,6 +19,7 @@ function ChatMessage({
   sender,
   visibility,
   removable,
+  status,
   time,
   attachs,
   onClick,
@@ -26,6 +28,7 @@ function ChatMessage({
   const [senderId, setSenderId] = useState(null);
 
   let isVisible;
+  const [showWarningDelete, setShowWarningDelete] = useState(false);
 
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -97,18 +100,19 @@ function ChatMessage({
   useEffect(() => {
     // console.log("time = ", time);
     const fetchData = async () => {
-      if (languageCode.hasOwnProperty(franc(message))) {
-        if ((languageCode[franc(message)][0] || franc(message)) !== language) {
-          handleTranslate(message, languageCodeQuery[language]);
-          // console.log("franc ", franc(message));
-          // console.log("orig", franc(message));
-          // console.log("selected", languageCodeQuery[language]);
-        }
-      } else {
-        handleTranslate(message, languageCodeQuery[language]);
-        // console.log("orig", franc(message));
-        // console.log("selected", languageCodeQuery[language]);
-      }
+      // if (languageCode.hasOwnProperty(franc(message))) {
+      //   if ((languageCode[franc(message)][0] || franc(message)) !== language) {
+      //     handleTranslate(message, languageCodeQuery[language]);
+      //     // console.log("franc ", franc(message));
+      //     // console.log("orig", franc(message));
+      //     // console.log("selected", languageCodeQuery[language]);
+      //   }
+      // } else {
+      //   handleTranslate(message, languageCodeQuery[language]);
+      //   // console.log("orig", franc(message));
+      //   // console.log("selected", languageCodeQuery[language]);
+      // }
+      handleTranslate(message, languageCodeQuery[language]);
     };
 
     if (data && data.clientQuery.message) {
@@ -145,6 +149,14 @@ function ChatMessage({
     }
   };
 
+  const handleShowWarningDelete = () => {
+    setShowWarningDelete(true);
+  };
+
+  const handleCloseWarning = () => {
+    setShowWarningDelete(false);
+  };
+
   return (
     <>
       <div className="chat-message-sender__container">
@@ -173,7 +185,10 @@ function ChatMessage({
                     />
                   </span>
                 </div>
-                <div className="chat-message-recipient__text">
+                <div
+                  className="chat-message-recipient__text"
+                  style={{ textAlign: "right" }}
+                >
                   <i dangerouslySetInnerHTML={{ __html: translatedText }}></i>
                 </div>
               </>
@@ -210,19 +225,37 @@ function ChatMessage({
           <span className="chat-message-sender__time">{time}</span>
           {user.id === senderId &&
             sender.role !== "client" &&
-            removable !== null && (
+            removable !== null &&
+            status !== "Выполнено" && (
               <div className="chat-message-sender__delete">
                 <img
                   src={DeleteMsgIcon}
                   alt=""
                   className="countries__delete-icon"
                   style={{ width: "42px" }}
-                  onClick={(e) => handleDeleteMsg(e)}
+                  onClick={handleShowWarningDelete}
                 />
               </div>
             )}
         </div>
       </div>
+
+      <Modal show={showWarningDelete} onHide={handleCloseWarning}>
+        <Modal.Header closeButton>
+          <Modal.Title>Предупреждение</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Вы уверены, что хотите удалить это сообщение?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseWarning}>
+            Отмена
+          </Button>
+          <Button variant="primary" onClick={handleDeleteMsg}>
+            Продолжить
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

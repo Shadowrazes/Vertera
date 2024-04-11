@@ -45,6 +45,7 @@ function AddCurator() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [queryError, setQueryError] = useState("");
   const [show, setShow] = useState(false);
 
   const [nameValue, setNameValue] = useState("");
@@ -246,6 +247,8 @@ function AddCurator() {
       error = get_translation("INTERFACE_SELECT_DEPARTMENT");
     } else if (selectedJobTitleId == null) {
       error = get_translation("INTERFACE_SELECT_JOB_TITLE");
+    } else if (queryError == "Unsolvable") {
+      error = "Введен уже существующий логин";
     } else {
       error = get_translation("INTERFACE_ERROR_ADD_CURATOR");
     }
@@ -324,6 +327,7 @@ function AddCurator() {
       handleShow();
     } catch (error) {
       console.error("Ошибка при добавлении куратора:", error);
+      setQueryError(error.networkError.result.errors[0].message);
       setIsErrorVisible(true);
     }
   };

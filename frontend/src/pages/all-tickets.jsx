@@ -1498,7 +1498,7 @@ function allTickets() {
                           .toFormat("HH:mm:ss")}
                       </Link>
                     </td>
-                    <td>
+                    <td style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -1523,7 +1523,9 @@ function allTickets() {
                             }}
                             className="alltickets__link"
                           >
-                            {ticket.initiator.id}
+                            {ticket.initiator.outerId
+                              ? ticket.initiator.outerId
+                              : ticket.initiator.id}
                           </Link>
                         </td>
                         <td>
@@ -1540,7 +1542,7 @@ function allTickets() {
                         </td>
                       </>
                     )}
-                    <td>
+                    <td style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{

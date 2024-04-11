@@ -126,6 +126,7 @@ function Chat() {
   const [showMsg, setShowMsg] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
   const isBuild = import.meta.env.DEV !== "build";
 
   const inputRef = useRef(null);
@@ -147,6 +148,7 @@ function Chat() {
       variables: {
         token: user.token,
         link: itemId,
+        lang: language,
       },
     });
   };
@@ -156,6 +158,7 @@ function Chat() {
       variables: {
         token: user.token,
         link: itemId,
+        lang: language,
       },
     });
   };
@@ -306,10 +309,6 @@ function Chat() {
         )
       );
 
-      //console.log(data.ticket.status.name.stroke);
-      //console.log(data.ticket.id);
-      //console.log(data.ticket.subTheme.theme.unit.name.stroke);
-
       if (data.clientQuery.ticket.status.name.stroke !== "Выполнено") {
         setIsVisible(true);
       } else {
@@ -337,8 +336,15 @@ function Chat() {
           themeId: data.clientQuery.ticket.subTheme.theme.id,
           subtheme: data.clientQuery.ticket.subTheme.name.stroke,
           subthemeId: data.clientQuery.ticket.subTheme.id,
+          recepient: null,
+          recepientId: null,
+          departmentsId: data.clientQuery.ticket.subTheme.departments.map(
+            (department) => department.id
+          ),
           editorContent: EditorState.createEmpty(),
           text: "",
+          isVisibleButton: true,
+          isVisibleDropdown: false,
         }));
         handleThemeClick(_theme, _themeId);
         setInputValues(inputs);
@@ -365,7 +371,7 @@ function Chat() {
       refetchQueries: [
         {
           query: isAdmin() ? MESSAGES_CHAT : MESSAGES_CHAT_CLIENT,
-          variables: { token: user.token, link: itemId },
+          variables: { token: user.token, link: itemId, lang: language },
         },
       ],
     });
@@ -610,6 +616,7 @@ function Chat() {
     handleShowMsg();
     setMessage("");
     setEditorState(EditorState.createEmpty());
+
     if (inputRef.current) {
       inputRef.current.value = null;
     }
@@ -723,7 +730,7 @@ function Chat() {
         window.location.reload();
       }
     } catch (error) {
-      showEditTicketError();
+      handleShowEditTicketError();
       console.error("Ошибка при смене куратора:", error);
     }
   };
@@ -826,13 +833,15 @@ function Chat() {
 
     if (newTicketsCount < 2) {
       error = "Минимальное число деления тикетов 2";
+    } else if (newTicketsCount == undefined) {
+      error = "Укажите число новых тикетов";
     }
 
     return error;
   };
 
   const handleSplitTicketFields = () => {
-    if (newTicketsCount < 2) {
+    if (newTicketsCount < 2 || newTicketsCount == undefined) {
       setIsErrorVisibleNewFields(true);
       return;
     }
@@ -851,13 +860,15 @@ function Chat() {
   };
 
   const handleUnitClick = (unit, unitId) => {
-    let theme, themeId, subtheme, subthemeId;
+    let theme, themeId, subtheme, subthemeId, recepient, recepientId;
 
     if (unit !== selectedUnit) {
       theme = null;
       themeId = null;
       subtheme = null;
       subthemeId = null;
+      recepient = null;
+      recepientId = null;
       setIsSubThemeDropdownVisible(true);
     }
 
@@ -871,6 +882,8 @@ function Chat() {
             themeId: themeId,
             subtheme: subtheme,
             subthemeId: subthemeId,
+            recepient: recepient,
+            recepientId: recepientId,
           }
         : input
     );
@@ -884,9 +897,13 @@ function Chat() {
   const handleThemeClick = (theme, themeId) => {
     let subtheme;
     let subthemeId;
+    let recepient;
+    let recepientId;
 
     if (theme !== selectedTheme) {
       subtheme = null;
+      recepient = null;
+      recepientId = null;
       setIsSubThemeDropdownVisible(true);
 
       switch ((selectedUnitId, themeId)) {
@@ -922,6 +939,8 @@ function Chat() {
             themeId: themeId,
             subtheme: subtheme,
             subthemeId: subthemeId,
+            recepient: recepient,
+            recepientId: recepientId,
           }
         : input
     );
@@ -931,10 +950,17 @@ function Chat() {
     setInputValues(updatedInputValues);
   };
 
-  const handleSubThemeClick = (subtheme, subthemeId) => {
+  const handleSubThemeClick = (subtheme, subthemeId, departmentsId) => {
     const updatedInputValues = inputValues.map((input) =>
       input.id === currentIndex + 1
-        ? { ...input, subtheme: subtheme, subthemeId: subthemeId }
+        ? {
+            ...input,
+            subtheme: subtheme,
+            subthemeId: subthemeId,
+            departmentsId: departmentsId,
+            recepient: null,
+            recepientId: null,
+          }
         : input
     );
 
@@ -1041,6 +1067,7 @@ function Chat() {
             ticketFields: {
               title: input.title,
               initiatorId: clientId,
+              recipientId: input.recepientId,
               unitId: input.unitId,
               themeId: input.themeId,
               subThemeId: input.subthemeId,
@@ -1126,8 +1153,10 @@ function Chat() {
 
     setSelectedDepartmentsId(departmentsId);
 
-    setSelectedCurator(null);
-    setSelectedCuratorId(null);
+    if (subTheme !== selectedSubThemeEdit) {
+      setSelectedCurator(null);
+      setSelectedCuratorId(null);
+    }
 
     setIsErrorVisibleEdit(false);
     // console.log(subThemeId);
@@ -1147,10 +1176,22 @@ function Chat() {
     let fullName = `${curatorSurname} ${curatorName} ${
       curatorPatronymic ? ` ${curatorPatronymic}` : ""
     }`;
+
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            recepient: fullName,
+            recepientId: curatorId,
+          }
+        : input
+    );
+
     setSelectedCurator(fullName);
     setSelectedCuratorId(curatorId);
 
     setIsErrorVisibleEdit(false);
+    setInputValues(updatedInputValues);
   };
 
   const errorMsgEdit = () => {
@@ -1216,7 +1257,23 @@ function Chat() {
     setisVisibleSplitFields(false);
     setIsVisibleMentor(false);
 
+    setNewTicketsCount(undefined);
+
     setMentorId(null);
+  };
+
+  const handleCloseSplitAddCurator = () => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            isVisibleButton: true,
+            isVisibleDropdown: false,
+          }
+        : input
+    );
+
+    setInputValues(updatedInputValues);
   };
 
   const handleShow = () => {
@@ -1378,6 +1435,20 @@ function Chat() {
     setShowEditTicketErorr(false);
   };
 
+  const handleSelectCuratorVisible = () => {
+    const updatedInputValues = inputValues.map((input) =>
+      input.id === currentIndex + 1
+        ? {
+            ...input,
+            isVisibleButton: false,
+            isVisibleDropdown: true,
+          }
+        : input
+    );
+
+    setInputValues(updatedInputValues);
+  };
+
   const handleRefetch = () => {
     refetch();
   };
@@ -1415,7 +1486,7 @@ function Chat() {
         {isAdmin() &&
           isVisibleHelperButtons &&
           currentStatus !== "Уведомление" &&
-          dataPerms.helperQuery.helperPerms.sendMsg && (
+          dataPerms.helperQuery?.helperPerms?.sendMsg && (
             <>
               <div className="chat__helper-buttons">
                 {isAdmin() &&
@@ -1889,7 +1960,10 @@ function Chat() {
                                 onClick={() =>
                                   handleSubThemeClick(
                                     subTheme.name.stroke,
-                                    subTheme.id
+                                    subTheme.id,
+                                    subTheme.departments.map(
+                                      (department) => department.id
+                                    )
                                   )
                                 }
                                 href="#"
@@ -1899,6 +1973,59 @@ function Chat() {
                             )
                         )}
                     </DropdownButton>
+                  )}
+                  {input.isVisibleButton && (
+                    <ButtonCustom
+                      title="Выбрать куратора"
+                      onClick={handleSelectCuratorVisible}
+                    />
+                  )}
+                  {input.isVisibleDropdown && (
+                    <>
+                      <div style={{ position: "relative" }}>
+                        <a onClick={handleCloseSplitAddCurator}>
+                          <div className="chat__edit-close"></div>
+                        </a>
+                      </div>
+                      <DropdownButton
+                        id="dropdown-custom-1"
+                        title={input.recepient || "Куратор"}
+                        className="themes__dropdown"
+                      >
+                        {dataQueryCurators
+                          .filter((curator) =>
+                            curator.departments.some((department) =>
+                              input.departmentsId.includes(department.id)
+                            )
+                          )
+                          .map(
+                            (curator, index) =>
+                              curator.user.isActive &&
+                              curator.permissions.sendMsg && (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() =>
+                                    handleCuratorClick(
+                                      curator.user.name,
+                                      curator.user.surname,
+                                      curator.user.patronymic,
+                                      curator.id
+                                    )
+                                  }
+                                  href="#"
+                                >
+                                  {`${curator.user.surname} ${
+                                    curator.user.name
+                                  } ${
+                                    curator.user.patronymic
+                                      ? ` ${curator.user.patronymic}`
+                                      : ""
+                                  }`}
+                                </Dropdown.Item>
+                              )
+                          )}
+                      </DropdownButton>
+                    </>
                   )}
                   <Editor
                     editorState={input.editorContent}
@@ -1979,7 +2106,9 @@ function Chat() {
                         data.clientQuery.ticket.initiator.patronymic
                           ? ` ${data.clientQuery.ticket.initiator.patronymic}`
                           : ""
-                      }`}
+                      } (${
+                        data.clientQuery.ticket.initiator.country.name.stroke
+                      })`}
                     </td>
                   </tr>
                   {currentStatus !== "Уведомление" && (
@@ -1994,7 +2123,9 @@ function Chat() {
                           data.clientQuery.ticket.recipient.patronymic
                             ? ` ${data.clientQuery.ticket.recipient.patronymic}`
                             : ""
-                        }`}
+                        }  (${
+                          data.clientQuery.ticket.recipient.country.name.stroke
+                        })`}
                       </td>
                     </tr>
                   )}
@@ -2030,7 +2161,8 @@ function Chat() {
           currentStatus !== "Уведомление" &&
           (user.id == data.clientQuery.ticket.initiator.id ||
             user.id == data.clientQuery.ticket.recipient.id ||
-            user.id == data.clientQuery.ticket?.assistant?.id) &&
+            user.id == data.clientQuery.ticket?.assistant?.id ||
+            user.role == "system") &&
           dataPerms.helperQuery.helperPerms.sendMsg ? (
             <Form className="chat-input__form container" onSubmit={sendMsg}>
               {/* <button
@@ -2132,7 +2264,8 @@ function Chat() {
                   )}
                   <div
                     className={
-                      currentStatus == "В процессе"
+                      currentStatus == "В процессе" ||
+                      currentStatus == "Ожидает дополнения"
                         ? "chat-input__button-row chat-input__button-row-gap"
                         : "chat-input__button-row"
                     }
@@ -2148,10 +2281,12 @@ function Chat() {
                       onClick={handleSubmit}
                     />
                     {isAdmin() &&
-                    currentStatus == "В процессе" &&
+                    (currentStatus == "В процессе" ||
+                      currentStatus == "Ожидает дополнения") &&
                     dataPerms.helperQuery.helperPerms.sendMsg ? (
                       <ButtonCustom
                         title="Закрыть заявку"
+                        type="button"
                         className="chat-input__button-close"
                         id="AddFileButton"
                         onClick={handleShowWarning}
@@ -2204,10 +2339,12 @@ function Chat() {
                   }
                 >
                   {isAdmin() &&
-                  currentStatus == "В процессе" &&
+                  (currentStatus == "В процессе" ||
+                    currentStatus == "Ожидает дополнения") &&
                   dataPerms.helperQuery.helperPerms.sendMsg ? (
                     <ButtonCustom
                       title="Закрыть заявку"
+                      type="button"
                       className="chat-input__button-close"
                       onClick={handleShowWarning}
                     />
@@ -2375,6 +2512,7 @@ function Chat() {
                       sender={msg.sender}
                       visibility={msg.visibility}
                       removable={msg.removable}
+                      status={currentStatus}
                       onClick={handleRefetch}
                       time={DateTime.fromISO(msg.date, { zone: "utc" })
                         .toLocal()

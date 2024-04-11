@@ -11,6 +11,7 @@ export const TABLE_TICKETS = gql`
           title
           initiator {
             id
+            outerId
           }
           recipient {
             id
@@ -79,6 +80,7 @@ export const TABLE_TICKETS_USER = gql`
           title
           initiator {
             id
+            outerId
           }
           recipient {
             id
@@ -132,7 +134,7 @@ export const TABLE_TICKETS_USER = gql`
 `;
 
 export const MESSAGES_CHAT = gql`
-  query ($token: String!, $link: String!) {
+  query ($token: String!, $link: String!, $lang: String!) {
     clientQuery(token: $token) {
       ticket(link: $link) {
         id
@@ -154,6 +156,11 @@ export const MESSAGES_CHAT = gql`
           name
           surname
           patronymic
+          country {
+            name(lang: $lang) {
+              stroke
+            }
+          }
         }
         assistant {
           id
@@ -167,6 +174,11 @@ export const MESSAGES_CHAT = gql`
           name
           surname
           patronymic
+          country {
+            name(lang: $lang) {
+              stroke
+            }
+          }
         }
         messages {
           id
@@ -236,7 +248,7 @@ export const MESSAGE = gql`
 `;
 
 export const MESSAGES_CHAT_CLIENT = gql`
-  query ($token: String!, $link: String!) {
+  query ($token: String!, $link: String!, $lang: String!) {
     clientQuery(token: $token) {
       ticket(link: $link) {
         id
@@ -287,7 +299,7 @@ export const MESSAGES_CHAT_CLIENT = gql`
         }
         subTheme {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
           departments {
@@ -298,12 +310,12 @@ export const MESSAGES_CHAT_CLIENT = gql`
           }
           theme {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
             unit {
               id
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
             }
