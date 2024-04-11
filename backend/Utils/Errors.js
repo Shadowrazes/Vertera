@@ -16,6 +16,7 @@ class Errors {
     static UpdNotOwnMsg = 'Upd forbidden';
     static MsgInClosedTicket = 'Ticket closed';
     static NotEnoughPerms = 'Not enough perms';
+    static InvalidType = 'Invalid type';
     static UpdateOfNotificationTicket = 'Changes forbidden';
     static ForbiddenTranslationType = 'This type of translation is forbidden';
     static TranslationInsertLangNoRu = 'Insert is possible only by ru lang';

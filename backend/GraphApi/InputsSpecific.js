@@ -52,4 +52,9 @@ export const InputsSpecific = `
         ticketFields: TicketInsert!
         messageFields: MessageInsert!
     }
+
+    input ThemeOrderUpdateItem {
+        id: Int!
+        orderNum: Int!
+    }
 `;

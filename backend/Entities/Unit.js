@@ -53,8 +53,8 @@ class Unit extends Entity {
         });
     }
 
-    static async TransUpdate(id, fields, initiator) {
-        return await super.Transaction(async (conn) => {
+    static async TransUpdate(id, fields, initiator, conn) {
+        const transFunc = async (conn) => {
             if (fields.stroke) {
                 const row = await this.GetById(id, initiator);
                 const translationResult = await Translation.TransUpdate(conn, fields, row.nameCode);
@@ -69,7 +69,16 @@ class Unit extends Entity {
 
             const result = await super.TransRequest(conn, sql, [updateFields, id]);
             return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
-        });
+        };
+
+        if (!conn) {
+            return await super.Transaction(async (conn) => {
+                return await transFunc(conn);
+            });
+        }
+        else {
+            return await transFunc(conn);
+        }
     }
 
     // Cascade deleting Unit & Themes & SubThemes & SubTheme to department link
