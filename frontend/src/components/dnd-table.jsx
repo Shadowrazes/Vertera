@@ -13,7 +13,7 @@ const DNDTable = () => {
   const {
     loading,
     error,
-    data: dataQuery,
+    data: dataThemeList,
     refetch,
   } = useQuery(THEME_LIST, {
     variables: {
@@ -21,38 +21,38 @@ const DNDTable = () => {
     },
   });
 
-  //   const initData = [
-  //     {
-  //       order: "Dylan",
-  //       lastName: "Murray",
-  //       city: "East Daphne",
-  //     },
-  //     {
-  //       firstName: "Raquel",
-  //       lastName: "Kohler",
-  //       city: "Columbus",
-  //     },
-  //     {
-  //       firstName: "Ervin",
-  //       lastName: "Reinger",
-  //       city: "South Linda",
-  //     },
-  //     {
-  //       firstName: "Brittany",
-  //       lastName: "McCullough",
-  //       city: "Lincoln",
-  //     },
-  //     {
-  //       firstName: "Branson",
-  //       lastName: "Frami",
-  //       city: "Charleston",
-  //     },
-  //   ];
+  // const initData = [
+  //   {
+  //     firstName: "Dylan",
+  //     lastName: "Murray",
+  //     city: "East Daphne",
+  //   },
+  //   {
+  //     firstName: "Raquel",
+  //     lastName: "Kohler",
+  //     city: "Columbus",
+  //   },
+  //   {
+  //     firstName: "Ervin",
+  //     lastName: "Reinger",
+  //     city: "South Linda",
+  //   },
+  //   {
+  //     firstName: "Brittany",
+  //     lastName: "McCullough",
+  //     city: "Lincoln",
+  //   },
+  //   {
+  //     firstName: "Branson",
+  //     lastName: "Frami",
+  //     city: "Charleston",
+  //   },
+  // ];
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "order",
+        accessorKey: "orderNum",
         header: "порядок",
       },
       {
@@ -67,15 +67,26 @@ const DNDTable = () => {
     []
   );
 
-  const [data, setData] = useState(() => initData);
+  const [data, setData] = useState([]);
+  const [dataQuery, setDataQuery] = useState(null);
+  const [inputValues, setInputValues] = useState({});
 
-  //   useEffect(() => {
-  //     // if (data && data.clientQuery.allThemeTree) {
-  //     //   setData(data.clientQuery.allThemeTree);
-  //     // }
+  useEffect(() => {
+    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+      const formattedData = dataThemeList.clientQuery.allThemeTree.map(
+        (unit) => {
+          return {
+            orderNum: unit.orderNum,
+            id: unit.id,
+            name: unit.name.stroke,
+          };
+        }
+      );
+      setData(formattedData);
+    }
 
-  //     refetch();
-  //   }, [data]);
+    refetch();
+  }, [dataThemeList]);
 
   const table = useMaterialReactTable({
     autoResetPageIndex: false,
