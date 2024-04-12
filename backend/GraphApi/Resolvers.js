@@ -256,7 +256,7 @@ export const resolvers = {
             return await Unit.TransUpdate(args.id, args.fields, context.user);
         },
         updateThemeOrders: async (_, args, context) => {
-            return await Theme.TransUpdate(args.type, args.fields, context.user);
+            return await Theme.UpdateOrders(args.type, args.fields, context.user);
         },
     },
     TranslationObjMutation: {
