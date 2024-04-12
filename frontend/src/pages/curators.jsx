@@ -123,7 +123,10 @@ function Curators() {
                 {curators.map(
                   (curator) =>
                     (showInactive || curator.user.isActive) && (
-                      <tr key={curator.id}>
+                      <tr
+                        className={curator.user.isActive ? "inactive-row" : ""}
+                        key={curator.id}
+                      >
                         <td>
                           {`${curator.user.surname} ${curator.user.name} ${
                             curator.user.patronymic

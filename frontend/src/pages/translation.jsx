@@ -23,6 +23,7 @@ function Translation() {
   const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
   const [show, setShow] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [language, setLanguage] = useState(localStorage.getItem("language"));
@@ -51,12 +52,15 @@ function Translation() {
     },
   });
 
-  const { data: dataLangList } = useQuery(LANGUAGE_LIST, {
-    variables: {
-      token: user.token,
-      lang: language,
-    },
-  });
+  const { loading: loadingLangList, data: dataLangList } = useQuery(
+    LANGUAGE_LIST,
+    {
+      variables: {
+        token: user.token,
+        lang: language,
+      },
+    }
+  );
 
   useEffect(() => {
     if (data && data.helperQuery.translationListFull) {
@@ -71,6 +75,10 @@ function Translation() {
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION);
 
   if (loading) {
+    return <Loader />;
+  }
+
+  if (loadingLangList) {
     return <Loader />;
   }
 
@@ -133,8 +141,13 @@ function Translation() {
         },
       });
 
-      console.log("Перевод успешно обновлен:", result);
-      handleShow();
+      if (
+        result.data.helperMutation.translationObj.updateTranslation.length !== 0
+      ) {
+        handleShowError();
+      } else {
+        handleShow();
+      }
     } catch (error) {
       console.error("Ошибка при обновлении перевода:", error);
     }
@@ -144,9 +157,17 @@ function Translation() {
     setShow(true);
   };
 
-  const handleClose = () => {
+  const handleShowError = () => {
+    setShowError(true);
+  };
+
+  const handleCloseLeave = () => {
     setShow(false);
     window.location.reload();
+  };
+
+  const handleClose = () => {
+    setShowError(false);
   };
 
   return (
@@ -166,14 +187,6 @@ function Translation() {
                     {langList.map((lang) => (
                       <td>{lang.name}</td>
                     ))}
-                    {/* <td>Русский</td>
-                    <td>Английский</td>
-                    <td>Испанский</td>
-                    <td>Чешский</td>
-                    <td>Болгарский</td>
-                    <td>Немецкий</td>
-                    <td>Венгерский</td>
-                    <td>Казахский</td> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -222,12 +235,26 @@ function Translation() {
             <ButtonCustom title="Сохранить" onClick={handleUpdateTranslation} />
           </div>
 
-          <Modal show={show} onHide={handleClose}>
+          <Modal show={show} onHide={handleCloseLeave}>
             <Modal.Header closeButton>
               <Modal.Title>Переводы обновлены</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <p>Таблица переводов успешно обновлена</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLeave}>
+                Закрыть
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showError} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Ошибка обновления переводов</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>При обновлении таблицы переводов произошла ошибка</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
