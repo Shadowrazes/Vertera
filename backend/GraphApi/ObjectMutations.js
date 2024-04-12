@@ -27,6 +27,6 @@ export const ObjectMutations = `
         addTranslation(fields: TranslationInsert!): String!
         updateCountry(id: Int!, fields: CountryUpdate!): Int!
         updateLang(id: Int!, fields: LangUpdate!): UpdateInfo!
-        updateTranslation(fields: [TranslationUpdate!]!): UpdateInfo!
+        updateTranslation(fields: [TranslationUpdate!]!): [String]!
     }
 `;

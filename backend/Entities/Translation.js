@@ -155,9 +155,9 @@ class Translation extends Entity {
         return code;
     }
 
-    // Types come from other entities, only internal
+    // Types come from other entities, only internal (disabled)
     static async TransInsert(conn, fields, type) {
-        if (fields.lang != this.MainLang) throw new Error(Errors.TranslationInsertLangNoRu);
+        // if (fields.lang != this.MainLang) throw new Error(Errors.TranslationInsertLangNoRu);
 
         const code = Translitter.Transform(type + ' ' + md5(new Date().toISOString()));
         const sql = `
@@ -171,24 +171,26 @@ class Translation extends Entity {
 
     // Cascade updating translation & dependent tables
     static async Update(fields) {
-        let result = undefined;
-        for (const field of fields) {
-            const sql = `
-                UPDATE ${this.TableName} 
-                SET ${field.lang} = ?
-                WHERE ${this.CodeField} = ?
-            `;
+        return await super.Transaction(async (conn) => {
+            let notUpdatedCodes = [];
 
-            result = await super.Request(sql, [field.stroke, field.code]);
-        }
+            for (let updItem of fields) {
+                try {
+                    await this.TransUpdate(conn, updItem, updItem.code)
+                }
+                catch {
+                    notUpdatedCodes.push(updItem.code);
+                }
+            }
 
-        return { affected: result.affectedRows, changed: result.changedRows, warning: result.warningStatus };
+            return notUpdatedCodes;
+        });
     }
 
-    // Code come from other entities, only internal
+    // Code come from other entities, only internal (disabled)
     // Cascade updating translation & dependent tables by other entities
     static async TransUpdate(conn, fields, code) {
-        if (fields.lang != this.MainLang) throw new Error(Errors.TranslationRenamingLangNoRu);
+        // if (fields.lang != this.MainLang) throw new Error(Errors.TranslationRenamingLangNoRu);
 
         const sql = `
             UPDATE ${this.TableName} 
