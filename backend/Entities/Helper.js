@@ -27,7 +27,7 @@ class Helper extends Entity {
     }
 
     static async GetListFiltered(filters) {
-        const sql = `
+        let sql = `
             SELECT * FROM ${this.TableName} 
             JOIN ${User.TableName} 
             ON ${this.TableName}.${this.PrimaryField} = ${User.TableName}.${User.PrimaryField}
