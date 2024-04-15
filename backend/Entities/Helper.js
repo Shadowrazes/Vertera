@@ -38,12 +38,13 @@ class Helper extends Entity {
 
         let fields = [];
         if (filters.countryIds && filters.countryIds.length > 0) {
-            sql += ` AND ${User.CountryIdField} IN (?)`;
+            sql += ` AND ${User.TableName}.${User.CountryIdField} IN (?)`;
             fields.push(filters.countryIds);
         }
         if (filters.departmentIds && filters.departmentIds.length > 0) {
-            sql += ` AND ${this.PrimaryField} IN (
-                SELECT DISTINCT ${HelperDepartment.HelperIdField} FROM ${HelperDepartment.TableName} 
+            sql += ` AND ${this.TableName}.${this.PrimaryField} IN (
+                SELECT DISTINCT ${HelperDepartment.HelperIdField} 
+                FROM ${HelperDepartment.TableName} 
                 WHERE ${HelperDepartment.DepartmentIdField} IN (?)
             )`;
             fields.push(filters.departmentIds);
