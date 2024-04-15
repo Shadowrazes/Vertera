@@ -1,18 +1,21 @@
 import { useMemo, useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import {
   MRT_TableContainer,
   useMaterialReactTable,
 } from "material-react-table";
 
-import { THEME_LIST, HELPER_PERMS } from "../apollo/queries";
+import { THEME_LIST } from "../apollo/queries";
+import { UPDATE_THEME_ORDER } from "../apollo/mutations";
 
 import Loader from "../pages/loading";
+import ButtonCustom from "../components/button";
 
 const DNDTable = () => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-
   const [data, setData] = useState([]);
+  const [dataOrder, setDataOrder] = useState([]);
+
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   const {
     loading,
@@ -27,20 +30,21 @@ const DNDTable = () => {
 
   useEffect(() => {
     if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
-      const formattedData = dataThemeList.clientQuery.allThemeTree.map(
-        (unit) => {
+      const formattedData = dataThemeList.clientQuery.allThemeTree
+        .find((unit) => unit.id == 3)
+        .themes.map((unit) => {
           return {
             orderNum: unit.orderNum,
             id: unit.id,
             name: unit.name.stroke,
           };
-        }
-      );
+        });
       setData(formattedData);
+      setDataOrder(formattedData);
     }
-
-    refetch();
   }, [dataThemeList]);
+
+  const [updateThemeOrder] = useMutation(UPDATE_THEME_ORDER);
 
   const columns = useMemo(
     () => [
@@ -71,12 +75,20 @@ const DNDTable = () => {
       onDragEnd: () => {
         const { draggingRow, hoveredRow } = table.getState();
         if (hoveredRow && draggingRow) {
-          data.splice(
+          const newData = [...data];
+          const newDataOrder = [...dataOrder];
+          newData.splice(
             hoveredRow.index,
             0,
-            data.splice(draggingRow.index, 1)[0]
+            newData.splice(draggingRow.index, 1)[0]
           );
-          setData([...data]);
+
+          newDataOrder.forEach((item, index) => {
+            item.orderNum = index + 1;
+          });
+
+          setData(newData);
+          setDataOrder(newDataOrder);
         }
       },
     }),
@@ -86,7 +98,35 @@ const DNDTable = () => {
     return <Loader />;
   }
 
-  return <MRT_TableContainer table={table} />;
+  const handleClickAplly = async () => {
+    const queryData = data.map((item, index) => ({
+      orderNum: dataOrder[index].orderNum,
+      id: item.id,
+    }));
+
+    // console.log(queryData);
+
+    try {
+      const result = await updateThemeOrder({
+        variables: {
+          token: user.token,
+          type: "unit",
+          themeOrderUpdateItem: queryData,
+        },
+      });
+
+      console.log("Порядок успешно обновлен:", result);
+    } catch (error) {
+      console.error("Ошибка при обновлении порядка:", error);
+    }
+  };
+
+  return (
+    <>
+      <MRT_TableContainer table={table} />
+      <ButtonCustom title="apply" onClick={handleClickAplly} />
+    </>
+  );
 };
 
 export default DNDTable;

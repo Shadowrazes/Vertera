@@ -250,18 +250,12 @@ export const EDIT_UNIT = gql`
     $stroke: String!
     $lang: String!
     $visibility: Int!
-    $orderNum: Int
   ) {
     helperMutation(token: $token) {
       themeObj {
         updateUnit(
           id: $id
-          fields: {
-            stroke: $stroke
-            lang: $lang
-            visibility: $visibility
-            orderNum: $orderNum
-          }
+          fields: { stroke: $stroke, lang: $lang, visibility: $visibility }
         ) {
           changed
         }
@@ -430,6 +424,20 @@ export const ACTIVATE_SUBTHEME = gql`
   }
 `;
 
+export const UPDATE_THEME_ORDER = gql`
+  mutation (
+    $token: String!
+    $type: String!
+    $themeOrderUpdateItem: [ThemeOrderUpdateItem]!
+  ) {
+    helperMutation(token: $token) {
+      themeObj {
+        updateThemeOrders(type: $type, fields: $themeOrderUpdateItem)
+      }
+    }
+  }
+`;
+
 export const ADD_DEPARTMENT = gql`
   mutation ($token: String!, $stroke: String!) {
     adminMutation(token: $token) {
@@ -499,9 +507,7 @@ export const UPDATE_TRANSLATION = gql`
   mutation ($token: String!, $translationUpdate: [TranslationUpdate!]!) {
     helperMutation(token: $token) {
       translationObj {
-        updateTranslation(fields: $translationUpdate) {
-          changed
-        }
+        updateTranslation(fields: $translationUpdate)
       }
     }
   }

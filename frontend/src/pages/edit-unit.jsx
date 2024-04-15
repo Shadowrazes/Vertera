@@ -26,7 +26,6 @@ function EditUnit() {
 
   const [nameValue, setNameValue] = useState("");
   const [visibility, setVisibility] = useState(null);
-  const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -78,7 +77,6 @@ function EditUnit() {
     if (data && data.helperQuery.unit) {
       setNameValue(data.helperQuery.unit.name.stroke);
       setVisibility(data.helperQuery.unit.visibility);
-      setOrderNum(data.helperQuery.unit.orderNum);
       // console.log(data.helperQuery.unit.name.stroke);
     }
 
@@ -122,18 +120,11 @@ function EditUnit() {
     setIsErrorVisible(false);
   };
 
-  const handleOnChangeOrderNum = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
     if (nameValue.trim() == "") {
       error = "Укажите название раздела";
-    } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при обработке раздела";
     }
@@ -144,7 +135,7 @@ function EditUnit() {
   const handleEditUnit = async (e) => {
     e.preventDefault();
 
-    if (nameValue.trim() == "" || orderNum < 0) {
+    if (nameValue.trim() == "") {
       setIsErrorVisible(true);
       return;
     }
@@ -158,7 +149,6 @@ function EditUnit() {
           stroke: nameValue.trim(),
           lang: "ru",
           visibility: parseInt(visibility),
-          orderNum: parseInt(orderNum),
         },
       });
 
@@ -203,17 +193,6 @@ function EditUnit() {
                   value={nameValue}
                   onChange={handleOnChangeName}
                 />
-                <Form.Label className="edit-curator__field-label">
-                  Порядок
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  className="add-curator__input edit-unit__input-order"
-                  value={orderNum}
-                  onChange={handleOnChangeOrderNum}
-                  min={0}
-                />
-
                 <Form.Label className="edit-curator__field-label">
                   Отображение
                 </Form.Label>

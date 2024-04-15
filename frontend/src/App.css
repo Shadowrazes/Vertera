@@ -25,3 +25,7 @@ a {
     font-size: 16px;
     margin-top: 25px;
 }
+
+.inactive-row {
+    background-color: lightgray !important;
+}
