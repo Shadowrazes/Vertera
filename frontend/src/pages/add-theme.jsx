@@ -33,7 +33,6 @@ function AddTheme() {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [nameValue, setNameValue] = useState("");
-  const [orderNum, setOrderNum] = useState(0);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -116,11 +115,6 @@ function AddTheme() {
     setIsErrorVisible(false);
   };
 
-  const handleOrderNumChange = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
@@ -128,8 +122,6 @@ function AddTheme() {
       error = "Выберите название раздела";
     } else if (nameValue.trim() == "") {
       error = "Укажите название темы";
-    } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -144,7 +136,7 @@ function AddTheme() {
     // console.log(selectedUnitId);
     // console.log(nameValue);
 
-    if (nameValue.trim() == "" || selectedUnit == null || orderNum < 0) {
+    if (nameValue.trim() == "" || selectedUnit == null) {
       setIsErrorVisible(true);
       return;
     }
@@ -159,7 +151,6 @@ function AddTheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           visibility: 1,
-          orderNum: parseInt(orderNum),
         },
       });
 
@@ -215,17 +206,6 @@ function AddTheme() {
                   value={nameValue}
                   className="add-currator__input add-theme__dropdown"
                   onChange={handleNameChange}
-                />
-                <Form.Label className="edit-curator__field-label">
-                  Порядок
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  className="add-currator__input"
-                  placeholder="Порядок"
-                  value={orderNum}
-                  onChange={handleOrderNumChange}
-                  min={0}
                 />
               </Form.Group>
               {isErrorVisible && (

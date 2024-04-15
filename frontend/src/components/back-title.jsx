@@ -1,12 +1,17 @@
+import { useNavigate } from "react-router-dom";
+
 import "../css/ticket-title.css";
 
 function BackTitle({ title, className, linkPrev }) {
+  const navigate = useNavigate();
   const handleGoBack = () => {
     // console.log(linkPrev);
     if (linkPrev == null) {
-      window.location.href = "/all-tickets";
+      // window.location.href = "/all-tickets";
+      navigate("/all-tickets");
     } else {
-      window.location.href = linkPrev;
+      // window.location.href = linkPrev;
+      navigate(`${linkPrev}`);
     }
   };
 

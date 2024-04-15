@@ -226,7 +226,6 @@ export const ADD_UNIT = gql`
     $stroke: String!
     $lang: String!
     $visibility: Int!
-    $orderNum: Int!
   ) {
     helperMutation(token: $token) {
       themeObj {
@@ -235,7 +234,7 @@ export const ADD_UNIT = gql`
             stroke: $stroke
             lang: $lang
             visibility: $visibility
-            orderNum: $orderNum
+            orderNum: 0
           }
         )
       }
@@ -271,7 +270,6 @@ export const ADD_THEME = gql`
     $stroke: String!
     $lang: String!
     $visibility: Int!
-    $orderNum: Int!
   ) {
     helperMutation(token: $token) {
       themeObj {
@@ -281,7 +279,7 @@ export const ADD_THEME = gql`
             stroke: $stroke
             lang: $lang
             visibility: $visibility
-            orderNum: $orderNum
+            orderNum: 0
           }
         )
       }
@@ -297,7 +295,6 @@ export const EDIT_THEME = gql`
     $stroke: String
     $lang: String!
     $visibility: Int!
-    $orderNum: Int
   ) {
     helperMutation(token: $token) {
       themeObj {
@@ -308,7 +305,6 @@ export const EDIT_THEME = gql`
             stroke: $stroke
             lang: $lang
             visibility: $visibility
-            orderNum: $orderNum
           }
         ) {
           changed
@@ -350,7 +346,6 @@ export const ADD_SUBTHEME = gql`
     $lang: String!
     $departmentIds: [Int]!
     $visibility: Int!
-    $orderNum: Int!
   ) {
     helperMutation(token: $token) {
       themeObj {
@@ -361,7 +356,7 @@ export const ADD_SUBTHEME = gql`
             lang: $lang
             departmentIds: $departmentIds
             visibility: $visibility
-            orderNum: $orderNum
+            orderNum: 0
           }
         )
       }
@@ -378,7 +373,6 @@ export const EDIT_SUBTHEME = gql`
     $lang: String!
     $departmentIds: [Int]
     $visibility: Int!
-    $orderNum: Int
   ) {
     helperMutation(token: $token) {
       themeObj {
@@ -390,7 +384,6 @@ export const EDIT_SUBTHEME = gql`
             lang: $lang
             departmentIds: $departmentIds
             visibility: $visibility
-            orderNum: $orderNum
           }
         ) {
           changed

@@ -29,3 +29,7 @@ a {
 .inactive-row {
     background-color: lightgray !important;
 }
+
+.inactive-row td {
+    background-color: lightgray !important;
+}

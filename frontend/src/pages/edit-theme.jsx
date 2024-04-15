@@ -30,7 +30,6 @@ function EditTheme() {
   const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
   const [visibility, setVisibility] = useState(null);
-  const [orderNum, setOrderNum] = useState(0);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [show, setShow] = useState(false);
@@ -99,7 +98,6 @@ function EditTheme() {
       setSelectedUnitId(data.helperQuery.theme.unit.id);
       setSelectedItem(data.helperQuery.theme.unit.name.stroke);
       setVisibility(data.helperQuery.theme.visibility);
-      setOrderNum(data.helperQuery.theme.orderNum);
       // console.log(data.theme.unit.id);
     }
 
@@ -160,11 +158,6 @@ function EditTheme() {
     setIsErrorVisible(false);
   };
 
-  const handleOnChangeOrderNum = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
@@ -172,8 +165,6 @@ function EditTheme() {
       error = "Выберите раздел";
     } else if (nameValue.trim() == "") {
       error = "Укажите название темы";
-    } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при обработке темы";
     }
@@ -188,7 +179,7 @@ function EditTheme() {
     // console.log(selectedUnitId);
     // console.log(nameValue);
 
-    if (nameValue.trim() == "" || selectedUnit == null || orderNum < 0) {
+    if (nameValue.trim() == "" || selectedUnit == null) {
       setIsErrorVisible(true);
       return;
     }
@@ -203,7 +194,6 @@ function EditTheme() {
           stroke: nameValue.trim(),
           lang: "ru",
           visibility: parseInt(visibility),
-          orderNum: orderNum,
         },
       });
 
@@ -268,16 +258,6 @@ function EditTheme() {
                   className="add-currator__input add-theme__dropdown"
                   value={nameValue}
                   onChange={handleOnChangeName}
-                />
-                <Form.Label className="edit-curator__field-label">
-                  Порядок
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  className="add-currator__input edit-theme__input-order"
-                  value={orderNum}
-                  onChange={handleOnChangeOrderNum}
-                  min={0}
                 />
 
                 <Form.Label
