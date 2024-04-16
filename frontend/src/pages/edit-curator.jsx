@@ -187,7 +187,7 @@ function EditCurator() {
     }
 
     if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
+      setLinkPrev("/curators");
     }
   }, [
     data,
@@ -688,14 +688,16 @@ function EditCurator() {
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
                     title="Применить"
-                    className={"add-curator__btn edit-curator__btn"}
+                    className={
+                      "add-curator__btn edit-curator__btn button-hover"
+                    }
                     onClick={handleEditCurator}
                   />
                   {isActive ? (
                     <ButtonCustom
                       title="Деактивировать куратора"
                       className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                        "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                       }
                       onClick={handleDeleteCurator}
                     />
@@ -703,7 +705,7 @@ function EditCurator() {
                     <ButtonCustom
                       title="Активировать куратора"
                       className={
-                        "add-curator__btn edit-curator__btn alltickets__button-two"
+                        "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                       }
                       onClick={handleActivateCurator}
                     />

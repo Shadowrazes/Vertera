@@ -219,7 +219,9 @@ function EditUnit() {
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
                     title="Применить"
-                    className={"add-curator__btn edit-curator__btn"}
+                    className={
+                      "add-curator__btn edit-curator__btn button-hover"
+                    }
                     onClick={handleEditUnit}
                   />
                 </div>

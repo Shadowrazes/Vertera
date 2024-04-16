@@ -1495,7 +1495,7 @@ function Chat() {
                     <a className="alltickets__link">
                       <ButtonCustom
                         title="Изменить тикет"
-                        className="chat-input__button-close"
+                        className="chat-input__button-close button-hover"
                         onClick={handleEditTicketView}
                       />
                     </a>
@@ -1511,7 +1511,7 @@ function Chat() {
                       <a className="alltickets__link">
                         <ButtonCustom
                           title="Консультация с другим куратором"
-                          className="chat-input__button-close"
+                          className="chat-input__button-close button-hover"
                           onClick={handleCuratorsChat}
                         />
                       </a>
@@ -1525,7 +1525,7 @@ function Chat() {
                       <a className="alltickets__link">
                         <ButtonCustom
                           title="Закончить диалог с куратором"
-                          className="chat-input__button-close"
+                          className="chat-input__button-close button-hover"
                           onClick={handleEndCuratorChat}
                         />
                       </a>
@@ -1538,7 +1538,7 @@ function Chat() {
                       <a className="alltickets__link">
                         <ButtonCustom
                           title="Вопрос решен"
-                          className="chat-input__button-close"
+                          className="chat-input__button-close button-hover"
                           onClick={handleEndMentor}
                         />
                       </a>
@@ -1549,7 +1549,7 @@ function Chat() {
                   <a className="alltickets__link">
                     <ButtonCustom
                       title="Разделить тикет"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleSplitTicket}
                     />
                   </a>
@@ -1559,7 +1559,7 @@ function Chat() {
                   <>
                     <ButtonCustom
                       title="Открыть тикет"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleOpen}
                     />
                   </>
@@ -1569,7 +1569,7 @@ function Chat() {
                   <a className="alltickets__link">
                     <ButtonCustom
                       title="Отправить наставнику"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleSendToMentor}
                     />
                   </a>
@@ -1760,7 +1760,7 @@ function Chat() {
               )}
               <ButtonCustom
                 title="Применить изменения"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleEditTicket}
               />
             </div>
@@ -1794,7 +1794,7 @@ function Chat() {
               )}
               <ButtonCustom
                 title="Отправить"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleSendToMentorQuery}
               />
             </div>
@@ -1842,7 +1842,7 @@ function Chat() {
               )}
               <ButtonCustom
                 title="Добавить куратора"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleAddCuratorChat}
               />
             </div>
@@ -1870,7 +1870,7 @@ function Chat() {
               )}
               <ButtonCustom
                 title="Создать новые тикеты"
-                className="chat-input__button-close"
+                className="chat-input__button-close button-hover"
                 onClick={handleSplitTicketFields}
               />
             </div>
@@ -1976,7 +1976,7 @@ function Chat() {
                   )}
                   {input.isVisibleButton && (
                     <ButtonCustom
-                      title="Выбрать куратора"
+                      title="Выбрать куратора button-hover"
                       onClick={handleSelectCuratorVisible}
                     />
                   )}
@@ -2081,7 +2081,7 @@ function Chat() {
                   <span className="form__error">{errorMsgSplit()}</span>
                 )}
                 <ButtonCustom
-                  title="Создать новые обращения"
+                  title="Создать новые обращения button-hover"
                   className="chat-input__button-send"
                   onClick={handleMutationSplitTicket}
                 />
@@ -2274,8 +2274,8 @@ function Chat() {
                       title="Отправить"
                       className={
                         isAdmin()
-                          ? "chat-input__button-send single"
-                          : "chat-input__button-send single"
+                          ? "chat-input__button-send button-hover single"
+                          : "chat-input__button-send button-hover single"
                       }
                       type="submit"
                       onClick={handleSubmit}
@@ -2287,8 +2287,7 @@ function Chat() {
                       <ButtonCustom
                         title="Закрыть заявку"
                         type="button"
-                        className="chat-input__button-close"
-                        id="AddFileButton"
+                        className="chat-input__button-close button-outlined"
                         onClick={handleShowWarning}
                       />
                     ) : (
@@ -2302,7 +2301,7 @@ function Chat() {
                       <div className="chat-input__button-row">
                         <ButtonCustom
                           title="Начать работу"
-                          className="chat-input__button-send single"
+                          className="chat-input__button-send button-hover single"
                           onClick={handleInProgress}
                         />
                       </div>
@@ -2345,7 +2344,7 @@ function Chat() {
                     <ButtonCustom
                       title="Закрыть заявку"
                       type="button"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-outlined"
                       onClick={handleShowWarning}
                     />
                   ) : (
@@ -2359,7 +2358,7 @@ function Chat() {
                     <div className="chat-input__button-row">
                       <ButtonCustom
                         title="Начать работу"
-                        className="chat-input__button-send single"
+                        className="chat-input__button-send button-hover single"
                         onClick={handleInProgress}
                       />
                     </div>
@@ -2476,7 +2475,7 @@ function Chat() {
 
                   <ButtonCustom
                     title="Отправить"
-                    className="chat-input__button-send single"
+                    className="chat-input__button-send button-hover single"
                     type="submit"
                     onClick={handleSubmit}
                   />
@@ -2583,7 +2582,7 @@ function Chat() {
                   : "Скрыть историю"
               }
               onClick={handleHideComponent}
-              className={"alltickets__btn-outlined single"}
+              className={"button-outlined single"}
             />
           </a>
         </>
@@ -2717,7 +2716,7 @@ function Chat() {
           {!isAdmin() && (
             <ButtonCustom
               title="Создать новую заявку"
-              className=""
+              className="button-hover"
               onClick={goToCreateTicket}
             />
           )}

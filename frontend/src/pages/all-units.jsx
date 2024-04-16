@@ -256,21 +256,30 @@ function Units() {
           </div>
           <MRT_TableContainer table={table} />
           <div className="units__btn-row">
-            <ButtonCustom title="Добавить раздел" onClick={goToAddUnit} />
+            <ButtonCustom
+              title="Добавить раздел"
+              onClick={goToAddUnit}
+              className={"button-hover"}
+            />
             <ButtonCustom
               title="Перейти к темам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToThemes}
             />
             <ButtonCustom
               title="Перейти к подтемам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToSubthemes}
             />
             {showApplyButton && (
               <ButtonCustom
                 title="Применить изменения порядка"
                 onClick={handleClickAplly}
+                className={"button-outlined"}
               />
             )}
           </div>

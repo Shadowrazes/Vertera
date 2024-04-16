@@ -879,7 +879,7 @@ function allTickets() {
               <ButtonCustom
                 title={get_translation("INTERFACE_CREATE_TICKET")}
                 onClick={handleCreateTicket}
-                className={"alltickets__btn"}
+                className={"alltickets__btn button-hover"}
               />
             )}
 
@@ -890,7 +890,7 @@ function allTickets() {
                   : get_translation("INTERFACE_HIDE_FILTER")
               }
               onClick={handleHideComponent}
-              className={"alltickets__btn alltickets__btn-outlined"}
+              className={"alltickets__btn button-outlined"}
             />
           </div>
         ) : (
@@ -901,9 +901,7 @@ function allTickets() {
                 : get_translation("INTERFACE_HIDE_FILTER")
             }
             onClick={handleHideComponent}
-            className={
-              "alltickets__btn alltickets__btn-outlined alltickets__button"
-            }
+            className={"alltickets__btn button-outlined alltickets__button"}
           />
         )}
       </div>
@@ -1170,10 +1168,11 @@ function allTickets() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>
@@ -1316,10 +1315,11 @@ function allTickets() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>
@@ -1674,6 +1674,7 @@ function allTickets() {
           <ButtonCustom
             title={get_translation("INTERFACE_TICKET_CREATOR")}
             onClick={goToCreateTicket}
+            className={"button-hover"}
           />
         </div>
       )}

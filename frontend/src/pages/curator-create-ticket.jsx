@@ -762,12 +762,12 @@ function CuratorCreateTicket() {
                   <div className="chat__helper-buttons">
                     <ButtonCustom
                       title="Выбрать куратора"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleCuratorsDropdown}
                     />
                     <ButtonCustom
                       title="Вставить список"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleIdFileInput}
                     />
                   </div>

@@ -259,13 +259,13 @@ function EditCountry() {
               <div className="edit-curator__btn-row">
                 <ButtonCustom
                   title="Применить"
-                  className={"edit-curator__btn"}
+                  className={"edit-curator__btn button-hover"}
                   onClick={handleEditCountry}
                 />
                 <ButtonCustom
                   title="Удалить страну"
                   className={
-                    "add-curator__btn edit-curator__btn alltickets__button-two"
+                    "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                   }
                   onClick={handleDeleteCountry}
                 />

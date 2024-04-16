@@ -373,7 +373,7 @@ function Countries() {
               <ButtonCustom
                 title="Добавить страну"
                 onClick={goToAddCountry}
-                className={"table__btn"}
+                className={"table__btn button-hover"}
               />
             </Tab>
             <Tab className="chat__tab-wrapper" eventKey="langs" title="Языки">
@@ -464,7 +464,7 @@ function Countries() {
                   <ButtonCustom
                     title="Добавить язык"
                     onClick={handleAddLangView}
-                    className={"table__btn"}
+                    className={"table__btn button-hover"}
                   />
                 </div>
               )}
@@ -495,7 +495,7 @@ function Countries() {
                       <ButtonCustom
                         title="Добавить"
                         onClick={handleAddLang}
-                        className={"table__btn"}
+                        className={"table__btn button-hover"}
                       />
                     </div>
                   </div>

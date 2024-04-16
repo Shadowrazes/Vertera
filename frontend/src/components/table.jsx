@@ -498,7 +498,7 @@ function TableTickets() {
           <ButtonCustom
             title={get_translation("INTERFACE_SHOW_ALL_TICKETS")}
             onClick={goToAllTickets}
-            className={"table__button"}
+            className={"table__button button-hover"}
           />
         </>
       )}

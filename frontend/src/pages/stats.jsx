@@ -228,7 +228,8 @@ function Stats() {
 
     allUserData = [...allUserData?.helperQuery.helperStatList];
     allUserData = allUserData
-      ?.sort((userData1, userData2) => {
+      ?.filter((userData) => userData.stats.likes !== 0)
+      .sort((userData1, userData2) => {
         return -(userData1.stats.likes - userData2.stats.likes);
       })
       .map((userData) => {
@@ -245,10 +246,11 @@ function Stats() {
     if (!allUserData) {
       return [];
     }
+
     allUserData = [...allUserData?.helperQuery.helperStatList];
     allUserData = allUserData
-      ?.sort((userData1, userData2) => {
-        // console.log(userData1.stats.avgReplyTime, userData2.stats.avgReplyTime);
+      ?.filter((userData) => userData.stats.avgReplyTime !== -3600)
+      .sort((userData1, userData2) => {
         return userData1.stats.avgReplyTime - userData2.stats.avgReplyTime;
       })
       .map((userData) => {
@@ -702,32 +704,20 @@ function Stats() {
               </>
             )}
 
-            <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
-            {/* <div className="stats__period-wrapper">
-              <DateRangePicker
-                ranges={predefinedRanges}
-                placeholder="Задать период"
-                className="alltickets__date-range-picker"
-                style={{ marginTop: "20px" }}
-                onChange={handlePeriodChange}
-                onClean={handlePeriodClean}
-                value={dateRange}
-              />
+            <div className="alltickets__container">
+              <h3 className="stats-title stats-title_left">
+                Рейтинг кураторов
+              </h3>
               <ButtonCustom
-                title="Применить"
-                className={"add-curator__btn"}
-                onClick={handlePeriodClick}
+                title={
+                  isVisibleFilters == false
+                    ? get_translation("INTERFACE_SHOW_FILTER")
+                    : get_translation("INTERFACE_HIDE_FILTER")
+                }
+                onClick={handleHideComponent}
+                className={"alltickets__btn button-outlined"}
               />
-            </div> */}
-            <ButtonCustom
-              title={
-                isVisibleFilters == false
-                  ? get_translation("INTERFACE_SHOW_FILTER")
-                  : get_translation("INTERFACE_HIDE_FILTER")
-              }
-              onClick={handleHideComponent}
-              className={"alltickets__btn alltickets__btn-outlined"}
-            />
+            </div>
             {isVisibleFilters && (
               <>
                 <div className="alltickets__filters-container">
@@ -858,10 +848,11 @@ function Stats() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>

@@ -213,7 +213,7 @@ function AddTheme() {
               )}
               <ButtonCustom
                 title="Применить"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleAddTheme}
               />
             </Col>

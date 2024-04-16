@@ -75,7 +75,11 @@ function OuterAuth() {
     return (
       <>
         <h2 style={{ marginBottom: "20px" }}>Ошибка авторизации</h2>
-        <ButtonCustom title="Ок" onClick={goToCreateTicket} />
+        <ButtonCustom
+          title="Ок"
+          className={"button-hover"}
+          onClick={goToCreateTicket}
+        />
       </>
     );
   }

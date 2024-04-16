@@ -150,7 +150,9 @@ function Curators() {
                         <td>
                           <Link
                             to={`/edit-curator/${curator.id}`}
-                            state={{ linkPrev: window.location.href }}
+                            state={{
+                              linkPrev: window.location.href,
+                            }}
                             className="alltickets__link"
                           >
                             <img src={EditIcon} alt="" />
@@ -165,7 +167,7 @@ function Curators() {
           <ButtonCustom
             title="Добавить куратора"
             onClick={goToAddCurator}
-            className={"table__btn"}
+            className={"table__btn button-hover"}
           />
         </>
       ) : (

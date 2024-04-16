@@ -123,9 +123,7 @@ function AddCurator() {
       setCountryList(dataCountryList.clientQuery.countryList);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/curators");
   }, [data, dataJobTitle, dataCountryList, location.state]);
 
   const [addHelperUser] = useMutation(ADD_HELPER_USER);
@@ -488,7 +486,7 @@ function AddCurator() {
             )}
             <ButtonCustom
               title={get_translation("INTERFACE_APPLY")}
-              className={"add-curator__btn"}
+              className={"add-curator__btn button-hover"}
               onClick={handleAddCurator}
             />
           </div>

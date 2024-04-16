@@ -301,21 +301,30 @@ function Theme() {
           <MRT_TableContainer table={table} />
 
           <div className="units__btn-row">
-            <ButtonCustom title="Добавить тему" onClick={goToAddTheme} />
+            <ButtonCustom
+              title="Добавить тему"
+              className={"button-hover"}
+              onClick={goToAddTheme}
+            />
             <ButtonCustom
               title="Перейти к разделам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToUnits}
             />
             <ButtonCustom
               title="Перейти к подтемам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToSubthemes}
             />
             {showApplyButton && (
               <ButtonCustom
                 title="Применить изменения порядка"
                 onClick={handleClickAplly}
+                className={"button-outlined"}
               />
             )}
           </div>
