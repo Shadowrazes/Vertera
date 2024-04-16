@@ -55,6 +55,8 @@ class Helper extends Entity {
     }
 
     static async GetStatsById(helperId, filters) {
+        if (!filters) filters = {};
+        
         let sql = `
             SELECT 
                 COUNT(*) AS totalTickets,
@@ -169,6 +171,8 @@ class Helper extends Entity {
     }
 
     static async GetStatsList(filters) {
+        if (!filters) filters = {};
+
         let result = [];
         const helpers = await this.GetListFiltered(filters);
 
@@ -179,14 +183,19 @@ class Helper extends Entity {
             result.push(helperStatData);
         }
 
-        if (filters.orderDir === 'DESC') {
-            result.sort((a, b) => b.stats[filters.orderBy] - a.stats[filters.orderBy]);
-        }
-        else {
-            result.sort((a, b) => a.stats[filters.orderBy] - b.stats[filters.orderBy]);
+        if(filters.orderBy){
+            if (filters.orderDir === 'DESC') {
+                result.sort((a, b) => b.stats[filters.orderBy] - a.stats[filters.orderBy]);
+            }
+            else {
+                result.sort((a, b) => a.stats[filters.orderBy] - b.stats[filters.orderBy]);
+            }
         }
 
-        const limitedResult = result.slice(0 + filters.offset, filters.limit + filters.offset);
+        let limitedResult = result;
+        if(filters.limit){
+            limitedResult = result.slice(0 + filters.offset, filters.limit + filters.offset);
+        }
 
         return limitedResult;
     }
