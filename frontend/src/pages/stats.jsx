@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 
-import { STATS, CURATORS_LIST } from "../apollo/queries";
+import {
+  STATS,
+  CURATORS_LIST,
+  THEME_LIST,
+  COUNTRY_LIST,
+  DEPARTMENTS_LIST,
+} from "../apollo/queries";
 
 import { DateRangePicker } from "rsuite";
+import { MultiSelect } from "primereact/multiselect";
 import TitleH2 from "../components/title";
 import Level from "../components/level";
 import ButtonCustom from "../components/button";
@@ -47,15 +54,29 @@ ChartJS.register(
   ArcElement
 );
 
-function Stats() {
-  const user = JSON.parse(localStorage.getItem("user"));
+import get_translation from "../helpers/translation";
 
+function Stats() {
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
+  const [themeList, setThemeList] = useState([]);
+  const [countryList, setCountryList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
+
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
+  const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
   const [dateRange, setDateRange] = useState(null);
   const [selectedDateAfter, setSelectedDateAfter] = useState(null);
   const [selectedDateBefore, setSelectedDateBefore] = useState(null);
+  const [selectedCountries, setSelectedCountries] = useState([]);
+  const [selectedCountiesId, setSelectedCountriesId] = useState([]);
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
 
   const [totalData, setTotalData] = useState({});
   const [likeData, setLikeData] = useState({});
@@ -63,6 +84,13 @@ function Stats() {
   const [fantasy, setFantasy] = useState({});
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
+
+  const [isVisibleFilters, setIsVisibleFilters] = useState(false);
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [language, setLanguage] = useState(localStorage.getItem("language"));
 
   const predefinedRanges = [
     {
@@ -99,9 +127,27 @@ function Stats() {
         offset: 0,
         orderBy: "id",
         orderDir: "",
-        // dateBefore: selectedDateBefore,
-        // dateAfter: selectedDateAfter,
       },
+    },
+  });
+
+  const { data: dataThemeList } = useQuery(THEME_LIST, {
+    variables: {
+      token: user?.token,
+    },
+  });
+
+  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+    variables: {
+      token: user?.token,
+      lang: language,
+    },
+  });
+
+  const { data: dataDepartmentList } = useQuery(DEPARTMENTS_LIST, {
+    variables: {
+      token: user.token,
+      lang: language,
     },
   });
 
@@ -298,20 +344,6 @@ function Stats() {
     setDateRange(period);
   };
 
-  const handlePeriodClick = async () => {
-    const variables = {
-      filters: {
-        dateAfter: selectedDateAfter,
-        dateBefore: selectedDateBefore,
-        limit: 999,
-        offset: 0,
-        orderBy: "id",
-        orderDir: "",
-      },
-    };
-    await refetch(variables);
-  };
-
   const handlePeriodClean = async () => {
     setDateRange(null);
 
@@ -335,6 +367,18 @@ function Stats() {
       }
     }
 
+    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+      setThemeList(dataThemeList.clientQuery.allThemeTree);
+    }
+
+    if (dataCountryList && dataCountryList.clientQuery.countryList) {
+      setCountryList(dataCountryList.clientQuery.countryList);
+    }
+
+    if (dataDepartmentList && dataDepartmentList.helperQuery.departmentList) {
+      setDepartmentList(dataDepartmentList.helperQuery.departmentList);
+    }
+
     let currentStats = getCurrentUserStats();
     if (currentStats) {
       if (isAdmin()) {
@@ -344,8 +388,6 @@ function Stats() {
         currentStats = currentStats[0].stats;
       }
     }
-
-    let avgReplyTimeAllUsers = getAvgReplyTimeAllUsers();
 
     setLikeData({
       labels: ["Положительные", "Отрицательные", "Неоценённые"],
@@ -422,12 +464,19 @@ function Stats() {
         value: getTimeStr(currentStats?.avgReplyTime),
       },
     ]);
-
     setFantasy(currentStats?.fantasy);
 
     setRateLike(getRateLike(data));
     setRateAvgTime(getRateAvgTime(data));
-  }, [data, dataQueryCurators, selectedCurator, selectedCuratorIndex]);
+  }, [
+    data,
+    dataQueryCurators,
+    selectedCurator,
+    selectedCuratorIndex,
+    dataThemeList,
+    dataCountryList,
+    dataDepartmentList,
+  ]);
 
   if (loading) {
     return <Loader />;
@@ -454,6 +503,114 @@ function Stats() {
 
     return <h2>Что-то пошло не так</h2>;
   }
+
+  const handleHideComponent = () => {
+    setIsVisibleFilters((prevVisibility) => !prevVisibility);
+  };
+
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+
+    if (unit !== selectedUnit) {
+      setSelectedTheme(null);
+      setSelectedThemeId(null);
+      setSelectedSubTheme(null);
+      setSelectedSubThemeId(null);
+      setSubThemeDropdownVisible(true);
+    }
+  };
+
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+
+    if (theme !== selectedTheme) {
+      setSelectedSubTheme(null);
+      setSubThemeDropdownVisible(true);
+    }
+  };
+
+  const handleSubThemeClick = (subTheme, subThemeId) => {
+    setSelectedSubTheme(subTheme);
+    setSelectedSubThemeId(subThemeId);
+  };
+
+  const handleCountriesOnChange = (country) => {
+    setSelectedCountries(country);
+    setSelectedCountriesId(country.map((country) => country.id));
+  };
+
+  const handleDepartmentsOnChange = (departments) => {
+    setSelectedDepartments(departments);
+    setSelectedDepartmentsId(departments.map((department) => department.id));
+    // console.log(departments);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const variables = {
+      filters: {
+        dateAfter: selectedDateAfter,
+        dateBefore: selectedDateBefore,
+        limit: 999,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "ASC",
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        countryIds: selectedCountiesId,
+        departmentIds: selectedDepartmentsId,
+      },
+    };
+    await refetch(variables);
+  };
+
+  const handleResetFilters = async (e) => {
+    e.preventDefault();
+
+    setSelectedDateAfter(null);
+    setSelectedDateBefore(null);
+    setSelectedUnit(null);
+    setSelectedUnitId(null);
+    setSelectedTheme(null);
+    setSelectedThemeId(null);
+    setSelectedSubTheme(null);
+    setSelectedSubThemeId(null);
+    setSelectedCountries([]);
+    setSelectedCountriesId([]);
+    setSelectedDepartments([]);
+    setSelectedDepartmentsId([]);
+
+    const variables = {
+      filters: {
+        dateAfter: selectedDateAfter,
+        dateBefore: selectedDateBefore,
+        limit: 999,
+        offset: 0,
+        orderBy: "id",
+        orderDir: "ASC",
+        unitIds: selectedUnitId,
+        themeIds: selectedThemeId,
+        subThemeIds: selectedSubThemeId,
+        countryIds: selectedCountiesId,
+        departmentIds: selectedDepartmentsId,
+      },
+    };
+    await refetch(variables);
+  };
+
+  const newCountriesList = countryList.map((country) => ({
+    name: country.name.stroke,
+    id: country.id,
+  }));
+
+  const newDepartmentList = departmentList.map((department) => ({
+    name: department.name.stroke,
+    id: department.id,
+  }));
 
   return (
     <>
@@ -546,7 +703,7 @@ function Stats() {
             )}
 
             <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
-            <div className="stats__period-wrapper">
+            {/* <div className="stats__period-wrapper">
               <DateRangePicker
                 ranges={predefinedRanges}
                 placeholder="Задать период"
@@ -561,7 +718,157 @@ function Stats() {
                 className={"add-curator__btn"}
                 onClick={handlePeriodClick}
               />
-            </div>
+            </div> */}
+            <ButtonCustom
+              title={
+                isVisibleFilters == false
+                  ? get_translation("INTERFACE_SHOW_FILTER")
+                  : get_translation("INTERFACE_HIDE_FILTER")
+              }
+              onClick={handleHideComponent}
+              className={"alltickets__btn alltickets__btn-outlined"}
+            />
+            {isVisibleFilters && (
+              <>
+                <div className="alltickets__filters-container">
+                  <Form>
+                    <Row className="alltickets__row">
+                      <div className="alltickets__column">
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={
+                            selectedUnit ||
+                            get_translation("INTERFACE_SELECT_UNIT")
+                          }
+                        >
+                          {themeList.map(
+                            (unit, index) =>
+                              unit.visibility !== 3 && (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() =>
+                                    handleUnitClick(unit.name.stroke, unit.id)
+                                  }
+                                  href="#"
+                                >
+                                  {unit.name.stroke}
+                                </Dropdown.Item>
+                              )
+                          )}
+                        </DropdownButton>
+
+                        {selectedUnit && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={
+                              selectedTheme ||
+                              get_translation("INTERFACE_TYPE_APPEALS")
+                            }
+                          >
+                            {themeList
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.map(
+                                (theme) =>
+                                  theme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={theme.id}
+                                      onClick={() =>
+                                        handleThemeClick(
+                                          theme.name.stroke,
+                                          theme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {theme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
+                          </DropdownButton>
+                        )}
+
+                        {isSubThemeDropdownVisible && selectedTheme && (
+                          <DropdownButton
+                            id="dropdown-custom-1"
+                            title={
+                              selectedSubTheme ||
+                              get_translation("INTERFACE_SUBTHEME")
+                            }
+                          >
+                            {themeList
+                              .find((unit) => unit.name.stroke === selectedUnit)
+                              ?.themes.find(
+                                (theme) => theme.name.stroke === selectedTheme
+                              )
+                              ?.subThemes.map(
+                                (subTheme) =>
+                                  subTheme.visibility !== 3 && (
+                                    <Dropdown.Item
+                                      key={subTheme.id}
+                                      onClick={() =>
+                                        handleSubThemeClick(
+                                          subTheme.name.stroke,
+                                          subTheme.id
+                                        )
+                                      }
+                                      href="#"
+                                    >
+                                      {subTheme.name.stroke}
+                                    </Dropdown.Item>
+                                  )
+                              )}
+                          </DropdownButton>
+                        )}
+                      </div>
+                      <div className="alltickets__column">
+                        <DateRangePicker
+                          ranges={predefinedRanges}
+                          placeholder="Задать период"
+                          className="alltickets__date-range-picker"
+                          onChange={handlePeriodChange}
+                          onClean={handlePeriodClean}
+                          value={dateRange}
+                        />
+
+                        <MultiSelect
+                          value={selectedCountries}
+                          onChange={(e) => handleCountriesOnChange(e.value)}
+                          options={newCountriesList}
+                          optionLabel="name"
+                          className="add-curator__multiselect"
+                          placeholder={get_translation(
+                            "INTERFACE_CURATORS_COUNTRY"
+                          )}
+                          filter
+                        />
+
+                        <MultiSelect
+                          value={selectedDepartments}
+                          onChange={(e) => handleDepartmentsOnChange(e.value)}
+                          options={newDepartmentList}
+                          optionLabel="name"
+                          placeholder={get_translation(
+                            "INTERFACE_SELECT_DEPARTMENT"
+                          )}
+                          className="add-curator__multiselect"
+                        />
+                      </div>
+                    </Row>
+                    <Row className="alltickets__button-row">
+                      <ButtonCustom
+                        title={get_translation("INTERFACE_APPLY")}
+                        onClick={handleSubmit}
+                      />
+                      <ButtonCustom
+                        title={get_translation("INTERFACE_RESET")}
+                        className="alltickets__button-two"
+                        onClick={handleResetFilters}
+                      />
+                    </Row>
+                  </Form>
+                </div>
+              </>
+            )}
             <Row className="mt-3">
               <Col md={6} className="mt-2">
                 <Table striped bordered hover>

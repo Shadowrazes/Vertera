@@ -124,7 +124,7 @@ function Curators() {
                   (curator) =>
                     (showInactive || curator.user.isActive) && (
                       <tr
-                        className={curator.user.isActive ? "inactive-row" : ""}
+                        className={!curator.user.isActive ? "inactive-row" : ""}
                         key={curator.id}
                       >
                         <td>

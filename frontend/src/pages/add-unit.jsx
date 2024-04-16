@@ -26,8 +26,6 @@ function addUnit() {
   const [show, setShow] = useState(false);
 
   const [nameValue, setNameValue] = useState("");
-  const [orderNum, setOrderNum] = useState(0);
-  const [selectedVisibility, setSelectedVisibility] = useState(null);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -65,18 +63,11 @@ function addUnit() {
     setIsErrorVisible(false);
   };
 
-  const handleOrderNumChange = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
     if (nameValue.trim() == "") {
       error = "Укажите название раздела";
-    } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при добавлении раздела";
     }
@@ -89,7 +80,7 @@ function addUnit() {
 
     // console.log(nameValue);
 
-    if (nameValue.trim() == "" || orderNum < 0) {
+    if (nameValue.trim() == "") {
       setIsErrorVisible(true);
       return;
     }
@@ -103,7 +94,6 @@ function addUnit() {
           stroke: nameValue.trim(),
           lang: "ru",
           visibility: 1,
-          orderNum: parseInt(orderNum),
         },
       });
 
@@ -151,17 +141,6 @@ function addUnit() {
                   value={nameValue}
                   className="add-currator__input add-theme__dropdown"
                   onChange={handleNameChange}
-                />
-                <Form.Label className="edit-curator__field-label">
-                  Порядок
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  className="add-currator__input"
-                  placeholder="Порядок"
-                  value={orderNum}
-                  onChange={handleOrderNumChange}
-                  min={0}
                 />
               </Form.Group>
               {isErrorVisible && (

@@ -39,7 +39,6 @@ function AddSubtheme() {
   const [nameValue, setNameValue] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
-  const [orderNum, setOrderNum] = useState(0);
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [language, setLanguage] = useState(localStorage.getItem("language"));
@@ -145,11 +144,6 @@ function AddSubtheme() {
     setIsErrorVisible(false);
   };
 
-  const handleOrderNumChange = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
@@ -159,8 +153,6 @@ function AddSubtheme() {
       error = get_translation("INTERFACE_SELECT_THEME");
     } else if (nameValue.trim() == "") {
       error = get_translation("INTERFACE_ENTER_SUBTHEME_TITLE");
-    } else if (orderNum < 0) {
-      error = get_translation("INTERFACE_ERROR_NEGATIVE_SORT");
     } else {
       error = get_translation("INTERFACE_ERROR_ADD_SUBTHEME");
     }
@@ -188,8 +180,7 @@ function AddSubtheme() {
     if (
       nameValue.trim() == "" ||
       selectedUnit == null ||
-      selectedTheme == null ||
-      orderNum < 0
+      selectedTheme == null
     ) {
       setIsErrorVisible(true);
       return;
@@ -206,7 +197,6 @@ function AddSubtheme() {
           lang: "ru",
           departmentIds: selectedDepartmentsId,
           visibility: 1,
-          orderNum: parseInt(orderNum),
         },
       });
 
@@ -308,20 +298,6 @@ function AddSubtheme() {
                 placeholder={get_translation("INTERFACE_SELECT_DEPARTMENT")}
                 className="add-curator__multiselect"
               />
-
-              <div>
-                <Form.Label className="edit-curator__field-label">
-                  {get_translation("INTERFACE_ORDER")}
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  className="add-currator__input"
-                  placeholder={get_translation("INTERFACE_ORDER")}
-                  value={orderNum}
-                  onChange={handleOrderNumChange}
-                  min={0}
-                />
-              </div>
 
               {isErrorVisible && (
                 <span className="form__error">{errorMsg()}</span>

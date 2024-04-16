@@ -10,7 +10,7 @@ import {
   ButtonGroup,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery, useLazyQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { DateTime } from "luxon";
 
 import {

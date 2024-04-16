@@ -35,11 +35,9 @@ function EditSubtheme() {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
-  const [orderNum, setOrderNum] = useState(0);
   const [visibility, setVisibility] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
@@ -118,11 +116,9 @@ function EditSubtheme() {
       setNameValue(data.helperQuery.subTheme.name.stroke);
       setSelectedUnit(data.helperQuery.subTheme.theme.unit.name.stroke);
       setSelectedUnitId(data.helperQuery.subTheme.theme.unit.id);
-      setSelectedItem(data.helperQuery.subTheme.theme.unit.name.stroke);
       setSelectedTheme(data.helperQuery.subTheme.theme.name.stroke);
       setSelectedThemeId(data.helperQuery.subTheme.theme.id);
       setVisibility(data.helperQuery.subTheme.visibility);
-      setOrderNum(data.helperQuery.subTheme.orderNum);
       // console.log(data.subTheme.theme.unit.id);
     }
 
@@ -213,9 +209,13 @@ function EditSubtheme() {
   }
 
   const handleUnitClick = (unit, unitId) => {
-    setSelectedItem(unit);
     setSelectedUnit(unit);
     setSelectedUnitId(unitId);
+
+    if (unit !== selectedUnit) {
+      setSelectedTheme(null);
+      setSelectedThemeId(null);
+    }
 
     setIsErrorVisible(false);
     // console.log(unitId);
@@ -235,11 +235,6 @@ function EditSubtheme() {
     setIsErrorVisible(false);
   };
 
-  const handleOnChangeOrderNum = (e) => {
-    setOrderNum(e.target.value);
-    setIsErrorVisible(false);
-  };
-
   const errorMsg = () => {
     let error = "";
 
@@ -249,8 +244,6 @@ function EditSubtheme() {
       error = "Выберите тему";
     } else if (nameValue.trim() == "") {
       error = "Укажите название подтемы";
-    } else if (orderNum < 0) {
-      error = "Порядок сортировки не может быть отрицательным";
     } else {
       error = "Ошибка при обработке подтемы";
     }
@@ -272,8 +265,7 @@ function EditSubtheme() {
     if (
       nameValue.trim() == "" ||
       selectedUnit == null ||
-      selectedTheme == null ||
-      orderNum < 0
+      selectedTheme == null
     ) {
       setIsErrorVisible(true);
       return;
@@ -290,7 +282,6 @@ function EditSubtheme() {
           lang: "ru",
           departmentIds: selectedDepartmentsId,
           visibility: parseInt(visibility),
-          orderNum: orderNum,
         },
       });
 
@@ -336,7 +327,7 @@ function EditSubtheme() {
 
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedItem}
+                title={selectedUnit}
                 className="add-theme__dropdown"
               >
                 {dataQuery.map(
@@ -409,19 +400,6 @@ function EditSubtheme() {
                 optionLabel="name"
                 placeholder="Выбрать департамент"
                 className="add-curator__multiselect"
-              />
-            </div>
-
-            <div className="edit-subtheme__field">
-              <Form.Label className="edit-curator__field-label">
-                Порядок
-              </Form.Label>
-              <Form.Control
-                type="number"
-                className="add-currator__input"
-                value={orderNum}
-                onChange={handleOnChangeOrderNum}
-                min={0}
               />
             </div>
 
