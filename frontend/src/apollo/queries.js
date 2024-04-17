@@ -689,6 +689,29 @@ export const STATS = gql`
   }
 `;
 
+export const HELPER_STATS = gql`
+  query ($token: String!, $id: Int!) {
+    helperQuery(token: $token) {
+      helper(id: $id) {
+        stats {
+          totalTickets
+          newTickets
+          inProgressTickets
+          onRevisionTickets
+          onExtensionTickets
+          onMentorTickets
+          closedTickets
+          avgReplyTime
+          likes
+          dislikes
+          notRated
+          fantasy
+        }
+      }
+    }
+  }
+`;
+
 export const STATUS_LIST = gql`
   query ($token: String!) {
     helperQuery(token: $token) {

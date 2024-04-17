@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 
 import {
   STATS,
@@ -7,6 +7,7 @@ import {
   THEME_LIST,
   COUNTRY_LIST,
   DEPARTMENTS_LIST,
+  HELPER_STATS,
 } from "../apollo/queries";
 
 import { DateRangePicker } from "rsuite";
@@ -62,7 +63,7 @@ function Stats() {
   const [countryList, setCountryList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
-  const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
+  const [selectedCuratorId, setSelectedCuratorId] = useState(0);
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -150,6 +151,9 @@ function Stats() {
       lang: language,
     },
   });
+
+  const [getHelperStats, { data: dataHelperStats }] =
+    useLazyQuery(HELPER_STATS);
 
   const {
     loading: loadingCurators,
@@ -322,13 +326,13 @@ function Stats() {
     curatorName,
     curatorSurname,
     curatorPatronymic,
-    curatorIndex
+    curatorId
   ) => {
     let fullName = `${curatorSurname} ${curatorName} ${
       curatorPatronymic ? ` ${curatorPatronymic}` : ""
     }`;
     setSelectedCurator(fullName);
-    setSelectedCuratorIndex(curatorIndex);
+    setSelectedCuratorId(curatorId);
   };
 
   const handlePeriodChange = async (period) => {
@@ -382,14 +386,27 @@ function Stats() {
     }
 
     let currentStats = getCurrentUserStats();
+
     if (currentStats) {
       if (isAdmin()) {
-        currentStats = currentStats[selectedCuratorIndex].stats;
+        currentStats = currentStats[selectedCuratorId].stats;
       } else {
         setSelectedCurator("");
         currentStats = currentStats[0].stats;
       }
     }
+
+    // let currentStats;
+
+    // if (selectedCuratorId) {
+    //   getHelperStats({
+    //     variables: {
+    //       token: user.token,
+    //       id: selectedCuratorId,
+    //     }
+    //   })
+
+    // }
 
     setLikeData({
       labels: ["Положительные", "Отрицательные", "Неоценённые"],
@@ -474,7 +491,7 @@ function Stats() {
     data,
     dataQueryCurators,
     selectedCurator,
-    selectedCuratorIndex,
+    selectedCuratorId,
     dataThemeList,
     dataCountryList,
     dataDepartmentList,
@@ -637,7 +654,7 @@ function Stats() {
                             curator.user.name,
                             curator.user.surname,
                             curator.user.patronymic,
-                            index
+                            curator.id
                           )
                         }
                         href="#"
