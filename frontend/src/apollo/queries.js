@@ -677,6 +677,9 @@ export const STATS = gql`
           totalTickets
           newTickets
           inProgressTickets
+          onRevisionTickets
+          onExtensionTickets
+          onMentorTickets
           closedTickets
           avgReplyTime
           likes

@@ -181,7 +181,7 @@ function EditUnit() {
             title={`Редактировать раздел #${unitId}`}
             linkPrev={linkPrev}
           />
-          <Row>
+          <Row className="edit-unit__container">
             <Col className="edit-unit__column">
               <Form.Group controlId="NameForm">
                 <Form.Label className="edit-curator__field-label">

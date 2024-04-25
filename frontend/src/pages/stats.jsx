@@ -64,6 +64,7 @@ function Stats() {
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
   const [selectedCuratorId, setSelectedCuratorId] = useState(0);
+  const [selectedCuratorStats, setSelectedCuratorStats] = useState(null);
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -83,6 +84,7 @@ function Stats() {
   const [likeData, setLikeData] = useState({});
   const [tableInfo, setTableInfo] = useState({});
   const [fantasy, setFantasy] = useState({});
+  const [allTickets, setAllTickets] = useState();
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
 
@@ -308,6 +310,10 @@ function Stats() {
   };
 
   const getTimeStr = (sourceHource) => {
+    if (sourceHource == -3600) {
+      return "Нет времени";
+    }
+
     let time = getTime(sourceHource);
     let result = "";
     if (time.hours > 0) {
@@ -322,17 +328,31 @@ function Stats() {
     return result !== "" ? result : "0 сек.";
   };
 
-  const handleCuratorClick = (
+  const handleCuratorClick = async (
     curatorName,
     curatorSurname,
     curatorPatronymic,
     curatorId
   ) => {
-    let fullName = `${curatorSurname} ${curatorName} ${
-      curatorPatronymic ? ` ${curatorPatronymic}` : ""
-    }`;
-    setSelectedCurator(fullName);
-    setSelectedCuratorId(curatorId);
+    let result;
+
+    result = await getHelperStats({
+      variables: {
+        token: user.token,
+        id: curatorId,
+      },
+    });
+
+    setSelectedCuratorStats(result.data.helperQuery.helper.stats);
+
+    if (curatorName !== null && curatorSurname !== null) {
+      let fullName = `${curatorSurname} ${curatorName} ${
+        curatorPatronymic ? ` ${curatorPatronymic}` : ""
+      }`;
+
+      setSelectedCurator(fullName);
+      setSelectedCuratorId(curatorId);
+    }
   };
 
   const handlePeriodChange = async (period) => {
@@ -385,28 +405,26 @@ function Stats() {
       setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
-    let currentStats = getCurrentUserStats();
+    // let currentStats = getCurrentUserStats();
 
-    if (currentStats) {
-      if (isAdmin()) {
-        currentStats = currentStats[selectedCuratorId].stats;
-      } else {
-        setSelectedCurator("");
-        currentStats = currentStats[0].stats;
-      }
-    }
-
-    // let currentStats;
-
-    // if (selectedCuratorId) {
-    //   getHelperStats({
-    //     variables: {
-    //       token: user.token,
-    //       id: selectedCuratorId,
-    //     }
-    //   })
-
+    // if (currentStats) {
+    //   if (isAdmin()) {
+    //     currentStats = currentStats?.find(
+    //       (item) => item.helper.id === selectedCuratorId
+    //     );
+    //     currentStats = currentStats?.stats;
+    //   } else {
+    //     setSelectedCurator("");
+    //     currentStats = currentStats[0].stats;
+    //   }
     // }
+
+    let currentStats;
+
+    if (!isAdmin()) {
+      handleCuratorClick(null, null, null, user.id);
+    }
+    currentStats = selectedCuratorStats;
 
     setLikeData({
       labels: ["Положительные", "Отрицательные", "Неоценённые"],
@@ -463,12 +481,28 @@ function Stats() {
         value: currentStats?.totalTickets,
       },
       {
-        name: "Закрытых тикетов",
-        value: currentStats?.closedTickets,
+        name: "Новых тикетов",
+        value: currentStats?.newTickets,
       },
       {
-        name: "Тикетов в работе",
+        name: "Тикеты в процессе",
         value: currentStats?.inProgressTickets,
+      },
+      {
+        name: "Тикеты на уточнении",
+        value: currentStats?.onRevisionTickets,
+      },
+      {
+        name: "Тикеты ожидающие дополнения",
+        value: currentStats?.onExtensionTickets,
+      },
+      {
+        name: "Тикеты с наставником",
+        value: currentStats?.onMentorTickets,
+      },
+      {
+        name: "Закрытых тикетов",
+        value: currentStats?.closedTickets,
       },
       {
         name: "Положительных отзывов",
@@ -483,6 +517,7 @@ function Stats() {
         value: getTimeStr(currentStats?.avgReplyTime),
       },
     ]);
+    setAllTickets(currentStats?.totalTickets);
     setFantasy(currentStats?.fantasy);
 
     setRateLike(getRateLike(data));
@@ -605,17 +640,17 @@ function Stats() {
 
     const variables = {
       filters: {
-        dateAfter: selectedDateAfter,
-        dateBefore: selectedDateBefore,
+        dateAfter: null,
+        dateBefore: null,
         limit: 999,
         offset: 0,
         orderBy: "id",
         orderDir: "ASC",
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        countryIds: selectedCountiesId,
-        departmentIds: selectedDepartmentsId,
+        unitIds: null,
+        themeIds: null,
+        subThemeIds: null,
+        countryIds: [],
+        departmentIds: [],
       },
     };
     await refetch(variables);
@@ -669,7 +704,7 @@ function Stats() {
                 )}
               </DropdownButton>
             )}
-            {selectedCurator != null && (
+            {selectedCuratorStats != null && (
               <>
                 <Row>
                   <Col>
@@ -695,7 +730,7 @@ function Stats() {
                     Уровень куратора VERTERA
                   </h3>
                   <Col md={6} className="mt-2">
-                    <Level fantasy={fantasy} />
+                    <Level fantasy={fantasy} allTickets={allTickets} />
                   </Col>
                 </Row>
                 <Row className="mt-5">

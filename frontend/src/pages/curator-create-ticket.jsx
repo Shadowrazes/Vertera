@@ -657,7 +657,7 @@ function CuratorCreateTicket() {
             title={get_translation("INTERFACE_CREATE_TICKET")}
             className="title__heading"
           />
-          <Form method="post">
+          <Form className="curator-create-ticket__container" method="post">
             <Row className="form__row">
               <Col className="form__column">
                 <Form.Group controlId="TicketTitleForm">

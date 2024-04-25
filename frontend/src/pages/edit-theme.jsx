@@ -226,7 +226,7 @@ function EditTheme() {
             title={`Редактировать тему #${themeId}`}
             linkPrev={linkPrev}
           />
-          <Row style={{ marginTop: "20px" }}>
+          <Row style={{ marginTop: "20px" }} className="edit-theme__container">
             <Col className="edit-curator__column edit-theme__column">
               <DropdownButton
                 id="dropdown-custom-1"

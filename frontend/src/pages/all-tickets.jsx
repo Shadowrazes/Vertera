@@ -224,7 +224,7 @@ function allTickets() {
       lang: language,
     },
   });
-  const { getCuratorsList, data: dataCurators } = useQuery(CURATORS_LIST, {
+  const { data: dataCurators } = useQuery(CURATORS_LIST, {
     variables: {
       token: user?.token,
     },

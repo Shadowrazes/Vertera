@@ -210,7 +210,10 @@ function EditCountry() {
             title={`Редактировать страну #${countryId}`}
             linkPrev={linkPrev}
           />
-          <Row className="add-curator__row" style={{ marginTop: "20px" }}>
+          <Row
+            className="add-curator__row edit-country__container"
+            style={{ marginTop: "20px" }}
+          >
             <Col className="add-curator__column add-subtheme__column">
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">

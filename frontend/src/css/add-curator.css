@@ -190,6 +190,10 @@
     width: 100% !important;
   }
 
+  .add-curator__column .add-curator__input {
+    width: 100% !important;
+  }
+
   .add-unit__row .add-curator__input {
     width: 416px !important;
   }
