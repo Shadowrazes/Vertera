@@ -267,6 +267,10 @@
   .alltickets__filters-container .p-multiselect {
     width: 100% !important;
   }
+
+  .alltickets__table-wrapper {
+    overflow-x: auto;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -314,5 +318,9 @@
     gap: 20px;
     justify-content: center;
     align-items: center;
+  }
+
+  .mobile {
+    display: none;
   }
 }

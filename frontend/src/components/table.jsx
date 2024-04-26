@@ -325,12 +325,14 @@ function TableTickets() {
                   <th>{get_translation("INTERFACE_THEME")}</th>
                   {isAdmin() && (
                     <>
-                      <th>ID партнера</th>
+                      <th className="mobile">ID партнера</th>
                       <th>{get_translation("INTERFACE_CURATOR")}</th>
                     </>
                   )}
-                  <th>{get_translation("INTERFACE_LAST_MSG")}</th>
-                  <th>{get_translation("INTERFACE_MSG")}</th>
+                  <th className="mobile">
+                    {get_translation("INTERFACE_LAST_MSG")}
+                  </th>
+                  <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
                   <th>{get_translation("INTERFACE_STATUS")}</th>
                 </tr>
               </thead>
@@ -410,7 +412,7 @@ function TableTickets() {
                     </td>
                     {isAdmin() && (
                       <>
-                        <td>
+                        <td className="mobile">
                           <Link
                             to={`/dialog/${ticket.link}`}
                             state={{
@@ -419,7 +421,9 @@ function TableTickets() {
                             }}
                             className="alltickets__link"
                           >
-                            {ticket.client.id}
+                            {ticket.initiator.outerId
+                              ? ticket.initiator.outerId
+                              : ticket.initiator.id}
                           </Link>
                         </td>
                         <td className="d-md-table-cell">
@@ -436,7 +440,7 @@ function TableTickets() {
                         </td>
                       </>
                     )}
-                    <td className="d-md-table-cell">
+                    <td className="d-md-table-cell mobile">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -456,7 +460,7 @@ function TableTickets() {
                             } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
-                    <td className="d-md-table-cell">
+                    <td className="d-md-table-cell mobile">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{

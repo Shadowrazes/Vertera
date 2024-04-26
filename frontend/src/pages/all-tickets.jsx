@@ -1422,7 +1422,7 @@ function allTickets() {
             ))}
           </div>
 
-          <div className="table__wrapper">
+          <div className="table__wrapper alltickets__table-wrapper">
             <Table className="table__table" hover>
               <thead>
                 <tr>
@@ -1432,12 +1432,14 @@ function allTickets() {
                   <th>{get_translation("INTERFACE_THEME")}</th>
                   {isHelper() && (
                     <>
-                      <th>ID партнера</th>
+                      <th className="mobile">ID партнера</th>
                       <th>{get_translation("INTERFACE_CURATOR")}</th>
                     </>
                   )}
-                  <th>{get_translation("INTERFACE_LAST_MSG")}</th>
-                  <th>{get_translation("INTERFACE_MSG")}</th>
+                  <th className="mobile">
+                    {get_translation("INTERFACE_LAST_MSG")}
+                  </th>
+                  <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
                   <th>{get_translation("INTERFACE_STATUS")}</th>
                 </tr>
               </thead>
@@ -1514,7 +1516,7 @@ function allTickets() {
                     </td>
                     {isHelper() && (
                       <>
-                        <td>
+                        <td className="mobile">
                           <Link
                             to={`/dialog/${ticket.link}`}
                             state={{
@@ -1542,7 +1544,7 @@ function allTickets() {
                         </td>
                       </>
                     )}
-                    <td style={{ textAlign: "left" }}>
+                    <td className="mobile" style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -1562,7 +1564,7 @@ function allTickets() {
                             } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
-                    <td>
+                    <td className="mobile">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
