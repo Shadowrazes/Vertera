@@ -286,7 +286,7 @@ function Countries() {
   };
 
   const handleApplyChange = async (id) => {
-    if (inputValues[id].code == "" || inputValues[id].name.trim() == "") {
+    if (inputValues[id].code == "" || inputValues[id].name == "") {
       setIsErrorEditVisible(true);
       return;
     }
