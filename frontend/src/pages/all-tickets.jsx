@@ -1469,9 +1469,13 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {`${handleUnitStroke(
-                          ticket.subTheme.theme.unit.name.stroke
-                        )} | ${ticket.subTheme.theme.name.stroke} ${
+                        {`${
+                          ticket.subTheme.theme.unit.name.stroke === null
+                            ? ""
+                            : `${handleUnitStroke(
+                                ticket.subTheme.theme.unit.name.stroke
+                              )} |`
+                        } ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
                             ? ""
                             : `| ${ticket.subTheme.name.stroke}`
