@@ -134,6 +134,17 @@ class Message extends Entity {
             };
             const msgLogRes = await TicketLog.TransInsert(conn, msgLogFields);
 
+            if (sender.role == User.RoleClient &&
+                sender.id == curTicket.initiatorId &&
+                curTicket.statusId == Ticket.StatusIdOnExtension) 
+            {
+                const sysInitiator = await User.GetById(User.AdminId);
+                const ticketUpdRes = await Ticket.TransUpdate(
+                    curTicket.id, { statusId: Ticket.StatusIdInProgress },
+                    undefined, sysInitiator, conn
+                );
+            }
+
             if (!isFirstMsg) {
                 const curReciever = await User.GetById(reciever.id);
 
