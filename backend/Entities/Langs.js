@@ -6,6 +6,7 @@ class Langs extends Entity {
     static PrimaryField = 'id';
     static NameField = 'name';
     static CodeField = 'code';
+    static IconPathField = 'iconPath';
     static IsActiveField = 'isActive';
 
     static async GetById(id) {

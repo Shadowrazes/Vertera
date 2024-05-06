@@ -295,6 +295,10 @@ class Ticket extends Entity {
                 arg.isSplit = true;
                 arg.initiator = initiator;
 
+                if(arg.ticketFields.recipientId == undefined){
+                    arg.ticketFields.recipientId = curTicket.recipientId;
+                }
+
                 const insertRes = await this.TransInsert(arg, conn);
             }
 
@@ -414,7 +418,7 @@ class Ticket extends Entity {
             const recipientChangeLogRes = await TicketLog.TransInsert(conn, recipientChangeLogFields);
             //  //
 
-            messageFields.recieverId = ticketFields.recipientId ;
+            messageFields.recieverId = ticketFields.recipientId;
             messageFields.ticketId = result.insertId;
             messageFields.type = Message.TypeDefault;
             const messageResult = await Message.TransInsert(messageFields, conn);

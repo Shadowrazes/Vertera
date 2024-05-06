@@ -67,6 +67,7 @@ export const InputsUpdate = `
     input LangUpdate {
         name: String
         code: String
+        iconPath: String
         isActive: Boolean
     }
 

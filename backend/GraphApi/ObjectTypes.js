@@ -24,6 +24,7 @@ export const ObjectTypes = `
         id: Int!
         name: String!
         code: String!
+        iconPath: String
         isActive: Int!
     }
 

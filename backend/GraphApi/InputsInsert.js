@@ -94,5 +94,6 @@ export const InputsInsert = `
     input LangInsert {
         name: String!
         code: String!
+        iconPath: String
     }
 `;
