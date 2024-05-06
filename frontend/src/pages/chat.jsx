@@ -719,15 +719,16 @@ function Chat() {
 
       setIsLoadingClose(false);
     }
+
     try {
       if (userId !== helperId) {
         await editTicket({
           variables: {
-            id: parseInt(itemId),
+            token: user.token,
+            id: ticketId,
             recipientId: userId,
           },
         });
-        window.location.reload();
       }
     } catch (error) {
       handleShowEditTicketError();
@@ -1477,7 +1478,7 @@ function Chat() {
           <div className="alltickets__container">
             <TicketTitle
               title={`${data?.clientQuery?.ticket.title}`}
-              state="Закрыто"
+              state="Тикет завершен"
               linkPrev={linkPrev}
             />
           </div>
@@ -1565,7 +1566,7 @@ function Chat() {
                   </>
                 )}
 
-                {isAdmin() && currentStatus === "Новый" && (
+                {isAdmin() && currentStatus === "В процессе" && (
                   <a className="alltickets__link">
                     <ButtonCustom
                       title="Отправить наставнику"
@@ -1976,7 +1977,8 @@ function Chat() {
                   )}
                   {input.isVisibleButton && (
                     <ButtonCustom
-                      title="Выбрать куратора button-hover"
+                      title="Выбрать куратора"
+                      className="button-hover"
                       onClick={handleSelectCuratorVisible}
                     />
                   )}
@@ -2081,8 +2083,8 @@ function Chat() {
                   <span className="form__error">{errorMsgSplit()}</span>
                 )}
                 <ButtonCustom
-                  title="Создать новые обращения button-hover"
-                  className="chat-input__button-send"
+                  title="Создать новые обращения"
+                  className="chat-input__button-send button-hover"
                   onClick={handleMutationSplitTicket}
                 />
               </div>
@@ -2272,11 +2274,7 @@ function Chat() {
                   >
                     <ButtonCustom
                       title="Отправить"
-                      className={
-                        isAdmin()
-                          ? "chat-input__button-send button-hover single"
-                          : "chat-input__button-send button-hover single"
-                      }
+                      className="chat-input__button-send button-hover single"
                       type="submit"
                       onClick={handleSubmit}
                     />
@@ -2386,6 +2384,99 @@ function Chat() {
           )}
         </div>
         <div className="chat-input__container">
+          {!isVisible && (
+            <div
+              className="chat-input__close-container"
+              style={{ width: "100%" }}
+            >
+              <div className="chat-input__close-box">
+                <span className="chat-input__close-text">Заявка закрыта</span>
+              </div>
+              {!isAdmin() && (
+                <div className="chat-message-recepient__rate-container">
+                  {!reaction ? (
+                    <span className="chat-message-recepient__rate-title">
+                      Оцените ответ
+                    </span>
+                  ) : (
+                    <span className="chat-message-recepient__rate-title">
+                      Ответ оценен
+                    </span>
+                  )}
+
+                  <div className="chat-message-recepient__rate">
+                    {!reaction && (
+                      <>
+                        <a href="#" onClick={handleLike}>
+                          <span className="chat-message-recepient__rate-icon-like">
+                            <img src="/like.svg" alt="" />
+                          </span>
+                        </a>
+                        <a href="#" onClick={handleDislike}>
+                          <span className="chat-message-recepient__rate-icon-dislike">
+                            <img src="/dislike.svg" alt="" />
+                          </span>
+                        </a>
+                      </>
+                    )}
+
+                    {reaction === "dislike" && (
+                      <a href="#" className="disabled">
+                        <span className="chat-message-recepient__rate-icon-dislike">
+                          <img src="/dislike.svg" alt="" />
+                        </span>
+                      </a>
+                    )}
+
+                    {reaction === "like" && (
+                      <a href="#" className="disabled">
+                        <span className="chat-message-recepient__rate-icon-like">
+                          <img src="/like.svg" alt="" />
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {isAdmin() && (
+                <div className="chat-message-recepient__rate-container">
+                  <span className="chat-message-recepient__rate-title">
+                    Оценка тикета
+                  </span>
+
+                  {!reaction && (
+                    <span className="chat-message-recepient__rate chat-message-recepient__text">
+                      Тикет еще не оценен
+                    </span>
+                  )}
+
+                  {reaction === "dislike" && (
+                    <a href="#" className="disabled">
+                      <span className="chat-message-recepient__rate-icon-dislike">
+                        <img src="/dislike.svg" alt="" />
+                      </span>
+                    </a>
+                  )}
+
+                  {reaction === "like" && (
+                    <a href="#" className="disabled">
+                      <span className="chat-message-recepient__rate-icon-like">
+                        <img src="/like.svg" alt="" />
+                      </span>
+                    </a>
+                  )}
+                </div>
+              )}
+              {!isAdmin() && (
+                <ButtonCustom
+                  title="Создать новую заявку"
+                  className="button-hover"
+                  onClick={goToCreateTicket}
+                />
+              )}
+            </div>
+          )}
           {isVisible &&
           !isAdmin() &&
           (currentStatus === "Новый" ||
@@ -2630,97 +2721,6 @@ function Chat() {
             </Table>
           </div>
         </>
-      )}
-      {/* ===== */}
-      {!isVisible && (
-        <div className="chat-input__close-container">
-          <div className="chat-input__close-box">
-            <span className="chat-input__close-text">Заявка закрыта</span>
-          </div>
-          {!isAdmin() && (
-            <div className="chat-message-recepient__rate-container">
-              {!reaction ? (
-                <span className="chat-message-recepient__rate-title">
-                  Оцените ответ
-                </span>
-              ) : (
-                <span className="chat-message-recepient__rate-title">
-                  Ответ оценен
-                </span>
-              )}
-
-              <div className="chat-message-recepient__rate">
-                {!reaction && (
-                  <>
-                    <a href="#" onClick={handleLike}>
-                      <span className="chat-message-recepient__rate-icon-like">
-                        <img src="/like.svg" alt="" />
-                      </span>
-                    </a>
-                    <a href="#" onClick={handleDislike}>
-                      <span className="chat-message-recepient__rate-icon-dislike">
-                        <img src="/dislike.svg" alt="" />
-                      </span>
-                    </a>
-                  </>
-                )}
-
-                {reaction === "dislike" && (
-                  <a href="#" className="disabled">
-                    <span className="chat-message-recepient__rate-icon-dislike">
-                      <img src="/dislike.svg" alt="" />
-                    </span>
-                  </a>
-                )}
-
-                {reaction === "like" && (
-                  <a href="#" className="disabled">
-                    <span className="chat-message-recepient__rate-icon-like">
-                      <img src="/like.svg" alt="" />
-                    </span>
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {isAdmin() && (
-            <div className="chat-message-recepient__rate-container">
-              <span className="chat-message-recepient__rate-title">
-                Оценка тикета
-              </span>
-
-              {!reaction && (
-                <span className="chat-message-recepient__rate chat-message-recepient__text">
-                  Тикет еще не оценен
-                </span>
-              )}
-
-              {reaction === "dislike" && (
-                <a href="#" className="disabled">
-                  <span className="chat-message-recepient__rate-icon-dislike">
-                    <img src="/dislike.svg" alt="" />
-                  </span>
-                </a>
-              )}
-
-              {reaction === "like" && (
-                <a href="#" className="disabled">
-                  <span className="chat-message-recepient__rate-icon-like">
-                    <img src="/like.svg" alt="" />
-                  </span>
-                </a>
-              )}
-            </div>
-          )}
-          {!isAdmin() && (
-            <ButtonCustom
-              title="Создать новую заявку"
-              className="button-hover"
-              onClick={goToCreateTicket}
-            />
-          )}
-        </div>
       )}
 
       <Modal show={show} onHide={handleCloseModal}>

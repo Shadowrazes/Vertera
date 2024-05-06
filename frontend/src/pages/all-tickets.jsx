@@ -815,7 +815,7 @@ function allTickets() {
   };
 
   const handleUnitStroke = (unit) => {
-    const words = unit.split(/[ /]/);
+    const words = unit?.split(/[ /]/);
     const firstLetters = words.map((word) => word.charAt(0).toUpperCase());
     const result = firstLetters.join("");
 
@@ -1580,7 +1580,7 @@ function allTickets() {
                         {ticket.messages?.length}
                       </Link>
                     </td>
-                    <td>
+                    <td id="alltickets__status">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{

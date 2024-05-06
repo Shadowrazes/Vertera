@@ -72,6 +72,12 @@
   margin-right: 5px;
 }
 
+.chat-message-sender__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .chat-message-sender__name {
   font-family: "TT Norms Pro", sans-serif;
   font-weight: 400;

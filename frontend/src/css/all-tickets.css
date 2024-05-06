@@ -226,6 +226,10 @@
   background-color: white !important;
 }
 
+#alltickets__status {
+  padding: 5px !important;
+}
+
 @media screen and (max-width: 1200px) {
   .alltickets__container {
     margin-top: 20px;

@@ -851,7 +851,7 @@ function CuratorCreateTicket() {
                       border: "1px solid #dee2e6",
                       borderRadius: "0 0 6px 6px",
                       padding: "10px",
-                      heigth: "250px",
+                      height: "50%",
                     }}
                     placeholder={get_translation("INTERFACE_ENTER_MSG")}
                     toolbar={{

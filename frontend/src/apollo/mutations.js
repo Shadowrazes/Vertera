@@ -518,6 +518,7 @@ export const CURATOR_ADD_TICKET = gql`
     $recieverId: Int!
     $ticketId: Int!
     $text: String!
+    $attachPaths: [String]
     $notification: Boolean!
     $idsOuter: Boolean!
     $ids: [Int]!
@@ -536,6 +537,7 @@ export const CURATOR_ADD_TICKET = gql`
           recieverId: $recieverId
           ticketId: $ticketId
           text: $text
+          attachPaths: $attachPaths
         }
         notification: $notification
         idsOuter: $idsOuter

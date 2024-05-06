@@ -232,9 +232,9 @@ function TableTickets() {
   }
 
   const handleUnitStroke = (unit) => {
-    const words = unit.split(/[ /]/);
-    const firstLetters = words.map((word) => word.charAt(0).toUpperCase());
-    const result = firstLetters.join("");
+    const words = unit?.split(/[ /]/);
+    const firstLetters = words?.map((word) => word.charAt(0).toUpperCase());
+    const result = firstLetters?.join("");
 
     return result;
   };

@@ -6,7 +6,7 @@ const getStatusColor = (status) => {
   switch (status) {
     case "Открыто":
       return "#00AB97";
-    case "Закрыто":
+    case "Тикет завершен":
       return "#AB0000";
     default:
       return "black";

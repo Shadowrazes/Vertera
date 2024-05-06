@@ -100,13 +100,49 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
               : "chat-message-recipient__box"
           }
         >
-          <h3 className="chat-message-recipient__name">
-            {getFullName(sender)}
-          </h3>
-          <div
-            dangerouslySetInnerHTML={{ __html: message }}
-            className="chat-message-recipient__text"
-          ></div>
+          <div className="chat-message-recipient__header">
+            <h3 className="chat-message-recipient__name">
+              {getFullName(sender)}
+            </h3>
+            <span className="chat-message-recipient__time">{time}</span>
+          </div>
+          <div className="chat-message-recipient__text">
+            <p dangerouslySetInnerHTML={{ __html: message }}></p>
+            {!isVisible && (
+              <>
+                <span className="chat-message-recipient__attachs-title">
+                  Прикрепленные файлы:
+                </span>
+                <div className="chat-message-recipient__attachs">
+                  {attachs &&
+                    attachs.map((attach) => (
+                      <div key={attach.id}>
+                        <a
+                          className="chat-message-recipient__attach-link"
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={
+                            isBuild
+                              ? "https://help.vertera.org:4444" + attach.path
+                              : "http://localhost:4444" + attach.path
+                          }
+                        >
+                          <img
+                            src="/file.svg"
+                            className="chat-message-recipient__attach-icon"
+                            alt=""
+                          />
+                          <span className="chat-message-recipient__attach">
+                            {attach.name}
+                          </span>
+                        </a>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
           {translatedText !== "" &&
             languageCode[franc(message)] !== language && (
               <>
@@ -120,46 +156,52 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                     />
                   </span>
                 </div>
-                <div className="chat-message-recipient__text">
+                <div
+                  className="chat-message-recipient__text"
+                  style={{ textAlign: "right" }}
+                >
                   <i dangerouslySetInnerHTML={{ __html: translatedText }}></i>
+                  {!isVisible && (
+                    <>
+                      <span className="chat-message-recipient__attachs-title">
+                        Прикрепленные файлы:
+                      </span>
+                      <div
+                        style={{ justifyContent: "flex-end" }}
+                        className="chat-message-recipient__attachs"
+                      >
+                        {attachs &&
+                          attachs.map((attach) => (
+                            <div key={attach.id}>
+                              <a
+                                className="chat-message-recipient__attach-link"
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={
+                                  isBuild
+                                    ? "https://help.vertera.org:4444" +
+                                      attach.path
+                                    : "http://localhost:4444" + attach.path
+                                }
+                              >
+                                <img
+                                  src="/file.svg"
+                                  className="chat-message-recipient__attach-icon"
+                                  alt=""
+                                />
+                                <span className="chat-message-recipient__attach">
+                                  {attach.name}
+                                </span>
+                              </a>
+                            </div>
+                          ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             )}
-          {!isVisible && (
-            <>
-              <span className="chat-message-recipient__attachs-title">
-                Прикрепленные файлы:
-              </span>
-              <div className="chat-message-recipient__attachs">
-                {attachs &&
-                  attachs.map((attach) => (
-                    <div key={attach.id}>
-                      <a
-                        className="chat-message-recipient__attach-link"
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={
-                          isBuild
-                            ? "https://help.vertera.org:4444" + attach.path
-                            : "http://localhost:4444" + attach.path
-                        }
-                      >
-                        <img
-                          src="/file.svg"
-                          className="chat-message-recipient__attach-icon"
-                          alt=""
-                        />
-                        <span className="chat-message-recipient__attach">
-                          {attach.name}
-                        </span>
-                      </a>
-                    </div>
-                  ))}
-              </div>
-            </>
-          )}
-          <span className="chat-message-recipient__time">{time}</span>
         </div>
       </div>
     </>
