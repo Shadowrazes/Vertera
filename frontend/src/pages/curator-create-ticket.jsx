@@ -657,7 +657,7 @@ function CuratorCreateTicket() {
             title={get_translation("INTERFACE_CREATE_TICKET")}
             className="title__heading"
           />
-          <Form method="post">
+          <Form className="curator-create-ticket__container" method="post">
             <Row className="form__row">
               <Col className="form__column">
                 <Form.Group controlId="TicketTitleForm">
@@ -762,12 +762,12 @@ function CuratorCreateTicket() {
                   <div className="chat__helper-buttons">
                     <ButtonCustom
                       title="Выбрать куратора"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleCuratorsDropdown}
                     />
                     <ButtonCustom
                       title="Вставить список"
-                      className="chat-input__button-close"
+                      className="chat-input__button-close button-hover"
                       onClick={handleIdFileInput}
                     />
                   </div>

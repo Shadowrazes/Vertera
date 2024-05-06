@@ -170,6 +170,7 @@ function FormComponent() {
               <a href="https://id.boss.vertera.org/?service=TICKET_SYSTEM&return=https%3A%2F%2Fhelp.vertera.org%2F">
                 <ButtonCustom
                   title={get_translation("INTERFACE_PARTNER_AUTH")}
+                  className={"button-hover"}
                 />
               </a>
             </div>

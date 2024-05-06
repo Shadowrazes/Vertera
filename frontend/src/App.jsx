@@ -35,8 +35,8 @@ function App() {
 
   return (
     <div className="container">
-      <Header user={user} setUser={setUser} />
       <Router>
+        <Header user={user} setUser={setUser} />
         <Routes>
           <Route path="/" element={<CreateTicket />} />
           <Route path="/all-tickets" element={<AllTickets />} />

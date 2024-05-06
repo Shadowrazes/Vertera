@@ -23,6 +23,7 @@ function Admin() {
         <ButtonCustom
           title="Авторизироваться как куратор"
           onClick={handleAuthHelperButton}
+          className={"button-hover"}
         />
       </div>
     </>

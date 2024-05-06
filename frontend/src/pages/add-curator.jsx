@@ -123,9 +123,7 @@ function AddCurator() {
       setCountryList(dataCountryList.clientQuery.countryList);
     }
 
-    if (location.state && location.state.linkPrev) {
-      setLinkPrev(location.state.linkPrev);
-    }
+    setLinkPrev("/curators");
   }, [data, dataJobTitle, dataCountryList, location.state]);
 
   const [addHelperUser] = useMutation(ADD_HELPER_USER);
@@ -174,26 +172,32 @@ function AddCurator() {
 
   const handleNameChange = (e) => {
     setNameValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handleSurnameChange = (e) => {
     setSurnameValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handlePatronymicChange = (e) => {
     setPatronymicValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handleLoginChange = (e) => {
     setLoginValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handlePasswordChange = (e) => {
     setPasswordValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handlePhoneChange = (e) => {
     setPhoneValue(e.target.value);
+    setIsErrorVisible(false);
   };
 
   const handleCountryClick = (country, countryId) => {
@@ -361,7 +365,7 @@ function AddCurator() {
                   type="text"
                   placeholder={get_translation("INTERFACE_NAME")}
                   value={nameValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handleNameChange}
                 />
               </Form.Group>
@@ -371,7 +375,7 @@ function AddCurator() {
                   type="text"
                   placeholder={get_translation("INTERFACE_SURNAME")}
                   value={surnameValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handleSurnameChange}
                 />
               </Form.Group>
@@ -381,7 +385,7 @@ function AddCurator() {
                   type="text"
                   placeholder={get_translation("INTERFACE_PATRONYMIC_PRESENCE")}
                   value={patronymicValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handlePatronymicChange}
                 />
               </Form.Group>
@@ -391,7 +395,7 @@ function AddCurator() {
                   type="phone"
                   placeholder={get_translation("INTERFACE_PHONE")}
                   value={phoneValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handlePhoneChange}
                 />
               </Form.Group>
@@ -440,7 +444,7 @@ function AddCurator() {
                   type="text"
                   placeholder={get_translation("INTERFACE_LOGIN")}
                   value={loginValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handleLoginChange}
                 />
               </Form.Group>
@@ -450,7 +454,7 @@ function AddCurator() {
                   type="text"
                   placeholder={get_translation("INTERFACE_PASSWORD")}
                   value={passwordValue}
-                  className="add-currator__input"
+                  className="add-curator__input"
                   onChange={handlePasswordChange}
                 />
               </Form.Group>
@@ -488,7 +492,7 @@ function AddCurator() {
             )}
             <ButtonCustom
               title={get_translation("INTERFACE_APPLY")}
-              className={"add-curator__btn"}
+              className={"add-curator__btn button-hover"}
               onClick={handleAddCurator}
             />
           </div>

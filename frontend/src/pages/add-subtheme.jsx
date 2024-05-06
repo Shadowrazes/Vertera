@@ -305,7 +305,7 @@ function AddSubtheme() {
 
               <ButtonCustom
                 title={get_translation("INTERFACE_APPLY")}
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleAddSubtheme}
               />
             </Col>

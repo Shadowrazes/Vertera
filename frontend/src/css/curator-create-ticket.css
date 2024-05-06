@@ -10,3 +10,15 @@
 .curator-create-ticket__alert {
     width: 416px;
 }
+
+@media screen and (max-width: 1200px) {
+    .curator-create-ticket__container .form__input {
+        width: 100% !important;
+    }
+    .curator-create-ticket__container #dropdown-custom-1 {
+        width: 100% !important;
+    }
+    /* .curator-create-ticket__container #ButtonForm {
+        width: 100% !important;
+    } */
+}

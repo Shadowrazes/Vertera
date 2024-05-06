@@ -86,6 +86,18 @@
   .edit-curator__column .add-curator__btn {
     width: 100% !important;
   }
+
+  .edit-unit__container #dropdown-custom-1 {
+    width: 416px !important;
+  }
+
+  .edit-theme__container #dropdown-custom-1 {
+    width: 416px !important;
+  }
+
+  .edit-country__container .edit-curator__btn {
+    width: 416px !important;
+  }
 }
 
 @media screen and (max-width: 768px) {

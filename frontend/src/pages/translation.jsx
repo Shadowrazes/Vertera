@@ -232,7 +232,11 @@ function Translation() {
                 </tbody>
               </Table>
             </div>
-            <ButtonCustom title="Сохранить" onClick={handleUpdateTranslation} />
+            <ButtonCustom
+              title="Сохранить"
+              className={"button-hover"}
+              onClick={handleUpdateTranslation}
+            />
           </div>
 
           <Modal show={show} onHide={handleCloseLeave}>

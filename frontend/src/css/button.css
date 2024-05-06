@@ -3,6 +3,23 @@
     background: #00AB97 !important;
     border-radius: 5px !important;
     border: 1px solid #00ab97 !important;
+    transition: .3s !important;
+}
+
+.button-outlined {
+    border: 1px solid #00ab97 !important;
+    color: #00ab97 !important;
+    background-color: white !important;
+    transition: .3s !important;
+}
+
+.button-outlined:hover {
+    background: #00ab97 !important;
+    color: white !important;
+}
+
+.button-hover:hover {
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
 @media screen and (max-width: 1200px) {

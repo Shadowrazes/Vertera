@@ -181,7 +181,7 @@ function EditUnit() {
             title={`Редактировать раздел #${unitId}`}
             linkPrev={linkPrev}
           />
-          <Row>
+          <Row className="edit-unit__container">
             <Col className="edit-unit__column">
               <Form.Group controlId="NameForm">
                 <Form.Label className="edit-curator__field-label">
@@ -219,7 +219,9 @@ function EditUnit() {
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
                     title="Применить"
-                    className={"add-curator__btn edit-curator__btn"}
+                    className={
+                      "add-curator__btn edit-curator__btn button-hover"
+                    }
                     onClick={handleEditUnit}
                   />
                 </div>

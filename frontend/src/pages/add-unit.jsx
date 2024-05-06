@@ -148,7 +148,7 @@ function addUnit() {
               )}
               <ButtonCustom
                 title="Применить"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleAddUnit}
               />
             </Col>

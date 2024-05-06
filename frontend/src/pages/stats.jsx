@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 
 import {
   STATS,
@@ -7,6 +7,7 @@ import {
   THEME_LIST,
   COUNTRY_LIST,
   DEPARTMENTS_LIST,
+  HELPER_STATS,
 } from "../apollo/queries";
 
 import { DateRangePicker } from "rsuite";
@@ -62,7 +63,8 @@ function Stats() {
   const [countryList, setCountryList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedCurator, setSelectedCurator] = useState(null);
-  const [selectedCuratorIndex, setSelectedCuratorIndex] = useState(0);
+  const [selectedCuratorId, setSelectedCuratorId] = useState(0);
+  const [selectedCuratorStats, setSelectedCuratorStats] = useState(null);
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -82,6 +84,7 @@ function Stats() {
   const [likeData, setLikeData] = useState({});
   const [tableInfo, setTableInfo] = useState({});
   const [fantasy, setFantasy] = useState({});
+  const [allTickets, setAllTickets] = useState();
   const [rateAvgTime, setRateAvgTime] = useState([]);
   const [rateLike, setRateLike] = useState([]);
 
@@ -150,6 +153,9 @@ function Stats() {
       lang: language,
     },
   });
+
+  const [getHelperStats, { data: dataHelperStats }] =
+    useLazyQuery(HELPER_STATS);
 
   const {
     loading: loadingCurators,
@@ -228,7 +234,8 @@ function Stats() {
 
     allUserData = [...allUserData?.helperQuery.helperStatList];
     allUserData = allUserData
-      ?.sort((userData1, userData2) => {
+      ?.filter((userData) => userData.stats.likes !== 0)
+      .sort((userData1, userData2) => {
         return -(userData1.stats.likes - userData2.stats.likes);
       })
       .map((userData) => {
@@ -245,10 +252,11 @@ function Stats() {
     if (!allUserData) {
       return [];
     }
+
     allUserData = [...allUserData?.helperQuery.helperStatList];
     allUserData = allUserData
-      ?.sort((userData1, userData2) => {
-        // console.log(userData1.stats.avgReplyTime, userData2.stats.avgReplyTime);
+      ?.filter((userData) => userData.stats.avgReplyTime !== -3600)
+      .sort((userData1, userData2) => {
         return userData1.stats.avgReplyTime - userData2.stats.avgReplyTime;
       })
       .map((userData) => {
@@ -302,6 +310,10 @@ function Stats() {
   };
 
   const getTimeStr = (sourceHource) => {
+    if (sourceHource == -3600) {
+      return "Нет времени";
+    }
+
     let time = getTime(sourceHource);
     let result = "";
     if (time.hours > 0) {
@@ -316,17 +328,31 @@ function Stats() {
     return result !== "" ? result : "0 сек.";
   };
 
-  const handleCuratorClick = (
+  const handleCuratorClick = async (
     curatorName,
     curatorSurname,
     curatorPatronymic,
-    curatorIndex
+    curatorId
   ) => {
-    let fullName = `${curatorSurname} ${curatorName} ${
-      curatorPatronymic ? ` ${curatorPatronymic}` : ""
-    }`;
-    setSelectedCurator(fullName);
-    setSelectedCuratorIndex(curatorIndex);
+    let result;
+
+    result = await getHelperStats({
+      variables: {
+        token: user.token,
+        id: curatorId,
+      },
+    });
+
+    setSelectedCuratorStats(result.data.helperQuery.helper.stats);
+
+    if (curatorName !== null && curatorSurname !== null) {
+      let fullName = `${curatorSurname} ${curatorName} ${
+        curatorPatronymic ? ` ${curatorPatronymic}` : ""
+      }`;
+
+      setSelectedCurator(fullName);
+      setSelectedCuratorId(curatorId);
+    }
   };
 
   const handlePeriodChange = async (period) => {
@@ -379,15 +405,26 @@ function Stats() {
       setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
-    let currentStats = getCurrentUserStats();
-    if (currentStats) {
-      if (isAdmin()) {
-        currentStats = currentStats[selectedCuratorIndex].stats;
-      } else {
-        setSelectedCurator("");
-        currentStats = currentStats[0].stats;
-      }
+    // let currentStats = getCurrentUserStats();
+
+    // if (currentStats) {
+    //   if (isAdmin()) {
+    //     currentStats = currentStats?.find(
+    //       (item) => item.helper.id === selectedCuratorId
+    //     );
+    //     currentStats = currentStats?.stats;
+    //   } else {
+    //     setSelectedCurator("");
+    //     currentStats = currentStats[0].stats;
+    //   }
+    // }
+
+    let currentStats;
+
+    if (!isAdmin()) {
+      handleCuratorClick(null, null, null, user.id);
     }
+    currentStats = selectedCuratorStats;
 
     setLikeData({
       labels: ["Положительные", "Отрицательные", "Неоценённые"],
@@ -444,12 +481,28 @@ function Stats() {
         value: currentStats?.totalTickets,
       },
       {
-        name: "Закрытых тикетов",
-        value: currentStats?.closedTickets,
+        name: "Новых тикетов",
+        value: currentStats?.newTickets,
       },
       {
-        name: "Тикетов в работе",
+        name: "Тикеты в процессе",
         value: currentStats?.inProgressTickets,
+      },
+      {
+        name: "Тикеты на уточнении",
+        value: currentStats?.onRevisionTickets,
+      },
+      {
+        name: "Тикеты ожидающие дополнения",
+        value: currentStats?.onExtensionTickets,
+      },
+      {
+        name: "Тикеты с наставником",
+        value: currentStats?.onMentorTickets,
+      },
+      {
+        name: "Закрытых тикетов",
+        value: currentStats?.closedTickets,
       },
       {
         name: "Положительных отзывов",
@@ -464,6 +517,7 @@ function Stats() {
         value: getTimeStr(currentStats?.avgReplyTime),
       },
     ]);
+    setAllTickets(currentStats?.totalTickets);
     setFantasy(currentStats?.fantasy);
 
     setRateLike(getRateLike(data));
@@ -472,7 +526,7 @@ function Stats() {
     data,
     dataQueryCurators,
     selectedCurator,
-    selectedCuratorIndex,
+    selectedCuratorId,
     dataThemeList,
     dataCountryList,
     dataDepartmentList,
@@ -586,17 +640,17 @@ function Stats() {
 
     const variables = {
       filters: {
-        dateAfter: selectedDateAfter,
-        dateBefore: selectedDateBefore,
+        dateAfter: null,
+        dateBefore: null,
         limit: 999,
         offset: 0,
         orderBy: "id",
         orderDir: "ASC",
-        unitIds: selectedUnitId,
-        themeIds: selectedThemeId,
-        subThemeIds: selectedSubThemeId,
-        countryIds: selectedCountiesId,
-        departmentIds: selectedDepartmentsId,
+        unitIds: null,
+        themeIds: null,
+        subThemeIds: null,
+        countryIds: [],
+        departmentIds: [],
       },
     };
     await refetch(variables);
@@ -635,7 +689,7 @@ function Stats() {
                             curator.user.name,
                             curator.user.surname,
                             curator.user.patronymic,
-                            index
+                            curator.id
                           )
                         }
                         href="#"
@@ -650,7 +704,7 @@ function Stats() {
                 )}
               </DropdownButton>
             )}
-            {selectedCurator != null && (
+            {selectedCuratorStats != null && (
               <>
                 <Row>
                   <Col>
@@ -676,7 +730,7 @@ function Stats() {
                     Уровень куратора VERTERA
                   </h3>
                   <Col md={6} className="mt-2">
-                    <Level fantasy={fantasy} />
+                    <Level fantasy={fantasy} allTickets={allTickets} />
                   </Col>
                 </Row>
                 <Row className="mt-5">
@@ -702,32 +756,20 @@ function Stats() {
               </>
             )}
 
-            <h3 className="stats-title stats-title_left">Рейтинг кураторов</h3>
-            {/* <div className="stats__period-wrapper">
-              <DateRangePicker
-                ranges={predefinedRanges}
-                placeholder="Задать период"
-                className="alltickets__date-range-picker"
-                style={{ marginTop: "20px" }}
-                onChange={handlePeriodChange}
-                onClean={handlePeriodClean}
-                value={dateRange}
-              />
+            <div className="alltickets__container">
+              <h3 className="stats-title stats-title_left">
+                Рейтинг кураторов
+              </h3>
               <ButtonCustom
-                title="Применить"
-                className={"add-curator__btn"}
-                onClick={handlePeriodClick}
+                title={
+                  isVisibleFilters == false
+                    ? get_translation("INTERFACE_SHOW_FILTER")
+                    : get_translation("INTERFACE_HIDE_FILTER")
+                }
+                onClick={handleHideComponent}
+                className={"alltickets__btn button-outlined"}
               />
-            </div> */}
-            <ButtonCustom
-              title={
-                isVisibleFilters == false
-                  ? get_translation("INTERFACE_SHOW_FILTER")
-                  : get_translation("INTERFACE_HIDE_FILTER")
-              }
-              onClick={handleHideComponent}
-              className={"alltickets__btn alltickets__btn-outlined"}
-            />
+            </div>
             {isVisibleFilters && (
               <>
                 <div className="alltickets__filters-container">
@@ -858,10 +900,11 @@ function Stats() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>

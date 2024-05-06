@@ -224,7 +224,7 @@ function allTickets() {
       lang: language,
     },
   });
-  const { getCuratorsList, data: dataCurators } = useQuery(CURATORS_LIST, {
+  const { data: dataCurators } = useQuery(CURATORS_LIST, {
     variables: {
       token: user?.token,
     },
@@ -879,7 +879,7 @@ function allTickets() {
               <ButtonCustom
                 title={get_translation("INTERFACE_CREATE_TICKET")}
                 onClick={handleCreateTicket}
-                className={"alltickets__btn"}
+                className={"alltickets__btn button-hover"}
               />
             )}
 
@@ -890,7 +890,7 @@ function allTickets() {
                   : get_translation("INTERFACE_HIDE_FILTER")
               }
               onClick={handleHideComponent}
-              className={"alltickets__btn alltickets__btn-outlined"}
+              className={"alltickets__btn button-outlined"}
             />
           </div>
         ) : (
@@ -901,9 +901,7 @@ function allTickets() {
                 : get_translation("INTERFACE_HIDE_FILTER")
             }
             onClick={handleHideComponent}
-            className={
-              "alltickets__btn alltickets__btn-outlined alltickets__button"
-            }
+            className={"alltickets__btn button-outlined alltickets__button"}
           />
         )}
       </div>
@@ -1170,10 +1168,11 @@ function allTickets() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>
@@ -1316,10 +1315,11 @@ function allTickets() {
                       <ButtonCustom
                         title={get_translation("INTERFACE_APPLY")}
                         onClick={handleSubmit}
+                        className={"button-hover"}
                       />
                       <ButtonCustom
                         title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two"
+                        className="alltickets__button-two button-outlined"
                         onClick={handleResetFilters}
                       />
                     </Row>
@@ -1422,7 +1422,7 @@ function allTickets() {
             ))}
           </div>
 
-          <div className="table__wrapper">
+          <div className="table__wrapper alltickets__table-wrapper">
             <Table className="table__table" hover>
               <thead>
                 <tr>
@@ -1432,12 +1432,14 @@ function allTickets() {
                   <th>{get_translation("INTERFACE_THEME")}</th>
                   {isHelper() && (
                     <>
-                      <th>ID партнера</th>
+                      <th className="mobile">ID партнера</th>
                       <th>{get_translation("INTERFACE_CURATOR")}</th>
                     </>
                   )}
-                  <th>{get_translation("INTERFACE_LAST_MSG")}</th>
-                  <th>{get_translation("INTERFACE_MSG")}</th>
+                  <th className="mobile">
+                    {get_translation("INTERFACE_LAST_MSG")}
+                  </th>
+                  <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
                   <th>{get_translation("INTERFACE_STATUS")}</th>
                 </tr>
               </thead>
@@ -1467,9 +1469,13 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {`${handleUnitStroke(
-                          ticket.subTheme.theme.unit.name.stroke
-                        )} | ${ticket.subTheme.theme.name.stroke} ${
+                        {`${
+                          ticket.subTheme.theme.unit.name.stroke === null
+                            ? ""
+                            : `${handleUnitStroke(
+                                ticket.subTheme.theme.unit.name.stroke
+                              )} |`
+                        } ${ticket.subTheme.theme.name.stroke} ${
                           ticket.subTheme.name.stroke === "none"
                             ? ""
                             : `| ${ticket.subTheme.name.stroke}`
@@ -1514,7 +1520,7 @@ function allTickets() {
                     </td>
                     {isHelper() && (
                       <>
-                        <td>
+                        <td className="mobile">
                           <Link
                             to={`/dialog/${ticket.link}`}
                             state={{
@@ -1542,7 +1548,7 @@ function allTickets() {
                         </td>
                       </>
                     )}
-                    <td style={{ textAlign: "left" }}>
+                    <td className="mobile" style={{ textAlign: "left" }}>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -1562,7 +1568,7 @@ function allTickets() {
                             } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
                       </Link>
                     </td>
-                    <td>
+                    <td className="mobile">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -1674,6 +1680,7 @@ function allTickets() {
           <ButtonCustom
             title={get_translation("INTERFACE_TICKET_CREATOR")}
             onClick={goToCreateTicket}
+            className={"button-hover"}
           />
         </div>
       )}

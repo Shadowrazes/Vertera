@@ -74,12 +74,12 @@ function ChatInput({ onSendMessage }) {
               <div className="chat-input__button-row">
                 <ButtonCustom
                   title="Отправить"
-                  className="chat-input__button-send"
+                  className="chat-input__button-send button-hover"
                   type="submit"
                 />
                 <ButtonCustom
                   title="Закрыть заявку"
-                  className="chat-input__button-close"
+                  className="chat-input__button-close button-outlined"
                   onClick={handleClose}
                 />
               </div>
@@ -94,7 +94,7 @@ function ChatInput({ onSendMessage }) {
           </div>
           <ButtonCustom
             title="Создать новую заявку"
-            className="chat-input__button-close"
+            className="chat-input__button-close button-hover"
             onClick={goToCreateTicket}
           />
         </div>

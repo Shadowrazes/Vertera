@@ -317,7 +317,7 @@ function Departments() {
               <ButtonCustom
                 title="Добавить департамент"
                 onClick={handleAddDepartmentView}
-                className={"table__btn"}
+                className={"table__btn button-hover"}
               />
             </div>
           )}
@@ -341,7 +341,7 @@ function Departments() {
                   <ButtonCustom
                     title="Добавить"
                     onClick={handleAddDepartment}
-                    className={"table__btn"}
+                    className={"table__btn button-hover"}
                   />
                 </div>
               </div>

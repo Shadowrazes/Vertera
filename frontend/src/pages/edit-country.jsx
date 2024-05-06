@@ -210,7 +210,10 @@ function EditCountry() {
             title={`Редактировать страну #${countryId}`}
             linkPrev={linkPrev}
           />
-          <Row className="add-curator__row" style={{ marginTop: "20px" }}>
+          <Row
+            className="add-curator__row edit-country__container"
+            style={{ marginTop: "20px" }}
+          >
             <Col className="add-curator__column add-subtheme__column">
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">
@@ -259,13 +262,13 @@ function EditCountry() {
               <div className="edit-curator__btn-row">
                 <ButtonCustom
                   title="Применить"
-                  className={"edit-curator__btn"}
+                  className={"edit-curator__btn button-hover"}
                   onClick={handleEditCountry}
                 />
                 <ButtonCustom
                   title="Удалить страну"
                   className={
-                    "add-curator__btn edit-curator__btn alltickets__button-two"
+                    "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                   }
                   onClick={handleDeleteCountry}
                 />

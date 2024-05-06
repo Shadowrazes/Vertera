@@ -211,7 +211,7 @@ function AddCountry() {
 
               <ButtonCustom
                 title="Применить"
-                className={"add-curator__btn"}
+                className={"add-curator__btn button-hover"}
                 onClick={handleAddCountry}
               />
             </Col>

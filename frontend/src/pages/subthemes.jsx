@@ -380,21 +380,30 @@ function Subthemes() {
           <MRT_TableContainer table={table} />
 
           <div className="units__btn-row">
-            <ButtonCustom title="Добавить подтему" onClick={goToAddSubtheme} />
+            <ButtonCustom
+              title="Добавить подтему"
+              className={"button-hover"}
+              onClick={goToAddSubtheme}
+            />
             <ButtonCustom
               title="Перейти к разделам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToUnits}
             />
             <ButtonCustom
               title="Перейти к темам"
-              className={"add-curator__btn units__btn alltickets__button-two"}
+              className={
+                "add-curator__btn units__btn alltickets__button-two button-outlined"
+              }
               onClick={goToThemes}
             />
             {showApplyButton && (
               <ButtonCustom
                 title="Применить изменения порядка"
                 onClick={handleClickAplly}
+                className={"button-outlined"}
               />
             )}
           </div>
