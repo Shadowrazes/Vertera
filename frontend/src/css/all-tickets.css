@@ -283,12 +283,6 @@
     gap: 0;
   }
 
-  .alltickets__container .title__heading-nomargin {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-  }
-
   .alltickets__container .alltickets__nav-info {
     flex-direction: column;
     margin-top: 20px;

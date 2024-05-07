@@ -487,7 +487,6 @@ function TableTickets() {
                             background: getStatusColor(
                               ticket.status.name.stroke
                             ),
-                            minWidth: "103px",
                           }}
                         >
                           {ticket.status.name.stroke}

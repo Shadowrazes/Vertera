@@ -28,6 +28,8 @@ import Departments from "./pages/departments";
 import CuratorCreateTicket from "./pages/curator-create-ticket";
 import NotFoundPage from "./pages/not-found-page";
 
+import Test from "./pages/test";
+
 import "./App.css";
 
 function App() {
@@ -86,6 +88,8 @@ function App() {
             element={<CuratorCreateTicket />}
           />
           <Route path="*" element={<NotFoundPage />} />
+
+          <Route path="/test" element={<Test />} />
         </Routes>
       </Router>
     </div>

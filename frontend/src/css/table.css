@@ -53,6 +53,7 @@
   align-items: center;
   border-radius: 4px;
   padding: 10px;
+  min-width: 100px;
 }
 
 @media screen and (max-width: 1585px) {
@@ -105,7 +106,8 @@
   }
 
   .table__table td, th {
-    flex: 1 1;
+    flex: 1 1 33%;
     border: 0.5px solid rgba(3,3,3,0.2);
+    padding: 5px !important;
   }
 }

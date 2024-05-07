@@ -871,7 +871,7 @@ function allTickets() {
       <div className="alltickets__container">
         <TitleH2
           title={get_translation("INTERFACE_ALL_APPEALS")}
-          className="title__heading-nomargin"
+          className="title__heading-nomargin mobile"
         />
         {!loading && !isHelper() ? (
           <div className="alltickets__nav-info">
@@ -1595,7 +1595,6 @@ function allTickets() {
                             background: getStatusColor(
                               ticket.status.name.stroke
                             ),
-                            minWidth: "115px",
                           }}
                         >
                           {ticket.status.name.stroke}
@@ -1684,12 +1683,6 @@ function allTickets() {
           />
         </div>
       )}
-
-      {/* {dataAmount == 0 && isHelper() && (
-        <div className="alltickets__empty-table">
-          <span className="alltickets__text">У вас нет тикетов</span>
-        </div>
-      )} */}
     </>
   );
 }

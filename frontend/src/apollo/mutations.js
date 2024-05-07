@@ -566,20 +566,34 @@ export const MENTOR_LEAVE = gql`
 `;
 
 export const ADD_LANG = gql`
-  mutation ($token: String!, $code: String!, $name: String!) {
+  mutation (
+    $token: String!
+    $code: String!
+    $name: String!
+    $iconPath: String
+  ) {
     helperMutation(token: $token) {
       translationObj {
-        addLang(fields: { code: $code, name: $name })
+        addLang(fields: { code: $code, name: $name, iconPath: $iconPath })
       }
     }
   }
 `;
 
 export const EDIT_LANG = gql`
-  mutation ($token: String!, $id: Int!, $code: String, $name: String) {
+  mutation (
+    $token: String!
+    $id: Int!
+    $code: String
+    $name: String
+    $iconPath: String
+  ) {
     helperMutation(token: $token) {
       translationObj {
-        updateLang(id: $id, fields: { code: $code, name: $name }) {
+        updateLang(
+          id: $id
+          fields: { code: $code, name: $name, iconPath: $iconPath }
+        ) {
           changed
         }
       }
