@@ -13,6 +13,7 @@ import { UPDATE_THEME_ORDER } from "../apollo/mutations";
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 import Loader from "./loading";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
@@ -23,8 +24,13 @@ function Units() {
 
   const [showInactive, setShowInactive] = useState(false);
   const [showApplyButton, setShowApplyButton] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showError, setShowError] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Порядок обновлен";
+  const modalBody = "Порядок разделов успешно обновлен";
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const modalErrorTitle = "Ошибка при смене порядка";
+  const modalErrorBody = "Порядок разделов не был обновлен";
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -201,31 +207,31 @@ function Units() {
       });
 
       if (result.data.helperMutation.themeObj.updateThemeOrders.length !== 0) {
-        handleShowError();
+        handleShowErrorModal();
       } else {
         console.log("Порядок успешно обновлен:", result);
-        handleShow();
+        handleShowModal();
       }
     } catch (error) {
       console.error("Ошибка при обновлении порядка:", error);
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleShowError = () => {
-    setShowError(true);
+  const handleShowErrorModal = () => {
+    setShowErrorModal(true);
   };
 
-  const handleCloseLeave = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     window.location.reload();
   };
 
-  const handleClose = () => {
-    setShowError(false);
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
   };
 
   return (
@@ -284,33 +290,19 @@ function Units() {
             )}
           </div>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Порядок обновлен</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Порядок разделов успешно обновлен</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
 
-          <Modal show={showError} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Ошибка при смене порядка</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Порядок разделов не был обновлен</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showErrorModal}
+            onClose={handleCloseErrorModal}
+            modalTitle={modalErrorTitle}
+            modalBody={modalErrorBody}
+          />
         </>
       ) : (
         <NotFoundPage />

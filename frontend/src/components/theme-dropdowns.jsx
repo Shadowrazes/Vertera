@@ -65,7 +65,7 @@ export default function ThemeDropdowns(props) {
   const handleUnitClick = (unit, unitId) => {
     setSelectedUnit(unit);
     setSelectedUnitId(unitId);
-    onUnitIdChange(unit);
+    onUnitIdChange(unitId);
 
     if (unit !== selectedUnit) {
       setSelectedTheme(null);
@@ -78,7 +78,7 @@ export default function ThemeDropdowns(props) {
   const handleThemeClick = (theme, themeId) => {
     setSelectedTheme(theme);
     setSelectedThemeId(themeId);
-    onThemeIdChange(theme);
+    onThemeIdChange(themeId);
 
     if (theme !== selectedTheme) {
       setSelectedSubTheme(null);
@@ -90,7 +90,7 @@ export default function ThemeDropdowns(props) {
   const handleSubThemeClick = (subTheme, subThemeId) => {
     setSelectedSubTheme(subTheme);
     setSelectedSubThemeId(subThemeId);
-    onSubThemeIdChange(subTheme);
+    onSubThemeIdChange(subThemeId);
 
     isVisibleChange(false);
   };

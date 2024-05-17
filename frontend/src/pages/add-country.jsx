@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Modal, Button, Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ import { MultiSelect } from "primereact/multiselect";
 import BackTitle from "../components/back-title";
 import ButtonCustom from "../components/button";
 import Loader from "../pages/loading";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import "../css/edit-ticket.css";
@@ -25,6 +26,10 @@ function AddCountry() {
   const [show, setShow] = useState(false);
 
   const [linkPrev, setLinkPrev] = useState(null);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Страна добавлена";
+  const modalBody = "Страна успешно добавлена";
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -151,19 +156,19 @@ function AddCountry() {
       });
 
       console.log("Страна успешно добавлена:", result);
-      handleShow();
+      handleShowModal();
     } catch (error) {
       console.error("Ошибка при добавлении страны:", error);
       setIsErrorVisible(true);
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     goToCountries();
   };
 
@@ -217,19 +222,12 @@ function AddCountry() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Страна добавлена</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Страна успешно добавлена</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

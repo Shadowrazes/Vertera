@@ -44,6 +44,7 @@ import ChatMessageSystem from "../components/chat-message-system";
 import ChatMessageDeleted from "../components/chat-message-deleted";
 import TicketTitle from "../components/ticket-title";
 import Loader from "../pages/loading";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import "../css/all-tickets.css";
@@ -58,7 +59,6 @@ function Chat() {
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
   const [dataLogQuery, setDataLogQuery] = useState([]);
   const [message, setMessage] = useState("");
-  const [messageDate, setMessageDate] = useState(null);
   const { itemId } = useParams();
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
@@ -117,26 +117,43 @@ function Chat() {
   const [isErrorVisibleCuratorChat, setIsErrorVisibleCuratorChat] =
     useState(false);
   const [isErrorVisibleMentor, setIsErrorVisibleMentor] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [showCuratorChat, setShowCuratorChat] = useState(false);
-  const [showMentor, setShowMentor] = useState(false);
-  const [showEditTicketError, setShowEditTicketErorr] = useState(false);
-  const [showMsg, setShowMsg] = useState(false);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [showSplitModal, setShowSplitModal] = useState(false);
+  const modalSplitTitle = "Обращение разделено";
+  const modalSplitBody = "Тикет успешно разделен";
+
+  const [showWarning, setShowWarning] = useState(false);
+  const modalWarningTitle = "Предупреждение";
+  const modalWarningBody = "Вы уверены, что хотите закрыть это обращение?";
+
+  const [showEdit, setShowEdit] = useState(false);
+  const modalEditTitle = "Тикет обновлен";
+  const modalEditBody = "Данные тикета успешно обновлены";
+
+  const [showCuratorChat, setShowCuratorChat] = useState(false);
+  const modalCuratorChatTitle = "Новый куратор добавлен";
+  const modalCuratorChatBody = "Новый куратор успешно добавлен в чат";
+
+  const [showMentor, setShowMentor] = useState(false);
+  const modalMentorTitle = "Наставник добавлен";
+  const modalMentorBody = "Наставник успешно добавлен в чат";
+
+  const [showEditTicketError, setShowEditTicketErorr] = useState(false);
+  const modalEditTicketErrorTitle = "Ошибка при изменении тикета";
+  const modalEditTicketErrorBody = "Во время изменения тикета произошла ошибка";
+
+  const [showMsg, setShowMsg] = useState(false);
+  const modalMsgTitle = "Сообщение отправлено";
+  const modalMsgBody = "Сообщение успешно отправлено";
+
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
   const isBuild = import.meta.env.DEV !== "build";
 
   const inputRef = useRef(null);
 
-  let userId = null;
-
   if (user === null) {
     window.location.href = "/";
-  } else {
-    userId = user.id;
   }
 
   const isAdmin = () => {
@@ -184,11 +201,7 @@ function Chat() {
     },
   });
 
-  const {
-    loading: loadingCurators,
-    error: errorCurators,
-    data: dataCurators,
-  } = useQuery(CURATORS_LIST, {
+  const { data: dataCurators } = useQuery(CURATORS_LIST, {
     variables: {
       token: user.token,
     },
@@ -588,7 +601,7 @@ function Chat() {
 
     let senderId;
 
-    if (userId == clientId) {
+    if (user.id == clientId) {
       senderId = helperId;
     } else {
       senderId = clientId;
@@ -598,11 +611,10 @@ function Chat() {
 
     uploadFiles()
       .then((filePaths) => {
-        setMessageDate(new Date());
         addMessage({
           variables: {
             token: user.token,
-            senderId: userId,
+            senderId: user.id,
             recieverId: senderId,
             ticketId: ticketId,
             text: getContent(),
@@ -624,7 +636,7 @@ function Chat() {
 
   const handleClose = async () => {
     setIsVisible(false);
-    setShowWarning(false);
+    handleCloseWarning();
 
     if (loaderUpdateStatus) {
       return <Loader />;
@@ -721,12 +733,12 @@ function Chat() {
     }
 
     try {
-      if (userId !== helperId) {
+      if (user.id !== helperId) {
         await editTicket({
           variables: {
             token: user.token,
             id: ticketId,
-            recipientId: userId,
+            recipientId: user.id,
           },
         });
       }
@@ -1035,7 +1047,7 @@ function Chat() {
     let senderId;
     let hasError = false;
 
-    if (userId == clientId) {
+    if (user.id == clientId) {
       senderId = helperId;
     } else {
       senderId = clientId;
@@ -1092,12 +1104,14 @@ function Chat() {
   };
 
   const handleShowModal = () => {
-    setShow(true);
+    setShowSplitModal(true);
   };
 
   const handleCloseModal = () => {
-    setShow(false);
+    setShowSplitModal(false);
     setShowEdit(false);
+    setShowMentor(false);
+    setShowCuratorChat(false);
     goToAllTickets();
   };
 
@@ -2594,7 +2608,7 @@ function Chat() {
                       attachs={msg.attachs}
                     />
                   </>
-                ) : msg.sender.id === userId ? (
+                ) : msg.sender.id === user.id ? (
                   <>
                     <ChatMessageSender
                       id={msg.id}
@@ -2662,7 +2676,7 @@ function Chat() {
           </div>
         )}
       </div>
-      {/* ===== */}
+
       {isAdmin() && (
         <>
           <a className="alltickets__link">
@@ -2723,106 +2737,56 @@ function Chat() {
         </>
       )}
 
-      <Modal show={show} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Обращение разделено</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Тикет успешно разделен</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showSplitModal}
+        onClose={handleCloseModal}
+        modalTitle={modalSplitTitle}
+        modalBody={modalSplitBody}
+      />
 
-      <Modal show={showWarning} onHide={handleCloseWarning}>
-        <Modal.Header closeButton>
-          <Modal.Title>Предупреждение</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Вы уверены, что хотите закрыть это обращение?</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseWarning}>
-            Отмена
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Продолжить
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showWarning}
+        onClose={handleCloseWarning}
+        onConfirm={handleClose}
+        modalTitle={modalWarningTitle}
+        modalBody={modalWarningBody}
+        warning={true}
+      />
 
-      <Modal show={showEdit} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Тикет обновлен</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Данные тикета успешно обновлены</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showEdit}
+        onClose={handleCloseModal}
+        modalTitle={modalEditTitle}
+        modalBody={modalEditBody}
+      />
 
-      <Modal show={showCuratorChat} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Новый куратор добавлен</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Новый куратор успешно добавлен в чат</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showCuratorChat}
+        onClose={handleCloseModal}
+        modalTitle={modalCuratorChatTitle}
+        modalBody={modalCuratorChatBody}
+      />
 
-      <Modal show={showMentor} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Наставник добавлен</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Наставник успешно добавлен в чат</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showMentor}
+        onClose={handleCloseModal}
+        modalTitle={modalMentorTitle}
+        modalBody={modalMentorBody}
+      />
 
-      <Modal show={showEditTicketError} onHide={handleHideEditTicketError}>
-        <Modal.Header closeButton>
-          <Modal.Title>Ошибка при изменении тикета</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Во время изменения тикета произошла ошибка</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleHideEditTicketError}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showEditTicketError}
+        onClose={handleHideEditTicketError}
+        modalTitle={modalEditTicketErrorTitle}
+        modalBody={modalEditTicketErrorBody}
+      />
 
-      <Modal show={showMsg} onHide={handleCloseMsg}>
-        <Modal.Header closeButton>
-          <Modal.Title>Сообщение отправлено</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Сообщение успешно отправлено</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseMsg}>
-            Закрыть
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showMsg}
+        onClose={handleCloseMsg}
+        modalTitle={modalMsgTitle}
+        modalBody={modalMsgBody}
+      />
     </>
   );
 }

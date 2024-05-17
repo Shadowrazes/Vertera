@@ -18,6 +18,7 @@ import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import get_translation from "../helpers/translation";
@@ -29,7 +30,10 @@ function AddSubtheme() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION");
+  const modalBody = get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION_FULL");
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -201,19 +205,19 @@ function AddSubtheme() {
       });
 
       console.log("Подтема успешно добавлена:", result);
-      handleShow();
+      handleShowModal();
     } catch (error) {
       console.error("Ошибка при добавлении подтемы:", error);
       setIsErrorVisible(true);
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     goToAllSubthemes();
   };
 
@@ -311,23 +315,12 @@ function AddSubtheme() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>
-                {get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION")}
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                {get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION_FULL")}
-              </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                {get_translation("INTERFACE_CLOSE")}
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

@@ -17,6 +17,7 @@ import { ADD_THEME } from "../apollo/mutations";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import "../css/add-theme.css";
@@ -27,7 +28,10 @@ function AddTheme() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Тема создана";
+  const modalBody = "Новая тема успешно создана";
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -155,19 +159,19 @@ function AddTheme() {
       });
 
       console.log("Тема успешно добавлена:", result);
-      handleShow();
+      handleShowModal();
     } catch (error) {
       console.error("Ошибка при добавлении темы:", error);
       setIsErrorVisible(true);
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     goToAllThemes();
   };
 
@@ -219,19 +223,12 @@ function AddTheme() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Тема создана</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Новая тема успешно создана</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

@@ -4,7 +4,6 @@ import "../css/ticket-title.css";
 
 function BackTitle({ title, className, linkPrev }) {
   const navigate = useNavigate();
-  console.log(linkPrev);
   const handleGoBack = () => {
     if (linkPrev == null) {
       // window.location.href = "/all-tickets";

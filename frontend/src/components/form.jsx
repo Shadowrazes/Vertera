@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
-import draftToHtml from "draftjs-to-html";
-import { EditorState, convertToRaw } from "draft-js";
 import { useMutation } from "@apollo/client";
 
 import { ADD_TICKET } from "../apollo/mutations";
 
-import { Editor } from "react-draft-wysiwyg";
 import TitleH2 from "./title";
 import ThemeDropdowns from "./theme-dropdowns";
 import TextEditor from "./text-editor";
-import FileInput from "./file-input";
+import ModalDialog from "./modal-dialog";
 import ButtonCustom from "./button";
 
 import "../css/form.css";
@@ -18,7 +15,6 @@ import "../css/form.css";
 import get_translation from "../helpers/translation";
 
 function FormComponent() {
-  const [textareaValue, setTextareaValue] = useState("");
   const [editorContent, setEditorContent] = useState("");
 
   const [ticketTitleValue, setTicketTitleValue] = useState("");
@@ -27,16 +23,23 @@ function FormComponent() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
 
-  const [uploadedFilesList, setUploadedFilesList] = useState([]);
-
   const [error, setError] = useState(null);
 
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
-  const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = get_translation("INTERFACE_MESSAGE_CREATION_TICKET");
+  const modalBody =
+    "Ваше обращение принято в обработку, пожалуйста, ожидайте ответа (срок обработки заявки до 24 часов)";
 
   const [isVisible, setIsVisible] = useState(false);
+
+  const [fileInputs, setFileInputs] = useState([
+    {
+      fileInput: true,
+    },
+  ]);
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
@@ -80,18 +83,6 @@ function FormComponent() {
     setError(error);
   };
 
-  const handleFileUploadResult = (filePaths) => {
-    setUploadedFilesList(filePaths);
-  };
-
-  const handleIsFilesSizeExceeded = (isFilesSizeExceeded) => {
-    setIsFilesSizeExceeded(isFilesSizeExceeded);
-  };
-
-  const handleIsFilesLimitExceeded = (isFilesLimitExceeded) => {
-    setIsFilesLimitExceeded(isFilesLimitExceeded);
-  };
-
   const handleGetEditorContent = (content) => {
     setEditorContent(content);
   };
@@ -127,33 +118,84 @@ function FormComponent() {
     return error;
   };
 
+  async function uploadFiles() {
+    const fileInputs = document.querySelectorAll(".fileInputForm input");
+    let filePaths = [];
+    let files = [];
+
+    for (let fileInput of fileInputs) {
+      if (fileInput.files.length > 0) {
+        files.push(fileInput.files[0]);
+      }
+    }
+
+    if (files.length > 0) {
+      let formdata = new FormData();
+      let filesValid = true;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        formdata.append(`fileFields`, file);
+      }
+
+      if (filesValid) {
+        try {
+          let requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow",
+          };
+
+          const response = await fetch(
+            isBuild
+              ? "https://help.vertera.org:4444/upload"
+              : "http://localhost:4444/upload",
+            requestOptions
+          );
+          const result = await response.json();
+
+          console.log(result);
+          filePaths = result.data.map((file) => file.path);
+          console.log(filePaths);
+
+          return filePaths;
+        } catch (error) {
+          console.log("error", error);
+          throw error;
+        }
+      }
+    }
+
+    return filePaths;
+  }
+
   const addTicketWithFiles = () => {
-    // uploadFiles()
-    //   .then((filePaths) => {
-    //     addTicket({
-    //       variables: {
-    //         token: user.token,
-    //         title: ticketTitleValue,
-    //         initiatorId: userId,
-    //         unitId: selectedUnitId,
-    //         themeId: selectedThemeId,
-    //         subThemeId: selectedSubThemeId,
-    //         senderId: userId,
-    //         recieverId: 1,
-    //         ticketId: 1,
-    //         text: textareaValue,
-    //         attachPaths: filePaths,
-    //         notification: false,
-    //       },
-    //     }).then((data) => {
-    //       // console.log(data.data.addTicket);
-    //       setIsVisible(false);
-    //       handleShow();
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.error("Ошибка при загрузке файлов:", error);
-    //   });
+    uploadFiles()
+      .then((filePaths) => {
+        addTicket({
+          variables: {
+            token: user.token,
+            title: ticketTitleValue,
+            initiatorId: userId,
+            unitId: selectedUnitId,
+            themeId: selectedThemeId,
+            subThemeId: selectedSubThemeId,
+            senderId: userId,
+            recieverId: 1,
+            ticketId: 1,
+            text: editorContent,
+            attachPaths: filePaths,
+            notification: false,
+          },
+        }).then((data) => {
+          // console.log(data.data.addTicket);
+          setIsVisible(false);
+          handleShowModal();
+        });
+      })
+      .catch((error) => {
+        console.error("Ошибка при загрузке файлов:", error);
+      });
   };
 
   const handleNewTicket = (e) => {
@@ -166,8 +208,6 @@ function FormComponent() {
     // console.log(selectedSubThemeId);
     // console.log(textareaValue);
 
-    console.log(editorContent);
-
     if (
       selectedUnitId == null ||
       selectedThemeId == null ||
@@ -177,7 +217,6 @@ function FormComponent() {
       editorContent === "<p></p>" ||
       editorContent === "<p></p>\n"
     ) {
-      console.log(1);
       setIsVisible(true);
       return;
     }
@@ -187,12 +226,70 @@ function FormComponent() {
     addTicketWithFiles();
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleAddFileInput = () => {
+    if (fileInputs.length >= 5) {
+      alert(get_translation("INTERFACE_ERROR_FILES_LIMIT"));
+      return;
+    }
+    setFileInputs(
+      fileInputs.concat([
+        {
+          fileInput: true,
+          id: generateUniqueId(),
+        },
+      ])
+    );
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const generateUniqueId = () => {
+    return Math.random().toString(36).substr(2, 9);
+  };
+
+  const handleRemoveFileInput = (idToRemove) => {
+    setFileInputs((prevFileInputs) =>
+      prevFileInputs.filter((fileInput) => fileInput.id !== idToRemove)
+    );
+  };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    let isFileSizeExceeded = false;
+
+    if (files.length > 5) {
+      e.target.value = null;
+      setIsVisible(true);
+      setIsFilesLimitExceeded(true);
+      console.log("Вы можете загрузить не более 5 файлов");
+      return;
+    }
+
+    Array.from(files).forEach((file) => {
+      const fileSizeInMB = file.size / (1024 * 1024);
+      const maxFileSize = 10;
+
+      if (fileSizeInMB > maxFileSize) {
+        isFileSizeExceeded = true;
+      }
+    });
+
+    if (isFileSizeExceeded) {
+      e.target.value = null;
+      setIsVisible(true);
+      setIsFilesSizeExceeded(true);
+      console.log("Размер файла не должен превышать 10 МБ");
+      return;
+    }
+
+    setIsFilesLimitExceeded(false);
+    setIsVisible(false);
+  };
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
     window.location.reload();
   };
 
@@ -266,11 +363,33 @@ function FormComponent() {
 
             <TextEditor onGetEditorContent={handleGetEditorContent} />
 
-            <FileInput
-              onFileUploadResult={handleFileUploadResult}
-              onFilesSizeExceeded={handleIsFilesSizeExceeded}
-              onFilesLimitExceeded={handleIsFilesLimitExceeded}
-            />
+            <div className="file-inputs">
+              {fileInputs.map((fileInput, index) => (
+                <Form.Group className="mb-3 fileInputForm" key={fileInput.id}>
+                  <Form.Control
+                    type="file"
+                    accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
+                    onChange={handleFileChange}
+                  />
+                  {index > 0 && (
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => handleRemoveFileInput(fileInput.id)}
+                    >
+                      {get_translation("INTERFACE_DELETE")}
+                    </Button>
+                  )}
+                </Form.Group>
+              ))}
+
+              <Button
+                variant="outline-primary"
+                id="AddFileButton"
+                onClick={handleAddFileInput}
+              >
+                {get_translation("INTERFACE_ADD_FILE")}
+              </Button>
+            </div>
 
             {isVisible && <span className="form__error">{errorMsg()}</span>}
 
@@ -286,24 +405,12 @@ function FormComponent() {
         </Row>
       </Form>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {get_translation("INTERFACE_MESSAGE_CREATION_TICKET")}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Ваше обращение принято в обработку, пожалуйста, ожидайте ответа
-            (срок обработки заявки до 24 часов)
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            {get_translation("INTERFACE_CLOSE")}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ModalDialog
+        show={showModal}
+        onClose={handleCloseModal}
+        modalTitle={modalTitle}
+        modalBody={modalBody}
+      />
     </>
   );
 }

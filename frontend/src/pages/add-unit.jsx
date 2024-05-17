@@ -16,6 +16,7 @@ import { ADD_UNIT } from "../apollo/mutations";
 
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 function addUnit() {
@@ -23,11 +24,14 @@ function addUnit() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Раздел создан";
+  const modalBody = "Новый раздел успешно создан";
 
   const [nameValue, setNameValue] = useState("");
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -98,7 +102,7 @@ function addUnit() {
       });
 
       console.log("Раздел успешно добавлен:", result);
-      handleShow();
+      handleShowModal();
     } catch (error) {
       // console.error("Ошибка при добавлении раздела:", error);
 
@@ -118,12 +122,12 @@ function addUnit() {
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     goToAllUnits();
   };
 
@@ -154,19 +158,12 @@ function addUnit() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Раздел создан</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Новый раздел успешно создан</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

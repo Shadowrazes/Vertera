@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Form,
   Row,
-  Col,
   Table,
   Button,
   DropdownButton,
@@ -26,6 +25,7 @@ import { DateRangePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
+import ThemeDropdowns from "../components/theme-dropdowns";
 import ButtonCustom from "../components/button";
 
 import "../css/all-tickets.css";
@@ -36,13 +36,11 @@ import get_translation from "../helpers/translation";
 
 function allTickets() {
   const [dataTableTickets, setDataTableTickets] = useState([]);
-  const [dataAmount, setDataAmount] = useState(0);
-  const [dataTheme, setDataTheme] = useState([]);
+  const [ticketsAmount, setTicketsAmount] = useState(0);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
   const [countryList, setCountryList] = useState([]);
   const [statusList, setStatusList] = useState([]);
 
-  const [selectedItem, setSelectedItem] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState(null);
@@ -69,13 +67,10 @@ function allTickets() {
   const [wordsFilterValue, setWordsFilterValue] = useState("");
   const [numberFilterValue, setNumberFilterValue] = useState("");
   const [daysFilterValue, setDaysFilterValue] = useState("");
-  const [idFilterValue, setIdFilterValue] = useState("");
   const [numberIdFilterValue, setNumberIdFilterValue] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedStatusesId, setSelectedStatusesId] = useState([]);
   const [selectedOuterId, setSelectedOuterId] = useState(null);
-  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
-    useState(true);
 
   const [selectedSort, setSelectedSort] = useState(-1);
   const [prevSelectedSort, setPrevSelectedSort] = useState(-1);
@@ -92,15 +87,11 @@ function allTickets() {
 
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
-
-  let userId = null;
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
-  } else {
-    userId = user.id;
   }
 
   const isAdmin = () => {
@@ -114,11 +105,11 @@ function allTickets() {
   const [fastFilterStr, setFastFilterStr] = useState(isAdmin() ? "all" : "my");
 
   const [helperIdsFilter, setHelperIdsFilter] = useState(
-    isAdmin() ? null : userId
+    isAdmin() ? null : user.id
   );
   const [helperStatusFilter, setHelperStatusFilter] = useState(null);
 
-  let fastFilterHelperId = isAdmin() ? null : userId;
+  let fastFilterHelperId = isAdmin() ? null : user.id;
   let fastFilterStatus = null;
 
   const pageNumbers = [];
@@ -147,7 +138,6 @@ function allTickets() {
 
     setSelectedUnit(null);
     setSelectedUnitId(null);
-    setSelectedItem(null);
     setSelectedTheme(null);
     setSelectedThemeId(null);
     setSelectedSubTheme(null);
@@ -165,7 +155,6 @@ function allTickets() {
     setWordsFilterValue("");
     setNumberFilterValue("");
     setDaysFilterValue("");
-    setIdFilterValue("");
     setNumberIdFilterValue("");
     setSelectedStatuses([]);
     setSelectedStatusesId([]);
@@ -350,7 +339,7 @@ function allTickets() {
       }
 
       if (data && data.helperQuery.ticketList?.count) {
-        setDataAmount(data.helperQuery.ticketList.count);
+        setTicketsAmount(data.helperQuery.ticketList.count);
       }
 
       if (dataCurators && dataCurators.helperQuery?.helperList) {
@@ -370,12 +359,8 @@ function allTickets() {
       }
 
       if (data && data.clientQuery.ticketListByClient?.count) {
-        setDataAmount(data.clientQuery.ticketListByClient.count);
+        setTicketsAmount(data.clientQuery.ticketListByClient.count);
       }
-    }
-
-    if (themeData && themeData.clientQuery.allThemeTree) {
-      setDataTheme(themeData.clientQuery.allThemeTree);
     }
 
     if (selectedSort !== prevSelectedSort) {
@@ -403,9 +388,6 @@ function allTickets() {
   ]);
 
   const tickets = dataTableTickets;
-
-  const ticketsAmount = dataAmount;
-  // console.log(ticketsAmount);
 
   for (let i = 1; i <= Math.ceil(ticketsAmount / itemsPerPage); i++) {
     pageNumbers.push(i);
@@ -553,56 +535,24 @@ function allTickets() {
     }
   };
 
-  const handleUnitClick = (unit, unitId) => {
-    setSelectedItem(unit);
-    setSelectedUnit(unit);
-    setSelectedUnitId(unitId);
-    // console.log(unitId);
-
-    setSelectedTheme(null);
-    setSelectedThemeId(null);
-    setSelectedSubTheme(null);
-    setSelectedSubThemeId(null);
-    setSubThemeDropdownVisible(true);
+  const handleUnitIdChange = (unit) => {
+    setSelectedUnitId(unit);
   };
 
-  const handleThemeClick = (theme, themeId) => {
-    setSelectedTheme(theme);
-    setSelectedThemeId(themeId);
-    // console.log(themeId);
-
-    setSelectedSubTheme(null);
-    setSubThemeDropdownVisible(true);
-
-    switch ((selectedUnitId, themeId)) {
-      case (1, 14):
-        setSelectedSubThemeId(73);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 15):
-        setSelectedSubThemeId(74);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 16):
-        setSelectedSubThemeId(75);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 22):
-        setSelectedSubThemeId(102);
-        setSubThemeDropdownVisible(false);
-        break;
-      case (2, 23):
-        setSelectedSubThemeId(103);
-        setSubThemeDropdownVisible(false);
-        break;
-      default:
-    }
+  const handleThemeIdChange = (theme) => {
+    setSelectedThemeId(theme);
   };
 
-  const handleSubThemeClick = (subTheme, subThemeId) => {
-    setSelectedSubTheme(subTheme);
-    setSelectedSubThemeId(subThemeId);
-    // console.log(subThemeId);
+  const handleSubThemeIdChange = (subTheme) => {
+    setSelectedSubThemeId(subTheme);
+  };
+
+  const handleIsVisibleChange = (isVisible) => {
+    setIsVisible(isVisible);
+  };
+
+  const handleError = (error) => {
+    setError(error);
   };
 
   const handleCuratorsOnChange = (curators) => {
@@ -750,7 +700,7 @@ function allTickets() {
     setFastFilterStr(filterStr);
 
     if (filterStr === "my") {
-      fastFilterHelperId = userId;
+      fastFilterHelperId = user.id;
       fastFilterStatus = null;
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
@@ -760,12 +710,12 @@ function allTickets() {
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "in-process") {
-      fastFilterHelperId = isAdmin() ? null : userId;
+      fastFilterHelperId = isAdmin() ? null : user.id;
       fastFilterStatus = 3;
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
     } else if (filterStr === "clarification") {
-      fastFilterHelperId = isAdmin() ? null : userId;
+      fastFilterHelperId = isAdmin() ? null : user.id;
       fastFilterStatus = [4, 5];
       setHelperIdsFilter(fastFilterHelperId);
       setHelperStatusFilter(fastFilterStatus);
@@ -873,7 +823,7 @@ function allTickets() {
           title={get_translation("INTERFACE_ALL_APPEALS")}
           className="title__heading-nomargin mobile"
         />
-        {!loading && !isHelper() ? (
+        {!isHelper() ? (
           <div className="alltickets__nav-info">
             {!isHelper() && (
               <ButtonCustom
@@ -905,583 +855,326 @@ function allTickets() {
           />
         )}
       </div>
-      {!loading && (
-        <>
-          {isVisibleFilters && (
-            <>
-              {isHelper() ? (
-                <div className="alltickets__filters-container">
-                  <Form>
-                    <Row className="alltickets__row">
-                      <div className="alltickets__column">
-                        <DropdownButton
-                          id="dropdown-custom-1"
-                          title={
-                            selectedItem ||
-                            get_translation("INTERFACE_SELECT_UNIT")
-                          }
+
+      <>
+        {isVisibleFilters && (
+          <>
+            <div className="alltickets__filters-container">
+              <Form>
+                <Row className="alltickets__row">
+                  <div className="alltickets__column">
+                    <ThemeDropdowns
+                      onUnitIdChange={handleUnitIdChange}
+                      onThemeIdChange={handleThemeIdChange}
+                      onSubThemeIdChange={handleSubThemeIdChange}
+                      isVisibleChange={handleIsVisibleChange}
+                      onError={handleError}
+                    />
+
+                    {isHelper() && (
+                      <MultiSelect
+                        value={selectedCurators}
+                        onChange={(e) => handleCuratorsOnChange(e.value)}
+                        options={newCuratorList}
+                        optionLabel="name"
+                        className="add-curator__multiselect"
+                        placeholder={get_translation("INTERFACE_CURATOR")}
+                        filter
+                      />
+                    )}
+
+                    {isHelper() && (
+                      <MultiSelect
+                        value={selectedCuratorsCountries}
+                        onChange={(e) =>
+                          handleCuratorsCountriesOnChange(e.value)
+                        }
+                        options={newCountriesList}
+                        optionLabel="name"
+                        className="add-curator__multiselect"
+                        placeholder={get_translation(
+                          "INTERFACE_CURATORS_COUNTRY"
+                        )}
+                        filter
+                      />
+                    )}
+
+                    {isHelper() && (
+                      <MultiSelect
+                        value={selectedClientsCountries}
+                        onChange={(e) =>
+                          handleClientsCountriesOnChange(e.value)
+                        }
+                        options={newCountriesList}
+                        optionLabel="name"
+                        className="add-curator__multiselect"
+                        placeholder={get_translation(
+                          "INTERFACE_PARTNERS_COUNTRY"
+                        )}
+                        filter
+                      />
+                    )}
+                  </div>
+
+                  <div className="alltickets__column">
+                    <DateRangePicker
+                      className="alltickets__date-range-picker"
+                      placeholder={get_translation("INTERFACE_SET_PERIOD")}
+                      locale={{
+                        sunday: "Вс",
+                        monday: "Пн",
+                        tuesday: "Вт",
+                        wednesday: "Ср",
+                        thursday: "Чт",
+                        friday: "Пт",
+                        saturday: "Сб",
+                        ok: "ОК",
+                        today: "Сегодня",
+                        yesterday: "Вчера",
+                        last7Days: "Последние 7 дней",
+                      }}
+                      onChange={handlePeriodClick}
+                      value={dateRange}
+                    />
+
+                    <DropdownButton
+                      id="dropdown-custom-1"
+                      title={
+                        isHelper()
+                          ? selectedReaction ||
+                            get_translation("INTERFACE_REACTIONS")
+                          : selectedReaction ||
+                            get_translation("INTERFACE_MY_REACTIONS")
+                      }
+                    >
+                      {reactions.map((reaction, index) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => handleReactionClick(reaction)}
+                          href="#"
                         >
-                          {dataTheme.map(
-                            (unit, index) =>
-                              unit.visibility !== 3 && (
-                                <Dropdown.Item
-                                  key={index}
-                                  onClick={() =>
-                                    handleUnitClick(unit.name.stroke, unit.id)
-                                  }
-                                  href="#"
-                                >
-                                  {unit.name.stroke}
-                                </Dropdown.Item>
-                              )
-                          )}
-                        </DropdownButton>
+                          {reaction}
+                        </Dropdown.Item>
+                      ))}
+                    </DropdownButton>
 
-                        {selectedUnit && (
-                          <DropdownButton
-                            id="dropdown-custom-1"
-                            title={
-                              selectedTheme ||
-                              get_translation("INTERFACE_TYPE_APPEALS")
-                            }
-                          >
-                            {dataTheme
-                              .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.map(
-                                (theme) =>
-                                  theme.visibility !== 3 && (
-                                    <Dropdown.Item
-                                      key={theme.id}
-                                      onClick={() =>
-                                        handleThemeClick(
-                                          theme.name.stroke,
-                                          theme.id
-                                        )
-                                      }
-                                      href="#"
-                                    >
-                                      {theme.name.stroke}
-                                    </Dropdown.Item>
-                                  )
-                              )}
-                          </DropdownButton>
-                        )}
-
-                        {isSubThemeDropdownVisible && selectedTheme && (
-                          <DropdownButton
-                            id="dropdown-custom-1"
-                            title={
-                              selectedSubTheme ||
-                              get_translation("INTERFACE_SUBTHEME")
-                            }
-                          >
-                            {dataTheme
-                              .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.find(
-                                (theme) => theme.name.stroke === selectedTheme
-                              )
-                              ?.subThemes.map(
-                                (subTheme) =>
-                                  subTheme.visibility !== 3 && (
-                                    <Dropdown.Item
-                                      key={subTheme.id}
-                                      onClick={() =>
-                                        handleSubThemeClick(
-                                          subTheme.name.stroke,
-                                          subTheme.id
-                                        )
-                                      }
-                                      href="#"
-                                    >
-                                      {subTheme.name.stroke}
-                                    </Dropdown.Item>
-                                  )
-                              )}
-                          </DropdownButton>
-                        )}
-
-                        <MultiSelect
-                          value={selectedCurators}
-                          onChange={(e) => handleCuratorsOnChange(e.value)}
-                          options={newCuratorList}
-                          optionLabel="name"
-                          className="add-curator__multiselect"
-                          placeholder={get_translation("INTERFACE_CURATOR")}
-                          filter
-                        />
-
-                        <MultiSelect
-                          value={selectedCuratorsCountries}
-                          onChange={(e) =>
-                            handleCuratorsCountriesOnChange(e.value)
-                          }
-                          options={newCountriesList}
-                          optionLabel="name"
-                          className="add-curator__multiselect"
-                          placeholder={get_translation(
-                            "INTERFACE_CURATORS_COUNTRY"
-                          )}
-                          filter
-                        />
-
-                        <MultiSelect
-                          value={selectedClientsCountries}
-                          onChange={(e) =>
-                            handleClientsCountriesOnChange(e.value)
-                          }
-                          options={newCountriesList}
-                          optionLabel="name"
-                          className="add-curator__multiselect"
-                          placeholder={get_translation(
-                            "INTERFACE_PARTNERS_COUNTRY"
-                          )}
-                          filter
-                        />
+                    {isHelper() && (
+                      <div className="alltickets__input-wrapper">
+                        <Form.Group controlId="wordsFilterForm">
+                          <Form.Control
+                            type="text"
+                            placeholder={get_translation("INTERFACE_REG_EXP")}
+                            className="add-currator__input"
+                            value={wordsFilterValue}
+                            onChange={handleWordsFilterValueChange}
+                          />
+                        </Form.Group>
                       </div>
-                      <div className="alltickets__column">
-                        <DateRangePicker
-                          className="alltickets__date-range-picker"
-                          placeholder={get_translation("INTERFACE_SET_PERIOD")}
-                          locale={{
-                            sunday: "Вс",
-                            monday: "Пн",
-                            tuesday: "Вт",
-                            wednesday: "Ср",
-                            thursday: "Чт",
-                            friday: "Пт",
-                            saturday: "Сб",
-                            ok: "ОК",
-                            today: "Сегодня",
-                            yesterday: "Вчера",
-                            last7Days: "Последние 7 дней",
-                          }}
-                          onChange={handlePeriodClick}
-                          value={dateRange}
-                        />
+                    )}
 
-                        <DropdownButton
-                          id="dropdown-custom-1"
-                          title={
-                            isHelper()
-                              ? selectedReaction ||
-                                get_translation("INTERFACE_REACTIONS")
-                              : selectedReaction ||
-                                get_translation("INTERFACE_MY_REACTIONS")
-                          }
+                    {isHelper() && (
+                      <MultiSelect
+                        value={selectedStatuses}
+                        onChange={(e) => handleStatusesOnChange(e.value)}
+                        options={newStatusesList}
+                        optionLabel="name"
+                        className="add-curator__multiselect"
+                        placeholder={get_translation("INTERFACE_THEME_STATUS")}
+                      />
+                    )}
+
+                    {isHelper() && (
+                      <Form.Group
+                        className="alltickets__days-ago"
+                        controlId="wordsFilterForm"
+                      >
+                        <div
+                          className="alltickets__days-ago-label"
+                          style={{ minWidth: "105px" }}
                         >
-                          {reactions.map((reaction, index) => (
-                            <Dropdown.Item
-                              key={index}
-                              onClick={() => handleReactionClick(reaction)}
-                              href="#"
-                            >
-                              {reaction}
-                            </Dropdown.Item>
-                          ))}
-                        </DropdownButton>
-
-                        <div className="alltickets__input-wrapper">
-                          <Form.Group controlId="wordsFilterForm">
-                            <Form.Control
-                              type="text"
-                              placeholder={get_translation("INTERFACE_REG_EXP")}
-                              className="add-currator__input"
-                              value={wordsFilterValue}
-                              onChange={handleWordsFilterValueChange}
-                            />
-                          </Form.Group>
+                          {get_translation("INTERFACE_CREATE_MORE")}
                         </div>
-
-                        <MultiSelect
-                          value={selectedStatuses}
-                          onChange={(e) => handleStatusesOnChange(e.value)}
-                          options={newStatusesList}
-                          optionLabel="name"
-                          className="add-curator__multiselect"
-                          placeholder={get_translation(
-                            "INTERFACE_THEME_STATUS"
-                          )}
+                        <Form.Control
+                          type="number"
+                          min={0}
+                          placeholder={get_translation("INTERFACE_DAY_AGO")}
+                          className="add-currator__input alltickets__days-ago-input"
+                          value={numberFilterValue}
+                          onChange={handleNumberFilterValueChange}
                         />
+                        <Form.Control
+                          type="number"
+                          min={0}
+                          placeholder={get_translation("INTERFACE_TIME")}
+                          className="add-currator__input alltickets__days-ago-input right-input"
+                          value={daysFilterValue}
+                          onChange={handleDaysFilterValueChange}
+                        />
+                      </Form.Group>
+                    )}
 
-                        <Form.Group
-                          className="alltickets__days-ago"
-                          controlId="wordsFilterForm"
-                        >
-                          <div
-                            className="alltickets__days-ago-label"
-                            style={{ minWidth: "105px" }}
-                          >
-                            {get_translation("INTERFACE_CREATE_MORE")}
-                          </div>
-                          <Form.Control
-                            type="number"
-                            min={0}
-                            placeholder={get_translation("INTERFACE_DAY_AGO")}
-                            className="add-currator__input alltickets__days-ago-input"
-                            value={numberFilterValue}
-                            onChange={handleNumberFilterValueChange}
-                          />
-                          <Form.Control
-                            type="number"
-                            min={0}
-                            placeholder={get_translation("INTERFACE_TIME")}
-                            className="add-currator__input alltickets__days-ago-input right-input"
-                            value={daysFilterValue}
-                            onChange={handleDaysFilterValueChange}
-                          />
-                        </Form.Group>
-
-                        <Form.Group
-                          className="alltickets__days-ago"
-                          controlId="wordsFilterForm"
-                        >
-                          <div className="alltickets__days-ago-label">ID</div>
-                          <DropdownButton
-                            id="dropdown-custom-1"
-                            title={
-                              selectedOuterId ||
-                              get_translation("INTERFACE_PARTNER_STRUCTURE")
-                            }
-                          >
-                            {outerIdSelect.map((outerId, index) => (
-                              <Dropdown.Item
-                                key={index}
-                                onClick={() => handleOuterIdClick(outerId)}
-                                href="#"
-                              >
-                                {outerId}
-                              </Dropdown.Item>
-                            ))}
-                          </DropdownButton>
-                          <Form.Control
-                            type="number"
-                            min={0}
-                            placeholder={get_translation("INTERFACE_ID_NUMBER")}
-                            className="add-currator__input alltickets__days-ago-input right-input"
-                            value={numberIdFilterValue}
-                            onChange={handleNumberIdFilterValueChange}
-                          />
-                        </Form.Group>
-                      </div>
-                    </Row>
-                    <Row className="alltickets__button-row">
-                      <ButtonCustom
-                        title={get_translation("INTERFACE_APPLY")}
-                        onClick={handleSubmit}
-                        className={"button-hover"}
-                      />
-                      <ButtonCustom
-                        title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two button-outlined"
-                        onClick={handleResetFilters}
-                      />
-                    </Row>
-                  </Form>
-                </div>
-              ) : (
-                <div className="alltickets__filters-container">
-                  <Form>
-                    <Row className="alltickets__row">
-                      <div className="alltickets__column">
+                    {isHelper() && (
+                      <Form.Group
+                        className="alltickets__days-ago"
+                        controlId="wordsFilterForm"
+                      >
+                        <div className="alltickets__days-ago-label">ID</div>
                         <DropdownButton
                           id="dropdown-custom-1"
                           title={
-                            selectedItem ||
-                            get_translation("INTERFACE_SELECT_UNIT")
+                            selectedOuterId ||
+                            get_translation("INTERFACE_PARTNER_STRUCTURE")
                           }
                         >
-                          {dataTheme.map(
-                            (unit, index) =>
-                              unit.visibility !== 3 && (
-                                <Dropdown.Item
-                                  key={index}
-                                  onClick={() =>
-                                    handleUnitClick(unit.name.stroke, unit.id)
-                                  }
-                                  href="#"
-                                >
-                                  {unit.name.stroke}
-                                </Dropdown.Item>
-                              )
-                          )}
-                        </DropdownButton>
-
-                        {selectedUnit && (
-                          <DropdownButton
-                            id="dropdown-custom-1"
-                            title={
-                              selectedTheme ||
-                              get_translation("INTERFACE_TYPE_APPEALS")
-                            }
-                          >
-                            {dataTheme
-                              .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.map(
-                                (theme) =>
-                                  theme.visibility !== 3 && (
-                                    <Dropdown.Item
-                                      key={theme.id}
-                                      onClick={() =>
-                                        handleThemeClick(
-                                          theme.name.stroke,
-                                          theme.id
-                                        )
-                                      }
-                                      href="#"
-                                    >
-                                      {theme.name.stroke}
-                                    </Dropdown.Item>
-                                  )
-                              )}
-                          </DropdownButton>
-                        )}
-
-                        {isSubThemeDropdownVisible && selectedTheme && (
-                          <DropdownButton
-                            id="dropdown-custom-1"
-                            title={
-                              selectedSubTheme ||
-                              get_translation("INTERFACE_SUBTHEME")
-                            }
-                          >
-                            {dataTheme
-                              .find((unit) => unit.name.stroke === selectedUnit)
-                              ?.themes.find(
-                                (theme) => theme.name.stroke === selectedTheme
-                              )
-                              ?.subThemes.map(
-                                (subTheme) =>
-                                  subTheme.visibility !== 3 && (
-                                    <Dropdown.Item
-                                      key={subTheme.id}
-                                      onClick={() =>
-                                        handleSubThemeClick(
-                                          subTheme.name.stroke,
-                                          subTheme.id
-                                        )
-                                      }
-                                      href="#"
-                                    >
-                                      {subTheme.name.stroke}
-                                    </Dropdown.Item>
-                                  )
-                              )}
-                          </DropdownButton>
-                        )}
-                      </div>
-                      <div className="alltickets__column">
-                        <DateRangePicker
-                          className="alltickets__date-range-picker"
-                          placeholder={get_translation("INTERFACE_SET_PERIOD")}
-                          locale={{
-                            sunday: "Вс",
-                            monday: "Пн",
-                            tuesday: "Вт",
-                            wednesday: "Ср",
-                            thursday: "Чт",
-                            friday: "Пт",
-                            saturday: "Сб",
-                            ok: "ОК",
-                            today: "Сегодня",
-                            yesterday: "Вчера",
-                            last7Days: "Последние 7 дней",
-                          }}
-                          onChange={handlePeriodClick}
-                          value={dateRange}
-                        />
-                        <DropdownButton
-                          id="dropdown-custom-1"
-                          title={
-                            isHelper()
-                              ? selectedReaction ||
-                                get_translation("INTERFACE_REACTIONS")
-                              : selectedReaction ||
-                                get_translation("INTERFACE_MY_REACTIONS")
-                          }
-                        >
-                          {reactions.map((reaction, index) => (
+                          {outerIdSelect.map((outerId, index) => (
                             <Dropdown.Item
                               key={index}
-                              onClick={() => handleReactionClick(reaction)}
+                              onClick={() => handleOuterIdClick(outerId)}
                               href="#"
                             >
-                              {reaction}
+                              {outerId}
                             </Dropdown.Item>
                           ))}
                         </DropdownButton>
-                      </div>
-                    </Row>
-                    <Row className="alltickets__button-row">
-                      <ButtonCustom
-                        title={get_translation("INTERFACE_APPLY")}
-                        onClick={handleSubmit}
-                        className={"button-hover"}
-                      />
-                      <ButtonCustom
-                        title={get_translation("INTERFACE_RESET")}
-                        className="alltickets__button-two button-outlined"
-                        onClick={handleResetFilters}
-                      />
-                    </Row>
-                  </Form>
-                </div>
-              )}
-            </>
-          )}
+                        <Form.Control
+                          type="number"
+                          min={0}
+                          placeholder={get_translation("INTERFACE_ID_NUMBER")}
+                          className="add-currator__input alltickets__days-ago-input right-input"
+                          value={numberIdFilterValue}
+                          onChange={handleNumberIdFilterValueChange}
+                        />
+                      </Form.Group>
+                    )}
+                  </div>
+                </Row>
+                <Row className="alltickets__button-row">
+                  <ButtonCustom
+                    title={get_translation("INTERFACE_APPLY")}
+                    onClick={handleSubmit}
+                    className={"button-hover"}
+                  />
+                  <ButtonCustom
+                    title={get_translation("INTERFACE_RESET")}
+                    className="alltickets__button-two button-outlined"
+                    onClick={handleResetFilters}
+                  />
+                </Row>
+              </Form>
+            </div>
+          </>
+        )}
 
-          {isHelper() && (
-            <ButtonGroup size="sm" className="mb-3 filter-buttonGroup">
-              {!isAdmin() && (
-                <Button
-                  onClick={handleFastFilter.bind(null, "my")}
-                  variant={
-                    fastFilterStr === "my" ? "primary" : "outline-primary"
+        {isHelper() && (
+          <ButtonGroup size="sm" className="mb-3 filter-buttonGroup">
+            {!isAdmin() && (
+              <Button
+                onClick={handleFastFilter.bind(null, "my")}
+                variant={fastFilterStr === "my" ? "primary" : "outline-primary"}
+              >
+                {get_translation("INTERFACE_MY_TICKETS")}
+              </Button>
+            )}
+            <Button
+              onClick={handleFastFilter.bind(null, "all")}
+              variant={fastFilterStr === "all" ? "primary" : "outline-primary"}
+            >
+              {get_translation("INTERFACE_ALL_TICKETS")}
+            </Button>
+            <Button
+              onClick={handleFastFilter.bind(null, "in-process")}
+              variant={
+                fastFilterStr === "in-process" ? "primary" : "outline-primary"
+              }
+            >
+              {get_translation("TICKETSTATUS_B9C8AB323A26E59E41F56A62E1B4E5D1")}
+            </Button>
+            <Button
+              onClick={handleFastFilter.bind(null, "clarification")}
+              variant={
+                fastFilterStr === "clarification"
+                  ? "primary"
+                  : "outline-primary"
+              }
+            >
+              {get_translation("TICKETSTATUS_08F55006CF2D6B8E04B9A6A6929DAD22")}
+            </Button>
+          </ButtonGroup>
+        )}
+
+        <div className="table__sorts">
+          <span className="table__sorts-label">
+            {get_translation("INTERFACE_SORT")}:
+          </span>
+          {columns.map((column, index) => (
+            <>
+              {isHelper() || index !== 0 ? (
+                <span
+                  key={column}
+                  onClick={() => {
+                    handleSorts(index);
+                  }}
+                  className={
+                    selectedSort === index
+                      ? "table__sort table__sort-active"
+                      : "table__sort"
                   }
                 >
-                  {get_translation("INTERFACE_MY_TICKETS")}
-                </Button>
-              )}
-              <Button
-                onClick={handleFastFilter.bind(null, "all")}
-                variant={
-                  fastFilterStr === "all" ? "primary" : "outline-primary"
-                }
-              >
-                {get_translation("INTERFACE_ALL_TICKETS")}
-              </Button>
-              <Button
-                onClick={handleFastFilter.bind(null, "in-process")}
-                variant={
-                  fastFilterStr === "in-process" ? "primary" : "outline-primary"
-                }
-              >
-                {get_translation(
-                  "TICKETSTATUS_B9C8AB323A26E59E41F56A62E1B4E5D1"
-                )}
-              </Button>
-              <Button
-                onClick={handleFastFilter.bind(null, "clarification")}
-                variant={
-                  fastFilterStr === "clarification"
-                    ? "primary"
-                    : "outline-primary"
-                }
-              >
-                {get_translation(
-                  "TICKETSTATUS_08F55006CF2D6B8E04B9A6A6929DAD22"
-                )}
-              </Button>
-            </ButtonGroup>
-          )}
-
-          <div className="table__sorts">
-            <span className="table__sorts-label">
-              {get_translation("INTERFACE_SORT")}:
-            </span>
-            {columns.map((column, index) => (
-              <>
-                {isHelper() || index !== 0 ? (
-                  <span
-                    key={column}
-                    onClick={() => {
-                      handleSorts(index);
-                    }}
-                    className={
-                      selectedSort === index
-                        ? "table__sort table__sort-active"
-                        : "table__sort"
-                    }
-                  >
-                    {columnsName[index]}
-                    {selectedSort === index && (
-                      <span className="table__sort-arrow">
-                        <svg
-                          className={
-                            orderDir == "DESC"
-                              ? "table__sort-arrow-svg-rotated"
-                              : "table__sort-arrow-svg"
-                          }
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="7"
-                          height="10"
-                          viewBox="0 0 7 10"
-                          fill="none"
-                        >
-                          <path
-                            d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                            stroke="#00AB97"
-                            strokeWidth="0.8"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </span>
-                    )}
-                  </span>
-                ) : null}
-              </>
-            ))}
-          </div>
-
-          <div className="table__wrapper alltickets__table-wrapper">
-            <Table className="table__table" hover>
-              <thead>
-                <tr>
-                  {isHelper() && <th>ID</th>}
-                  <th>{get_translation("INTERFACE_CHAPTER")}</th>
-                  <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
-                  <th>{get_translation("INTERFACE_THEME")}</th>
-                  {isHelper() && (
-                    <>
-                      <th className="mobile">ID партнера</th>
-                      <th>{get_translation("INTERFACE_CURATOR")}</th>
-                    </>
-                  )}
-                  <th className="mobile">
-                    {get_translation("INTERFACE_LAST_MSG")}
-                  </th>
-                  <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
-                  <th>{get_translation("INTERFACE_STATUS")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.id}>
-                    {isHelper() && (
-                      <td>
-                        <Link
-                          to={`/dialog/${ticket.link}`}
-                          state={{
-                            status: ticket.status.name.stroke,
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          {ticket.id}
-                        </Link>
-                      </td>
-                    )}
-                    <td style={{ textAlign: "left" }}>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
+                  {columnsName[index]}
+                  {selectedSort === index && (
+                    <span className="table__sort-arrow">
+                      <svg
+                        className={
+                          orderDir == "DESC"
+                            ? "table__sort-arrow-svg-rotated"
+                            : "table__sort-arrow-svg"
+                        }
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="7"
+                        height="10"
+                        viewBox="0 0 7 10"
+                        fill="none"
                       >
-                        {`${
-                          ticket.subTheme.theme.unit.name.stroke === null
-                            ? ""
-                            : `${handleUnitStroke(
-                                ticket.subTheme.theme.unit.name.stroke
-                              )} |`
-                        } ${ticket.subTheme.theme.name.stroke} ${
-                          ticket.subTheme.name.stroke === "none"
-                            ? ""
-                            : `| ${ticket.subTheme.name.stroke}`
-                        }`}
-                      </Link>
-                    </td>
+                        <path
+                          d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                          stroke="#00AB97"
+                          strokeWidth="0.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </span>
+                  )}
+                </span>
+              ) : null}
+            </>
+          ))}
+        </div>
+
+        <div className="table__wrapper alltickets__table-wrapper">
+          <Table className="table__table" hover>
+            <thead>
+              <tr>
+                {isHelper() && <th>ID</th>}
+                <th>{get_translation("INTERFACE_CHAPTER")}</th>
+                <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
+                <th>{get_translation("INTERFACE_THEME")}</th>
+                {isHelper() && (
+                  <>
+                    <th className="mobile">ID партнера</th>
+                    <th>{get_translation("INTERFACE_CURATOR")}</th>
+                  </>
+                )}
+                <th className="mobile">
+                  {get_translation("INTERFACE_LAST_MSG")}
+                </th>
+                <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
+                <th>{get_translation("INTERFACE_STATUS")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((ticket) => (
+                <tr key={ticket.id}>
+                  {isHelper() && (
                     <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
@@ -1491,187 +1184,213 @@ function allTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {DateTime.fromISO(ticket.date, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("yyyy.MM.dd")}
-                        <br />
-                        {DateTime.fromISO(ticket.date, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("HH:mm:ss")}
+                        {ticket.id}
                       </Link>
                     </td>
-                    <td style={{ textAlign: "left" }}>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.title.length > 20
-                          ? `${ticket.title.slice(0, 20)}...`
-                          : `${ticket.title}`}
-                      </Link>
-                    </td>
-                    {isHelper() && (
-                      <>
-                        <td className="mobile">
-                          <Link
-                            to={`/dialog/${ticket.link}`}
-                            state={{
-                              status: ticket.status.name.stroke,
-                              linkPrev: window.location.href,
-                            }}
-                            className="alltickets__link"
-                          >
-                            {ticket.initiator.outerId
-                              ? ticket.initiator.outerId
-                              : ticket.initiator.id}
-                          </Link>
-                        </td>
-                        <td>
-                          <Link
-                            to={`/dialog/${ticket.link}`}
-                            state={{
-                              status: ticket.status.name.stroke,
-                              linkPrev: window.location.href,
-                            }}
-                            className="alltickets__link"
-                          >
-                            {`${ticket.recipient.surname} ${ticket.recipient.name}`}
-                          </Link>
-                        </td>
-                      </>
-                    )}
-                    <td className="mobile" style={{ textAlign: "left" }}>
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.lastMessage.date
-                          .slice(0, 10)
-                          .replace(/-/g, ".")}
-                        |{" "}
-                        {ticket.lastMessage.sender.surname === "system"
-                          ? "Системное сообщение"
-                          : `${
-                              ticket.lastMessage.sender.name
-                            } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
-                      </Link>
-                    </td>
-                    <td className="mobile">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.messages?.length}
-                      </Link>
-                    </td>
-                    <td id="alltickets__status">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        <span
-                          className="table__status"
-                          style={{
-                            background: getStatusColor(
-                              ticket.status.name.stroke
-                            ),
+                  )}
+                  <td style={{ textAlign: "left" }}>
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {`${
+                        ticket.subTheme.theme.unit.name.stroke === null
+                          ? ""
+                          : `${handleUnitStroke(
+                              ticket.subTheme.theme.unit.name.stroke
+                            )} |`
+                      } ${ticket.subTheme.theme.name.stroke} ${
+                        ticket.subTheme.name.stroke === "none"
+                          ? ""
+                          : `| ${ticket.subTheme.name.stroke}`
+                      }`}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {DateTime.fromISO(ticket.date, {
+                        zone: "utc",
+                      })
+                        .toLocal()
+                        .toFormat("yyyy.MM.dd")}
+                      <br />
+                      {DateTime.fromISO(ticket.date, {
+                        zone: "utc",
+                      })
+                        .toLocal()
+                        .toFormat("HH:mm:ss")}
+                    </Link>
+                  </td>
+                  <td style={{ textAlign: "left" }}>
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {ticket.title.length > 20
+                        ? `${ticket.title.slice(0, 20)}...`
+                        : `${ticket.title}`}
+                    </Link>
+                  </td>
+                  {isHelper() && (
+                    <>
+                      <td className="mobile">
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
                           }}
+                          className="alltickets__link"
                         >
-                          {ticket.status.name.stroke}
-                        </span>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            <DropdownButton
-              id="dropdown-custom-1"
-              title={
-                itemsPerPage || get_translation("INTERFACE_NUMBER_OF_LINES")
-              }
-              className="alltickets__amount"
-            >
-              {itemsPerPageArray.map((amount, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => setItemsPerPage(amount)}
-                  href="#"
-                >
-                  {amount}
-                </Dropdown.Item>
+                          {ticket.initiator.outerId
+                            ? ticket.initiator.outerId
+                            : ticket.initiator.id}
+                        </Link>
+                      </td>
+                      <td>
+                        <Link
+                          to={`/dialog/${ticket.link}`}
+                          state={{
+                            status: ticket.status.name.stroke,
+                            linkPrev: window.location.href,
+                          }}
+                          className="alltickets__link"
+                        >
+                          {`${ticket.recipient.surname} ${ticket.recipient.name}`}
+                        </Link>
+                      </td>
+                    </>
+                  )}
+                  <td className="mobile" style={{ textAlign: "left" }}>
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                      {ticket.lastMessage.sender.surname === "system"
+                        ? "Системное сообщение"
+                        : `${
+                            ticket.lastMessage.sender.name
+                          } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
+                    </Link>
+                  </td>
+                  <td className="mobile">
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {ticket.messages?.length}
+                    </Link>
+                  </td>
+                  <td id="alltickets__status">
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      <span
+                        className="table__status"
+                        style={{
+                          background: getStatusColor(ticket.status.name.stroke),
+                        }}
+                      >
+                        {ticket.status.name.stroke}
+                      </span>
+                    </Link>
+                  </td>
+                </tr>
               ))}
-            </DropdownButton>
-          </div>
+            </tbody>
+          </Table>
 
-          <ul className="alltickets__pagination">
-            {isVisible && (
-              <button
-                onClick={handlePrevPage}
-                className={
-                  currentPage === 1
-                    ? "alltickets__page-btn-disabled"
-                    : "alltickets__page-btn"
-                }
-                disabled={currentPage === 1}
+          <DropdownButton
+            id="dropdown-custom-1"
+            title={itemsPerPage || get_translation("INTERFACE_NUMBER_OF_LINES")}
+            className="alltickets__amount"
+          >
+            {itemsPerPageArray.map((amount, index) => (
+              <Dropdown.Item
+                key={index}
+                onClick={() => setItemsPerPage(amount)}
+                href="#"
               >
-                {get_translation("INTERFACE_PREVIOUS")}
-              </button>
-            )}
-            {pageNumbers.map((number) => (
-              <li key={number} className="alltickets__page-item">
-                <button
-                  onClick={() => handleNewPage(number)}
-                  className={
-                    number === currentPage
-                      ? "alltickets__page-link active-link"
-                      : "alltickets__page-link"
-                  }
-                >
-                  {number}
-                </button>
-              </li>
+                {amount}
+              </Dropdown.Item>
             ))}
-            {isVisible && (
+          </DropdownButton>
+        </div>
+
+        <ul className="alltickets__pagination">
+          {isVisible && (
+            <button
+              onClick={handlePrevPage}
+              className={
+                currentPage === 1
+                  ? "alltickets__page-btn-disabled"
+                  : "alltickets__page-btn"
+              }
+              disabled={currentPage === 1}
+            >
+              {get_translation("INTERFACE_PREVIOUS")}
+            </button>
+          )}
+          {pageNumbers.map((number) => (
+            <li key={number} className="alltickets__page-item">
               <button
-                onClick={handleNextPage}
+                onClick={() => handleNewPage(number)}
                 className={
-                  currentPage === Math.ceil(data.length / itemsPerPage)
-                    ? "alltickets__page-btn-disabled"
-                    : "alltickets__page-btn"
-                }
-                disabled={
-                  currentPage === Math.ceil(ticketsAmount / itemsPerPage)
+                  number === currentPage
+                    ? "alltickets__page-link active-link"
+                    : "alltickets__page-link"
                 }
               >
-                {get_translation("INTERFACE_NEXT")}
+                {number}
               </button>
-            )}
-          </ul>
-        </>
-      )}
-      {dataAmount == 0 && !isHelper() && (
+            </li>
+          ))}
+          {isVisible && (
+            <button
+              onClick={handleNextPage}
+              className={
+                currentPage === Math.ceil(data.length / itemsPerPage)
+                  ? "alltickets__page-btn-disabled"
+                  : "alltickets__page-btn"
+              }
+              disabled={currentPage === Math.ceil(ticketsAmount / itemsPerPage)}
+            >
+              {get_translation("INTERFACE_NEXT")}
+            </button>
+          )}
+        </ul>
+      </>
+
+      {ticketsAmount == 0 && !isHelper() && (
         <div className="alltickets__empty-table">
           <span className="alltickets__text">
             {get_translation("INTERFACE_NO_TICKETS")}

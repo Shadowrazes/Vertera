@@ -24,6 +24,7 @@ import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import BackTitle from "../components/back-title";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import "../css/add-curator.css";
@@ -46,7 +47,10 @@ function AddCurator() {
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [queryError, setQueryError] = useState("");
-  const [show, setShow] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = get_translation("INTERFACE_MESSAGE_ADD_CURATOR");
+  const modalBody = get_translation("INTERFACE_MESSAGE_ADD_CURATOR_FULL");
 
   const [nameValue, setNameValue] = useState("");
   const [surnameValue, setSurnameValue] = useState("");
@@ -55,8 +59,8 @@ function AddCurator() {
   const [loginValue, setLoginValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -328,7 +332,7 @@ function AddCurator() {
       }
 
       console.log("Куратор успешно добавлен:", result);
-      handleShow();
+      handleShowModal();
     } catch (error) {
       console.error("Ошибка при добавлении куратора:", error);
       setQueryError(error.networkError.result.errors[0].message);
@@ -336,12 +340,12 @@ function AddCurator() {
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
     goToAllCurators();
   };
 
@@ -497,21 +501,12 @@ function AddCurator() {
             />
           </div>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>
-                {get_translation("INTERFACE_MESSAGE_ADD_CURATOR")}
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>{get_translation("INTERFACE_MESSAGE_ADD_CURATOR_FULL")}</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                {get_translation("INTERFACE_CLOSE")}
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseModal}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

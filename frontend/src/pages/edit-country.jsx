@@ -10,6 +10,7 @@ import { MultiSelect } from "primereact/multiselect";
 import BackTitle from "../components/back-title";
 import ButtonCustom from "../components/button";
 import Loader from "../pages/loading";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import "../css/edit-ticket.css";
@@ -24,14 +25,23 @@ function EditCountry() {
   const [selectedLangsId, setSelectedLangsId] = useState([]);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Страна обновлена";
+  const modalBody = "Страна успешно обновлена";
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const modalSuccessTitle = "Страна удалена";
+  const modalSuccessBody = "Страна успешно удалена";
+
   const [showWarning, setShowWarning] = useState(false);
+  const modalWarningTitle = "Предупреждение";
+  const modalWarningBody = "Вы уверены, что хотите удалить страну?";
 
   const [linkPrev, setLinkPrev] = useState(null);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -51,13 +61,13 @@ function EditCountry() {
     );
   };
 
-  const { loading, error, data } = useQuery(LANGUAGE_LIST, {
+  const { data } = useQuery(LANGUAGE_LIST, {
     variables: {
       token: user.token,
       lang: language,
     },
   });
-  const { data: dataCountry } = useQuery(COUNTRY, {
+  const { loading, data: dataCountry } = useQuery(COUNTRY, {
     variables: {
       token: user.token,
       id: parseInt(countryId),
@@ -94,6 +104,10 @@ function EditCountry() {
 
   const [editCountry] = useMutation(EDIT_COUNTRY);
   const [deleteCountry] = useMutation(DELETE_COUNTRY);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   const handleNameChange = (e) => {
     setNameValue(e.target.value);
@@ -155,16 +169,16 @@ function EditCountry() {
   };
 
   const handleShow = () => {
-    setShow(true);
+    setShowModal(true);
   };
 
-  const handleShowTwo = () => {
-    setShowTwo(true);
+  const handleShowSuccess = () => {
+    setShowSuccessModal(true);
   };
 
   const handleCloseLeave = () => {
-    setShow(false);
-    setShowTwo(false);
+    setShowModal(false);
+    setShowSuccessModal(false);
     goToCountries();
   };
 
@@ -190,7 +204,7 @@ function EditCountry() {
       });
 
       console.log("Страна успешно удалена:", result);
-      handleShowTwo();
+      handleShowSuccess();
     } catch (error) {
       console.error("Ошибка при удалении страны:", error);
       setIsErrorVisible(true);
@@ -276,50 +290,28 @@ function EditCountry() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Страна обновлена</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Страна успешно обновлена</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseLeave}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
 
-          <Modal show={showWarning} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Вы уверены, что хотите удалить страну?</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Отмена
-              </Button>
-              <Button variant="primary" onClick={handleConfirmDelete}>
-                Продолжить
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showWarning}
+            onClose={handleClose}
+            onConfirm={handleConfirmDelete}
+            modalTitle={modalWarningTitle}
+            modalBody={modalWarningBody}
+            warning={true}
+          />
 
-          <Modal show={showTwo} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Страна удалена</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Страна успешно удалена</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showSuccessModal}
+            onClose={handleCloseLeave}
+            modalTitle={modalSuccessTitle}
+            modalBody={modalSuccessBody}
+          />
         </>
       ) : (
         <NotFoundPage />

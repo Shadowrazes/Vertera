@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Form, Modal, Button } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
-import { useNavigate, Link } from "react-router-dom";
 
 import { DEPARTMENTS_LIST } from "../apollo/queries";
 import {
@@ -13,6 +12,7 @@ import {
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
 import Loader from "../pages/loading";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 import DeleteIcon from "../assets/delete_icon.svg";
@@ -32,10 +32,13 @@ function Departments() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [isErrorEditVisible, setIsErrorEditVisible] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [showWarning, setShowWarning] = useState(false);
+  const modalTitle = "Предупреждение";
+  const modalBody = "Вы уверены, что хотите удалить этот дераптамент?";
+
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -347,19 +350,15 @@ function Departments() {
               </div>
             </>
           )}
-          <Modal show={showWarning} onHide={handleCloseModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Вы уверены, что хотите удалить этот дераптамент?</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseWarning}>
-                Удалить
-              </Button>
-            </Modal.Footer>
-          </Modal>
+
+          <ModalDialog
+            show={showWarning}
+            onClose={handleCloseModal}
+            onConfirm={handleCloseWarning}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+            warning={true}
+          />
         </>
       ) : (
         <NotFoundPage />

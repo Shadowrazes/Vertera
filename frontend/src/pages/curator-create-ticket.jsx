@@ -23,6 +23,8 @@ import { Editor } from "react-draft-wysiwyg";
 import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
+import ThemeDropdowns from "../components/theme-dropdowns";
+import TextEditor from "../components/text-editor";
 import ButtonCustom from "../components/button";
 import NotFoundPage from "./not-found-page";
 
@@ -41,8 +43,7 @@ function CuratorCreateTicket() {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [textareaValue, setTextareaValue] = useState("");
+  const [editorContent, setEditorContent] = useState("");
   const [selectedCurators, setSelectedCurators] = useState([]);
   const [selectedCuratorsId, setSelectedCuratorsId] = useState([]);
   const [idInputs, setIdInputs] = useState([]);
@@ -54,8 +55,6 @@ function CuratorCreateTicket() {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
-  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
-    useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [isButtonsVisible, setIsButtonsVisible] = useState(true);
   const [isCuratorsDropdownVisible, setIsCuratorsDropdownVisible] =
@@ -203,62 +202,28 @@ function CuratorCreateTicket() {
     );
   }
 
-  const handleUnitClick = (unit, unitId) => {
-    setSelectedItem(unit);
-    setSelectedUnit(unit);
-    setSelectedUnitId(unitId);
-    // console.log(unitId);
-
-    if (unit !== selectedUnit) {
-      setSelectedTheme(null);
-      setSelectedSubTheme(null);
-      setSubThemeDropdownVisible(true);
-      setIsVisible(false);
-    }
+  const handleUnitIdChange = (unit) => {
+    setSelectedUnitId(unit);
   };
 
-  const handleThemeClick = (theme, themeId) => {
-    setSelectedTheme(theme);
-    setSelectedThemeId(themeId);
-    // console.log(themeId);
-
-    if (theme !== selectedTheme) {
-      setSelectedSubTheme(null);
-      setSubThemeDropdownVisible(true);
-      setIsVisible(false);
-
-      switch ((selectedUnitId, themeId)) {
-        case (1, 14):
-          setSelectedSubThemeId(73);
-          setSubThemeDropdownVisible(false);
-          break;
-        case (2, 15):
-          setSelectedSubThemeId(74);
-          setSubThemeDropdownVisible(false);
-          break;
-        case (2, 16):
-          setSelectedSubThemeId(75);
-          setSubThemeDropdownVisible(false);
-          break;
-        case (2, 22):
-          setSelectedSubThemeId(102);
-          setSubThemeDropdownVisible(false);
-          break;
-        case (2, 23):
-          setSelectedSubThemeId(103);
-          setSubThemeDropdownVisible(false);
-          break;
-        default:
-      }
-    }
+  const handleThemeIdChange = (theme) => {
+    setSelectedThemeId(theme);
   };
 
-  const handleSubThemeClick = (subTheme, subThemeId) => {
-    setSelectedSubTheme(subTheme);
-    setSelectedSubThemeId(subThemeId);
-    // console.log(subThemeId);
+  const handleSubThemeIdChange = (subTheme) => {
+    setSelectedSubThemeId(subTheme);
+  };
 
-    setIsVisible(false);
+  const handleIsVisibleChange = (isVisible) => {
+    setIsVisible(isVisible);
+  };
+
+  const handleError = (error) => {
+    setError(error);
+  };
+
+  const handleGetEditorContent = (content) => {
+    setEditorContent(content);
   };
 
   const handleCuratorsOnChange = (curators) => {
@@ -669,85 +634,14 @@ function CuratorCreateTicket() {
                     onChange={handleTicketTitleChange}
                   />
                 </Form.Group>
-                <DropdownButton
-                  id="dropdown-custom-1"
-                  title={
-                    selectedItem || get_translation("INTERFACE_SELECT_UNIT")
-                  }
-                >
-                  {dataQuery.map(
-                    (unit, index) =>
-                      unit.visibility !== 3 && (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() =>
-                            handleUnitClick(unit.name.stroke, unit.id)
-                          }
-                          href="#"
-                        >
-                          {unit.name.stroke}
-                        </Dropdown.Item>
-                      )
-                  )}
-                </DropdownButton>
 
-                {selectedUnit && (
-                  <DropdownButton
-                    id="dropdown-custom-1"
-                    title={
-                      selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
-                    }
-                  >
-                    {dataQuery
-                      .find((unit) => unit.name.stroke === selectedUnit)
-                      ?.themes.map(
-                        (theme) =>
-                          theme.visibility !== 3 && (
-                            <Dropdown.Item
-                              key={theme.id}
-                              onClick={() =>
-                                handleThemeClick(theme.name.stroke, theme.id)
-                              }
-                              href="#"
-                            >
-                              {theme.name.stroke}
-                            </Dropdown.Item>
-                          )
-                      )}
-                  </DropdownButton>
-                )}
-
-                {isSubThemeDropdownVisible && selectedTheme && (
-                  <DropdownButton
-                    id="dropdown-custom-1"
-                    title={
-                      selectedSubTheme || get_translation("INTERFACE_SUBTHEME")
-                    }
-                  >
-                    {dataQuery
-                      .find((unit) => unit.name.stroke === selectedUnit)
-                      ?.themes.find(
-                        (theme) => theme.name.stroke === selectedTheme
-                      )
-                      ?.subThemes.map(
-                        (subTheme) =>
-                          subTheme.visibility !== 3 && (
-                            <Dropdown.Item
-                              key={subTheme.id}
-                              onClick={() =>
-                                handleSubThemeClick(
-                                  subTheme.name.stroke,
-                                  subTheme.id
-                                )
-                              }
-                              href="#"
-                            >
-                              {subTheme.name.stroke}
-                            </Dropdown.Item>
-                          )
-                      )}
-                  </DropdownButton>
-                )}
+                <ThemeDropdowns
+                  onUnitIdChange={handleUnitIdChange}
+                  onThemeIdChange={handleThemeIdChange}
+                  onSubThemeIdChange={handleSubThemeIdChange}
+                  isVisibleChange={handleIsVisibleChange}
+                  onError={handleError}
+                />
                 <div className="curator-create-ticket__reciever-label">
                   {(isCuratorsDropdownVisible || isIdFileInputVisible) && (
                     <a onClick={handleCloseClick}>
@@ -839,36 +733,7 @@ function CuratorCreateTicket() {
 
               <Col className="form__column">
                 <Form.Group className="custom-editor">
-                  <Editor
-                    editorState={editorState}
-                    onEditorStateChange={handleEditorChange}
-                    stripPastedStyles
-                    toolbarStyle={{
-                      border: "1px solid #dee2e6",
-                      borderRadius: "6px 6px 0 0",
-                    }}
-                    editorStyle={{
-                      border: "1px solid #dee2e6",
-                      borderRadius: "0 0 6px 6px",
-                      padding: "10px",
-                      height: "50%",
-                    }}
-                    placeholder={get_translation("INTERFACE_ENTER_MSG")}
-                    toolbar={{
-                      options: ["inline", "list", "emoji", "remove", "history"],
-                      inline: {
-                        options: [
-                          "bold",
-                          "italic",
-                          "underline",
-                          "strikethrough",
-                        ],
-                      },
-                      list: {
-                        options: ["unordered", "ordered"],
-                      },
-                    }}
-                  />
+                  <TextEditor onGetEditorContent={handleGetEditorContent} />
                 </Form.Group>
                 <div className="file-inputs">
                   {fileInputs.map((fileInput, index) => (

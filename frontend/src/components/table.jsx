@@ -40,8 +40,8 @@ function TableTickets() {
     get_translation("INTERFACE_LAST_MSG"),
   ];
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
   let userId = null;
 
   if (user?.id === null) {
@@ -262,101 +262,156 @@ function TableTickets() {
 
   return (
     <>
-      {!loading && (
-        <>
-          <TitleH2
-            title={get_translation("INTERFACE_MY_APPEALS")}
-            className="title__heading"
-          />
-          <div className="table__sorts">
-            <span className="table__sorts-label">
-              {get_translation("INTERFACE_SORT")}:
-            </span>
-            {columns.map((column, index) => (
-              <>
-                {isAdmin() || index !== 0 ? (
-                  <span
-                    key={column}
-                    onClick={() => {
-                      handleSorts(index);
-                    }}
-                    className={
-                      selectedSort === index
-                        ? "table__sort table__sort-active"
-                        : "table__sort"
-                    }
-                  >
-                    {columnsName[index]}
-                    {selectedSort === index && (
-                      <span className="table__sort-arrow">
-                        <svg
-                          className={
-                            orderDir == "DESC"
-                              ? "table__sort-arrow-svg-rotated"
-                              : "table__sort-arrow-svg"
-                          }
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="7"
-                          height="10"
-                          viewBox="0 0 7 10"
-                          fill="none"
-                        >
-                          <path
-                            d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
-                            stroke="#00AB97"
-                            strokeWidth="0.8"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </span>
-                    )}
-                  </span>
-                ) : null}
-              </>
-            ))}
-          </div>
-          <div className="table__wrapper">
-            <Table className="table__table" hover>
-              <thead>
-                <tr>
-                  {isAdmin() && <th>ID</th>}
-                  <th>{get_translation("INTERFACE_CHAPTER")}</th>
-                  <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
-                  <th>{get_translation("INTERFACE_THEME")}</th>
-                  {isAdmin() && (
-                    <>
-                      <th className="mobile">ID партнера</th>
-                      <th>{get_translation("INTERFACE_CURATOR")}</th>
-                    </>
-                  )}
-                  <th className="mobile">
-                    {get_translation("INTERFACE_LAST_MSG")}
-                  </th>
-                  <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
-                  <th>{get_translation("INTERFACE_STATUS")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr className="d-md-table-row" key={ticket.id}>
-                    {isAdmin() && (
-                      <td className="d-md-table-cell">
-                        <Link
-                          to={`/dialog/${ticket.link}`}
-                          state={{
-                            status: ticket.status.name.stroke,
-                            linkPrev: window.location.href,
-                          }}
-                          className="alltickets__link"
-                        >
-                          {ticket.id}
-                        </Link>
-                      </td>
-                    )}
-                    <td
-                      className="d-md-table-cell"
-                      style={{ textAlign: "left" }}
+      <TitleH2
+        title={get_translation("INTERFACE_MY_APPEALS")}
+        className="title__heading"
+      />
+      <div className="table__sorts">
+        <span className="table__sorts-label">
+          {get_translation("INTERFACE_SORT")}:
+        </span>
+        {columns.map((column, index) => (
+          <>
+            {isAdmin() || index !== 0 ? (
+              <span
+                key={column}
+                onClick={() => {
+                  handleSorts(index);
+                }}
+                className={
+                  selectedSort === index
+                    ? "table__sort table__sort-active"
+                    : "table__sort"
+                }
+              >
+                {columnsName[index]}
+                {selectedSort === index && (
+                  <span className="table__sort-arrow">
+                    <svg
+                      className={
+                        orderDir == "DESC"
+                          ? "table__sort-arrow-svg-rotated"
+                          : "table__sort-arrow-svg"
+                      }
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="7"
+                      height="10"
+                      viewBox="0 0 7 10"
+                      fill="none"
                     >
+                      <path
+                        d="M3.5 9V1M3.5 1L1 3.15385M3.5 1L6 3.15385"
+                        stroke="#00AB97"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </span>
+            ) : null}
+          </>
+        ))}
+      </div>
+      <div className="table__wrapper">
+        <Table className="table__table" hover>
+          <thead>
+            <tr>
+              {isAdmin() && <th>ID</th>}
+              <th>{get_translation("INTERFACE_CHAPTER")}</th>
+              <th>{get_translation("INTERFACE_DATE_CREATE")}</th>
+              <th>{get_translation("INTERFACE_THEME")}</th>
+              {isAdmin() && (
+                <>
+                  <th className="mobile">ID партнера</th>
+                  <th>{get_translation("INTERFACE_CURATOR")}</th>
+                </>
+              )}
+              <th className="mobile">
+                {get_translation("INTERFACE_LAST_MSG")}
+              </th>
+              <th className="mobile">{get_translation("INTERFACE_MSG")}</th>
+              <th>{get_translation("INTERFACE_STATUS")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tickets.map((ticket) => (
+              <tr key={ticket.id}>
+                {isAdmin() && (
+                  <td>
+                    <Link
+                      to={`/dialog/${ticket.link}`}
+                      state={{
+                        status: ticket.status.name.stroke,
+                        linkPrev: window.location.href,
+                      }}
+                      className="alltickets__link"
+                    >
+                      {ticket.id}
+                    </Link>
+                  </td>
+                )}
+                <td style={{ textAlign: "left" }}>
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    {`${
+                      ticket.subTheme.theme.unit.name.stroke === null
+                        ? ""
+                        : `${handleUnitStroke(
+                            ticket.subTheme.theme.unit.name.stroke
+                          )} |`
+                    } ${ticket.subTheme.theme.name.stroke} ${
+                      ticket.subTheme.name.stroke === "none"
+                        ? ""
+                        : `| ${ticket.subTheme.name.stroke}`
+                    }`}
+                  </Link>
+                </td>
+                <td>
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    {DateTime.fromISO(ticket.date, {
+                      zone: "utc",
+                    })
+                      .toLocal()
+                      .toFormat("yyyy.MM.dd")}
+                    <br />
+                    {DateTime.fromISO(ticket.date, {
+                      zone: "utc",
+                    })
+                      .toLocal()
+                      .toFormat("HH:mm:ss")}
+                  </Link>
+                </td>
+                <td style={{ textAlign: "left" }}>
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    {ticket.title.length > 20
+                      ? `${ticket.title.slice(0, 20)}...`
+                      : `${ticket.title}`}
+                  </Link>
+                </td>
+                {isAdmin() && (
+                  <>
+                    <td className="mobile">
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -365,16 +420,12 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {`${handleUnitStroke(
-                          ticket.subTheme.theme.unit.name.stroke
-                        )} | ${ticket.subTheme.theme.name.stroke} ${
-                          ticket.subTheme.name.stroke === "none"
-                            ? ""
-                            : `| ${ticket.subTheme.name.stroke}`
-                        }`}
+                        {ticket.initiator.outerId
+                          ? ticket.initiator.outerId
+                          : ticket.initiator.id}
                       </Link>
                     </td>
-                    <td className="d-md-table-cell">
+                    <td>
                       <Link
                         to={`/dialog/${ticket.link}`}
                         state={{
@@ -383,128 +434,69 @@ function TableTickets() {
                         }}
                         className="alltickets__link"
                       >
-                        {DateTime.fromISO(ticket.date, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("yyyy.MM.dd")}
-                        <br />
-                        {DateTime.fromISO(ticket.date, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("HH:mm:ss")}
+                        {`${ticket.recipient.surname} ${ticket.recipient.name}`}
                       </Link>
                     </td>
-                    <td className="d-md-table-cell">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.title.length > 20
-                          ? `${ticket.title.slice(0, 20)}...`
-                          : `${ticket.title}`}
-                      </Link>
-                    </td>
-                    {isAdmin() && (
-                      <>
-                        <td className="mobile">
-                          <Link
-                            to={`/dialog/${ticket.link}`}
-                            state={{
-                              status: ticket.status.name.stroke,
-                              linkPrev: window.location.href,
-                            }}
-                            className="alltickets__link"
-                          >
-                            {ticket.initiator.outerId
-                              ? ticket.initiator.outerId
-                              : ticket.initiator.id}
-                          </Link>
-                        </td>
-                        <td className="d-md-table-cell">
-                          <Link
-                            to={`/dialog/${ticket.link}`}
-                            state={{
-                              status: ticket.status.name.stroke,
-                              linkPrev: window.location.href,
-                            }}
-                            className="alltickets__link"
-                          >
-                            {`${ticket.helper.user.surname} ${ticket.helper.user.name}`}
-                          </Link>
-                        </td>
-                      </>
-                    )}
-                    <td className="d-md-table-cell mobile">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.lastMessage.date
-                          .slice(0, 10)
-                          .replace(/-/g, ".")}
-                        |{" "}
-                        {ticket.lastMessage.sender.surname === "system"
-                          ? "Системное сообщение"
-                          : `${
-                              ticket.lastMessage.sender.name
-                            } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
-                      </Link>
-                    </td>
-                    <td className="d-md-table-cell mobile">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        {ticket.messages.length}
-                      </Link>
-                    </td>
-                    <td className="d-md-table-cell">
-                      <Link
-                        to={`/dialog/${ticket.link}`}
-                        state={{
-                          status: ticket.status.name.stroke,
-                          linkPrev: window.location.href,
-                        }}
-                        className="alltickets__link"
-                      >
-                        <span
-                          className="table__status"
-                          style={{
-                            background: getStatusColor(
-                              ticket.status.name.stroke
-                            ),
-                          }}
-                        >
-                          {ticket.status.name.stroke}
-                        </span>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
-          <ButtonCustom
-            title={get_translation("INTERFACE_SHOW_ALL_TICKETS")}
-            onClick={goToAllTickets}
-            className={"table__button button-hover"}
-          />
-        </>
-      )}
+                  </>
+                )}
+                <td className="mobile" style={{ textAlign: "left" }}>
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
+                    {ticket.lastMessage.sender.surname === "system"
+                      ? "Системное сообщение"
+                      : `${
+                          ticket.lastMessage.sender.name
+                        } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
+                  </Link>
+                </td>
+                <td className="mobile">
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    {ticket.messages?.length}
+                  </Link>
+                </td>
+                <td id="alltickets__status">
+                  <Link
+                    to={`/dialog/${ticket.link}`}
+                    state={{
+                      status: ticket.status.name.stroke,
+                      linkPrev: window.location.href,
+                    }}
+                    className="alltickets__link"
+                  >
+                    <span
+                      className="table__status"
+                      style={{
+                        background: getStatusColor(ticket.status.name.stroke),
+                      }}
+                    >
+                      {ticket.status.name.stroke}
+                    </span>
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+      <ButtonCustom
+        title={get_translation("INTERFACE_SHOW_ALL_TICKETS")}
+        onClick={goToAllTickets}
+        className={"table__button button-hover"}
+      />
     </>
   );
 }
