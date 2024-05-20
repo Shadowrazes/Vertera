@@ -11,6 +11,7 @@ import { UPDATE_TRANSLATION } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
+import ModalDialog from "../components/modal-dialog";
 import Loader from "./loading";
 import NotFoundPage from "./not-found-page";
 
@@ -22,11 +23,16 @@ function Translation() {
 
   const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
-  const [show, setShow] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Переводы обновлены";
+  const modalBody = "Таблица переводов успешно обновлена";
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const modalErrorTitle = "Ошибка обновления переводов";
+  const modalErrorBody = "При обновлении таблицы переводов произошла ошибка";
+
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -154,20 +160,20 @@ function Translation() {
   };
 
   const handleShow = () => {
-    setShow(true);
+    setShowModal(true);
   };
 
   const handleShowError = () => {
-    setShowError(true);
+    setShowErrorModal(true);
   };
 
   const handleCloseLeave = () => {
-    setShow(false);
+    setShowModal(false);
     window.location.reload();
   };
 
   const handleClose = () => {
-    setShowError(false);
+    setShowErrorModal(false);
   };
 
   return (
@@ -239,33 +245,19 @@ function Translation() {
             />
           </div>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Переводы обновлены</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Таблица переводов успешно обновлена</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseLeave}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
 
-          <Modal show={showError} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Ошибка обновления переводов</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>При обновлении таблицы переводов произошла ошибка</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showErrorModal}
+            onClose={handleClose}
+            modalTitle={modalErrorTitle}
+            modalBody={modalErrorBody}
+          />
         </>
       ) : (
         <NotFoundPage />

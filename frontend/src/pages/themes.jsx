@@ -19,6 +19,7 @@ import { UPDATE_THEME_ORDER } from "../apollo/mutations";
 
 import TitleH2 from "../components/title";
 import ButtonCustom from "../components/button";
+import ModalDialog from "../components/modal-dialog";
 import Loader from "./loading";
 import NotFoundPage from "./not-found-page";
 
@@ -32,10 +33,16 @@ function Theme() {
 
   const [showInactive, setShowInactive] = useState(false);
   const [showApplyButton, setShowApplyButton] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showError, setShowError] = useState(false);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Порядок обновлен";
+  const modalBody = "Порядок тем успешно обновлен";
+
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const modalErrorTitle = "Ошибка при смене порядка";
+  const modalErrorBody = "Порядок тем не был обновлен";
+
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -242,20 +249,20 @@ function Theme() {
   };
 
   const handleShow = () => {
-    setShow(true);
+    setShowModal(true);
   };
 
   const handleShowError = () => {
-    setShowError(true);
+    setShowErrorModal(true);
   };
 
   const handleCloseLeave = () => {
-    setShow(false);
+    setShowModal(false);
     window.location.reload();
   };
 
   const handleClose = () => {
-    setShowError(false);
+    setShowErrorModal(false);
   };
 
   return (
@@ -329,33 +336,19 @@ function Theme() {
             )}
           </div>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Порядок обновлен</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Порядок тем успешно обновлен</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseLeave}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
 
-          <Modal show={showError} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Ошибка при смене порядка</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Порядок тем не был обновлен</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showErrorModal}
+            onClose={handleClose}
+            modalTitle={modalErrorTitle}
+            modalBody={modalErrorBody}
+          />
         </>
       ) : (
         <NotFoundPage />

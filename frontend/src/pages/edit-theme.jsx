@@ -17,6 +17,7 @@ import { EDIT_THEME } from "../apollo/mutations";
 import BackTitle from "../components/back-title";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
+import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
 function EditTheme() {
@@ -32,7 +33,10 @@ function EditTheme() {
   const [visibility, setVisibility] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const modalTitle = "Тема обновлена";
+  const modalBody = "Название темы успешно обновлено";
 
   const visibilityItems = {
     1: "Доступно всем",
@@ -206,11 +210,11 @@ function EditTheme() {
   };
 
   const handleShow = () => {
-    setShow(true);
+    setShowModal(true);
   };
 
   const handleCloseLeave = () => {
-    setShow(false);
+    setShowModal(false);
     goToAllThemes();
   };
 
@@ -299,19 +303,12 @@ function EditTheme() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Тема обновлена</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Название темы успешно обновлено</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showModal}
+            onClose={handleCloseLeave}
+            modalTitle={modalTitle}
+            modalBody={modalBody}
+          />
         </>
       ) : (
         <NotFoundPage />

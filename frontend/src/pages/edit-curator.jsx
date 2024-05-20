@@ -12,7 +12,6 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
-  DELETE_USER,
   DISABLE_HELPER_USER,
   EDIT_HELPER_USER,
   UPDATE_CURATOR_PERMS,
@@ -29,6 +28,7 @@ import { MultiSelect } from "primereact/multiselect";
 import { DatePicker } from "rsuite";
 import BackTitle from "../components/back-title";
 import ButtonCustom from "../components/button";
+import ModalDialog from "../components/modal-dialog";
 import Loader from "../pages/loading";
 import NotFoundPage from "./not-found-page";
 
@@ -41,7 +41,7 @@ function EditCurator() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [departmentList, setDepartmentList] = useState([]);
-  const [jobTltleList, setJobTitleList] = useState([]);
+  const [jobTitleList, setJobTitleList] = useState([]);
   const [countryList, setCountryList] = useState([]);
 
   const [nameValue, setNameValue] = useState("");
@@ -56,19 +56,33 @@ function EditCurator() {
   const [selectedCountryId, setSelectedCountryId] = useState(null);
   const [isActive, setIsActive] = useState(null);
 
-  const [selectedAccessCurators, setSelectedAccessCurators] = useState(false);
-  const [selectedAccessThemes, setSelectedAccessThemes] = useState(false);
-  const [selectedAccessTransfers, setSelectedAccessTransfers] = useState(false);
-  const [selectedAccessToAnswers, setSelectedAccessToAnswers] = useState(false);
+  const [selectedAccessHelperEdit, setSelectedAccessHelperEdit] =
+    useState(false);
+  const [selectedAccessThemeEdit, setSelectedAccessThemeEdit] = useState(false);
+  const [selectedAccessTranslationEdit, setSelectedAccessTranslationEdit] =
+    useState(false);
+  const [selectedAccessSendMsg, setSelectedAccessSendMsg] = useState(false);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
-  const [showThree, setShowThree] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const modalSuccessTitle = "Куратор обновлен";
+  const modalSuccessBody = "Данные куратора успешно обновлены";
+
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const modalDeactivateTitle = "Куратор деактивирован";
+  const modalDeactivateBody = "Куратор успешно деактивирован";
+
+  const [showActivateModal, setShowActivateModal] = useState(false);
+  const modalActivateTitle = "Куратор активирован";
+  const modalActivateBody = "Куратор успешно активирован";
+
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const modalWarningTitle = "Предупреждение";
+  const modalWarningBody = "Вы уверены, что хотите деактивировать куратора?";
+
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -119,8 +133,6 @@ function EditCurator() {
   const [disableHelperUser, { loading: loadingDisableHelperUser }] =
     useMutation(DISABLE_HELPER_USER);
 
-  const [deleteUser, { loading: loadingDeleteUser }] = useMutation(DELETE_USER);
-
   const [updateCuratorPerms] = useMutation(UPDATE_CURATOR_PERMS);
 
   const navigate = useNavigate();
@@ -136,10 +148,12 @@ function EditCurator() {
     }
 
     if (data && data.helperQuery.helper.permissions) {
-      setSelectedAccessToAnswers(data.helperQuery.helper.permissions.sendMsg);
-      setSelectedAccessCurators(data.helperQuery.helper.permissions.helperEdit);
-      setSelectedAccessThemes(data.helperQuery.helper.permissions.themeEdit);
-      setSelectedAccessTransfers(
+      setSelectedAccessSendMsg(data.helperQuery.helper.permissions.sendMsg);
+      setSelectedAccessHelperEdit(
+        data.helperQuery.helper.permissions.helperEdit
+      );
+      setSelectedAccessThemeEdit(data.helperQuery.helper.permissions.themeEdit);
+      setSelectedAccessTranslationEdit(
         data.helperQuery.helper.permissions.translationEdit
       );
     }
@@ -251,19 +265,19 @@ function EditCurator() {
   };
 
   const handleOnChangeAccessCurators = (e) => {
-    setSelectedAccessCurators(e.target.checked);
+    setSelectedAccessHelperEdit(e.target.checked);
   };
 
   const handleOnChangeAccessThemes = (e) => {
-    setSelectedAccessThemes(e.target.checked);
+    setSelectedAccessThemeEdit(e.target.checked);
   };
 
   const handleOnChangeAccessTransfers = (e) => {
-    setSelectedAccessTransfers(e.target.checked);
+    setSelectedAccessTranslationEdit(e.target.checked);
   };
 
   const handleOnChangeAccessAnswers = (e) => {
-    setSelectedAccessToAnswers(e.target.checked);
+    setSelectedAccessSendMsg(e.target.checked);
   };
 
   const handlePeriodClick = (originalDate) => {
@@ -349,10 +363,10 @@ function EditCurator() {
         variables: {
           token: user.token,
           id: parseInt(curatorId),
-          sendMsg: selectedAccessToAnswers,
-          helperEdit: selectedAccessCurators,
-          themeEdit: selectedAccessThemes,
-          translationEdit: selectedAccessTransfers,
+          sendMsg: selectedAccessSendMsg,
+          helperEdit: selectedAccessHelperEdit,
+          themeEdit: selectedAccessThemeEdit,
+          translationEdit: selectedAccessTranslationEdit,
         },
       });
       console.log("Права доступа успешно обновлены:", result);
@@ -393,7 +407,7 @@ function EditCurator() {
       }
 
       console.log("Куратор успешно обновлен:", result);
-      handleShow();
+      handleShowSuccessModal();
     } catch (error) {
       console.error("Ошибка при обновлении куратора:", error);
       setIsErrorVisible(true);
@@ -407,7 +421,7 @@ function EditCurator() {
 
   const handleConfirm = async (e) => {
     e.preventDefault();
-    setShowWarning(false);
+    setShowWarningModal(false);
 
     try {
       const result = await disableHelperUser({
@@ -418,7 +432,7 @@ function EditCurator() {
         },
       });
       console.log("Куратор успешно удален:", result);
-      setShowTwo(true);
+      setShowDeactivateModal(true);
     } catch (error) {
       console.error("Ошибка удалении куратора:", error);
       setIsErrorVisible(true);
@@ -437,31 +451,29 @@ function EditCurator() {
         },
       });
       console.log("Куратор успешно активирован:", result);
-      setShowThree(true);
+      setShowActivateModal(true);
     } catch (error) {
       console.error("Ошибка активации куратора:", error);
       setIsErrorVisible(true);
     }
   };
 
-  const handleShow = () => {
-    setShow(true);
+  const handleShowSuccessModal = () => {
+    setShowSuccessModal(true);
   };
 
   const handleShowWarning = () => {
-    setShowWarning(true);
+    setShowWarningModal(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
+  const handleCloseModal = () => {
+    setShowWarningModal(false);
   };
 
-  const handleCloseLeave = () => {
-    setShow(false);
-    setShowTwo(false);
-    setShowWarning(false);
+  const handleCloseModalLeave = () => {
+    setShowSuccessModal(false);
+    setShowDeactivateModal(false);
+    setShowActivateModal(false);
     goToAllCurators();
   };
 
@@ -555,8 +567,8 @@ function EditCurator() {
                         className=""
                         type="checkbox"
                         id="custom-switch"
-                        value={selectedAccessCurators}
-                        checked={selectedAccessCurators}
+                        value={selectedAccessHelperEdit}
+                        checked={selectedAccessHelperEdit}
                         onChange={handleOnChangeAccessCurators}
                       />
                       <span className="edit-curator__field-label">
@@ -572,8 +584,8 @@ function EditCurator() {
                       <Form.Check
                         type="checkbox"
                         id="custom-switch"
-                        value={selectedAccessThemes}
-                        checked={selectedAccessThemes}
+                        value={selectedAccessThemeEdit}
+                        checked={selectedAccessThemeEdit}
                         onChange={handleOnChangeAccessThemes}
                       />
                       <span className="edit-curator__field-label">
@@ -589,8 +601,8 @@ function EditCurator() {
                       <Form.Check
                         type="checkbox"
                         id="custom-switch"
-                        value={selectedAccessTransfers}
-                        checked={selectedAccessTransfers}
+                        value={selectedAccessTranslationEdit}
+                        checked={selectedAccessTranslationEdit}
                         onChange={handleOnChangeAccessTransfers}
                       />
                       <span className="edit-curator__field-label">
@@ -606,8 +618,8 @@ function EditCurator() {
                       <Form.Check
                         type="checkbox"
                         id="custom-switch"
-                        value={selectedAccessToAnswers}
-                        checked={selectedAccessToAnswers}
+                        value={selectedAccessSendMsg}
+                        checked={selectedAccessSendMsg}
                         onChange={handleOnChangeAccessAnswers}
                       />
                       <span className="edit-curator__field-label">
@@ -667,7 +679,7 @@ function EditCurator() {
                   Должность
                 </Form.Label>
                 <DropdownButton id="dropdown-custom-1" title={selectedJobTitle}>
-                  {jobTltleList.map((jobTitle, index) => (
+                  {jobTitleList.map((jobTitle, index) => (
                     <Dropdown.Item
                       key={index}
                       onClick={() =>
@@ -715,64 +727,35 @@ function EditCurator() {
             </Col>
           </Row>
 
-          <Modal show={show} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Куратор обновлен</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Данные куратора успешно обновлены</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showSuccessModal}
+            onClose={handleCloseModalLeave}
+            modalTitle={modalSuccessTitle}
+            modalBody={modalSuccessBody}
+          />
 
-          <Modal show={showTwo} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Куратор деактивирован</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Куратор успешно деактивирован</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showDeactivateModal}
+            onClose={handleCloseModalLeave}
+            modalTitle={modalDeactivateTitle}
+            modalBody={modalDeactivateBody}
+          />
 
-          <Modal show={showThree} onHide={handleCloseLeave}>
-            <Modal.Header closeButton>
-              <Modal.Title>Куратор активирован</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Куратор успешно активирован</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLeave}>
-                Закрыть
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showActivateModal}
+            onClose={handleCloseModalLeave}
+            modalTitle={modalActivateTitle}
+            modalBody={modalActivateBody}
+          />
 
-          <Modal show={showWarning} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Предупреждение</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>Вы уверены, что хотите деактивировать куратора?</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Отмена
-              </Button>
-              <Button variant="primary" onClick={handleConfirm}>
-                Продолжить
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <ModalDialog
+            show={showWarningModal}
+            onClose={handleCloseModal}
+            onConfirm={handleConfirm}
+            modalTitle={modalWarningTitle}
+            modalBody={modalWarningBody}
+            warning={true}
+          />
         </>
       ) : (
         <NotFoundPage />
