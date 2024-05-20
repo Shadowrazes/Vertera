@@ -1,4 +1,4 @@
-import "../css/chat-message-system.css";
+import "../../css/chat-message-system.css";
 
 function ChatMessage({ message, time }) {
   return (

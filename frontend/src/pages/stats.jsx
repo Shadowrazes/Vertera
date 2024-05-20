@@ -13,7 +13,7 @@ import {
 import { DateRangePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
 import TitleH2 from "../components/title";
-import Level from "../components/level";
+import Level from "../components/stats_components/level";
 import ButtonCustom from "../components/button";
 import Loader from "./loading";
 import NotFoundPage from "./not-found-page";

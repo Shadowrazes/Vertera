@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 
-import { ADD_TICKET } from "../apollo/mutations";
+import { ADD_TICKET } from "../../apollo/mutations";
 
-import TitleH2 from "./title";
-import ThemeDropdowns from "./theme-dropdowns";
-import TextEditor from "./text-editor";
-import ModalDialog from "./modal-dialog";
-import ButtonCustom from "./button";
+import TitleH2 from "../title";
+import ThemeDropdowns from "../theme-dropdowns";
+import TextEditor from "../text-editor";
+import ModalDialog from "../modal-dialog";
+import ButtonCustom from "../button";
 
-import "../css/form.css";
+import "../../css/form.css";
 
-import get_translation from "../helpers/translation";
+import get_translation from "../../helpers/translation";
 
 function FormComponent() {
   const [editorContent, setEditorContent] = useState("");

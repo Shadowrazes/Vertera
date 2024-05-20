@@ -97,7 +97,7 @@ export default function ThemeDropdowns(props) {
 
   return (
     <>
-      <Col className="form__column">
+      <div className="form__column">
         <DropdownButton
           id="dropdown-custom-1"
           title={selectedUnit || get_translation("INTERFACE_SELECT_UNIT")}
@@ -164,7 +164,7 @@ export default function ThemeDropdowns(props) {
               )}
           </DropdownButton>
         )}
-      </Col>
+      </div>
     </>
   );
 }

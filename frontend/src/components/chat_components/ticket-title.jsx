@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import "../css/ticket-title.css";
+import "../../css/ticket-title.css";
 
 const getStatusColor = (status) => {
   switch (status) {

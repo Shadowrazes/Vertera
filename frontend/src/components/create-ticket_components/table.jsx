@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import { Table, Container, Row, Col } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import { DateTime } from "luxon";
 
-import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../apollo/queries";
+import { TABLE_TICKETS_USER, TABLE_TICKETS } from "../../apollo/queries";
 
-import TitleH2 from "./title";
-import ButtonCustom from "./button";
-import Loader from "../pages/loading";
+import TitleH2 from "../title";
+import ButtonCustom from "../button";
+import Loader from "../../pages/loading";
 
-import "../css/table.css";
-import "../css/all-tickets.css";
+import "../../css/table.css";
+import "../../css/all-tickets.css";
 
-import get_translation from "../helpers/translation";
+import get_translation from "../../helpers/translation";
 
 function TableTickets() {
   const [dataQuery, setData] = useState([]);

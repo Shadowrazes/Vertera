@@ -1,25 +1,22 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import { MESSAGE } from "../apollo/queries";
-
-import Loader from "../pages/loading";
+import { MESSAGE } from "../../apollo/queries";
 
 import { franc } from "franc";
-import { Translater } from "../api/translater";
+import { Translater } from "../../api/translater";
 
-import "../css/chat-message-sender.css";
+import "../../css/chat-message-sender.css";
 
-function ChatMessage({ id, message, sender, time, attachs, onClick }) {
+function ChatMessage({ id, message, sender, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
-  const [senderId, setSenderId] = useState(null);
 
   let isVisible;
 
   const isBuild = import.meta.env.DEV !== "build";
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   const { data } = useQuery(MESSAGE, {
     variables: {
@@ -100,10 +97,6 @@ function ChatMessage({ id, message, sender, time, attachs, onClick }) {
       // }
       handleTranslate(message, languageCodeQuery[language]);
     };
-
-    if (data && data.clientQuery.message) {
-      setSenderId(data.clientQuery.message.sender.id);
-    }
 
     fetchData();
     setTranslatedText("");

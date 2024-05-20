@@ -1,4 +1,4 @@
-import "../css/level.css";
+import "../../css/level.css";
 import { useState, useEffect } from "react";
 
 function Level({ fantasy, allTickets }) {

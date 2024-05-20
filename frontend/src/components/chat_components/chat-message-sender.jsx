@@ -1,16 +1,49 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
 
-import { Translater } from "../api/translater";
+import { MESSAGE } from "../../apollo/queries";
+import { DELETE_MESSAGE } from "../../apollo/mutations";
+
+import Loader from "../../pages/loading";
+import ModalDialog from "../modal-dialog";
+
 import { franc } from "franc";
+import { Translater } from "../../api/translater";
 
-import "../css/chat-message-recipient.css";
+import DeleteMsgIcon from "../../assets/delete_msg_icon.svg";
+import "../../css/chat-message-sender.css";
 
-function ChatMessage({ message, sender, visibility, time, attachs }) {
+function ChatMessage({
+  id,
+  message,
+  sender,
+  visibility,
+  removable,
+  status,
+  time,
+  attachs,
+  onClick,
+}) {
   const [translatedText, setTranslatedText] = useState("");
+  const [senderId, setSenderId] = useState(null);
+
   let isVisible;
+
+  const [showWarningDelete, setShowWarningDelete] = useState(false);
+  const modalTitle = "Предупреждение";
+  const modalBody = "Вы уверены, что хотите удалить это сообщение?";
+
   const isBuild = import.meta.env.DEV !== "build";
 
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
+
+  const { data } = useQuery(MESSAGE, {
+    variables: {
+      token: user.token,
+      id: id,
+    },
+  });
 
   const languageCode = {
     rus: ["RU", "/flags/ru.svg"],
@@ -21,7 +54,6 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
     deu: ["DE", "/flags/de.svg"],
     hu: ["HU", "/flags/hu.svg"],
     kaz: ["KZ", "/flags/kz.svg"],
-    ewe: ["EN", "/flags/en.svg"],
   };
 
   const languageCodeQuery = {
@@ -35,7 +67,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
     KZ: ["казахский", "/flags/kz.svg"],
   };
 
-  if (attachs.length == 0) {
+  if (attachs.length === 0) {
     isVisible = true;
   } else {
     isVisible = false;
@@ -43,7 +75,6 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
 
   const getFullName = (userData) => {
     let result = "";
-    // console.log(userData);
 
     if (userData?.surname) {
       result += userData?.surname + " ";
@@ -52,7 +83,6 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
     if (userData?.name) {
       result += userData?.name + " ";
     }
-
     if (userData?.patronymic) {
       result += userData?.patronymic;
     }
@@ -71,6 +101,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
   };
 
   useEffect(() => {
+    // console.log("time = ", time);
     const fetchData = async () => {
       // if (languageCode.hasOwnProperty(franc(message))) {
       //   if ((languageCode[franc(message)][0] || franc(message)) !== language) {
@@ -86,39 +117,77 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
       // }
       handleTranslate(message, languageCodeQuery[language]);
     };
+
+    if (data && data.clientQuery.message) {
+      setSenderId(data.clientQuery.message.sender.id);
+    }
+
     fetchData();
     setTranslatedText("");
-  }, [message, language]);
+  }, [data, message, language]);
+
+  const [deleteMessage, { loading: loadingDelete }] =
+    useMutation(DELETE_MESSAGE);
+
+  if (loadingDelete) {
+    return <Loader />;
+  }
+
+  const handleDeleteMsg = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await deleteMessage({
+        variables: {
+          token: user.token,
+          id: id,
+        },
+      });
+      handleCloseWarning();
+      console.log("Сообщение успешно добавлена:", result);
+      if (onClick) {
+        onClick();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleShowWarningDelete = () => {
+    setShowWarningDelete(true);
+  };
+
+  const handleCloseWarning = () => {
+    setShowWarningDelete(false);
+  };
 
   return (
     <>
-      <div className="chat-message-recipient__container">
+      <div className="chat-message-sender__container">
         <div
           className={
             visibility == 2
-              ? "chat-message-recipient__box chat-message-recipient__box-curators-chat"
-              : "chat-message-recipient__box"
+              ? "chat-message-sender__box chat-message-sender__box-curators-chat"
+              : "chat-message-sender__box"
           }
         >
-          <div className="chat-message-recipient__header">
-            <h3 className="chat-message-recipient__name">
-              {getFullName(sender)}
-            </h3>
-            <span className="chat-message-recipient__time">{time}</span>
+          <div className="chat-message-sender__header">
+            <h3 className="chat-message-sender__name">{getFullName(sender)}</h3>
+            <span className="chat-message-sender__time">{time}</span>
           </div>
-          <div className="chat-message-recipient__text">
+          <div className="chat-message-sender__text">
             <p dangerouslySetInnerHTML={{ __html: message }}></p>
             {!isVisible && (
               <>
-                <span className="chat-message-recipient__attachs-title">
+                <span className="chat-message-sender__attachs-title">
                   Прикрепленные файлы:
                 </span>
-                <div className="chat-message-recipient__attachs">
+                <div className="chat-message-sender__attachs">
                   {attachs &&
                     attachs.map((attach) => (
                       <div key={attach.id}>
                         <a
-                          className="chat-message-recipient__attach-link"
+                          className="chat-message-sender__attach-link"
                           download
                           target="_blank"
                           rel="noopener noreferrer"
@@ -128,12 +197,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                               : "http://localhost:4444" + attach.path
                           }
                         >
-                          <img
-                            src="/file.svg"
-                            className="chat-message-recipient__attach-icon"
-                            alt=""
-                          />
-                          <span className="chat-message-recipient__attach">
+                          <span className="chat-message-sender__attach">
                             {attach.name}
                           </span>
                         </a>
@@ -163,18 +227,18 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                   <i dangerouslySetInnerHTML={{ __html: translatedText }}></i>
                   {!isVisible && (
                     <>
-                      <span className="chat-message-recipient__attachs-title">
+                      <span className="chat-message-sender__attachs-title">
                         Прикрепленные файлы:
                       </span>
                       <div
                         style={{ justifyContent: "flex-end" }}
-                        className="chat-message-recipient__attachs"
+                        className="chat-message-sender__attachs"
                       >
                         {attachs &&
                           attachs.map((attach) => (
                             <div key={attach.id}>
                               <a
-                                className="chat-message-recipient__attach-link"
+                                className="chat-message-sender__attach-link"
                                 download
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -185,12 +249,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                                     : "http://localhost:4444" + attach.path
                                 }
                               >
-                                <img
-                                  src="/file.svg"
-                                  className="chat-message-recipient__attach-icon"
-                                  alt=""
-                                />
-                                <span className="chat-message-recipient__attach">
+                                <span className="chat-message-sender__attach">
                                   {attach.name}
                                 </span>
                               </a>
@@ -202,10 +261,32 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                 </div>
               </>
             )}
+          {user.id === senderId &&
+            sender.role !== "client" &&
+            removable !== null &&
+            status !== "Выполнено" && (
+              <div className="chat-message-sender__delete">
+                <img
+                  src={DeleteMsgIcon}
+                  alt=""
+                  className="countries__delete-icon"
+                  style={{ width: "42px" }}
+                  onClick={handleShowWarningDelete}
+                />
+              </div>
+            )}
         </div>
       </div>
+
+      <ModalDialog
+        show={showWarningDelete}
+        onClose={handleCloseWarning}
+        onConfirm={handleDeleteMsg}
+        modalTitle={modalTitle}
+        modalBody={modalBody}
+        warning={true}
+      />
     </>
   );
 }
-
 export default ChatMessage;

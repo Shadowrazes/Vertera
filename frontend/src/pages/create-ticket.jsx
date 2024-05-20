@@ -1,5 +1,5 @@
-import Form from "../components/form";
-import Table from "../components/table";
+import Form from "../components/create-ticket_components/form";
+import Table from "../components/create-ticket_components/table";
 
 function CreateTicket() {
   return (

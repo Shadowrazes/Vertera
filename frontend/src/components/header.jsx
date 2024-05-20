@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import {
   Modal,
   Button,
@@ -128,7 +128,7 @@ function Header({ user }) {
     return user?.role === "helper" || user?.role === "system";
   };
 
-  const { data, refetch } = useQuery(LOGIN);
+  const [Login, { data, refetch }] = useLazyQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);
@@ -181,7 +181,7 @@ function Header({ user }) {
     setIsLoad(true);
     setIsError(false);
     try {
-      const { data: loginData } = await refetch(loginVariables);
+      const loginData = Login({ variables: loginVariables });
       if (loginData) {
         localStorage.setItem(
           "user",
