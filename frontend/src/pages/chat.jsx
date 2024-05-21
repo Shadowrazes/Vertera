@@ -10,7 +10,6 @@ import {
   Form,
   Row,
   Tab,
-  Table,
   Tabs,
   ToggleButton,
   ToggleButtonGroup,
@@ -37,7 +36,9 @@ import {
 import { Editor } from "react-draft-wysiwyg";
 import ButtonCustom from "../components/button";
 import TicketTitle from "../components/chat_components/ticket-title";
+import InfoTable from "../components/chat_components/info-table";
 import MessageList from "../components/chat_components/message-list";
+import Counter from "../components/chat_components/counter";
 import Reaction from "../components/chat_components/reaction";
 import Logs from "../components/chat_components/logs";
 import Loader from "../pages/loading";
@@ -197,7 +198,11 @@ function Chat() {
     },
   });
 
-  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+  const {
+    loading: loadingCuratorsList,
+    error: errorCuratorsList,
+    data: dataCurators,
+  } = useQuery(CURATORS_LIST, {
     variables: {
       token: user.token,
     },
@@ -365,25 +370,18 @@ function Chat() {
     }
   }, [data, dataThemeList, dataCurators, location.state, newTicketsCount]);
 
-  const navigate = useNavigate();
-
-  const goToCreateTicket = () => {
-    navigate("/");
-  };
-
   const goToAllTickets = () => {
     navigate("/all-tickets");
   };
 
-  const [addMessage, { loader: loaderAddMsg, error: errorAddMsg }] =
-    useMutation(ADD_MESSAGE, {
-      refetchQueries: [
-        {
-          query: isAdmin() ? MESSAGES_CHAT : MESSAGES_CHAT_CLIENT,
-          variables: { token: user.token, link: itemId, lang: language },
-        },
-      ],
-    });
+  const [addMessage, { loader: loaderAddMsg }] = useMutation(ADD_MESSAGE, {
+    refetchQueries: [
+      {
+        query: isAdmin() ? MESSAGES_CHAT : MESSAGES_CHAT_CLIENT,
+        variables: { token: user.token, link: itemId, lang: language },
+      },
+    ],
+  });
 
   const [
     updateTicket,
@@ -403,12 +401,24 @@ function Chat() {
   const [mentorLeave, { loading: loadingMentorLeave }] =
     useMutation(MENTOR_LEAVE);
 
-  if (loading) {
+  if (
+    loading ||
+    loadingThemeList ||
+    loadingThemeList ||
+    loadingEditTicket ||
+    loadingSplitTicket ||
+    loadingSendToMentor ||
+    loadingMentorLeave ||
+    loadingCuratorsList
+  ) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorCuratorsList || errorThemeList) {
+    const networkError =
+      error.networkError ??
+      errorCuratorsList.networkError ??
+      errorThemeList.networkError;
 
     if (!isAdmin() && error.message === "Forbidden") {
       return <NotFoundPage />;
@@ -430,34 +440,6 @@ function Chat() {
       }
     }
     return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingThemeList) {
-    return <Loader />;
-  }
-
-  if (errorThemeList) {
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingThemeList) {
-    return <Loader />;
-  }
-
-  if (errorThemeList) {
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingEditTicket) {
-    return <Loader />;
-  }
-
-  if (loadingSplitTicket) {
-    return <Loader />;
-  }
-
-  if (loadingSendToMentor) {
-    return <Loader />;
   }
 
   const handleEditorChange = (newEditorState) => {
@@ -803,21 +785,6 @@ function Chat() {
     });
     setReaction("dislike");
     // console.log(reaction);
-  };
-
-  const getFullName = (userData) => {
-    let result = "";
-    // console.log(userData);
-    if (userData?.surname) {
-      result += userData?.surname + " ";
-    }
-    if (userData?.name) {
-      result += userData?.name + " ";
-    }
-    if (userData?.patronymic) {
-      result += userData?.patronymic;
-    }
-    return result;
   };
 
   const handleSplitTicket = () => {
@@ -1493,7 +1460,7 @@ function Chat() {
         {isAdmin() &&
           isVisibleHelperButtons &&
           currentStatus !== "Уведомление" &&
-          dataPerms.helperQuery?.helperPerms?.sendMsg && (
+          dataPerms?.helperQuery?.helperPerms?.sendMsg && (
             <>
               <div className="chat__helper-buttons">
                 {isAdmin() &&
@@ -2098,82 +2065,31 @@ function Chat() {
           </>
         )}
 
-        {isAdmin() && (
-          <Row>
-            <Col md={6}>
-              <Table bordered hover>
-                <tbody>
-                  <tr>
-                    <td>
-                      <b>Создатель обращения:</b>
-                    </td>
-                    <td>
-                      {`${data.clientQuery.ticket.initiator.surname} ${
-                        data.clientQuery.ticket.initiator.name
-                      } ${
-                        data.clientQuery.ticket.initiator.patronymic
-                          ? ` ${data.clientQuery.ticket.initiator.patronymic}`
-                          : ""
-                      } (${
-                        data.clientQuery.ticket.initiator.country.name.stroke
-                      })`}
-                    </td>
-                  </tr>
-                  {currentStatus !== "Уведомление" && (
-                    <tr>
-                      <td>
-                        <b>Текущий куратор:</b>
-                      </td>
-                      <td>
-                        {`${data.clientQuery.ticket.recipient.surname} ${
-                          data.clientQuery.ticket.recipient.name
-                        } ${
-                          data.clientQuery.ticket.recipient.patronymic
-                            ? ` ${data.clientQuery.ticket.recipient.patronymic}`
-                            : ""
-                        }  (${
-                          data.clientQuery.ticket.recipient.country.name.stroke
-                        })`}
-                      </td>
-                    </tr>
-                  )}
-                  {isAdmin() && currentStatus == "На уточнении" && (
-                    <tr>
-                      <td>
-                        <b>Уточняющий куратор:</b>
-                      </td>
-                      <td>
-                        {getFullName(data?.clientQuery.ticket?.assistant)}
-                      </td>
-                    </tr>
-                  )}
-                  {currentStatus == "У наставника" && (
-                    <tr>
-                      <td>
-                        <b>Уточняющий наставник:</b>
-                      </td>
-                      <td>
-                        {getFullName(data?.clientQuery.ticket?.assistant)}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </Col>
-          </Row>
+        <InfoTable data={data} currentStatus={currentStatus} />
+
+        {!isVisible && (
+          <Reaction
+            reaction={reaction}
+            handleLike={handleLike}
+            handleDislike={handleDislike}
+          />
         )}
 
-        <div className="chat-input__container">
-          {isVisible &&
-          isAdmin() &&
-          currentStatus !== "Новый" &&
-          currentStatus !== "Уведомление" &&
-          (user.id == data.clientQuery.ticket.initiator.id ||
-            user.id == data.clientQuery.ticket.recipient.id ||
-            user.id == data.clientQuery.ticket?.assistant?.id ||
-            user.role == "system") &&
-          dataPerms.helperQuery.helperPerms.sendMsg ? (
-            <Form className="chat-input__form container" onSubmit={sendMsg}>
+        {isVisible &&
+        currentStatus !== "Уведомление" &&
+        (user.id == data.clientQuery.ticket.initiator.id ||
+          user.id == data.clientQuery.ticket.recipient.id ||
+          user.id == data.clientQuery.ticket?.assistant?.id ||
+          user.role == "system") &&
+        (user.role === "helper"
+          ? dataPerms?.helperQuery?.helperPerms?.sendMsg &&
+            currentStatus !== "Новый"
+          : currentStatus === "Новый" ||
+            currentStatus === "Ожидает дополнения" ||
+            (currentStatus === "У наставника" &&
+              user.id === data?.clientQuery?.ticket.assistant?.id)) ? (
+          <div className="chat-input__container">
+            <Form className="chat-input__form1 container" onSubmit={sendMsg}>
               <Row className="chat-input__row">
                 <Col className="chat-input__row">
                   <Form.Group className="custom-editor">
@@ -2303,7 +2219,9 @@ function Chat() {
                 </Col>
               </Row>
             </Form>
-          ) : (
+          </div>
+        ) : (
+          <div className="chat-input__container">
             <Form className="chat-input__form" onSubmit={sendMsg}>
               <Row className="chat-input__row">
                 <div
@@ -2340,106 +2258,8 @@ function Chat() {
                   )}
               </Row>
             </Form>
-          )}
-        </div>
-
-        <div className="chat-input__container">
-          {!isVisible && (
-            <Reaction
-              reaction={reaction}
-              handleLike={handleLike}
-              handleDislike={handleDislike}
-            />
-          )}
-
-          {isVisible &&
-            !isAdmin() &&
-            (currentStatus === "Новый" ||
-              (currentStatus === "Ожидает дополнения" &&
-                currentStatus !== "Уведомление") ||
-              (currentStatus === "У наставника" &&
-                user.id === data?.clientQuery?.ticket.assistant?.id)) && (
-              <Form className="chat-input__form container" onSubmit={sendMsg}>
-                <Row className="chat-input__row">
-                  <Col className="chat-input__row">
-                    <Form.Group className="custom-editor">
-                      <Editor
-                        editorState={editorState}
-                        onEditorStateChange={handleEditorChange}
-                        stripPastedStyles
-                        toolbarStyle={{
-                          border: "1px solid #dee2e6",
-                          borderRadius: "6px 6px 0 0",
-                        }}
-                        editorStyle={{
-                          border: "1px solid #dee2e6",
-                          borderRadius: "0 0 6px 6px",
-                          padding: "10px",
-                          height: "150px",
-                        }}
-                        placeholder={"Введите здесь ваше сообщение"}
-                        toolbar={{
-                          options: [
-                            "inline",
-                            "list",
-                            "emoji",
-                            "remove",
-                            "history",
-                          ],
-                          inline: {
-                            options: [
-                              "bold",
-                              "italic",
-                              "underline",
-                              "strikethrough",
-                            ],
-                          },
-                          list: {
-                            options: ["unordered", "ordered"],
-                          },
-                        }}
-                      />
-                    </Form.Group>
-
-                    <div className="file-inputs">
-                      {fileInputs.map((fileInput, index) => (
-                        <Form.Group key={index} className="mb-3 fileInputForm">
-                          <Form.Control
-                            type="file"
-                            accept=".jpg, .jpeg, .png, .gif, .pdf, .txt, .rtf, .doc, .docx, .zip, .rar, .tar"
-                            onChange={handleFileChange}
-                          />
-                          {index > 0 && (
-                            <Button
-                              variant="outline-danger"
-                              onClick={() => handleRemoveFileInput(index)}
-                            >
-                              Удалить
-                            </Button>
-                          )}
-                        </Form.Group>
-                      ))}
-
-                      <Button
-                        variant="outline-primary"
-                        id="AddFileButton"
-                        onClick={handleAddFileInput}
-                      >
-                        Добавить файл
-                      </Button>
-                    </div>
-
-                    <ButtonCustom
-                      title="Отправить"
-                      className="chat-input__button-send button-hover single"
-                      type="submit"
-                      onClick={handleSubmit}
-                    />
-                  </Col>
-                </Row>
-              </Form>
-            )}
-        </div>
+          </div>
+        )}
 
         <MessageList
           messagesQuery={messagesQuery}
@@ -2448,30 +2268,11 @@ function Chat() {
           handleRefetch={handleRefetch}
         />
 
-        {isAdmin() && currentStatus !== "Уведомление" && (
-          <div className="chat__counter-wrapper">
-            <span className="chat__counter-label">Счетчик:</span>
-            <span
-              className={
-                currentStatus == "В процессе" ||
-                currentStatus == "На уточнении" ||
-                (currentStatus == "Новый" &&
-                  messagesQuery.at(-1).sender.id !==
-                    data.clientQuery.ticket.recipient.id)
-                  ? "chat__counter-work"
-                  : "chat__counter-stop"
-              }
-            >
-              {currentStatus == "В процессе" ||
-              currentStatus == "На уточнении" ||
-              (currentStatus == "Новый" &&
-                messagesQuery.at(-1).sender.id !==
-                  data.clientQuery.ticket.recipient.id)
-                ? "Запущен"
-                : "Остановлен"}
-            </span>
-          </div>
-        )}
+        <Counter
+          currentStatus={currentStatus}
+          messagesQuery={messagesQuery}
+          data={data}
+        />
       </div>
 
       {isAdmin() && <Logs currentStatus={currentStatus} logs={dataLogQuery} />}

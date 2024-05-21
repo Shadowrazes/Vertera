@@ -47,7 +47,7 @@ function EditTheme() {
   const findKeyByValue = (obj, value) =>
     Object.keys(obj).find((key) => obj[key] === value);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -110,12 +110,12 @@ function EditTheme() {
     refetch();
   }, [data, dataTheme, location.state]);
 
-  if (loading) {
+  if (loading || loadingEditTheme || loadingTheme) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorTheme) {
+    const networkError = error.networkError ?? errorTheme.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
@@ -134,18 +134,6 @@ function EditTheme() {
     }
 
     return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingTheme) {
-    return <Loader />;
-  }
-
-  if (errorTheme) {
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingEditTheme) {
-    return <Loader />;
   }
 
   const handleUnitClick = (unit, unitId) => {

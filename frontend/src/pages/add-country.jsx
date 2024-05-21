@@ -23,7 +23,6 @@ function AddCountry() {
   const [selectedLangsId, setSelectedLangsId] = useState([]);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [show, setShow] = useState(false);
 
   const [linkPrev, setLinkPrev] = useState(null);
 

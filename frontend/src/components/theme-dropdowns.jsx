@@ -1,31 +1,20 @@
 import { useState, useEffect } from "react";
-import {
-  Form,
-  Row,
-  Col,
-  Button,
-  DropdownButton,
-  Dropdown,
-  Modal,
-} from "react-bootstrap";
+import { DropdownButton, Dropdown } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 
 import { THEME_LIST } from "../apollo/queries";
 
 import Loader from "../pages/loading";
-import ButtonCustom from "../components/button";
 
 import get_translation from "../helpers/translation";
 
-export default function ThemeDropdowns(props) {
-  const {
-    onUnitIdChange,
-    onThemeIdChange,
-    onSubThemeIdChange,
-    isVisibleChange,
-    onError,
-  } = props;
-
+export default function ThemeDropdowns({
+  onUnitIdChange,
+  onThemeIdChange,
+  onSubThemeIdChange,
+  isVisibleChange,
+  onError,
+}) {
   const [dataQuery, setData] = useState([]);
 
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -34,7 +23,6 @@ export default function ThemeDropdowns(props) {
   const [selectedThemeId, setSelectedThemeId] = useState(null);
   const [selectedSubTheme, setSelectedSubTheme] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
 
   const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
     useState(true);
@@ -69,7 +57,9 @@ export default function ThemeDropdowns(props) {
 
     if (unit !== selectedUnit) {
       setSelectedTheme(null);
+      setSelectedThemeId(null);
       setSelectedSubTheme(null);
+      setSelectedSubThemeId(null);
       setSubThemeDropdownVisible(true);
       isVisibleChange(false);
     }
@@ -82,6 +72,7 @@ export default function ThemeDropdowns(props) {
 
     if (theme !== selectedTheme) {
       setSelectedSubTheme(null);
+      setSelectedSubThemeId(null);
       setSubThemeDropdownVisible(true);
       isVisibleChange(false);
     }

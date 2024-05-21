@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button, Modal } from "react-bootstrap";
 
 import get_translation from "../helpers/translation";

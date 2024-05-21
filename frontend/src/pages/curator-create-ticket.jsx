@@ -4,23 +4,17 @@ import {
   Row,
   Col,
   Button,
-  DropdownButton,
-  Dropdown,
   ToggleButton,
   ToggleButtonGroup,
   Alert,
   Spinner,
   Modal,
 } from "react-bootstrap";
-import draftToHtml from "draftjs-to-html";
-import { EditorState, convertToRaw } from "draft-js";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { THEME_LIST, CURATORS_LIST, HELPER_PERMS } from "../apollo/queries";
+import { CURATORS_LIST, HELPER_PERMS } from "../apollo/queries";
 import { ADD_TICKET, CURATOR_ADD_TICKET } from "../apollo/mutations";
 
-import { Editor } from "react-draft-wysiwyg";
-import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
 import ThemeDropdowns from "../components/theme-dropdowns";
@@ -34,14 +28,10 @@ import "../css/curator-create-ticket.css";
 import get_translation from "../helpers/translation";
 
 function CuratorCreateTicket() {
-  const [dataQuery, setData] = useState([]);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
 
-  const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
-  const [selectedTheme, setSelectedTheme] = useState(null);
   const [selectedThemeId, setSelectedThemeId] = useState(null);
-  const [selectedSubTheme, setSelectedSubTheme] = useState(null);
   const [selectedSubThemeId, setSelectedSubThemeId] = useState(null);
   const [editorContent, setEditorContent] = useState("");
   const [selectedCurators, setSelectedCurators] = useState([]);
@@ -71,11 +61,7 @@ function CuratorCreateTicket() {
   const [isFilesSizeExceeded, setIsFilesSizeExceeded] = useState(false);
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  );
-
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const isBuild = import.meta.env.DEV !== "build";
 
   const { data: dataPerms } = useQuery(HELPER_PERMS, {
@@ -99,26 +85,21 @@ function CuratorCreateTicket() {
     },
   ]);
 
-  const { loading, error, data } = useQuery(THEME_LIST, {
-    variables: {
-      token: user?.token,
-    },
-  });
-  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+  const {
+    loading: loadingCuratorsList,
+    error: errorCuratorsList,
+    data: dataCurators,
+  } = useQuery(CURATORS_LIST, {
     variables: {
       token: user?.token,
     },
   });
 
   useEffect(() => {
-    if (data && data.clientQuery.allThemeTree) {
-      setData(data.clientQuery.allThemeTree);
-    }
-
     if (dataCurators && dataCurators.helperQuery.helperList) {
       setDataQueryCurators(dataCurators.helperQuery.helperList);
     }
-  }, [data, dataCurators]);
+  }, [dataCurators]);
 
   const [addTicket] = useMutation(ADD_TICKET);
   const [curatorAddTicket] = useMutation(CURATOR_ADD_TICKET);
@@ -174,13 +155,13 @@ function CuratorCreateTicket() {
     return filePaths;
   }
 
-  if (loading) {
+  if (loadingCuratorsList) {
     return <Loader />;
   }
 
-  if (error) {
+  if (errorCuratorsList) {
     // console.error("GraphQL Error:", error);
-    const networkError = error.networkError;
+    const networkError = errorCuratorsList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
@@ -224,6 +205,8 @@ function CuratorCreateTicket() {
 
   const handleGetEditorContent = (content) => {
     setEditorContent(content);
+
+    setIsVisible(false);
   };
 
   const handleCuratorsOnChange = (curators) => {
@@ -256,23 +239,6 @@ function CuratorCreateTicket() {
     setIdInputs([]);
   };
 
-  const handleEditorChange = (newEditorState) => {
-    setEditorState(newEditorState);
-
-    setIsVisible(false);
-  };
-
-  const getContent = () => {
-    const contentState = editorState.getCurrentContent();
-    const rawContent = convertToRaw(contentState);
-
-    // setTextareaValue(draftToHtml(rawContent));
-
-    // console.log(draftToHtml(rawContent));
-
-    return draftToHtml(rawContent);
-  };
-
   const handleTicketTitleChange = (e) => {
     setTicketTitleValue(e.target.value);
 
@@ -292,7 +258,11 @@ function CuratorCreateTicket() {
       error = get_translation("INTERFACE_SELECT_THEME");
     } else if (selectedSubThemeId == null) {
       error = get_translation("INTERFACE_SELECT_SUBTHEME");
-    } else if (getContent() == "<p></p>" || getContent() == "<p></p>\n") {
+    } else if (
+      editorContent == "<p></p>" ||
+      editorContent == "<p></p>\n" ||
+      editorContent == ""
+    ) {
       error = get_translation("INTERFACE_DESCRIBE_SITUATION");
     } else if (ticketTitleValue.trim() == "") {
       error = get_translation("INTERFACE_DESCRIBE_TITLE");
@@ -318,7 +288,7 @@ function CuratorCreateTicket() {
               senderId: user.id,
               recieverId: 1,
               ticketId: 1,
-              text: getContent(),
+              text: editorContent,
               attachPaths: filePaths,
               notification: isNotificaton,
               idsOuter: isOuterids,
@@ -350,7 +320,7 @@ function CuratorCreateTicket() {
               senderId: user.id,
               recieverId: 1,
               ticketId: 1,
-              text: getContent(),
+              text: editorContent,
               attachPaths: filePaths,
               notification: isNotificaton,
               idsOuter: isOuterids,
@@ -393,7 +363,7 @@ function CuratorCreateTicket() {
               senderId: user.id,
               recieverId: 1,
               ticketId: 1,
-              text: getContent(),
+              text: editorContent,
               attachPaths: filePaths,
               notification: isNotificaton,
             },
@@ -428,8 +398,9 @@ function CuratorCreateTicket() {
       selectedThemeId == null ||
       selectedSubThemeId == null ||
       ticketTitleValue.trim() == "" ||
-      getContent() == "<p></p>" ||
-      getContent() == "<p></p>\n"
+      editorContent == "<p></p>" ||
+      editorContent == "<p></p>\n" ||
+      editorContent == ""
     ) {
       setIsVisible(true);
       return;

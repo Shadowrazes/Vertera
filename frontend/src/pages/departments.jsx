@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Form, Modal, Button } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { DEPARTMENTS_LIST } from "../apollo/queries";

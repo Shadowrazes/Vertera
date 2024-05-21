@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Modal,
-  Button,
-  Dropdown,
-  DropdownButton,
-} from "react-bootstrap";
+import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import { UNIT, HELPER_PERMS } from "../apollo/queries";
 import { EDIT_UNIT } from "../apollo/mutations";
@@ -43,7 +35,7 @@ function EditUnit() {
   const findKeyByValue = (obj, value) =>
     Object.keys(obj).find((key) => obj[key] === value);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -89,7 +81,7 @@ function EditUnit() {
     refetch();
   }, [data, location.state]);
 
-  if (loading) {
+  if (loading || loadingEditUnit) {
     return <Loader />;
   }
 
@@ -113,10 +105,6 @@ function EditUnit() {
     }
 
     return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingEditUnit) {
-    return <Loader />;
   }
 
   const handleOnChangeName = (e) => {

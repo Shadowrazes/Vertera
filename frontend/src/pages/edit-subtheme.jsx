@@ -77,9 +77,9 @@ function EditSubtheme() {
   };
 
   const {
-    loading: loadingTheme,
-    error: errorTheme,
-    data: dataTheme,
+    loading: loadingThemeList,
+    error: errorThemeList,
+    data: dataThemeList,
   } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
@@ -112,8 +112,8 @@ function EditSubtheme() {
   };
 
   useEffect(() => {
-    if (dataTheme && dataTheme.clientQuery.allThemeTree) {
-      setData(dataTheme.clientQuery.allThemeTree);
+    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+      setData(dataThemeList.clientQuery.allThemeTree);
     }
 
     if (data && data.helperQuery.subTheme) {
@@ -146,13 +146,18 @@ function EditSubtheme() {
     setLinkPrev("/subthemes");
 
     refetch();
-  }, [data, dataTheme, dataDepartmentList, location.state]);
+  }, [data, dataThemeList, dataDepartmentList, location.state]);
 
-  if (loading) {
+  if (
+    loading ||
+    loadingEditSubtheme ||
+    loadingDepartmentList ||
+    loadingThemeList
+  ) {
     return <Loader />;
   }
 
-  if (error) {
+  if (error || errorDepartmentList || errorThemeList) {
     const networkError = error.networkError;
 
     if (networkError) {
@@ -172,44 +177,6 @@ function EditSubtheme() {
     }
 
     return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingTheme) {
-    return <Loader />;
-  }
-
-  if (errorTheme) {
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingDepartmentList) {
-    return <Loader />;
-  }
-
-  if (errorDepartmentList) {
-    const networkError = errorDepartmentList.networkError;
-
-    if (networkError) {
-      // console.log("Network Error:", networkError);
-
-      if (networkError.result && networkError.result.errors) {
-        const errorMessage = networkError.result.errors[0].message;
-
-        console.log("Error Message from Response:", errorMessage);
-        if (user && errorMessage === "Invalid token") {
-          localStorage.removeItem("user");
-          document.location.href = "/";
-        } else if (errorMessage === "Forbidden") {
-          return <NotFoundPage />;
-        }
-      }
-    }
-
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingEditSubtheme) {
-    return <Loader />;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -257,14 +224,6 @@ function EditSubtheme() {
 
   const handleEditSubtheme = async (e) => {
     e.preventDefault();
-
-    // console.log(selectedUnit);
-    // console.log(selectedUnitId);
-    // console.log(selectedTheme);
-    // console.log(selectedThemeId);
-    // console.log(nameValue);
-    // console.log(selectedDepartments);
-    // console.log(selectedDepartmentsId);
 
     if (
       nameValue.trim() == "" ||

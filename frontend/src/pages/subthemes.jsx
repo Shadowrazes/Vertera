@@ -344,48 +344,7 @@ function Subthemes() {
             )}
           </div>
 
-          {/* <div className="table__wrapper">
-            <Table className="table__table" hover>
-              <thead>
-                <tr>
-                  <td>Порядок</td>
-                  <td>Подтема ID</td>
-                  <td>Название подтемы</td>
-                  <td>Редактировать</td>
-                </tr>
-              </thead>
-              <tbody>
-                {dataQuery
-                  .find((unit) => unit.name.stroke === selectedUnit)
-                  ?.themes.find((theme) => theme.name.stroke === selectedTheme)
-                  ?.subThemes.map(
-                    (subTheme) =>
-                      (showInactive || subTheme.visibility !== 3) && (
-                        <tr key={subTheme.id}>
-                          <td>{subTheme.orderNum}</td>
-                          <td>{subTheme.id}</td>
-                          <td>{subTheme.name.stroke}</td>
-
-                          <td>
-                            <Link
-                              to={`/edit-subtheme/${subTheme.id}`}
-                              state={{
-                                linkPrev: window.location.href,
-                              }}
-                              className="alltickets__link"
-                            >
-                              <img src={EditIcon} alt="" />
-                            </Link>
-                          </td>
-                        </tr>
-                      )
-                  )}
-              </tbody>
-            </Table>
-          </div> */}
-
           <MRT_TableContainer table={table} />
-
           <div className="units__btn-row">
             <ButtonCustom
               title="Добавить подтему"
@@ -414,16 +373,14 @@ function Subthemes() {
               />
             )}
           </div>
-
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
             modalTitle={modalTitle}
             modalBody={modalBody}
           />
-
           <ModalDialog
-            show={showModal}
+            show={showErrorModal}
             onClose={handleClose}
             modalTitle={modalErrorTitle}
             modalBody={modalErrorBody}

@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import { THEME_LIST, HELPER_PERMS } from "../apollo/queries";
 import { ADD_THEME } from "../apollo/mutations";
@@ -38,7 +30,7 @@ function AddTheme() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [nameValue, setNameValue] = useState("");
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";

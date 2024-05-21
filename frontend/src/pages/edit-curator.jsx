@@ -108,19 +108,31 @@ function EditCurator() {
     },
   });
 
-  const { data: dataDepartmentsList } = useQuery(DEPARTMENTS_LIST, {
+  const {
+    loading: loadingDepartmentList,
+    error: errorDepartmentList,
+    data: dataDepartmentsList,
+  } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
       lang: language,
     },
   });
-  const { data: dataJobTitleList } = useQuery(JOB_TITLE_LIST, {
+  const {
+    loading: loadingJobTitleList,
+    error: errorJobTitleList,
+    data: dataJobTitleList,
+  } = useQuery(JOB_TITLE_LIST, {
     variables: {
       token: user.token,
       lang: language,
     },
   });
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+  const {
+    loading: loadingCountryList,
+    error: errorCountryList,
+    data: dataCountryList,
+  } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user.token,
       lang: language,
@@ -211,12 +223,23 @@ function EditCurator() {
     location.state,
   ]);
 
-  if (loading) {
+  if (
+    loading ||
+    loadingEditHelper ||
+    loadingDisableHelperUser ||
+    loadingCountryList ||
+    loadingDepartmentList ||
+    loadingJobTitleList
+  ) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorCountryList || errorDepartmentList || errorJobTitleList) {
+    const networkError =
+      error.networkError ??
+      errorCountryList.networkError ??
+      errorDepartmentList.networkError ??
+      errorJobTitleList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
@@ -234,14 +257,6 @@ function EditCurator() {
       }
     }
     return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingEditHelper) {
-    return <Loader />;
-  }
-
-  if (loadingDisableHelperUser) {
-    return <Loader />;
   }
 
   const handleOnChangeName = (e) => {

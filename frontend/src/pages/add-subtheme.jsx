@@ -44,8 +44,8 @@ function AddSubtheme() {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedDepartmentsId, setSelectedDepartmentsId] = useState([]);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -100,12 +100,12 @@ function AddSubtheme() {
 
   const [addSubtheme] = useMutation(ADD_SUBTHEME);
 
-  if (loading) {
+  if (loading || loadingDepartmentList) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorDepartmentList) {
+    const networkError = error.networkError ?? errorDepartmentList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);

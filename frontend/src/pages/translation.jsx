@@ -58,15 +58,16 @@ function Translation() {
     },
   });
 
-  const { loading: loadingLangList, data: dataLangList } = useQuery(
-    LANGUAGE_LIST,
-    {
-      variables: {
-        token: user.token,
-        lang: language,
-      },
-    }
-  );
+  const {
+    loading: loadingLangList,
+    error: errorLangList,
+    data: dataLangList,
+  } = useQuery(LANGUAGE_LIST, {
+    variables: {
+      token: user.token,
+      lang: language,
+    },
+  });
 
   useEffect(() => {
     if (data && data.helperQuery.translationListFull) {
@@ -80,16 +81,12 @@ function Translation() {
 
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION);
 
-  if (loading) {
+  if (loading || loadingLangList) {
     return <Loader />;
   }
 
-  if (loadingLangList) {
-    return <Loader />;
-  }
-
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorLangList) {
+    const networkError = error.networkError ?? errorLangList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);

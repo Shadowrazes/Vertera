@@ -9,14 +9,10 @@ import {
   Alert,
   Overlay,
   Popover,
-  OverlayTrigger,
   Dropdown,
-  DropdownButton,
-  ButtonGroup,
   Nav,
   NavDropdown,
 } from "react-bootstrap";
-import { useNavigate, Link } from "react-router-dom";
 
 import { LOGIN, TRANSLATE, HELPER_PERMS } from "../apollo/queries";
 
@@ -128,7 +124,7 @@ function Header({ user }) {
     return user?.role === "helper" || user?.role === "system";
   };
 
-  const [Login, { data, refetch }] = useLazyQuery(LOGIN);
+  const [Login, { data }] = useLazyQuery(LOGIN);
 
   const handleClose = () => {
     setShowLoginModal(false);

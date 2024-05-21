@@ -25,7 +25,6 @@ import { DateRangePicker } from "rsuite";
 import { MultiSelect } from "primereact/multiselect";
 import Loader from "../pages/loading";
 import TitleH2 from "../components/title";
-import ThemeDropdowns from "../components/theme-dropdowns";
 import ButtonCustom from "../components/button";
 
 import "../css/all-tickets.css";
@@ -35,6 +34,7 @@ import "rsuite/dist/rsuite-no-reset.min.css";
 import get_translation from "../helpers/translation";
 
 function allTickets() {
+  const [dataQuery, setDataQuery] = useState([]);
   const [dataTableTickets, setDataTableTickets] = useState([]);
   const [ticketsAmount, setTicketsAmount] = useState(0);
   const [dataQueryCurators, setDataQueryCurators] = useState([]);
@@ -81,6 +81,9 @@ function allTickets() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [isVisibleFilters, setIsVisibleFilters] = useState(false);
+  const [isSubThemeDropdownVisible, setSubThemeDropdownVisible] =
+    useState(true);
+  const [isRefetching, setIsRefetching] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevCurrentPage, setPrevCurrentPage] = useState(-1);
@@ -160,65 +163,89 @@ function allTickets() {
     setSelectedStatusesId([]);
     setQueryReaction(null);
 
-    if (isHelper()) {
-      // console.log(1);
-      const variables = {
-        filters: {
-          helperIds: helperIdsFilter,
-          unitIds: null,
-          themeIds: null,
-          subThemeIds: null,
-          dateBefore: null,
-          dateAfter: null,
-          reaction: null,
-          limit: itemsPerPage,
-          offset: offset,
-          orderBy: orderBy,
-          orderDir: orderDir,
-          statusIds: null,
-          lang: "ru",
-        },
-        lang: language,
-      };
-      await refetch(variables);
-    } else {
-      const variables = {
-        filters: {
-          unitIds: null,
-          themeIds: null,
-          subThemeIds: null,
-          dateBefore: null,
-          dateAfter: null,
-          reaction: null,
-          limit: itemsPerPage,
-          offset: offset,
-          orderBy: orderBy,
-          orderDir: orderDir,
-          lang: "ru",
-        },
-        lang: language,
-      };
-      await refetch(variables);
+    setIsRefetching(true);
+
+    try {
+      if (isHelper()) {
+        // console.log(1);
+        const variables = {
+          filters: {
+            helperIds: helperIdsFilter,
+            unitIds: null,
+            themeIds: null,
+            subThemeIds: null,
+            dateBefore: null,
+            dateAfter: null,
+            reaction: null,
+            limit: itemsPerPage,
+            offset: offset,
+            orderBy: orderBy,
+            orderDir: orderDir,
+            statusIds: null,
+            lang: "ru",
+          },
+          lang: language,
+        };
+        await refetch(variables);
+      } else {
+        const variables = {
+          filters: {
+            unitIds: null,
+            themeIds: null,
+            subThemeIds: null,
+            dateBefore: null,
+            dateAfter: null,
+            reaction: null,
+            limit: itemsPerPage,
+            offset: offset,
+            orderBy: orderBy,
+            orderDir: orderDir,
+            lang: "ru",
+          },
+          lang: language,
+        };
+        await refetch(variables);
+      }
+    } catch (error) {
+      console.error("Refetch error:", error);
+    } finally {
+      setIsRefetching(false);
     }
   };
 
-  const { data: themeData } = useQuery(THEME_LIST, {
+  const {
+    loading: loadingThemeList,
+    error: errorThemeList,
+    data: dataThemeList,
+  } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
     },
   });
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+  const {
+    loading: loadingCountryList,
+    error: errorCountryList,
+    data: dataCountryList,
+  } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user?.token,
       lang: language,
     },
   });
-  const { data: dataCurators } = useQuery(CURATORS_LIST, {
+  const {
+    loading: loadingCuratorsList,
+    error: errorCuratorsList,
+    data: dataCurators,
+  } = useQuery(CURATORS_LIST, {
     variables: {
       token: user?.token,
     },
   });
-  const { data: dataStatusList } = useQuery(STATUS_LIST, {
+  const {
+    loading: loadingStatusList,
+    error: errorStatusList,
+    data: dataStatusList,
+  } = useQuery(STATUS_LIST, {
     variables: {
       token: user?.token,
     },
@@ -363,6 +390,10 @@ function allTickets() {
       }
     }
 
+    if (dataThemeList && dataThemeList.clientQuery.allThemeTree) {
+      setDataQuery(dataThemeList.clientQuery.allThemeTree);
+    }
+
     if (selectedSort !== prevSelectedSort) {
       handleSorts(selectedSort);
       setPrevSelectedSort(selectedSort);
@@ -377,7 +408,7 @@ function allTickets() {
     // console.log(pageNumbers.length);
   }, [
     data,
-    themeData,
+    dataThemeList,
     dataCurators,
     dataCountryList,
     dataStatusList,
@@ -393,12 +424,22 @@ function allTickets() {
     pageNumbers.push(i);
   }
 
-  if (loading) {
+  if (
+    loading ||
+    loadingCountryList ||
+    loadingCuratorsList ||
+    loadingStatusList ||
+    isRefetching
+  ) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorCountryList || errorCuratorsList || errorStatusList) {
+    const networkError =
+      error.networkError ??
+      errorCountryList.networkError ??
+      errorCuratorsList.networkError ??
+      errorStatusList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
@@ -535,24 +576,37 @@ function allTickets() {
     }
   };
 
-  const handleUnitIdChange = (unit) => {
-    setSelectedUnitId(unit);
+  const handleUnitClick = (unit, unitId) => {
+    setSelectedUnit(unit);
+    setSelectedUnitId(unitId);
+
+    if (unit !== selectedUnit) {
+      setSelectedTheme(null);
+      setSelectedThemeId(null);
+      setSelectedSubTheme(null);
+      setSelectedSubThemeId(null);
+      setSubThemeDropdownVisible(true);
+      setIsVisible(false);
+    }
   };
 
-  const handleThemeIdChange = (theme) => {
-    setSelectedThemeId(theme);
+  const handleThemeClick = (theme, themeId) => {
+    setSelectedTheme(theme);
+    setSelectedThemeId(themeId);
+
+    if (theme !== selectedTheme) {
+      setSelectedSubTheme(null);
+      setSelectedSubThemeId(null);
+      setSubThemeDropdownVisible(true);
+      setIsVisible(false);
+    }
   };
 
-  const handleSubThemeIdChange = (subTheme) => {
-    setSelectedSubThemeId(subTheme);
-  };
+  const handleSubThemeClick = (subTheme, subThemeId) => {
+    setSelectedSubTheme(subTheme);
+    setSelectedSubThemeId(subThemeId);
 
-  const handleIsVisibleChange = (isVisible) => {
-    setIsVisible(isVisible);
-  };
-
-  const handleError = (error) => {
-    setError(error);
+    setIsVisible(false);
   };
 
   const handleCuratorsOnChange = (curators) => {
@@ -628,72 +682,122 @@ function allTickets() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // console.log(selectedUnit);
-    // console.log(selectedUnitId);
-    // console.log(selectedTheme);
-    // console.log(selectedThemeId);
-    // console.log(selectedSubTheme);
-    // console.log(selectedSubThemeId);
-    // console.log(selectedDateBefore);
-    // console.log(selectedDateAfter);
-    // console.log(queryReaction);
-
-    if (isHelper()) {
-      // console.log(5);
-
-      let helperIds;
-      if (selectedCuratorsId.length === 0) {
-        helperIds = user.id;
-        if (user.id == 0) {
-          helperIds = undefined;
+    setIsRefetching(true);
+    try {
+      if (isHelper()) {
+        let helperIds;
+        if (selectedCuratorsId.length === 0) {
+          helperIds = user.id;
+          if (user.id == 0) {
+            helperIds = undefined;
+          }
+        } else {
+          helperIds = selectedCuratorsId;
         }
-      } else {
-        helperIds = selectedCuratorsId;
-      }
 
-      const variables = {
-        filters: {
-          unitIds: selectedUnitId,
-          themeIds: selectedThemeId,
-          subThemeIds: selectedSubThemeId,
-          helperIds: helperIds,
-          helperCountryIds: selectedCuratorsCountiesId,
-          clientCountryIds: selectedClientsCountiesId,
-          dateBefore: selectedDateBefore,
-          dateAfter: selectedDateAfter,
-          reaction: queryReaction,
-          limit: itemsPerPage,
-          words: wordsFilterValue,
-          statusIds: selectedStatusesId,
-          offset: offset,
-          orderBy: orderBy,
-          orderDir: orderDir,
-          outerId: parseInt(numberIdFilterValue),
-          lang: "ru",
-        },
-        lang: language,
-      };
-      await refetch(variables);
-    } else {
-      const variables = {
-        clientId: user.id,
-        filters: {
-          unitIds: selectedUnitId,
-          themeIds: selectedThemeId,
-          subThemeIds: selectedSubThemeId,
-          dateBefore: selectedDateBefore,
-          dateAfter: selectedDateAfter,
-          reaction: queryReaction,
-          limit: itemsPerPage,
-          offset: offset,
-          orderBy: orderBy,
-          orderDir: orderDir,
-          lang: "ru",
-        },
-        lang: language,
-      };
-      await refetch(variables);
+        const variables = {
+          filters: {
+            unitIds: selectedUnitId,
+            themeIds: selectedThemeId,
+            subThemeIds: selectedSubThemeId,
+            helperIds: helperIds,
+            helperCountryIds: selectedCuratorsCountiesId,
+            clientCountryIds: selectedClientsCountiesId,
+            dateBefore: selectedDateBefore,
+            dateAfter: selectedDateAfter,
+            reaction: queryReaction,
+            limit: itemsPerPage,
+            words: wordsFilterValue,
+            statusIds: selectedStatusesId,
+            offset: offset,
+            orderBy: orderBy,
+            orderDir: orderDir,
+            outerId: parseInt(numberIdFilterValue),
+            lang: "ru",
+          },
+          lang: language,
+        };
+        await refetch(variables);
+      } else {
+        const variables = {
+          clientId: user.id,
+          filters: {
+            unitIds: selectedUnitId,
+            themeIds: selectedThemeId,
+            subThemeIds: selectedSubThemeId,
+            dateBefore: selectedDateBefore,
+            dateAfter: selectedDateAfter,
+            reaction: queryReaction,
+            limit: itemsPerPage,
+            offset: offset,
+            orderBy: orderBy,
+            orderDir: orderDir,
+            lang: "ru",
+          },
+          lang: language,
+        };
+        await refetch(variables);
+      }
+    } catch (error) {
+      console.error("Refetch error:", error);
+    } finally {
+      setIsRefetching(false);
     }
+
+    // if (isHelper()) {
+    //   let helperIds;
+    //   if (selectedCuratorsId.length === 0) {
+    //     helperIds = user.id;
+    //     if (user.id == 0) {
+    //       helperIds = undefined;
+    //     }
+    //   } else {
+    //     helperIds = selectedCuratorsId;
+    //   }
+
+    //   const variables = {
+    //     filters: {
+    //       unitIds: selectedUnitId,
+    //       themeIds: selectedThemeId,
+    //       subThemeIds: selectedSubThemeId,
+    //       helperIds: helperIds,
+    //       helperCountryIds: selectedCuratorsCountiesId,
+    //       clientCountryIds: selectedClientsCountiesId,
+    //       dateBefore: selectedDateBefore,
+    //       dateAfter: selectedDateAfter,
+    //       reaction: queryReaction,
+    //       limit: itemsPerPage,
+    //       words: wordsFilterValue,
+    //       statusIds: selectedStatusesId,
+    //       offset: offset,
+    //       orderBy: orderBy,
+    //       orderDir: orderDir,
+    //       outerId: parseInt(numberIdFilterValue),
+    //       lang: "ru",
+    //     },
+    //     lang: language,
+    //   };
+    //   await refetch(variables);
+    // } else {
+    //   const variables = {
+    //     clientId: user.id,
+    //     filters: {
+    //       unitIds: selectedUnitId,
+    //       themeIds: selectedThemeId,
+    //       subThemeIds: selectedSubThemeId,
+    //       dateBefore: selectedDateBefore,
+    //       dateAfter: selectedDateAfter,
+    //       reaction: queryReaction,
+    //       limit: itemsPerPage,
+    //       offset: offset,
+    //       orderBy: orderBy,
+    //       orderDir: orderDir,
+    //       lang: "ru",
+    //     },
+    //     lang: language,
+    //   };
+    //   await refetch(variables);
+    // }
   };
 
   const handleFastFilter = async (filterStr, event) => {
@@ -863,13 +967,93 @@ function allTickets() {
               <Form>
                 <Row className="alltickets__row">
                   <div className="alltickets__column">
-                    <ThemeDropdowns
-                      onUnitIdChange={handleUnitIdChange}
-                      onThemeIdChange={handleThemeIdChange}
-                      onSubThemeIdChange={handleSubThemeIdChange}
-                      isVisibleChange={handleIsVisibleChange}
-                      onError={handleError}
-                    />
+                    <div className="form__column">
+                      <DropdownButton
+                        id="dropdown-custom-1"
+                        title={
+                          selectedUnit ||
+                          get_translation("INTERFACE_SELECT_UNIT")
+                        }
+                      >
+                        {dataQuery.map(
+                          (unit, index) =>
+                            unit.visibility !== 3 && (
+                              <Dropdown.Item
+                                key={index}
+                                onClick={() =>
+                                  handleUnitClick(unit.name.stroke, unit.id)
+                                }
+                                href="#"
+                              >
+                                {unit.name.stroke}
+                              </Dropdown.Item>
+                            )
+                        )}
+                      </DropdownButton>
+
+                      {selectedUnit && (
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={
+                            selectedTheme ||
+                            get_translation("INTERFACE_TYPE_APPEALS")
+                          }
+                        >
+                          {dataQuery
+                            .find((unit) => unit.name.stroke === selectedUnit)
+                            ?.themes.map(
+                              (theme) =>
+                                theme.visibility !== 3 && (
+                                  <Dropdown.Item
+                                    key={theme.id}
+                                    onClick={() =>
+                                      handleThemeClick(
+                                        theme.name.stroke,
+                                        theme.id
+                                      )
+                                    }
+                                    href="#"
+                                  >
+                                    {theme.name.stroke}
+                                  </Dropdown.Item>
+                                )
+                            )}
+                        </DropdownButton>
+                      )}
+
+                      {isSubThemeDropdownVisible && selectedTheme && (
+                        <DropdownButton
+                          id="dropdown-custom-1"
+                          title={
+                            selectedSubTheme ||
+                            get_translation("INTERFACE_SUBTHEME")
+                          }
+                        >
+                          {dataQuery
+                            .find((unit) => unit.name.stroke === selectedUnit)
+                            ?.themes.find(
+                              (theme) => theme.name.stroke === selectedTheme
+                            )
+                            ?.subThemes.map(
+                              (subTheme) =>
+                                subTheme.visibility !== 3 && (
+                                  <Dropdown.Item
+                                    key={subTheme.id}
+                                    onClick={() =>
+                                      handleSubThemeClick(
+                                        subTheme.name.stroke,
+                                        subTheme.id
+                                      )
+                                    }
+                                    href="#"
+                                  >
+                                    {subTheme.name.stroke}
+                                  </Dropdown.Item>
+                                )
+                            )}
+                        </DropdownButton>
+                      )}
+                    </div>
 
                     {isHelper() && (
                       <MultiSelect

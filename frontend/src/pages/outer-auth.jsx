@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useLazyQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import { LOGIN, LOGIN_OUTER } from "../apollo/queries";
+import { LOGIN_OUTER } from "../apollo/queries";
 
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 
 function OuterAuth() {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   const navigate = useNavigate();
 

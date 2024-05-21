@@ -3,7 +3,7 @@ import { useState } from "react";
 import ButtonCustom from "../components/button";
 
 function Admin() {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user) {
     document.location.href = "/";

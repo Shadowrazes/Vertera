@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Modal, Button, Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -61,13 +61,21 @@ function EditCountry() {
     );
   };
 
-  const { data } = useQuery(LANGUAGE_LIST, {
+  const {
+    loading: loadingLanguageList,
+    error: errorLanguageList,
+    data: dataLanguageList,
+  } = useQuery(LANGUAGE_LIST, {
     variables: {
       token: user.token,
       lang: language,
     },
   });
-  const { loading, data: dataCountry } = useQuery(COUNTRY, {
+  const {
+    loading: loadingCountry,
+    error: errorCountry,
+    data: dataCountry,
+  } = useQuery(COUNTRY, {
     variables: {
       token: user.token,
       id: parseInt(countryId),
@@ -95,18 +103,40 @@ function EditCountry() {
       );
     }
 
-    if (data && data.clientQuery.langList) {
-      setLangs(data.clientQuery.langList);
+    if (dataLanguageList && dataLanguageList.clientQuery.langList) {
+      setLangs(dataLanguageList.clientQuery.langList);
     }
 
     setLinkPrev("/countries");
-  }, [data, dataCountry, location.state]);
+  }, [dataLanguageList, dataCountry, location.state]);
 
   const [editCountry] = useMutation(EDIT_COUNTRY);
   const [deleteCountry] = useMutation(DELETE_COUNTRY);
 
-  if (loading) {
+  if (loadingCountry || loadingLanguageList) {
     return <Loader />;
+  }
+
+  if (errorCountry || errorLanguageList) {
+    const networkError =
+      errorCountry.networkError ?? errorLanguageList.networkError;
+
+    if (networkError) {
+      // console.log("Network Error:", networkError);
+
+      if (networkError.result && networkError.result.errors) {
+        const errorMessage = networkError.result.errors[0].message;
+
+        console.log("Error Message from Response:", errorMessage);
+        if (user && errorMessage === "Invalid token") {
+          localStorage.removeItem("user");
+          document.location.href = "/";
+        } else if (errorMessage === "Forbidden") {
+          return <NotFoundPage />;
+        }
+      }
+    }
+    return <h2>Что-то пошло не так</h2>;
   }
 
   const handleNameChange = (e) => {

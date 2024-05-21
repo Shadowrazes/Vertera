@@ -134,28 +134,37 @@ function Stats() {
     },
   });
 
-  const { data: dataThemeList } = useQuery(THEME_LIST, {
+  const {
+    loading: loadingThemeList,
+    error: errorThemeList,
+    data: dataThemeList,
+  } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
     },
   });
 
-  const { data: dataCountryList } = useQuery(COUNTRY_LIST, {
+  const {
+    loading: loadingCountryList,
+    error: errorCountryList,
+    data: dataCountryList,
+  } = useQuery(COUNTRY_LIST, {
     variables: {
       token: user?.token,
       lang: language,
     },
   });
 
-  const { data: dataDepartmentList } = useQuery(DEPARTMENTS_LIST, {
+  const {
+    loading: loadingDepartmentList,
+    error: errorDepartmentList,
+    data: dataDepartmentList,
+  } = useQuery(DEPARTMENTS_LIST, {
     variables: {
       token: user.token,
       lang: language,
     },
   });
-
-  const [getHelperStats, { data: dataHelperStats }] =
-    useLazyQuery(HELPER_STATS);
 
   const {
     loading: loadingCurators,
@@ -166,6 +175,11 @@ function Stats() {
       token: user.token,
     },
   });
+
+  const [
+    getHelperStats,
+    { loading: loadingHelperStats, error: errorHelperStats },
+  ] = useLazyQuery(HELPER_STATS);
 
   const getCurrentUserStats = () => {
     if (isAdmin()) {
@@ -405,20 +419,6 @@ function Stats() {
       setDepartmentList(dataDepartmentList.helperQuery.departmentList);
     }
 
-    // let currentStats = getCurrentUserStats();
-
-    // if (currentStats) {
-    //   if (isAdmin()) {
-    //     currentStats = currentStats?.find(
-    //       (item) => item.helper.id === selectedCuratorId
-    //     );
-    //     currentStats = currentStats?.stats;
-    //   } else {
-    //     setSelectedCurator("");
-    //     currentStats = currentStats[0].stats;
-    //   }
-    // }
-
     let currentStats;
 
     if (!isAdmin()) {
@@ -532,12 +532,32 @@ function Stats() {
     dataDepartmentList,
   ]);
 
-  if (loading) {
+  if (
+    loading ||
+    loadingCountryList ||
+    loadingCurators ||
+    loadingDepartmentList ||
+    loadingThemeList ||
+    loadingHelperStats
+  ) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (
+    error ||
+    errorCountryList ||
+    errorCurators ||
+    errorDepartmentList ||
+    errorHelperStats ||
+    errorThemeList
+  ) {
+    const networkError =
+      error.networkError ??
+      errorCountryList.networkError ??
+      errorCurators.networkError ??
+      errorDepartmentList.networkError ??
+      errorHelperStats.networkError ??
+      errorThemeList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);

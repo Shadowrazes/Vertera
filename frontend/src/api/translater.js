@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const Translater = async (textToTranslate, lang) => {
-  const apiKey = "sk-VKa9joRd7jw8szImPTxBaji0HV6ioHpW";
+  const apiKey = import.meta.env.VITE_API_KEY;
   const model = "gpt-3.5-turbo";
   const base_url = "https://api.proxyapi.ru/openai/v1";
 

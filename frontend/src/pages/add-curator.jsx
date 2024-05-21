@@ -132,12 +132,15 @@ function AddCurator() {
 
   const [addHelperUser] = useMutation(ADD_HELPER_USER);
 
-  if (loading) {
+  if (loading || loadingCountryList || loadingJobTitleList) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
+  if (error || errorCountryList || errorJobTitleList) {
+    const networkError =
+      error.networkError ??
+      errorCountryList.networkError ??
+      errorJobTitleList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
@@ -155,22 +158,6 @@ function AddCurator() {
       }
     }
 
-    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
-  }
-
-  if (loadingCountryList) {
-    return <Loader />;
-  }
-
-  if (errorCountryList) {
-    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
-  }
-
-  if (loadingJobTitleList) {
-    return <Loader />;
-  }
-
-  if (errorJobTitleList) {
     return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 

@@ -103,41 +103,12 @@ function Countries() {
   const [deleteLang, { loading: loadingDelete }] = useMutation(DELETE_LANG);
   const [editLang] = useMutation(EDIT_LANG);
 
-  if (loading) {
+  if (loading || loadingDelete || loadingLangList) {
     return <Loader />;
   }
 
-  if (error) {
-    const networkError = error.networkError;
-
-    if (networkError) {
-      // console.log("Network Error:", networkError);
-
-      if (networkError.result && networkError.result.errors) {
-        const errorMessage = networkError.result.errors[0].message;
-
-        console.log("Error Message from Response:", errorMessage);
-        if (user && errorMessage === "Invalid token") {
-          localStorage.removeItem("user");
-          document.location.href = "/";
-        } else if (errorMessage === "Forbidden") {
-          return <NotFoundPage />;
-        }
-      }
-    }
-    return <h2>Что-то пошло не так</h2>;
-  }
-
-  if (loadingDelete) {
-    return <Loader />;
-  }
-
-  if (loadingLangList) {
-    return <Loader />;
-  }
-
-  if (errorLangList) {
-    const networkError = errorLangList.networkError;
+  if (error || errorLangList) {
+    const networkError = error.networkError ?? errorLangList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);
