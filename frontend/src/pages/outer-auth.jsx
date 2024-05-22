@@ -7,6 +7,8 @@ import { LOGIN_OUTER } from "../apollo/queries";
 import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 
+import get_translation from "../helpers/translation";
+
 function OuterAuth() {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -74,7 +76,9 @@ function OuterAuth() {
 
     return (
       <>
-        <h2 style={{ marginBottom: "20px" }}>Ошибка авторизации</h2>
+        <h2 style={{ marginBottom: "20px" }}>
+          {get_translation("INTERFACE_ERROR_OUTERAUTH")}
+        </h2>
         <ButtonCustom
           title="Ок"
           className={"button-hover"}

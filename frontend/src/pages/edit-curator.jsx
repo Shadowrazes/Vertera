@@ -1,14 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import {
-  Button,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Form,
-  Modal,
-  Row,
-} from "react-bootstrap";
+import { Col, Dropdown, DropdownButton, Form, Row } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -34,6 +26,8 @@ import NotFoundPage from "./not-found-page";
 
 import "../css/dropdown.css";
 import "../css/edit-curator.css";
+
+import get_translation from "../helpers/translation";
 
 function EditCurator() {
   const { curatorId } = useParams();
@@ -256,7 +250,7 @@ function EditCurator() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleOnChangeName = (e) => {
@@ -323,19 +317,19 @@ function EditCurator() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Укажите имя";
+      error = get_translation("INTERFACE_ENTER_NAME");
     } else if (surnameValue.trim() == "") {
-      error = "Укажите фамилию";
+      error = get_translation("INTERFACE_ENTER_SURNAME");
     } else if (birthdayValue == null) {
-      error = "Укажите дату рождения";
+      error = get_translation("INTERFACE_BIRTHDAY");
     } else if (selectedCountry == null) {
-      error = "Укажите страну";
+      error = get_translation("INTERFACE_ENTER_COUNTRY");
     } else if (selectedDepartments.length == 0) {
-      error = "Выберите департамент";
+      error = get_translation("INTERFACE_SELECT_DEPARTMENT");
     } else if (selectedJobTitle == null) {
-      error = "Выберите должность";
+      error = get_translation("INTERFACE_JOB_TITLE");
     } else {
-      error = "Ошибка при обработке куратора";
+      error = get_translation("INTERFACE_ERROR_CURATOR_CHANGE");
     }
 
     return error;

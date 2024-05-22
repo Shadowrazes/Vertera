@@ -195,6 +195,7 @@ function Chat() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
 

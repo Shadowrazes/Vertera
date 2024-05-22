@@ -93,22 +93,22 @@ function Stats() {
     useState(true);
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const [language, setLanguage] = useState(localStorage.getItem("language"));
+  const [language] = useState(localStorage.getItem("language"));
 
   const predefinedRanges = [
     {
-      label: "Неделя",
+      label: get_translation("INTERFACE_WEEK"),
       value: [subDays(new Date(), 6), new Date()],
       placement: "bottom",
     },
     {
-      label: "Месяц",
+      label: get_translation("INTERFACE_MONTH"),
       value: [subDays(new Date(), 29), new Date()],
       placement: "bottom",
     },
 
     {
-      label: "Все время",
+      label: get_translation("INTERFACE_ALL_TIME"),
       value: [new Date(new Date().getFullYear() - 1, 0, 1), new Date()],
       placement: "bottom",
     },
@@ -141,6 +141,7 @@ function Stats() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
 
@@ -325,21 +326,21 @@ function Stats() {
 
   const getTimeStr = (sourceHource) => {
     if (sourceHource == -3600) {
-      return "Нет времени";
+      return get_translation("INTERFACE_NO_TIME");
     }
 
     let time = getTime(sourceHource);
     let result = "";
     if (time.hours > 0) {
-      result += time.hours + " ч. ";
+      result += time.hours + get_translation("INTERFACE_H");
     }
     if (time.minutes > 0) {
-      result += time.minutes + " мин. ";
+      result += time.minutes + get_translation("INTERFACE_MIN");
     }
     if (time.seconds > 0) {
-      result += time.seconds + " сек.";
+      result += time.seconds + get_translation("INTERFACE_SEC");
     }
-    return result !== "" ? result : "0 сек.";
+    return result !== "" ? result : get_translation("INTERFACE_0SEC");
   };
 
   const handleCuratorClick = async (
@@ -427,7 +428,11 @@ function Stats() {
     currentStats = selectedCuratorStats;
 
     setLikeData({
-      labels: ["Положительные", "Отрицательные", "Неоценённые"],
+      labels: [
+        get_translation("INTERFACE_POSITIVE"),
+        get_translation("INTERFACE_NEGATIVE"),
+        get_translation("INTERFACE_NOT_RATED"),
+      ],
       datasets: [
         {
           backgroundColor: [
@@ -449,13 +454,13 @@ function Stats() {
 
     setTotalData({
       labels: [
-        "Положительные отзывы",
-        "Средняя скорость ответа",
-        "Эффективность",
+        get_translation("INTERFACE_POSITIVE_REVIEW"),
+        get_translation("INTERFACE_AVG_REPLY_TIME"),
+        get_translation("INTERFACE_EFFICIENCY"),
       ],
       datasets: [
         {
-          label: "Моя статистика",
+          label: get_translation("INTERFACE_MY_STATS"),
           backgroundColor: ["#EBE0FF88"],
           data: [
             coefs.likeDislikeCoef,
@@ -464,7 +469,7 @@ function Stats() {
           ],
         },
         {
-          label: "Средние значения",
+          label: get_translation("INTERFACE_AVG_VALUE"),
           backgroundColor: ["#D1FDD6"],
           data: [
             avgCoefs.likeDislikeCoef,
@@ -477,43 +482,43 @@ function Stats() {
 
     setTableInfo([
       {
-        name: "Всего тикетов",
+        name: get_translation("INTERFACE_TOTAL_TICKETS"),
         value: currentStats?.totalTickets,
       },
       {
-        name: "Новых тикетов",
+        name: get_translation("INTERFACE_NEW_TICKETS"),
         value: currentStats?.newTickets,
       },
       {
-        name: "Тикеты в процессе",
+        name: get_translation("INTERFACE_IN_PROGRESS_TICKETS"),
         value: currentStats?.inProgressTickets,
       },
       {
-        name: "Тикеты на уточнении",
+        name: get_translation("INTERFACE_ON_REVISION_TICKETS"),
         value: currentStats?.onRevisionTickets,
       },
       {
-        name: "Тикеты ожидающие дополнения",
+        name: get_translation("INTERFACE_ON_EXTENSION_TICKETS"),
         value: currentStats?.onExtensionTickets,
       },
       {
-        name: "Тикеты с наставником",
+        name: get_translation("INTERFACE_ON_MENTOR_TICKETS"),
         value: currentStats?.onMentorTickets,
       },
       {
-        name: "Закрытых тикетов",
+        name: get_translation("INTERFACE_CLOSED_TICKETS"),
         value: currentStats?.closedTickets,
       },
       {
-        name: "Положительных отзывов",
+        name: get_translation("INTERFACE_POSITIVE_REVIEW"),
         value: currentStats?.likes,
       },
       {
-        name: "Отрицательных отзывов",
+        name: get_translation("INTERFACE_NEGATIVE_REVIEW"),
         value: currentStats?.dislikes,
       },
       {
-        name: "Среднее время ответа",
+        name: get_translation("INTERFACE_AVG_REPLY_TIME"),
         value: getTimeStr(currentStats?.avgReplyTime),
       },
     ]);
@@ -575,7 +580,7 @@ function Stats() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleHideComponent = () => {
@@ -690,12 +695,15 @@ function Stats() {
     <>
       {isHelper() ? (
         <>
-          <TitleH2 title="Статистика" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_STATS")}
+            className="title__heading"
+          />
           <div className="stats__container">
             {isAdmin() && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedCurator || "Куратор"}
+                title={selectedCurator || get_translation("INTERFACE_CURATOR")}
                 className="themes__dropdown"
               >
                 {dataQueryCurators.map(
@@ -731,7 +739,9 @@ function Stats() {
                     <Table striped bordered hover>
                       <thead>
                         <tr>
-                          <th colSpan={2}>Общая информация</th>
+                          <th colSpan={2}>
+                            {get_translation("INTERFACE_GENERAL_INFO")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -747,7 +757,7 @@ function Stats() {
                 </Row>
                 <Row className="mt-5">
                   <h3 className="stats-title stats-title_left">
-                    Уровень куратора VERTERA
+                    {get_translation("INTERFACE_CURATOR_LEVEL")}
                   </h3>
                   <Col md={6} className="mt-2">
                     <Level fantasy={fantasy} allTickets={allTickets} />
@@ -755,7 +765,9 @@ function Stats() {
                 </Row>
                 <Row className="mt-5">
                   <Col md={7}>
-                    <h3 className="stats-title">Статистика моя/средняя</h3>
+                    <h3 className="stats-title">
+                      {get_translation("INTERFACE_STATS/AVG")}
+                    </h3>
                     <Radar
                       data={totalData}
                       options={{
@@ -769,7 +781,9 @@ function Stats() {
                     />
                   </Col>
                   <Col md={5}>
-                    <h3 className="stats-title">Статистика лайки/дизлайки</h3>
+                    <h3 className="stats-title">
+                      {get_translation("INTERFACE_STATS_LIKE/DISLIKE")}
+                    </h3>
                     <Doughnut data={likeData} options={{ responsive: true }} />
                   </Col>
                 </Row>
@@ -778,7 +792,7 @@ function Stats() {
 
             <div className="alltickets__container">
               <h3 className="stats-title stats-title_left">
-                Рейтинг кураторов
+                {get_translation("INTERFACE_RATING_CURATOR")}
               </h3>
               <ButtonCustom
                 title={
@@ -885,7 +899,7 @@ function Stats() {
                       <div className="alltickets__column">
                         <DateRangePicker
                           ranges={predefinedRanges}
-                          placeholder="Задать период"
+                          placeholder={get_translation("INTERFACE_SET_PERIOD")}
                           className="alltickets__date-range-picker"
                           onChange={handlePeriodChange}
                           onClean={handlePeriodClean}
@@ -937,7 +951,9 @@ function Stats() {
                 <Table striped bordered hover>
                   <thead>
                     <tr>
-                      <th colSpan={3}>По времени ответа</th>
+                      <th colSpan={3}>
+                        {get_translation("INTERFACE_TIME_REPLY")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -955,7 +971,9 @@ function Stats() {
                 <Table striped bordered hover>
                   <thead>
                     <tr>
-                      <th colSpan={3}>По кол-ву положительных отзывов</th>
+                      <th colSpan={3}>
+                        {get_translation("INTERFACE_AMOUNT_POSITIVE_REVIEW")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -963,7 +981,9 @@ function Stats() {
                       <tr key={index}>
                         <td>{index + 1}</td>
                         <td>{elem.name}</td>
-                        <td>{elem.value} отзыв(-ов)</td>
+                        <td>
+                          {elem.value} {get_translation("INTERFACE_REVIEWS")}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

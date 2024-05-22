@@ -220,6 +220,7 @@ function allTickets() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
   const {
@@ -429,17 +430,25 @@ function allTickets() {
     loadingCountryList ||
     loadingCuratorsList ||
     loadingStatusList ||
-    isRefetching
+    isRefetching ||
+    loadingThemeList
   ) {
     return <Loader />;
   }
 
-  if (error || errorCountryList || errorCuratorsList || errorStatusList) {
+  if (
+    error ||
+    errorCountryList ||
+    errorCuratorsList ||
+    errorStatusList ||
+    errorThemeList
+  ) {
     const networkError =
       error.networkError ??
       errorCountryList.networkError ??
       errorCuratorsList.networkError ??
-      errorStatusList.networkError;
+      errorStatusList.networkError ??
+      errorThemeList.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);

@@ -59,6 +59,7 @@ function Units() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

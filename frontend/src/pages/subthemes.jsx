@@ -1,14 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  Table,
-  DropdownButton,
-  Dropdown,
-  Form,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { DropdownButton, Dropdown, Form } from "react-bootstrap";
 import {
   MRT_TableContainer,
   useMaterialReactTable,
@@ -25,6 +18,8 @@ import NotFoundPage from "./not-found-page";
 
 import EditIcon from "../assets/edit_icon.svg";
 
+import get_translation from "../helpers/translation";
+
 function Subthemes() {
   const [dataAll, setDataAll] = useState([]);
   const [data, setData] = useState([]);
@@ -35,14 +30,10 @@ function Subthemes() {
   const [showApplyButton, setShowApplyButton] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Порядок обновлен";
-  const modalBody = "Порядок тем успешно обновлен";
-
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const modalErrorTitle = "Ошибка при смене порядка";
-  const modalErrorBody = "Порядок тем не был обновлен";
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -69,6 +60,7 @@ function Subthemes() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 
@@ -100,15 +92,15 @@ function Subthemes() {
     () => [
       {
         accessorKey: "id",
-        header: "Подтема ID",
+        header: get_translation("INTERFACE_SUBTHEME_ID"),
       },
       {
         accessorKey: "name",
-        header: "Название подтемы",
+        header: get_translation("INTERFACE_SUBTHEME_TITLE"),
       },
       {
         accessorKey: "link",
-        header: "Редактировать",
+        header: get_translation("INTERFACE_EDIT"),
         Cell: ({ row }) => (
           <Link
             to={`/edit-subtheme/${row.original.id}`}
@@ -183,7 +175,7 @@ function Subthemes() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleUnitClick = (unit) => {
@@ -285,7 +277,10 @@ function Subthemes() {
     <>
       {isAdmin() ? (
         <>
-          <TitleH2 title="Подтемы" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_SUBTHEMES")}
+            className="title__heading"
+          />
           <div
             className="edit-curator__checkbox-block"
             style={{ marginBottom: "20px" }}
@@ -297,13 +292,13 @@ function Subthemes() {
               onChange={handleIsActiveChange}
             />
             <span className="edit-curator__field-label">
-              Отображать неактивные подтемы
+              {get_translation("INTERFACE_SHOW_DEACTIVE_SUBTHEME")}
             </span>
           </div>
           <div className="subthemes__dropdown-wrapper">
             <DropdownButton
               id="dropdown-custom-1"
-              title={selectedUnit || "Выберите подразделение"}
+              title={selectedUnit || get_translation("INTERFACE_SELECT_UNIT")}
               className="themes__dropdown"
             >
               {dataAll.map(
@@ -323,7 +318,9 @@ function Subthemes() {
             {selectedUnit && (
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedTheme || "Тип обращения"}
+                title={
+                  selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
+                }
                 className="themes__dropdown"
               >
                 {dataAll
@@ -347,19 +344,19 @@ function Subthemes() {
           <MRT_TableContainer table={table} />
           <div className="units__btn-row">
             <ButtonCustom
-              title="Добавить подтему"
+              title={get_translation("INTERFACE_ADD_SUBTHEME")}
               className={"button-hover"}
               onClick={goToAddSubtheme}
             />
             <ButtonCustom
-              title="Перейти к разделам"
+              title={get_translation("INTERFACE_GO_TO_UNITS")}
               className={
                 "add-curator__btn units__btn alltickets__button-two button-outlined"
               }
               onClick={goToUnits}
             />
             <ButtonCustom
-              title="Перейти к темам"
+              title={get_translation("INTERFACE_GO_TO_THEMES")}
               className={
                 "add-curator__btn units__btn alltickets__button-two button-outlined"
               }
@@ -367,23 +364,24 @@ function Subthemes() {
             />
             {showApplyButton && (
               <ButtonCustom
-                title="Применить изменения порядка"
+                title={get_translation("INTERFACE_APPLY_ORDER_CHANGE")}
                 onClick={handleClickAplly}
                 className={"button-outlined"}
               />
             )}
           </div>
+
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_ORDER_CHANGE")}
+            modalBody={get_translation("INTERFACE_ORDER_CHANGE_SUBTHEME")}
           />
           <ModalDialog
             show={showErrorModal}
             onClose={handleClose}
-            modalTitle={modalErrorTitle}
-            modalBody={modalErrorBody}
+            modalTitle={get_translation("INTERFACE_ORDER_CHANGE_ERROR")}
+            modalBody={get_translation("INTERFACE_ORDER_CHANGE_ERROR_SUBTHEME")}
           />
         </>
       ) : (

@@ -1,14 +1,17 @@
 import "../css/not-found-page.css";
 
+import get_translation from "../helpers/translation";
+
 function NotFoundPage() {
   return (
     <>
-      <h2>Страница не найдена</h2>
+      <h2>{get_translation("INTERFACE_PAGE_NOT_FOUND")}</h2>
       <p className="notfoundpage__text">
-        Неправильно набран адрес, или такая страница больше не существует.
+        {get_translation("INTERFACE_WRONG_ADDRESS")}
       </p>
       <p className="notfoundpage__text">
-        Вернуться на <a href="/">главную</a>
+        {get_translation("INTERFACE_BACK_TO")}{" "}
+        <a href="/">{get_translation("INTERFACE_MAIN")}</a>
       </p>
     </>
   );

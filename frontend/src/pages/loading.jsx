@@ -3,6 +3,8 @@ import LogoLoader from "../assets/logo-loader.svg";
 import Spinner from "../components/spinner";
 import "../css/loading.css";
 
+import get_translation from "../helpers/translation";
+
 function Loader() {
   const [progress, setProgress] = useState(0);
 
@@ -22,7 +24,9 @@ function Loader() {
     <>
       <div className="loading__container">
         <img className="loading__logo" src={LogoLoader} alt=""></img>
-        <span className="loading__title">Тикет Система</span>
+        <span className="loading__title">
+          {get_translation("INTERFACE_TICKET_SYSTEM")}
+        </span>
         <Spinner progress={progress} />
       </div>
     </>

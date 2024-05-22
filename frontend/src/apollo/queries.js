@@ -379,25 +379,25 @@ export const USER = gql`
 `;
 
 export const THEME_LIST = gql`
-  query ($token: String!) {
+  query ($token: String!, $lang: String!) {
     clientQuery(token: $token) {
       allThemeTree {
         id
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
         visibility
         orderNum
         themes {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
           visibility
           orderNum
           subThemes {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
             visibility

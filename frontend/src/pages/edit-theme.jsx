@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import { THEME, THEME_LIST, HELPER_PERMS } from "../apollo/queries";
 import { EDIT_THEME } from "../apollo/mutations";
@@ -20,6 +12,8 @@ import ButtonCustom from "../components/button";
 import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
+import get_translation from "../helpers/translation";
+
 function EditTheme() {
   const { themeId } = useParams();
   const location = useLocation();
@@ -28,26 +22,24 @@ function EditTheme() {
   const [dataQuery, setData] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("");
   const [nameValue, setNameValue] = useState("");
   const [visibility, setVisibility] = useState(null);
 
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Тема обновлена";
-  const modalBody = "Название темы успешно обновлено";
 
   const visibilityItems = {
-    1: "Доступно всем",
-    2: "Доступно кураторам",
-    3: "Не доступно",
+    1: get_translation("INTERFACE_VISIBILITY_ALL"),
+    2: get_translation("INTERFACE_VISIBILITY_CURATORS"),
+    3: get_translation("INTERFACE_VISIBILITY_NONE"),
   };
 
   const findKeyByValue = (obj, value) =>
     Object.keys(obj).find((key) => obj[key] === value);
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -73,6 +65,7 @@ function EditTheme() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
   const { loading, error, data, refetch } = useQuery(THEME, {
@@ -100,7 +93,6 @@ function EditTheme() {
       setNameValue(data.helperQuery.theme.name.stroke);
       setSelectedUnit(data.helperQuery.theme.unit.name.stroke);
       setSelectedUnitId(data.helperQuery.theme.unit.id);
-      setSelectedItem(data.helperQuery.theme.unit.name.stroke);
       setVisibility(data.helperQuery.theme.visibility);
       // console.log(data.theme.unit.id);
     }
@@ -133,11 +125,10 @@ function EditTheme() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleUnitClick = (unit, unitId) => {
-    setSelectedItem(unit);
     setSelectedUnit(unit);
     setSelectedUnitId(unitId);
 
@@ -154,11 +145,11 @@ function EditTheme() {
     let error = "";
 
     if (selectedUnit == null) {
-      error = "Выберите раздел";
+      error = get_translation("INTERFACE_SELECT_UNIT");
     } else if (nameValue.trim() == "") {
-      error = "Укажите название темы";
+      error = get_translation("INTERFACE_ENTER_THEME");
     } else {
-      error = "Ошибка при обработке темы";
+      error = get_translation("INTERFACE_ERROR_THEME_CHANGE");
     }
 
     return error;
@@ -215,14 +206,14 @@ function EditTheme() {
       {isAdmin() ? (
         <>
           <BackTitle
-            title={`Редактировать тему #${themeId}`}
+            title={`${get_translation("INTERFACE_EDIT_THEME")} #${themeId}`}
             linkPrev={linkPrev}
           />
           <Row style={{ marginTop: "20px" }} className="edit-theme__container">
             <Col className="edit-curator__column edit-theme__column">
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedItem}
+                title={selectedUnit}
                 className="add-theme__dropdown"
               >
                 {dataQuery.map(
@@ -243,7 +234,7 @@ function EditTheme() {
 
               <Form.Group controlId="NameForm">
                 <Form.Label className="edit-curator__field-label">
-                  Название темы
+                  {get_translation("INTERFACE_THEME_NAME")}
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -256,11 +247,14 @@ function EditTheme() {
                   className="edit-curator__field-label"
                   style={{ marginTop: "20px" }}
                 >
-                  Порядок
+                  {get_translation("INTERFACE_ORDER")}
                 </Form.Label>
                 <DropdownButton
                   id="dropdown-custom-1"
-                  title={visibilityItems[visibility] || "Уровень отображения"}
+                  title={
+                    visibilityItems[visibility] ||
+                    get_translation("INTERFACE_VISIBILITY_LEVEL")
+                  }
                 >
                   {Object.values(visibilityItems).map((item, index) => (
                     <Dropdown.Item
@@ -280,7 +274,7 @@ function EditTheme() {
                 )}
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
-                    title="Применить"
+                    title={get_translation("INTERFACE_APPLY")}
                     className={
                       "add-curator__btn edit-curator__btn button-hover"
                     }
@@ -294,8 +288,8 @@ function EditTheme() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_THEME_CHANGED")}
+            modalBody={get_translation("INTERFACE_THEME_CHANGED_FULL")}
           />
         </>
       ) : (

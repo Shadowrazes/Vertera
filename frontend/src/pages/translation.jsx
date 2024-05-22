@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { Table, Form, Modal, Button } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 
 import {
   TRANSLATION_LIST,
@@ -17,6 +17,8 @@ import NotFoundPage from "./not-found-page";
 
 import "../css/translation.css";
 
+import get_translation from "../helpers/translation";
+
 function Translation() {
   const [dataQuery, setData] = useState([]);
   const [langList, setLanglist] = useState([]);
@@ -24,12 +26,7 @@ function Translation() {
   const [updatedTranslations, setUpdatedTranslations] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Переводы обновлены";
-  const modalBody = "Таблица переводов успешно обновлена";
-
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const modalErrorTitle = "Ошибка обновления переводов";
-  const modalErrorBody = "При обновлении таблицы переводов произошла ошибка";
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const [language] = useState(localStorage.getItem("language"));
@@ -104,7 +101,7 @@ function Translation() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleTranslation = (e, code, lang) => {
@@ -177,7 +174,10 @@ function Translation() {
     <>
       {isAdmin() ? (
         <>
-          <TitleH2 title="Переводы" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_TRANSLATION")}
+            className="title__heading"
+          />
           <div className="translation__wrapper">
             <div
               className="table__wrapper"
@@ -186,7 +186,7 @@ function Translation() {
               <Table className="table__table" hover>
                 <thead>
                   <tr>
-                    <td>Строковый код</td>
+                    <td>{get_translation("INTERFACE_STROKE_CODE")}</td>
                     {langList.map((lang) => (
                       <td>{lang.name}</td>
                     ))}
@@ -198,7 +198,7 @@ function Translation() {
                       <td>
                         <Form.Control
                           type="text"
-                          placeholder="Строковый код"
+                          placeholder={get_translation("INTERFACE_STROKE_CODE")}
                           value={translationsData.code}
                           className="add-currator__input translation__readonly-input"
                           readOnly
@@ -236,7 +236,7 @@ function Translation() {
               </Table>
             </div>
             <ButtonCustom
-              title="Сохранить"
+              title={get_translation("INTERFACE_SAVE")}
               className={"button-hover"}
               onClick={handleUpdateTranslation}
             />
@@ -245,15 +245,15 @@ function Translation() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_TRANSLATION_UPDATE")}
+            modalBody={get_translation("INTERFACE_TRANSLATION_UPDATE_FULL")}
           />
 
           <ModalDialog
             show={showErrorModal}
             onClose={handleClose}
-            modalTitle={modalErrorTitle}
-            modalBody={modalErrorBody}
+            modalTitle={get_translation("INTERFACE_TRANSLATION_ERROR")}
+            modalBody={get_translation("INTERFACE_TRANSLATION_ERROR_FULL")}
           />
         </>
       ) : (

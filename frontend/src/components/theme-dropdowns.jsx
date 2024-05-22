@@ -28,10 +28,12 @@ export default function ThemeDropdowns({
     useState(true);
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
 

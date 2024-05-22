@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import {
-  Form,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import {
   SUBTHEME,
@@ -24,6 +17,8 @@ import Loader from "../pages/loading";
 import ButtonCustom from "../components/button";
 import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
+
+import get_translation from "../helpers/translation";
 
 function EditSubtheme() {
   const { subthemeId } = useParams();
@@ -44,13 +39,11 @@ function EditSubtheme() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Тема обновлена";
-  const modalBody = "Название подтемы успешно обновлено";
 
   const visibilityItems = {
-    1: "Доступно всем",
-    2: "Доступно кураторам",
-    3: "Не доступно",
+    1: get_translation("INTERFACE_VISIBILITY_ALL"),
+    2: get_translation("INTERFACE_VISIBILITY_CURATORS"),
+    3: get_translation("INTERFACE_VISIBILITY_NONE"),
   };
 
   const findKeyByValue = (obj, value) =>
@@ -83,6 +76,7 @@ function EditSubtheme() {
   } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
   const {
@@ -176,7 +170,7 @@ function EditSubtheme() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -210,13 +204,13 @@ function EditSubtheme() {
     let error = "";
 
     if (selectedUnit == null) {
-      error = "Выберите раздел";
+      error = get_translation("INTERFACE_SELECT_UNIT");
     } else if (selectedTheme == null) {
-      error = "Выберите тему";
+      error = get_translation("INTERFACE_SELECT_THEME");
     } else if (nameValue.trim() == "") {
-      error = "Укажите название подтемы";
+      error = get_translation("INTERFACE_ENTER_SUBTHEME");
     } else {
-      error = "Ошибка при обработке подтемы";
+      error = get_translation("INTERFACE_ERROR_SUBTHEME_CHANGE");
     }
 
     return error;
@@ -279,13 +273,15 @@ function EditSubtheme() {
       {isAdmin() ? (
         <>
           <BackTitle
-            title={`Редактировать подтему #${subthemeId}`}
+            title={`${get_translation(
+              "INTERFACE_EDIT_SUBTHEME"
+            )} #${subthemeId}`}
             linkPrev={linkPrev}
           />
           <Col className="edit-curator__column edit-subtheme__column">
             <div className="edit-subtheme__field">
               <Form.Label className="edit-curator__field-label">
-                Раздел
+                {get_translation("INTERFACE_CHAPTER")}
               </Form.Label>
 
               <DropdownButton
@@ -313,11 +309,13 @@ function EditSubtheme() {
             {selectedUnit && (
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">
-                  Тема
+                  {get_translation("INTERFACE_THEME")}
                 </Form.Label>
                 <DropdownButton
                   id="dropdown-custom-1"
-                  title={selectedTheme || "Тип обращения"}
+                  title={
+                    selectedTheme || get_translation("INTERFACE_TYPE_APPEALS")
+                  }
                 >
                   {dataQuery
                     .find((unit) => unit.name.stroke === selectedUnit)
@@ -341,7 +339,7 @@ function EditSubtheme() {
 
             <div className="edit-subtheme__field">
               <Form.Label className="edit-curator__field-label">
-                Название подтемы
+                {get_translation("INTERFACE_SUBTHEME_TITLE")}
               </Form.Label>
               <Form.Control
                 type="text"
@@ -353,7 +351,7 @@ function EditSubtheme() {
 
             <div className="edit-subtheme__field">
               <Form.Label className="edit-curator__field-label">
-                Департамент
+                {get_translation("INTERFACE_DEPARTMENT")}
               </Form.Label>
 
               <MultiSelect
@@ -361,18 +359,21 @@ function EditSubtheme() {
                 onChange={(e) => handleDepartmentsOnChange(e.value)}
                 options={newDepartmentList}
                 optionLabel="name"
-                placeholder="Выбрать департамент"
+                placeholder={get_translation("INTERFACE_SELECT_DEPARTMENT")}
                 className="add-curator__multiselect"
               />
             </div>
 
             <div className="edit-subtheme__field">
               <Form.Label className="edit-curator__field-label">
-                Отображение
+                {get_translation("INTERFACE_VISIBILITY")}
               </Form.Label>
               <DropdownButton
                 id="dropdown-custom-1"
-                title={visibilityItems[visibility] || "Уровень отображения"}
+                title={
+                  visibilityItems[visibility] ||
+                  get_translation("INTERFACE_VISIBILITY_LEVEL")
+                }
               >
                 {Object.values(visibilityItems).map((item, index) => (
                   <Dropdown.Item
@@ -392,7 +393,7 @@ function EditSubtheme() {
               )}
               <div className="edit-curator__btn-row">
                 <ButtonCustom
-                  title="Применить"
+                  title={get_translation("INTERFACE_APPLY")}
                   className={"add-curator__btn edit-curator__btn button-hover"}
                   onClick={handleEditSubtheme}
                 />
@@ -403,8 +404,8 @@ function EditSubtheme() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_SUBTHEME_CHANGED")}
+            modalBody={get_translation("INTERFACE_SUBTHEME_CHANGED_FULL")}
           />
         </>
       ) : (

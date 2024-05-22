@@ -67,6 +67,7 @@ function AddSubtheme() {
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
   const {

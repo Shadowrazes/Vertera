@@ -31,6 +31,7 @@ function AddTheme() {
   const [nameValue, setNameValue] = useState("");
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -52,6 +53,7 @@ function AddTheme() {
   const { loading, error, data } = useQuery(THEME_LIST, {
     variables: {
       token: user.token,
+      lang: language,
     },
   });
 

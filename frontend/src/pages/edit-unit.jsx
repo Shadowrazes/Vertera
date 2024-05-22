@@ -12,6 +12,8 @@ import ButtonCustom from "../components/button";
 import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
+import get_translation from "../helpers/translation";
+
 function EditUnit() {
   const { unitId } = useParams();
   const location = useLocation();
@@ -23,13 +25,11 @@ function EditUnit() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Раздел обновлен";
-  const modalBody = "Название раздела успешно обновлено";
 
   const visibilityItems = {
-    1: "Доступно всем",
-    2: "Доступно кураторам",
-    3: "Не доступно",
+    1: get_translation("INTERFACE_VISIBILITY_ALL"),
+    2: get_translation("INTERFACE_VISIBILITY_CURATORS"),
+    3: get_translation("INTERFACE_VISIBILITY_NONE"),
   };
 
   const findKeyByValue = (obj, value) =>
@@ -104,7 +104,7 @@ function EditUnit() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleOnChangeName = (e) => {
@@ -116,9 +116,9 @@ function EditUnit() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Укажите название раздела";
+      error = get_translation("INTERFACE_ENTER_UNIT");
     } else {
-      error = "Ошибка при обработке раздела";
+      error = get_translation("INTERFACE_ERROR_UNIT_CHANGE");
     }
 
     return error;
@@ -170,14 +170,14 @@ function EditUnit() {
       {isAdmin() ? (
         <>
           <BackTitle
-            title={`Редактировать раздел #${unitId}`}
+            title={`${get_translation("INTERFACE_EDIT_UNIT")} #${unitId}`}
             linkPrev={linkPrev}
           />
           <Row className="edit-unit__container">
             <Col className="edit-unit__column">
               <Form.Group controlId="NameForm">
                 <Form.Label className="edit-curator__field-label">
-                  Название раздела
+                  {get_translation("INTERFACE_NAME_OF_UNIT")}
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -186,11 +186,14 @@ function EditUnit() {
                   onChange={handleOnChangeName}
                 />
                 <Form.Label className="edit-curator__field-label">
-                  Отображение
+                  {get_translation("INTERFACE_VISIBILITY")}
                 </Form.Label>
                 <DropdownButton
                   id="dropdown-custom-1"
-                  title={visibilityItems[visibility] || "Уровень отображения"}
+                  title={
+                    visibilityItems[visibility] ||
+                    get_translation("INTERFACE_VISIBILITY_LEVEL")
+                  }
                 >
                   {Object.values(visibilityItems).map((item, index) => (
                     <Dropdown.Item
@@ -210,7 +213,7 @@ function EditUnit() {
                 )}
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
-                    title="Применить"
+                    title={get_translation("INTERFACE_APPLY")}
                     className={
                       "add-curator__btn edit-curator__btn button-hover"
                     }
@@ -224,8 +227,8 @@ function EditUnit() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_UNIT_CHANGED")}
+            modalBody={get_translation("INTERFACE_UNIT_CHANGED_FULL")}
           />
         </>
       ) : (
