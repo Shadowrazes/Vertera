@@ -267,7 +267,7 @@ function CuratorCreateTicket() {
     } else if (ticketTitleValue.trim() == "") {
       error = get_translation("INTERFACE_DESCRIBE_TITLE");
     } else if (successfulImports === null && failedImports === null) {
-      error = "Невозможно отправить обращения";
+      error = get_translation("INTERFACE_ERROR_TICKET_CREATION");
     }
 
     return error;
@@ -500,7 +500,7 @@ function CuratorCreateTicket() {
       e.target.value = null;
       setIsFilesSizeExceeded(true);
       console.log("Размер файла не должен превышать 10 МБ");
-      alert("Размер файла не должен превышать 10 МБ");
+      alert(get_translation("INTERFACE_ERROR_FILE_SIZE_EXEEDED"));
       return;
     }
 
@@ -620,18 +620,18 @@ function CuratorCreateTicket() {
                     </a>
                   )}
                   <Form.Label className="edit-curator__field-label">
-                    Получатели
+                    {get_translation("INTERFACE_RECEPIENTS")}
                   </Form.Label>
                 </div>
                 {isButtonsVisible && (
                   <div className="chat__helper-buttons">
                     <ButtonCustom
-                      title="Выбрать куратора"
+                      title={get_translation("INTERFACE_SELECT_CURATOR")}
                       className="chat-input__button-close button-hover"
                       onClick={handleCuratorsDropdown}
                     />
                     <ButtonCustom
-                      title="Вставить список"
+                      title={get_translation("INTERFACE_INPUT_LIST")}
                       className="chat-input__button-close button-hover"
                       onClick={handleIdFileInput}
                     />
@@ -646,7 +646,7 @@ function CuratorCreateTicket() {
                       optionLabel="name"
                       className="add-curator__multiselect"
                       placeholder={get_translation("INTERFACE_CURATOR")}
-                      emptyMessage="Нет доступных опций"
+                      emptyMessage={get_translation("INTERFACE_EMPTY_SELECT")}
                       filter
                     />
                   </>
@@ -669,8 +669,10 @@ function CuratorCreateTicket() {
                             variant="success"
                             className="curator-create-ticket__alert"
                           >
-                            Успешный импорт <br /> <br />
-                            Импортировано {successfulImports} записей
+                            {get_translation("INTERFACE_SUCCESSFUL_IMPORT")}{" "}
+                            <br /> <br />
+                            {get_translation("INTERFACE_IMPORTED")}{" "}
+                            {successfulImports}
                           </Alert>
                         )}
 
@@ -679,11 +681,14 @@ function CuratorCreateTicket() {
                             variant="warning"
                             className="curator-create-ticket__alert"
                           >
-                            Частично успешный импорт <br /> <br />
-                            Импортировано {successfulImports} записей <br />
-                            Не удалось импортировать {
-                              failedImports
-                            } записей <br />
+                            {get_translation(
+                              "INTERFACE_PARTLY_SUCCESSFUL_IMPORT"
+                            )}{" "}
+                            <br /> <br />
+                            {get_translation("INTERFACE_IMPORTED")}{" "}
+                            {successfulImports} <br />
+                            {get_translation("INTERFACE_FAILED_IMPORT")}{" "}
+                            {failedImports}
                           </Alert>
                         )}
 
@@ -693,7 +698,7 @@ function CuratorCreateTicket() {
                               variant="danger"
                               className="curator-create-ticket__alert"
                             >
-                              Записей в файле не найдено
+                              {get_translation("INTERFACE_EMPTY_FILE")}
                             </Alert>
                           )}
                       </>
@@ -746,10 +751,10 @@ function CuratorCreateTicket() {
                     onChange={handleToggleChange}
                   >
                     <ToggleButton id="tbg-radio-1" value={1}>
-                      Создать обращение
+                      {get_translation("INTERFACE_CREATE_TICKET")}
                     </ToggleButton>
                     <ToggleButton id="tbg-radio-2" value={2}>
-                      Создать уведомление
+                      {get_translation("INTERFACE_CREATE_NOTIFICATION")}
                     </ToggleButton>
                   </ToggleButtonGroup>
                 ) : null}
@@ -771,15 +776,11 @@ function CuratorCreateTicket() {
           <Modal show={showSuccess} onHide={handleCloseSuccess}>
             <Modal.Header closeButton>
               <Modal.Title>
-                {isNotificaton ? "Уведомления " : "Обращения "}
-                созданы
+                {get_translation("INTERFACE_TICKETS_CREATED")}
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>
-                {isNotificaton ? "Уведомления " : "Обращения "} успешно созданы
-                и отправлены получателям
-              </p>
+              <p>{get_translation("INTERFACE_TICKETS_CREATED_FULL")}</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseSuccess}>
@@ -791,15 +792,11 @@ function CuratorCreateTicket() {
           <Modal show={showError} onHide={handleCloseError}>
             <Modal.Header closeButton>
               <Modal.Title>
-                {isNotificaton ? "Уведомления " : "Обращения "}
-                были созданы частично
+                {get_translation("INTERFACE_TICKETS_CREATED_PARTLY")}
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>
-                Часть {isNotificaton ? " уведомлений " : " обращений "} успешно
-                отправлена. Следующие ID не удалось найти:
-              </p>
+              <p>{get_translation("INTERFACE_TICKETS_CREATED_PARTLY")}</p>
               <ul className="failed-imports">
                 {failedQueryImports?.slice(0, 5).map((failedImport, index) => (
                   <li key={index}>{failedImport}</li>

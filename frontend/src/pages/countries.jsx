@@ -20,6 +20,8 @@ import "../css/edit-ticket.css";
 import "../css/translation.css";
 import "../css/countries.css";
 
+import get_translation from "../helpers/translation";
+
 function Countries() {
   const [countiesList, setCountiesList] = useState([]);
   const [langList, setLangList] = useState([]);
@@ -38,8 +40,6 @@ function Countries() {
   const [isErrorEditVisible, setIsErrorEditVisible] = useState(false);
 
   const [showWarning, setShowWarning] = useState(false);
-  const modalTitle = "Предупреждение";
-  const modalBody = "Вы уверены, что хотите удалить этот язык?";
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const [language] = useState(localStorage.getItem("language"));
@@ -125,7 +125,7 @@ function Countries() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleAddLangView = () => {
@@ -157,13 +157,13 @@ function Countries() {
     let error = "";
 
     if (newCodeValue.trim() == "") {
-      error = "Введите код языка";
+      error = get_translation("INTERFACE_ENTER_LANG_CODE");
     } else if (newNameValue.trim() == "") {
-      error = "Введите название языка";
+      error = get_translation("INTERFACE_ENTER_LANG_NAME");
     } else if (queryError == "Unsolvable") {
-      error = "Введен уже существующий код или название языка";
+      error = get_translation("INTERFACE_ERROR_NOT_UNIQUE_LANG");
     } else {
-      error = "Ошибка при добавлении языка";
+      error = get_translation("INTERFACE_ERROR_ADD_LANG");
     }
 
     return error;
@@ -255,7 +255,7 @@ function Countries() {
   };
 
   const errorEditMsg = () => {
-    let error = "Введите код или название языка";
+    let error = get_translation("INTERFACE_ENTER_CODE/NAME_LANG");
 
     return error;
   };
@@ -295,7 +295,10 @@ function Countries() {
     <>
       {isAdmin() ? (
         <>
-          <TitleH2 title="Все страны" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_INTERFACE_ALL_COUNTRY")}
+            className="title__heading"
+          />
           <Tabs
             defaultActiveKey="countries"
             id="justify-tab-example"
@@ -305,17 +308,17 @@ function Countries() {
             <Tab
               className="chat__tab-wrapper"
               eventKey="countries"
-              title="Страны"
+              title={get_translation("INTERFACE_COUNTRIES")}
             >
               <div className="table__wrapper">
                 <Table className="table__table" hover>
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Код</th>
-                      <th>Название</th>
-                      <th>Языки</th>
-                      <th>Редактировать</th>
+                      <th>{get_translation("INTERFACE_CODE")}</th>
+                      <th>{get_translation("INTERFACE_TITLE")}</th>
+                      <th>{get_translation("INTERFACE_LANGS")}</th>
+                      <th>{get_translation("INTERFACE_EDIT")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -346,21 +349,27 @@ function Countries() {
                 </Table>
               </div>
               <ButtonCustom
-                title="Добавить страну"
+                title={get_translation("INTERFACE_ADD_COUNTRY")}
                 onClick={goToAddCountry}
                 className={"table__btn button-hover"}
               />
             </Tab>
-            <Tab className="chat__tab-wrapper" eventKey="langs" title="Языки">
+            <Tab
+              className="chat__tab-wrapper"
+              eventKey="langs"
+              title={get_translation("INTERFACE_LANGS")}
+            >
               <div className="table__wrapper">
                 <Table className="table__table" hover>
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Код</th>
-                      <th>Название</th>
-                      <th>Удалить</th>
-                      {isApplyColumnVisible && <th>Применить</th>}
+                      <th>{get_translation("INTERFACE_CODE")}</th>
+                      <th>{get_translation("INTERFACE_TITLE")}</th>
+                      <th>{get_translation("INTERFACE_DELETE")}</th>
+                      {isApplyColumnVisible && (
+                        <th>{get_translation("INTERFACE_APPLY")}</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -437,7 +446,7 @@ function Countries() {
               {isButtonVisible && (
                 <div className="countries__lang-buttons">
                   <ButtonCustom
-                    title="Добавить язык"
+                    title={get_translation("INTERFACE_ADD_LANG")}
                     onClick={handleAddLangView}
                     className={"table__btn button-hover"}
                   />
@@ -452,14 +461,14 @@ function Countries() {
                     <div className="countries__column">
                       <Form.Control
                         type="text"
-                        placeholder="Код"
+                        placeholder={get_translation("INTERFACE_CODE")}
                         value={newCodeValue}
                         className="add-currator__input"
                         onChange={handleNewCode}
                       />
                       <Form.Control
                         type="text"
-                        placeholder="Название"
+                        placeholder={get_translation("INTERFACE_TITLE")}
                         value={newNameValue}
                         className="add-currator__input"
                         onChange={handleNewName}
@@ -468,7 +477,7 @@ function Countries() {
                         <span className="form__error">{errorMsg()}</span>
                       )}
                       <ButtonCustom
-                        title="Добавить"
+                        title={get_translation("INTERFACE_ADD")}
                         onClick={handleAddLang}
                         className={"table__btn button-hover"}
                       />
@@ -483,8 +492,8 @@ function Countries() {
             show={showWarning}
             onClose={handleCloseModal}
             onConfirm={handleCloseWarning}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_WARNING")}
+            modalBody={get_translation("INTERFACE_WARNING_DELETE_LANG")}
             warning={true}
           />
         </>

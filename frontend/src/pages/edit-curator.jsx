@@ -60,20 +60,9 @@ function EditCurator() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const modalSuccessTitle = "Куратор обновлен";
-  const modalSuccessBody = "Данные куратора успешно обновлены";
-
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
-  const modalDeactivateTitle = "Куратор деактивирован";
-  const modalDeactivateBody = "Куратор успешно деактивирован";
-
   const [showActivateModal, setShowActivateModal] = useState(false);
-  const modalActivateTitle = "Куратор активирован";
-  const modalActivateBody = "Куратор успешно активирован";
-
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const modalWarningTitle = "Предупреждение";
-  const modalWarningBody = "Вы уверены, что хотите деактивировать куратора?";
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const [language] = useState(localStorage.getItem("language"));
@@ -496,14 +485,14 @@ function EditCurator() {
       {isAdmin() ? (
         <>
           <BackTitle
-            title={`Редактировать куратора #${curatorId}`}
+            title={`${get_translation("INTERFACE_EDIT_CURATOR")} #${curatorId}`}
             linkPrev={linkPrev}
           />
           <Row className="edit-curator__row">
             <Col className="edit-curator__column">
               <Form.Group controlId="NameForm">
                 <Form.Label className="edit-curator__field-label">
-                  Имя
+                  {get_translation("INTERFACE_NAME")}
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -515,7 +504,7 @@ function EditCurator() {
 
               <Form.Group controlId="SurnameForm">
                 <Form.Label className="edit-curator__field-label">
-                  Фамилия
+                  {get_translation("INTERFACE_SURNAME")}
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -527,7 +516,7 @@ function EditCurator() {
 
               <Form.Group controlId="PatronymicForm">
                 <Form.Label className="edit-curator__field-label">
-                  Отчество
+                  {get_translation("INTERFACE_PATRONYMIC")}
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -542,7 +531,7 @@ function EditCurator() {
                 controlId="BirthdayForm"
               >
                 <Form.Label className="edit-curator__field-label">
-                  Дата рождения
+                  {get_translation("INTERFACE_DATE_OF_BIRTHDAY")}
                 </Form.Label>
                 <DatePicker
                   id="DatePicker"
@@ -581,7 +570,7 @@ function EditCurator() {
                         onChange={handleOnChangeAccessCurators}
                       />
                       <span className="edit-curator__field-label">
-                        Редактирование кураторов
+                        {get_translation("INTERFACE_PERMS_EDIT_CURATORS")}
                       </span>
                     </div>
                   </Form.Group>
@@ -598,7 +587,7 @@ function EditCurator() {
                         onChange={handleOnChangeAccessThemes}
                       />
                       <span className="edit-curator__field-label">
-                        Редактирование тем
+                        {get_translation("INTERFACE_PERMS_EDIT_THEMES")}
                       </span>
                     </div>
                   </Form.Group>
@@ -615,7 +604,7 @@ function EditCurator() {
                         onChange={handleOnChangeAccessTransfers}
                       />
                       <span className="edit-curator__field-label">
-                        Редактирование переводов
+                        {get_translation("INTERFACE_PERMS_EDIT_TRANSLATIONS")}
                       </span>
                     </div>
                   </Form.Group>
@@ -632,7 +621,7 @@ function EditCurator() {
                         onChange={handleOnChangeAccessAnswers}
                       />
                       <span className="edit-curator__field-label">
-                        Возможность отвечать на обращения
+                        {get_translation("INTERFACE_PERMS_SEND_MSG")}
                       </span>
                     </div>
                   </Form.Group>
@@ -646,7 +635,7 @@ function EditCurator() {
                 controlId="CountryForm"
               >
                 <Form.Label className="edit-curator__field-label">
-                  Страна
+                  {get_translation("INTERFACE_COUNTRY")}
                 </Form.Label>
                 <DropdownButton id="dropdown-custom-1" title={selectedCountry}>
                   {countryList.map((country, index) => (
@@ -668,7 +657,7 @@ function EditCurator() {
                 controlId="DepartmentsForm"
               >
                 <Form.Label className="edit-curator__field-label">
-                  Департаменты
+                  {get_translation("INTERFACE_DEPARTAMENTS")}
                 </Form.Label>
 
                 <MultiSelect
@@ -685,7 +674,7 @@ function EditCurator() {
                 controlId="JobTitleForm"
               >
                 <Form.Label className="edit-curator__field-label">
-                  Должность
+                  {get_translation("INTERFACE_JOB")}
                 </Form.Label>
                 <DropdownButton id="dropdown-custom-1" title={selectedJobTitle}>
                   {jobTitleList.map((jobTitle, index) => (
@@ -708,7 +697,7 @@ function EditCurator() {
                 )}
                 <div className="edit-curator__btn-row">
                   <ButtonCustom
-                    title="Применить"
+                    title={get_translation("INTERFACE_APPLY")}
                     className={
                       "add-curator__btn edit-curator__btn button-hover"
                     }
@@ -716,7 +705,7 @@ function EditCurator() {
                   />
                   {isActive ? (
                     <ButtonCustom
-                      title="Деактивировать куратора"
+                      title={get_translation("INTERFACE_DEACTIVATE_CURATOR")}
                       className={
                         "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                       }
@@ -724,7 +713,7 @@ function EditCurator() {
                     />
                   ) : (
                     <ButtonCustom
-                      title="Активировать куратора"
+                      title={get_translation("INTERFACE_ACTIVATE_CURATOR")}
                       className={
                         "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                       }
@@ -739,30 +728,30 @@ function EditCurator() {
           <ModalDialog
             show={showSuccessModal}
             onClose={handleCloseModalLeave}
-            modalTitle={modalSuccessTitle}
-            modalBody={modalSuccessBody}
+            modalTitle={get_translation("INTERFACE_CURATOR_CHANGED")}
+            modalBody={get_translation("INTERFACE_CURATOR_CHANGED_FULL")}
           />
 
           <ModalDialog
             show={showDeactivateModal}
             onClose={handleCloseModalLeave}
-            modalTitle={modalDeactivateTitle}
-            modalBody={modalDeactivateBody}
+            modalTitle={get_translation("INTERFACE_CURATOR_DEACTIVATED")}
+            modalBody={get_translation("INTERFACE_CURATOR_DEACTIVATED_FULL")}
           />
 
           <ModalDialog
             show={showActivateModal}
             onClose={handleCloseModalLeave}
-            modalTitle={modalActivateTitle}
-            modalBody={modalActivateBody}
+            modalTitle={get_translation("INTERFACE_CURATOR_ACTIVATED")}
+            modalBody={get_translation("INTERFACE_CURATOR_ACTIVATED_FULL")}
           />
 
           <ModalDialog
             show={showWarningModal}
             onClose={handleCloseModal}
             onConfirm={handleConfirm}
-            modalTitle={modalWarningTitle}
-            modalBody={modalWarningBody}
+            modalTitle={get_translation("INTERFACE_WARNING")}
+            modalBody={get_translation("INTERFACE_WARNING_DEACTIVATE_CURATOR")}
             warning={true}
           />
         </>

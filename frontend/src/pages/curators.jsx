@@ -14,12 +14,14 @@ import EditIcon from "../assets/edit_icon.svg";
 import "../css/table.css";
 import "../css/edit-curator.css";
 
+import get_translation from "../helpers/translation";
+
 function Curators() {
   const [dataQuery, setData] = useState([]);
 
   const [showInactive, setShowInactive] = useState(false);
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -82,7 +84,7 @@ function Curators() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleIsActiveChange = () => {
@@ -93,7 +95,10 @@ function Curators() {
     <>
       {isAdmin() ? (
         <>
-          <TitleH2 title="Все кураторы" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_ALL_CURATORS")}
+            className="title__heading"
+          />
           <div
             className="edit-curator__checkbox-block"
             style={{ marginBottom: "20px" }}
@@ -105,18 +110,18 @@ function Curators() {
               onChange={handleIsActiveChange}
             />
             <span className="edit-curator__field-label">
-              Отображать неактивных кураторов
+              {get_translation("INTERFACE_SHOW_DEACTIVE_CURATORS")}
             </span>
           </div>
           <div className="table__wrapper">
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>ФИО</th>
-                  <th>Дата рождения</th>
-                  <th>Куратор ID</th>
-                  <th>Вступил в должность</th>
-                  <th>Редактировать</th>
+                  <th>{get_translation("INTERFACE_FULL_NAME")}</th>
+                  <th>{get_translation("INTERFACE_DATE_OF_BIRTHDAY")}</th>
+                  <th>{get_translation("INTERFACE_CURATOR")} ID</th>
+                  <th>{get_translation("INTERFACE_TOOK_OFFICE")}</th>
+                  <th>{get_translation("INTERFACE_EDIT")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,7 +170,7 @@ function Curators() {
             </Table>
           </div>
           <ButtonCustom
-            title="Добавить куратора"
+            title={get_translation("INTERFACE_ADD_CURATOR")}
             onClick={goToAddCurator}
             className={"table__btn button-hover"}
           />

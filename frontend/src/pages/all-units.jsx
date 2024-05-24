@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, Link } from "react-router-dom";
-import { Form, Modal, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import {
   MRT_TableContainer,
   useMaterialReactTable,
@@ -19,6 +19,8 @@ import NotFoundPage from "./not-found-page";
 import EditIcon from "../assets/edit_icon.svg";
 import "../css/units.css";
 
+import get_translation from "../helpers/translation";
+
 function Units() {
   const [data, setData] = useState([]);
 
@@ -26,13 +28,9 @@ function Units() {
   const [showApplyButton, setShowApplyButton] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Порядок обновлен";
-  const modalBody = "Порядок разделов успешно обновлен";
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const modalErrorTitle = "Ошибка при смене порядка";
-  const modalErrorBody = "Порядок разделов не был обновлен";
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -103,15 +101,15 @@ function Units() {
     () => [
       {
         accessorKey: "id",
-        header: "Раздел ID",
+        header: `${get_translation("INTERFACE_UNIT")} ID`,
       },
       {
         accessorKey: "name",
-        header: "Название разделение",
+        header: get_translation("INTERFACE_NAME_OF_UNIT"),
       },
       {
         accessorKey: "link",
-        header: "Редактировать",
+        header: get_translation("INTERFACE_EDIT"),
         Cell: ({ row }) => (
           <Link
             to={`/edit-unit/${row.original.id}`}
@@ -186,14 +184,14 @@ function Units() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleIsActiveChange = () => {
     setShowInactive(!showInactive);
   };
 
-  const handleClickAplly = async () => {
+  const handleClickApply = async () => {
     const queryData = data.map(({ id, orderNum }) => ({ id, orderNum }));
 
     // console.log(queryData);
@@ -246,7 +244,10 @@ function Units() {
           }
           `}
           </style>
-          <TitleH2 title="Разделения" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_UNITS")}
+            className="title__heading"
+          />
           <div
             className="edit-curator__checkbox-block"
             style={{ marginBottom: "20px" }}
@@ -258,25 +259,25 @@ function Units() {
               onChange={handleIsActiveChange}
             />
             <span className="edit-curator__field-label">
-              Отображать неактивные разделы
+              {get_translation("INTERFACE_SHOW_DEACTIVE_UNITS")}
             </span>
           </div>
           <MRT_TableContainer table={table} />
           <div className="units__btn-row">
             <ButtonCustom
-              title="Добавить раздел"
+              title={get_translation("INTERFACE_ADD_UNIT")}
               onClick={goToAddUnit}
               className={"button-hover"}
             />
             <ButtonCustom
-              title="Перейти к темам"
+              title={get_translation("INTERFACE_GO_TO_THEMES")}
               className={
                 "add-curator__btn units__btn alltickets__button-two button-outlined"
               }
               onClick={goToThemes}
             />
             <ButtonCustom
-              title="Перейти к подтемам"
+              title={get_translation("INTERFACE_GO_TO_SUBTHEMES")}
               className={
                 "add-curator__btn units__btn alltickets__button-two button-outlined"
               }
@@ -284,8 +285,8 @@ function Units() {
             />
             {showApplyButton && (
               <ButtonCustom
-                title="Применить изменения порядка"
-                onClick={handleClickAplly}
+                title={get_translation("INTERFACE_APPLY_ORDER_CHANGE")}
+                onClick={handleClickApply}
                 className={"button-outlined"}
               />
             )}
@@ -294,15 +295,15 @@ function Units() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_ORDER_CHANGE")}
+            modalBody={get_translation("INTERFACE_ORDER_CHANGE_UNIT")}
           />
 
           <ModalDialog
             show={showErrorModal}
             onClose={handleCloseErrorModal}
-            modalTitle={modalErrorTitle}
-            modalBody={modalErrorBody}
+            modalTitle={get_translation("INTERFACE_ORDER_CHANGE_ERROR")}
+            modalBody={get_translation("INTERFACE_ORDER_CHANGE_ERROR_UNIT")}
           />
         </>
       ) : (

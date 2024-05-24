@@ -16,6 +16,8 @@ import NotFoundPage from "./not-found-page";
 import "../css/edit-ticket.css";
 import "../css/edit-curator.css";
 
+import get_translation from "../helpers/translation";
+
 function EditCountry() {
   const { countryId } = useParams();
   const [langs, setLangs] = useState([]);
@@ -27,16 +29,8 @@ function EditCountry() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Страна обновлена";
-  const modalBody = "Страна успешно обновлена";
-
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const modalSuccessTitle = "Страна удалена";
-  const modalSuccessBody = "Страна успешно удалена";
-
   const [showWarning, setShowWarning] = useState(false);
-  const modalWarningTitle = "Предупреждение";
-  const modalWarningBody = "Вы уверены, что хотите удалить страну?";
 
   const [linkPrev, setLinkPrev] = useState(null);
 
@@ -136,7 +130,7 @@ function EditCountry() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleNameChange = (e) => {
@@ -153,13 +147,13 @@ function EditCountry() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Укажите название страны";
+      error = get_translation("INTERFACE_ENTER_COUNTRY_NAME");
     } else if (codeValue.trim() == "") {
-      error = "Укажите код страны";
+      error = get_translation("INTERFACE_ENTER_COUNTRY_CODE");
     } else if (selectedLangsId.length == 0) {
-      error = "Выберите язык";
+      error = get_translation("INTERFACE_SELECT_LANG");
     } else {
-      error = "Ошибка при изменении страны";
+      error = get_translation("INTERFACE_ERROR_COUNTRY_CHANGE");
     }
 
     return error;
@@ -251,7 +245,7 @@ function EditCountry() {
       {isAdmin() ? (
         <>
           <BackTitle
-            title={`Редактировать страну #${countryId}`}
+            title={`${get_translation("INTERFACE_EDIT_COUNTRY")} #${countryId}`}
             linkPrev={linkPrev}
           />
           <Row
@@ -261,12 +255,14 @@ function EditCountry() {
             <Col className="add-curator__column add-subtheme__column">
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">
-                  Название
+                  {get_translation("INTERFACE_COUNTRY_NAME")}
                 </Form.Label>
                 <Form.Group controlId="NameForm">
                   <Form.Control
                     type="text"
-                    placeholder="Введите название страны"
+                    placeholder={get_translation(
+                      "INTERFACE_ENTER_COUNTRY_NAME"
+                    )}
                     value={nameValue}
                     className="add-currator__input"
                     onChange={handleNameChange}
@@ -275,12 +271,14 @@ function EditCountry() {
               </div>
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">
-                  Код
+                  {get_translation("INTERFACE_COUNTRY_CODE")}
                 </Form.Label>
                 <Form.Group controlId="CodeForm">
                   <Form.Control
                     type="text"
-                    placeholder="Введите код страны"
+                    placeholder={get_translation(
+                      "INTERFACE_ENTER_COUNTRY_CODE"
+                    )}
                     value={codeValue}
                     className="add-currator__input"
                     onChange={handleCodeChange}
@@ -289,14 +287,14 @@ function EditCountry() {
               </div>
               <div className="edit-subtheme__field">
                 <Form.Label className="edit-curator__field-label">
-                  Языки
+                  {get_translation("INTERFACE_LANGS")}
                 </Form.Label>
                 <MultiSelect
                   value={selectedLangs}
                   onChange={(e) => handleLangsChange(e.value)}
                   options={newLangs}
                   optionLabel="name"
-                  placeholder="Выберите языки"
+                  placeholder={get_translation("INTERFACE_SELECT_LANGS")}
                   className="add-curator__multiselect"
                 />
               </div>
@@ -305,12 +303,12 @@ function EditCountry() {
               )}
               <div className="edit-curator__btn-row">
                 <ButtonCustom
-                  title="Применить"
+                  title={get_translation("INTERFACE_APPLY")}
                   className={"edit-curator__btn button-hover"}
                   onClick={handleEditCountry}
                 />
                 <ButtonCustom
-                  title="Удалить страну"
+                  title={get_translation("INTERFACE_DELETE_COUNTRY")}
                   className={
                     "add-curator__btn edit-curator__btn alltickets__button-two button-outlined"
                   }
@@ -323,24 +321,24 @@ function EditCountry() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseLeave}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_COUNTRY_CHANGED")}
+            modalBody={get_translation("INTERFACE_COUNTRY_CHANGED_FULL")}
           />
 
           <ModalDialog
             show={showWarning}
             onClose={handleClose}
             onConfirm={handleConfirmDelete}
-            modalTitle={modalWarningTitle}
-            modalBody={modalWarningBody}
+            modalTitle={get_translation("INTERFACE_WARNING")}
+            modalBody={get_translation("INTERFACE_WARNING_DELETE_COUNTRY")}
             warning={true}
           />
 
           <ModalDialog
             show={showSuccessModal}
             onClose={handleCloseLeave}
-            modalTitle={modalSuccessTitle}
-            modalBody={modalSuccessBody}
+            modalTitle={get_translation("INTERFACE_COUNTRY_DELETED")}
+            modalBody={get_translation("INTERFACE_COUNTRY_DELETED_FULL")}
           />
         </>
       ) : (

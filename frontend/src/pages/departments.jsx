@@ -19,6 +19,8 @@ import DeleteIcon from "../assets/delete_icon.svg";
 import ApplyIcon from "../assets/apply_icon.svg";
 import "../css/table.css";
 
+import get_translation from "../helpers/translation";
+
 function Departments() {
   const [departmentsList, setDepartmentsList] = useState([]);
   const [changes, setChanges] = useState({});
@@ -34,8 +36,6 @@ function Departments() {
   const [isErrorEditVisible, setIsErrorEditVisible] = useState(false);
 
   const [showWarning, setShowWarning] = useState(false);
-  const modalTitle = "Предупреждение";
-  const modalBody = "Вы уверены, что хотите удалить этот дераптамент?";
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
   const [language] = useState(localStorage.getItem("language"));
@@ -90,7 +90,7 @@ function Departments() {
         }
       }
     }
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   if (loadingDelete) {
@@ -119,9 +119,9 @@ function Departments() {
     let error = "";
 
     if (newNameValue.trim() == "") {
-      error = "Введите название департамента";
+      error = get_translation("INTERFACE_ENTER_DEPARTMENT_NAME");
     } else {
-      error = "Ошибка при добавлении департамента";
+      error = get_translation("INTERFACE_ERROR_ADD_DEPARTMENT");
     }
 
     return error;
@@ -170,7 +170,7 @@ function Departments() {
   };
 
   const errorEditMsg = () => {
-    let error = "Введите название департамента";
+    let error = get_translation("INTERFACE_ENTER_DEPARTMENT_NAME");
 
     return error;
   };
@@ -245,15 +245,20 @@ function Departments() {
     <>
       {isAdmin() ? (
         <>
-          <TitleH2 title="Все департаменты" className="title__heading" />
+          <TitleH2
+            title={get_translation("INTERFACE_DEPARTAMENTS")}
+            className="title__heading"
+          />
           <div className="table__wrapper">
             <Table className="table__table" hover>
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Название</th>
-                  <th>Удалить</th>
-                  {isApplyColumnVisible && <th>Применить</th>}
+                  <th>{get_translation("INTERFACE_TITLE")}</th>
+                  <th>{get_translation("INTERFACE_DELETE")}</th>
+                  {isApplyColumnVisible && (
+                    <th>{get_translation("INTERFACE_APPLY")}</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -318,7 +323,7 @@ function Departments() {
           {isButtonVisible && (
             <div className="countries__lang-buttons">
               <ButtonCustom
-                title="Добавить департамент"
+                title={get_translation("INTERFACE_ADD_DEPARTMENT")}
                 onClick={handleAddDepartmentView}
                 className={"table__btn button-hover"}
               />
@@ -333,7 +338,7 @@ function Departments() {
                 <div className="countries__column">
                   <Form.Control
                     type="text"
-                    placeholder="Название"
+                    placeholder={get_translation("INTERFACE_TITLE")}
                     value={newNameValue}
                     className="add-currator__input"
                     onChange={handleNewName}
@@ -342,7 +347,7 @@ function Departments() {
                     <span className="form__error">{errorMsg()}</span>
                   )}
                   <ButtonCustom
-                    title="Добавить"
+                    title={get_translation("INTERFACE_ADD")}
                     onClick={handleAddDepartment}
                     className={"table__btn button-hover"}
                   />
@@ -355,8 +360,8 @@ function Departments() {
             show={showWarning}
             onClose={handleCloseModal}
             onConfirm={handleCloseWarning}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_WARNING")}
+            modalBody={get_translation("INTERFACE_WARNING_DELETE_DEPARTMENT")}
             warning={true}
           />
         </>

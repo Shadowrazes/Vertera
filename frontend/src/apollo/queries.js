@@ -54,6 +54,7 @@ export const TABLE_TICKETS = gql`
             text
           }
           status {
+            id
             name(lang: "ru") {
               stroke
             }
@@ -123,6 +124,7 @@ export const TABLE_TICKETS_USER = gql`
             text
           }
           status {
+            id
             name(lang: $lang) {
               stroke
             }
