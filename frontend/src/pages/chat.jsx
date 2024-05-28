@@ -2078,7 +2078,7 @@ function Chat() {
           </>
         )}
 
-        <InfoTable data={data} currentStatus={currentStatusId} />
+        <InfoTable data={data} currentStatusId={currentStatusId} />
 
         {!isVisible && (
           <Reaction
@@ -2274,19 +2274,19 @@ function Chat() {
         <MessageList
           messagesQuery={messagesQuery}
           userId={user.id}
-          currentStatus={currentStatusId}
+          currentStatusId={currentStatusId}
           handleRefetch={handleRefetch}
         />
 
         <Counter
-          currentStatus={currentStatusId}
+          currentStatusId={currentStatusId}
           messagesQuery={messagesQuery}
           data={data}
         />
       </div>
 
       {isAdmin() && (
-        <Logs currentStatus={currentStatusId} logs={dataLogQuery} />
+        <Logs currentStatusId={currentStatusId} logs={dataLogQuery} />
       )}
 
       <ModalDialog

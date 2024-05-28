@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import ButtonCustom from "../components/button";
 
+import get_translation from "../helpers/translation";
+get_translation("INTERFACE_");
+
 function Admin() {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -19,9 +22,9 @@ function Admin() {
   return (
     <>
       <div className="auth">
-        <h2>Необходимо авторизироваться</h2>
+        <h2>{get_translation("INTERFACE_MUST_AUTH")}</h2>
         <ButtonCustom
-          title="Авторизироваться как куратор"
+          title={get_translation("INTERFACE_AUTH_CURATOR")}
           onClick={handleAuthHelperButton}
           className={"button-hover"}
         />

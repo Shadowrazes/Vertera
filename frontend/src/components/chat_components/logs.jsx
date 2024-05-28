@@ -4,7 +4,9 @@ import { DateTime } from "luxon";
 import { Table } from "react-bootstrap";
 import ButtonCustom from "../../components/button";
 
-function Logs({ currentStatus, logs }) {
+import get_translation from "../../helpers/translation";
+
+function Logs({ currentStatusId, logs }) {
   const [isVisibleLogs, setIsVisibleLogs] = useState(false);
 
   const handleHideComponent = () => {
@@ -30,7 +32,11 @@ function Logs({ currentStatus, logs }) {
     <>
       <a className="alltickets__link">
         <ButtonCustom
-          title={isVisibleLogs == false ? "Показать историю" : "Скрыть историю"}
+          title={
+            isVisibleLogs == false
+              ? get_translation("INTERFACE_SHOW_LOGS")
+              : get_translation("INTERFACE_HIDE_LOGS")
+          }
           onClick={handleHideComponent}
           className={"button-outlined single"}
         />
@@ -40,18 +46,16 @@ function Logs({ currentStatus, logs }) {
         <>
           <div
             className={
-              currentStatus == "Новый"
-                ? "chat__table-log-new"
-                : "chat__table-log"
+              currentStatusId == 1 ? "chat__table-log-new" : "chat__table-log"
             }
           >
             <Table className="table__table" hover>
               <thead>
                 <tr>
-                  <th>Дата</th>
-                  <th>Имя</th>
-                  <th>Роль</th>
-                  <th>Событие</th>
+                  <th>{get_translation("INTERFACE_DATE")}</th>
+                  <th>{get_translation("INTERFACE_NAME")}</th>
+                  <th>{get_translation("INTERFACE_ROLE")}</th>
+                  <th>{get_translation("INTERFACE_EVENT")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,10 +71,10 @@ function Logs({ currentStatus, logs }) {
                     <td>{getFullName(log.initiator)}</td>
                     <td>
                       {log.initiator.role == "system"
-                        ? "Система"
+                        ? get_translation("INTERFACE_SYSTEM")
                         : log.initiator.role == "helper"
-                        ? "Куратор"
-                        : "Партнер"}
+                        ? get_translation("INTERFACE_CURATOR")
+                        : get_translation("INTERFACE_PARTNER")}
                     </td>
                     <td>{log.info}</td>
                   </tr>

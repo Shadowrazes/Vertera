@@ -5,6 +5,8 @@ import { franc } from "franc";
 
 import "../../css/chat-message-recipient.css";
 
+import get_translation from "../../helpers/translation";
+
 function ChatMessage({ message, sender, visibility, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
   let isVisible;
@@ -111,7 +113,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
             {!isVisible && (
               <>
                 <span className="chat-message-recipient__attachs-title">
-                  Прикрепленные файлы:
+                  {get_translation("INTERFACE_ATTECHED_FILES")}:
                 </span>
                 <div className="chat-message-recipient__attachs">
                   {attachs &&
@@ -148,7 +150,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
               <>
                 <div className="chat-message-translate">
                   <span>
-                    Перевод на{" "}
+                    {get_translation("INTERFACE_TRANSLATION_ON")}{" "}
                     <img
                       src={languageCodeQuery[language][1]}
                       className="language-menu__flag"
@@ -164,7 +166,7 @@ function ChatMessage({ message, sender, visibility, time, attachs }) {
                   {!isVisible && (
                     <>
                       <span className="chat-message-recipient__attachs-title">
-                        Прикрепленные файлы:
+                        {get_translation("INTERFACE_ATTACHED_FILES")}:
                       </span>
                       <div
                         style={{ justifyContent: "flex-end" }}

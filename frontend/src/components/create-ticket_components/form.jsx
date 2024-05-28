@@ -29,9 +29,6 @@ function FormComponent() {
   const [isFilesLimitExceeded, setIsFilesLimitExceeded] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = get_translation("INTERFACE_MESSAGE_CREATION_TICKET");
-  const modalBody =
-    "Ваше обращение принято в обработку, пожалуйста, ожидайте ответа (срок обработки заявки до 24 часов)";
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -408,8 +405,8 @@ function FormComponent() {
       <ModalDialog
         show={showModal}
         onClose={handleCloseModal}
-        modalTitle={modalTitle}
-        modalBody={modalBody}
+        modalTitle={get_translation("INTERFACE_MESSAGE_CREATION_TICKET")}
+        modalBody={get_translation("INTERFACE_MESSAGE_CREATION_TICKET_FULL")}
       />
     </>
   );

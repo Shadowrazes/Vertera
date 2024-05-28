@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import {
   COUNTRY_LIST,
@@ -49,8 +41,6 @@ function AddCurator() {
   const [queryError, setQueryError] = useState("");
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = get_translation("INTERFACE_MESSAGE_ADD_CURATOR");
-  const modalBody = get_translation("INTERFACE_MESSAGE_ADD_CURATOR_FULL");
 
   const [nameValue, setNameValue] = useState("");
   const [surnameValue, setSurnameValue] = useState("");
@@ -491,8 +481,8 @@ function AddCurator() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_MESSAGE_ADD_CURATOR")}
+            modalBody={get_translation("INTERFACE_MESSAGE_ADD_CURATOR_FULL")}
           />
         </>
       ) : (

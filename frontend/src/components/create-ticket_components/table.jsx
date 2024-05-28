@@ -239,21 +239,21 @@ function TableTickets() {
     return result;
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Новый":
+  const getStatusColor = (statusId) => {
+    switch (statusId) {
+      case 1:
         return "#E3F3F6";
-      case "В процессе":
+      case 3:
         return "#F6F6E3";
-      case "На уточнении":
+      case 4:
         return "#F0E3F6";
-      case "Ожидает дополнения":
+      case 5:
         return "#F6EDE3";
-      case "У наставника":
+      case 7:
         return "#E3E5F6";
-      case "Уведомление":
+      case 6:
         return "#FFFFFF";
-      case "Выполнено":
+      case 2:
         return "#E3F6E5";
       default:
         return "#FFFFFF";
@@ -323,7 +323,9 @@ function TableTickets() {
               <th>{get_translation("INTERFACE_THEME")}</th>
               {isAdmin() && (
                 <>
-                  <th className="mobile">ID партнера</th>
+                  <th className="mobile">
+                    {get_translation("INTERFACE_PARTNER_ID")}
+                  </th>
                   <th>{get_translation("INTERFACE_CURATOR")}</th>
                 </>
               )}
@@ -450,7 +452,7 @@ function TableTickets() {
                   >
                     {ticket.lastMessage.date.slice(0, 10).replace(/-/g, ".")}|{" "}
                     {ticket.lastMessage.sender.surname === "system"
-                      ? "Системное сообщение"
+                      ? get_translation("INTERFACE_SYSTEM_MSG")
                       : `${
                           ticket.lastMessage.sender.name
                         } ${ticket.lastMessage.sender.surname.charAt(0)}.`}
@@ -480,7 +482,7 @@ function TableTickets() {
                     <span
                       className="table__status"
                       style={{
-                        background: getStatusColor(ticket.status.name.stroke),
+                        background: getStatusColor(ticket.status.id),
                       }}
                     >
                       {ticket.status.name.stroke}

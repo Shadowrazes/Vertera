@@ -15,6 +15,8 @@ import NotFoundPage from "./not-found-page";
 
 import "../css/edit-ticket.css";
 
+import get_translation from "../helpers/translation";
+
 function AddCountry() {
   const [langs, setLangs] = useState([]);
   const [codeValue, setCodeValue] = useState("");
@@ -27,10 +29,8 @@ function AddCountry() {
   const [linkPrev, setLinkPrev] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Страна добавлена";
-  const modalBody = "Страна успешно добавлена";
 
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   if (user === null) {
     window.location.href = "/";
@@ -118,13 +118,13 @@ function AddCountry() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Укажите название страны";
+      error = get_translation("INTERFACE_ENTER_COUNTRY_NAME");
     } else if (codeValue.trim() == "") {
-      error = "Укажите код страны";
+      error = get_translation("INTERFACE_ENTER_COUNTRY_CODE");
     } else if (selectedLangsId.length == 0) {
-      error = "Выберите язык";
+      error = get_translation("INTERFACE_SELECT_LANG");
     } else {
-      error = "Ошибка при добавлении страны";
+      error = get_translation("INTERFACE_ERROR_ADD_COUNTRY");
     }
 
     return error;
@@ -180,13 +180,16 @@ function AddCountry() {
     <>
       {isAdmin() ? (
         <>
-          <BackTitle title="Добавить страну" linkPrev={linkPrev} />
+          <BackTitle
+            title={get_translation("INTERFACE_ADD_COUNTRY")}
+            linkPrev={linkPrev}
+          />
           <Row className="add-curator__row" style={{ marginTop: "20px" }}>
             <Col className="add-curator__column add-subtheme__column">
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Введите название страны"
+                  placeholder={get_translation("INTERFACE_ENTER_COUNTRY_NAME")}
                   value={nameValue}
                   className="add-currator__input"
                   onChange={handleNameChange}
@@ -195,7 +198,7 @@ function AddCountry() {
               <Form.Group controlId="CodeForm">
                 <Form.Control
                   type="text"
-                  placeholder="Введите код страны"
+                  placeholder={get_translation("INTERFACE_ENTER_COUNTRY_CODE")}
                   value={codeValue}
                   className="add-currator__input"
                   onChange={handleCodeChange}
@@ -206,7 +209,7 @@ function AddCountry() {
                 onChange={(e) => handleLangsChange(e.value)}
                 options={newLangs}
                 optionLabel="name"
-                placeholder="Выберите языки"
+                placeholder={get_translation("INTERFACE_SELECT_LANGS")}
                 className="add-curator__multiselect"
               />
               {isErrorVisible && (
@@ -214,7 +217,7 @@ function AddCountry() {
               )}
 
               <ButtonCustom
-                title="Применить"
+                title={get_translation("INTERFACE_APPLY")}
                 className={"add-curator__btn button-hover"}
                 onClick={handleAddCountry}
               />
@@ -224,8 +227,8 @@ function AddCountry() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_MESSAGE_COUNTRY_ADDED")}
+            modalBody={get_translation("INTERFACE_MESSAGE_COUNTRY_ADDED_FULL")}
           />
         </>
       ) : (

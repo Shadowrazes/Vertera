@@ -6,7 +6,12 @@ import ChatMessageSender from "./chat-message-sender";
 import ChatMessageSystem from "./chat-message-system";
 import ChatMessageRecipient from "./chat-message-recipient";
 
-function MessageList({ messagesQuery, userId, currentStatus, handleRefetch }) {
+function MessageList({
+  messagesQuery,
+  userId,
+  currentStatusId,
+  handleRefetch,
+}) {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   const isAdmin = () => {
@@ -36,7 +41,7 @@ function MessageList({ messagesQuery, userId, currentStatus, handleRefetch }) {
                   sender={msg.sender}
                   visibility={msg.visibility}
                   removable={msg.removable}
-                  status={currentStatus}
+                  statusId={currentStatusId}
                   onClick={handleRefetch}
                   time={DateTime.fromISO(msg.date, { zone: "utc" })
                     .toLocal()

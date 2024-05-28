@@ -2,7 +2,9 @@ import { useState } from "react";
 
 import { Table, Col, Row } from "react-bootstrap";
 
-function InfoTable({ data, currentStatus }) {
+import get_translation from "../../helpers/translation";
+
+function InfoTable({ data, currentStatusId }) {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   const isAdmin = () => {
@@ -31,7 +33,7 @@ function InfoTable({ data, currentStatus }) {
           <tbody>
             <tr>
               <td>
-                <b>Создатель обращения:</b>
+                <b>{get_translation("INTERFACE_TICKET_CREATOR")}:</b>
               </td>
               <td>
                 {`${data.clientQuery.ticket.initiator.surname} ${
@@ -43,10 +45,10 @@ function InfoTable({ data, currentStatus }) {
                 } (${data.clientQuery.ticket.initiator.country.name.stroke})`}
               </td>
             </tr>
-            {currentStatus !== "Уведомление" && (
+            {currentStatusId !== 6 && (
               <tr>
                 <td>
-                  <b>Текущий куратор:</b>
+                  <b>{get_translation("INTERFACE_CURRENT_CURATOR")}:</b>
                 </td>
                 <td>
                   {`${data.clientQuery.ticket.recipient.surname} ${
@@ -61,18 +63,18 @@ function InfoTable({ data, currentStatus }) {
                 </td>
               </tr>
             )}
-            {isAdmin() && currentStatus == "На уточнении" && (
+            {isAdmin() && currentStatusId == 4 && (
               <tr>
                 <td>
-                  <b>Уточняющий куратор:</b>
+                  <b>{get_translation("INTERFACE_ASSISTANT")}:</b>
                 </td>
                 <td>{getFullName(data?.clientQuery.ticket?.assistant)}</td>
               </tr>
             )}
-            {currentStatus == "У наставника" && (
+            {currentStatusId == 7 && (
               <tr>
                 <td>
-                  <b>Уточняющий наставник:</b>
+                  <b>{get_translation("INTERFACE_ASSISTANT_MENTOR")}:</b>
                 </td>
                 <td>{getFullName(data?.clientQuery.ticket?.assistant)}</td>
               </tr>

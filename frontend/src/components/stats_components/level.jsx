@@ -1,5 +1,8 @@
-import "../../css/level.css";
 import { useState, useEffect } from "react";
+
+import "../../css/level.css";
+
+import get_translation from "../../helpers/translation";
 
 function Level({ fantasy, allTickets }) {
   const getLevel = () => {
@@ -25,7 +28,7 @@ function Level({ fantasy, allTickets }) {
         <span className="level__circle">{level}</span>
         <div className="level__progress-wrapper">
           <span className="level__progress-text">
-            Прогресс текущего уровня: {getProgress()}%
+            {get_translation("INTERFACE_CURRENT_PROGRESS")}: {getProgress()}%
           </span>
           <div className="level__progress-bar">
             <div

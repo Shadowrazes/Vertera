@@ -4,9 +4,10 @@ import { useQuery } from "@apollo/client";
 import { MESSAGE } from "../../apollo/queries";
 
 import { franc } from "franc";
-import { Translater } from "../../api/translater";
 
 import "../../css/chat-message-sender.css";
+
+import get_translation from "../../helpers/translation";
 
 function ChatMessage({ id, message, sender, time, attachs }) {
   const [translatedText, setTranslatedText] = useState("");
@@ -81,7 +82,6 @@ function ChatMessage({ id, message, sender, time, attachs }) {
   };
 
   useEffect(() => {
-    // console.log("time = ", time);
     const fetchData = async () => {
       // if (languageCode.hasOwnProperty(franc(message))) {
       //   if ((languageCode[franc(message)][0] || franc(message)) !== language) {
@@ -120,7 +120,7 @@ function ChatMessage({ id, message, sender, time, attachs }) {
               <>
                 <div className="chat-message-translate">
                   <span>
-                    Перевод на{" "}
+                    {get_translation("INTERFACE_TRANSLATION_ON")}{" "}
                     <img
                       src={languageCodeQuery[language][1]}
                       className="language-menu__flag"
@@ -136,7 +136,7 @@ function ChatMessage({ id, message, sender, time, attachs }) {
           {!isVisible && (
             <>
               <span className="chat-message-sender__attachs-title">
-                Прикрепленные файлы:
+                {get_translation("INTERFACE_ATTACHED_FILES")}:
               </span>
               <div className="chat-message-sender__attachs">
                 {attachs &&
@@ -163,7 +163,7 @@ function ChatMessage({ id, message, sender, time, attachs }) {
             </>
           )}
           <div className="chat-message-deleted__delete-msg">
-            <span>Сообщение удалено</span>
+            <span>{get_translation("INTERFACE_MSG_DELETED")}</span>
             <span
               className="chat-message-sender__time"
               style={{ marginTop: "0" }}

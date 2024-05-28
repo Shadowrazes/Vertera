@@ -2,11 +2,13 @@ import { useNavigate } from "react-router-dom";
 
 import "../../css/ticket-title.css";
 
+import get_translation from "../../helpers/translation";
+
 const getStatusColor = (status) => {
   switch (status) {
-    case "Открыто":
+    case get_translation("INTERFACE_TICKET_OPENED"):
       return "#00AB97";
-    case "Тикет завершен":
+    case get_translation("INTERFACE_TICKET_CLOSED"):
       return "#AB0000";
     default:
       return "black";

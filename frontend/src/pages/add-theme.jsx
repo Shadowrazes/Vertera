@@ -14,6 +14,8 @@ import NotFoundPage from "./not-found-page";
 
 import "../css/add-theme.css";
 
+import get_translation from "../helpers/translation";
+
 function AddTheme() {
   const [dataQuery, setData] = useState([]);
   const location = useLocation();
@@ -96,7 +98,7 @@ function AddTheme() {
       }
     }
 
-    return <h2>Что-то пошло не так</h2>;
+    return <h2>{get_translation("INTERFACE_ERROR")}</h2>;
   }
 
   const handleUnitClick = (unit, unitId) => {
@@ -117,11 +119,11 @@ function AddTheme() {
     let error = "";
 
     if (selectedUnit == null) {
-      error = "Выберите название раздела";
+      error = get_translation("INTERFACE_SELECT_UNIT");
     } else if (nameValue.trim() == "") {
-      error = "Укажите название темы";
+      error = get_translation("INTERFACE_ENTER_THEME");
     } else {
-      error = "Ошибка при добавлении раздела";
+      error = get_translation("INTERFACE_ERROR_ADD_THEME");
     }
 
     return error;
@@ -173,12 +175,15 @@ function AddTheme() {
     <>
       {isAdmin() ? (
         <>
-          <BackTitle title="Добавить тему" linkPrev={linkPrev} />
+          <BackTitle
+            title={get_translation("INTERFACE_ADD_THEME")}
+            linkPrev={linkPrev}
+          />
           <Row className="add-curator__row" style={{ marginTop: "20px" }}>
             <Col className="add-curator__column add-theme__column">
               <DropdownButton
                 id="dropdown-custom-1"
-                title={selectedItem || "Выберите подразделение"}
+                title={selectedItem || get_translation("INTERFACE_SELECT_UNIT")}
                 className="add-theme__dropdown"
               >
                 {dataQuery.map(
@@ -200,7 +205,7 @@ function AddTheme() {
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Название темы"
+                  placeholder={get_translation("INTERFACE_THEME_NAME")}
                   value={nameValue}
                   className="add-currator__input add-theme__dropdown"
                   onChange={handleNameChange}
@@ -210,7 +215,7 @@ function AddTheme() {
                 <span className="form__error">{errorMsg()}</span>
               )}
               <ButtonCustom
-                title="Применить"
+                title={get_translation("INTERFACE_APPLY")}
                 className={"add-curator__btn button-hover"}
                 onClick={handleAddTheme}
               />
@@ -220,8 +225,8 @@ function AddTheme() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_MESSAGE_THEME_CREATION")}
+            modalBody={get_translation("INTERFACE_MESSAGE_THEME_CREATION_FULL")}
           />
         </>
       ) : (

@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-function Counter({ currentStatus, messagesQuery, data }) {
+import get_translation from "../../helpers/translation";
+
+function Counter({ currentStatusId, messagesQuery, data }) {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
   const isAdmin = () => {
@@ -9,27 +11,29 @@ function Counter({ currentStatus, messagesQuery, data }) {
 
   return (
     <>
-      {isAdmin() && currentStatus !== "Уведомление" && (
+      {isAdmin() && currentStatusId !== 6 && (
         <div className="chat__counter-wrapper">
-          <span className="chat__counter-label">Счетчик:</span>
+          <span className="chat__counter-label">
+            {get_translation("INTERFACE_COUNTER")}:
+          </span>
           <span
             className={
-              currentStatus == "В процессе" ||
-              currentStatus == "На уточнении" ||
-              (currentStatus == "Новый" &&
+              currentStatusId == 3 ||
+              currentStatusId == 4 ||
+              (currentStatusId == 1 &&
                 messagesQuery.at(-1).sender.id !==
                   data.clientQuery.ticket.recipient.id)
                 ? "chat__counter-work"
                 : "chat__counter-stop"
             }
           >
-            {currentStatus == "В процессе" ||
-            currentStatus == "На уточнении" ||
-            (currentStatus == "Новый" &&
+            {currentStatusId == 3 ||
+            currentStatusId == 4 ||
+            (currentStatusId == 1 &&
               messagesQuery.at(-1).sender.id !==
                 data.clientQuery.ticket.recipient.id)
-              ? "Запущен"
-              : "Остановлен"}
+              ? get_translation("INTERFACE_COUNTRE_ENABLED")
+              : get_translation("INTERFACE_COUNTER_DISABLED")}
           </span>
         </div>
       )}

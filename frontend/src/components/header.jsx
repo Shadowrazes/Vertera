@@ -343,7 +343,7 @@ function Header({ user }) {
               )}
               {isHelper() && dataPerms?.helperQuery?.helperPerms?.sendMsg ? (
                 <Nav.Link href="/curator-create-ticket">
-                  Создать обращение
+                  {get_translation("INTERFACE_CREATE_TICKET")}
                 </Nav.Link>
               ) : null}
               {dataPerms?.helperQuery?.helperPerms.helperEdit || isAdmin() ? (
@@ -357,7 +357,9 @@ function Header({ user }) {
                 </Nav.Link>
               ) : null}
               {isAdmin() && (
-                <Nav.Link href="/departments">Департаменты</Nav.Link>
+                <Nav.Link href="/departments">
+                  {get_translation("INTERFACE_DEPARTAMENTS")}
+                </Nav.Link>
               )}
               {dataPerms?.helperQuery?.helperPerms.translationEdit ||
               isAdmin() ? (
@@ -365,7 +367,9 @@ function Header({ user }) {
                   <Nav.Link href="/translation">
                     {get_translation("INTERFACE_TRANSLATION")}
                   </Nav.Link>
-                  <Nav.Link href="/countries">Страны и языки</Nav.Link>
+                  <Nav.Link href="/countries">
+                    {get_translation("INTERFACE_COUNTRIES_LANGS")}
+                  </Nav.Link>
                 </>
               ) : null}
               <Nav.Link>

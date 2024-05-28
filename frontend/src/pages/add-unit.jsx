@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Modal,
-  Button,
-  Dropdown,
-  DropdownButton,
-} from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 
 import { HELPER_PERMS } from "../apollo/queries";
 import { ADD_UNIT } from "../apollo/mutations";
@@ -19,6 +11,8 @@ import BackTitle from "../components/back-title";
 import ModalDialog from "../components/modal-dialog";
 import NotFoundPage from "./not-found-page";
 
+import get_translation from "../helpers/translation";
+
 function addUnit() {
   const location = useLocation();
   const [linkPrev, setLinkPrev] = useState(null);
@@ -26,8 +20,6 @@ function addUnit() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = "Раздел создан";
-  const modalBody = "Новый раздел успешно создан";
 
   const [nameValue, setNameValue] = useState("");
 
@@ -71,9 +63,9 @@ function addUnit() {
     let error = "";
 
     if (nameValue.trim() == "") {
-      error = "Укажите название раздела";
+      error = get_translation("INTERFACE_ENTER_UNIT");
     } else {
-      error = "Ошибка при добавлении раздела";
+      error = get_translation("INTERFACE_ERROR_ADD_UNIT");
     }
 
     return error;
@@ -135,13 +127,16 @@ function addUnit() {
     <>
       {isAdmin() ? (
         <>
-          <BackTitle title="Добавить раздел" linkPrev={linkPrev} />
+          <BackTitle
+            title={get_translation("INTERFACE_ADD_UNIT")}
+            linkPrev={linkPrev}
+          />
           <Row className="add-curator__row add-unit__row">
             <Col className="add-curator__column">
               <Form.Group controlId="NameForm">
                 <Form.Control
                   type="text"
-                  placeholder="Название раздела"
+                  placeholder={get_translation("INTERFACE_NAME_OF_UNIT")}
                   value={nameValue}
                   className="add-currator__input add-theme__dropdown"
                   onChange={handleNameChange}
@@ -151,7 +146,7 @@ function addUnit() {
                 <span className="form__error">{errorMsg()}</span>
               )}
               <ButtonCustom
-                title="Применить"
+                title={get_translation("INTERFACE_APPLY")}
                 className={"add-curator__btn button-hover"}
                 onClick={handleAddUnit}
               />
@@ -161,8 +156,8 @@ function addUnit() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_MESSAGE_UNIT_CREATION")}
+            modalBody={get_translation("INTERFACE_MESSAGE_UNIT_CREATION_FULL")}
           />
         </>
       ) : (

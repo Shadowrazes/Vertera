@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Modal,
-  Button,
-} from "react-bootstrap";
+import { Form, Row, Col, Dropdown, DropdownButton } from "react-bootstrap";
 
 import { THEME_LIST, DEPARTMENTS_LIST, HELPER_PERMS } from "../apollo/queries";
 import { ADD_SUBTHEME } from "../apollo/mutations";
@@ -32,8 +24,6 @@ function AddSubtheme() {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const modalTitle = get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION");
-  const modalBody = get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION_FULL");
 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
@@ -319,8 +309,10 @@ function AddSubtheme() {
           <ModalDialog
             show={showModal}
             onClose={handleCloseModal}
-            modalTitle={modalTitle}
-            modalBody={modalBody}
+            modalTitle={get_translation("INTERFACE_MESSAGE_SUBTHEME_CREATION")}
+            modalBody={get_translation(
+              "INTERFACE_MESSAGE_SUBTHEME_CREATION_FULL"
+            )}
           />
         </>
       ) : (

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import ButtonCustom from "../button";
 
+import get_translation from "../../helpers/translation";
+
 function Reaction({ reaction, handleLike, handleDislike }) {
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
@@ -20,17 +22,19 @@ function Reaction({ reaction, handleLike, handleDislike }) {
     <>
       <div className="chat-input__close-container" style={{ width: "100%" }}>
         <div className="chat-input__close-box">
-          <span className="chat-input__close-text">Заявка закрыта</span>
+          <span className="chat-input__close-text">
+            {get_translation("INTERFACE_TICKET_CLOSED")}
+          </span>
         </div>
         {!isAdmin() && (
           <div className="chat-message-recepient__rate-container">
             {!reaction ? (
               <span className="chat-message-recepient__rate-title">
-                Оцените ответ
+                {get_translation("INTERFACE_RATE_ANSWER")}
               </span>
             ) : (
               <span className="chat-message-recepient__rate-title">
-                Ответ оценен
+                {get_translation("INTERFACE_RATED_ANSWER")}
               </span>
             )}
 
@@ -72,12 +76,12 @@ function Reaction({ reaction, handleLike, handleDislike }) {
         {isAdmin() && (
           <div className="chat-message-recepient__rate-container">
             <span className="chat-message-recepient__rate-title">
-              Оценка тикета
+              {get_translation("INTERFACE_TICKET_RATING")}
             </span>
 
             {!reaction && (
               <span className="chat-message-recepient__rate chat-message-recepient__text">
-                Тикет еще не оценен
+                {get_translation("INTERFACE_TICKET_NOT_RATED")}
               </span>
             )}
 
@@ -100,7 +104,7 @@ function Reaction({ reaction, handleLike, handleDislike }) {
         )}
         {!isAdmin() && (
           <ButtonCustom
-            title="Создать новую заявку"
+            title={get_translation("INTERFACE_CREATE_NEW_TICKET")}
             className="button-hover"
             onClick={goToCreateTicket}
           />

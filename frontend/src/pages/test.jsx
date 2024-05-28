@@ -1,6 +1,5 @@
 import { useState } from "react";
 import ThemeDropdowns from "../components/theme-dropdowns";
-import FileInput from "../components/file-input";
 import ModalDialog from "../components/modal-dialog";
 import Logs from "../components/chat_components/logs";
 import MessageList from "../components/chat_components/message-list";

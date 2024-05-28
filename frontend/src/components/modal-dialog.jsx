@@ -25,7 +25,7 @@ function ModalDialog({
           </Button>
           {warning && (
             <Button variant="primary" onClick={onConfirm}>
-              Продолжить
+              {get_translation("INTERFACE_CONTINUE")}
             </Button>
           )}
         </Modal.Footer>

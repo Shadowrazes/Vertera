@@ -13,13 +13,15 @@ import { Translater } from "../../api/translater";
 import DeleteMsgIcon from "../../assets/delete_msg_icon.svg";
 import "../../css/chat-message-sender.css";
 
+import get_translation from "../../helpers/translation";
+
 function ChatMessage({
   id,
   message,
   sender,
   visibility,
   removable,
-  status,
+  statusId,
   time,
   attachs,
   onClick,
@@ -30,8 +32,6 @@ function ChatMessage({
   let isVisible;
 
   const [showWarningDelete, setShowWarningDelete] = useState(false);
-  const modalTitle = "Предупреждение";
-  const modalBody = "Вы уверены, что хотите удалить это сообщение?";
 
   const isBuild = import.meta.env.DEV !== "build";
 
@@ -180,7 +180,7 @@ function ChatMessage({
             {!isVisible && (
               <>
                 <span className="chat-message-sender__attachs-title">
-                  Прикрепленные файлы:
+                  {get_translation("INTERFACE_ATTACHED_FILES")}:
                 </span>
                 <div className="chat-message-sender__attachs">
                   {attachs &&
@@ -212,7 +212,7 @@ function ChatMessage({
               <>
                 <div className="chat-message-translate">
                   <span>
-                    Перевод на{" "}
+                    {get_translation("INTERFACE_TRANSLATION_ON")}{" "}
                     <img
                       src={languageCodeQuery[language][1]}
                       className="language-menu__flag"
@@ -228,7 +228,7 @@ function ChatMessage({
                   {!isVisible && (
                     <>
                       <span className="chat-message-sender__attachs-title">
-                        Прикрепленные файлы:
+                        {get_translation("INTERFACE_ATTACHED_FILES")}:
                       </span>
                       <div
                         style={{ justifyContent: "flex-end" }}
@@ -264,7 +264,7 @@ function ChatMessage({
           {user.id === senderId &&
             sender.role !== "client" &&
             removable !== null &&
-            status !== "Выполнено" && (
+            statusId !== 2 && (
               <div className="chat-message-sender__delete">
                 <img
                   src={DeleteMsgIcon}
@@ -282,8 +282,8 @@ function ChatMessage({
         show={showWarningDelete}
         onClose={handleCloseWarning}
         onConfirm={handleDeleteMsg}
-        modalTitle={modalTitle}
-        modalBody={modalBody}
+        modalTitle={get_translation("INTERFACE_WARNING")}
+        modalBody={get_translation("INTERFACE_WARNING_DELETE_MSG")}
         warning={true}
       />
     </>
