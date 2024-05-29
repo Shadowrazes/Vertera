@@ -196,6 +196,7 @@ function EditUnit() {
                     visibilityItems[visibility] ||
                     get_translation("INTERFACE_VISIBILITY_LEVEL")
                   }
+                  style={{ margin: "20px" }}
                 >
                   {Object.values(visibilityItems).map((item, index) => (
                     <Dropdown.Item
