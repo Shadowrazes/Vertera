@@ -93,6 +93,7 @@ function EditSubtheme() {
     variables: {
       token: user.token,
       id: parseInt(subthemeId),
+      lang: language,
     },
   });
 

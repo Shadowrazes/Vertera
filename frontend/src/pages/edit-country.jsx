@@ -73,6 +73,7 @@ function EditCountry() {
     variables: {
       token: user.token,
       id: parseInt(countryId),
+      lang: language,
     },
   });
 

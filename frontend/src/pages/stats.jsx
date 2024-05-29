@@ -25,10 +25,8 @@ import {
   Form,
   Row,
   Col,
-  Button,
   DropdownButton,
   Dropdown,
-  Modal,
   Table,
 } from "react-bootstrap";
 
@@ -557,12 +555,12 @@ function Stats() {
     errorThemeList
   ) {
     const networkError =
-      error.networkError ??
-      errorCountryList.networkError ??
-      errorCurators.networkError ??
-      errorDepartmentList.networkError ??
-      errorHelperStats.networkError ??
-      errorThemeList.networkError;
+      error?.networkError ??
+      errorCountryList?.networkError ??
+      errorCurators?.networkError ??
+      errorDepartmentList?.networkError ??
+      errorHelperStats?.networkError ??
+      errorThemeList?.networkError;
 
     if (networkError) {
       // console.log("Network Error:", networkError);

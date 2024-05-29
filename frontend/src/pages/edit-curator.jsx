@@ -88,6 +88,7 @@ function EditCurator() {
     variables: {
       token: user.token,
       id: parseInt(curatorId),
+      lang: language,
     },
   });
 

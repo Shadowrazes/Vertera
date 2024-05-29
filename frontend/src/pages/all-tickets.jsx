@@ -249,6 +249,7 @@ function allTickets() {
   } = useQuery(STATUS_LIST, {
     variables: {
       token: user?.token,
+      lang: language,
     },
   });
 

@@ -31,6 +31,7 @@ function Units() {
   const [showErrorModal, setShowErrorModal] = useState(false);
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";

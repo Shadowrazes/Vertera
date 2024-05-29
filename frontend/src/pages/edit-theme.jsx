@@ -72,6 +72,7 @@ function EditTheme() {
     variables: {
       token: user.token,
       id: parseInt(themeId),
+      lang: language,
     },
   });
 

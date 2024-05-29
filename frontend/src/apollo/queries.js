@@ -55,7 +55,7 @@ export const TABLE_TICKETS = gql`
           }
           status {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
           }
@@ -204,13 +204,13 @@ export const MESSAGES_CHAT = gql`
         }
         status {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
         }
         subTheme {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
           departments {
@@ -221,12 +221,12 @@ export const MESSAGES_CHAT = gql`
           }
           theme {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
             unit {
               id
-              name(lang: "ru") {
+              name(lang: $lang) {
                 stroke
               }
             }
@@ -295,7 +295,7 @@ export const MESSAGES_CHAT_CLIENT = gql`
         }
         status {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
         }
@@ -418,11 +418,11 @@ export const THEME_LIST = gql`
 `;
 
 export const DEPARTMENTS_LIST = gql`
-  query ($token: String!, $lang: String!) {
+  query ($token: String!) {
     helperQuery(token: $token) {
       departmentList {
         id
-        name(lang: $lang) {
+        name(lang: "ru") {
           stroke
         }
       }
@@ -479,7 +479,7 @@ export const CURATORS_LIST = gql`
 `;
 
 export const HELPER = gql`
-  query ($token: String!, $id: Int!) {
+  query ($token: String!, $id: Int!, $lang: String!) {
     helperQuery(token: $token) {
       helper(id: $id) {
         id
@@ -504,7 +504,7 @@ export const HELPER = gql`
           patronymic
           country {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
           }
@@ -567,12 +567,12 @@ export const COUNTRY_LIST = gql`
 `;
 
 export const COUNTRY = gql`
-  query ($token: String!, $id: Int!) {
+  query ($token: String!, $id: Int!, $lang: String!) {
     clientQuery(token: $token) {
       country(id: $id) {
         id
         code
-        name(lang: "ru") {
+        name(lang: $lang) {
           code
           stroke
         }
@@ -598,10 +598,10 @@ export const LANGUAGE_LIST = gql`
 `;
 
 export const UNIT = gql`
-  query ($token: String!, $id: Int!) {
+  query ($token: String!, $id: Int!, $lang: String!) {
     helperQuery(token: $token) {
       unit(id: $id) {
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
         visibility
@@ -612,17 +612,17 @@ export const UNIT = gql`
 `;
 
 export const THEME = gql`
-  query ($token: String!, $id: Int!) {
+  query ($token: String!, $id: Int!, $lang: String!) {
     helperQuery(token: $token) {
       theme(id: $id) {
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
         visibility
         orderNum
         unit {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
         }
@@ -632,22 +632,22 @@ export const THEME = gql`
 `;
 
 export const SUBTHEME = gql`
-  query ($token: String!, $id: Int!) {
+  query ($token: String!, $id: Int!, $lang: String!) {
     helperQuery(token: $token) {
       subTheme(id: $id) {
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
         orderNum
         visibility
         theme {
           id
-          name(lang: "ru") {
+          name(lang: $lang) {
             stroke
           }
           unit {
             id
-            name(lang: "ru") {
+            name(lang: $lang) {
               stroke
             }
           }
@@ -718,11 +718,11 @@ export const HELPER_STATS = gql`
 `;
 
 export const STATUS_LIST = gql`
-  query ($token: String!) {
+  query ($token: String!, $lang: String!) {
     helperQuery(token: $token) {
       ticketStatusList {
         id
-        name(lang: "ru") {
+        name(lang: $lang) {
           stroke
         }
       }

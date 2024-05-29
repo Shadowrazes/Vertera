@@ -36,6 +36,7 @@ function EditUnit() {
     Object.keys(obj).find((key) => obj[key] === value);
 
   const [user] = useState(JSON.parse(localStorage.getItem("user")));
+  const [language] = useState(localStorage.getItem("language"));
 
   if (user === null) {
     window.location.href = "/";
@@ -58,6 +59,7 @@ function EditUnit() {
     variables: {
       token: user.token,
       id: parseInt(unitId),
+      lang: language,
     },
   });
 
