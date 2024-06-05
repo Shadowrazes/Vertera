@@ -11,7 +11,7 @@ function NotFoundPage() {
       </p>
       <p className="notfoundpage__text">
         {get_translation("INTERFACE_BACK_TO")}{" "}
-        <a href="/">{get_translation("INTERFACE_MAIN")}</a>
+        <a href="/">{get_translation("INTERFACE_HOME")}</a>
       </p>
     </>
   );
